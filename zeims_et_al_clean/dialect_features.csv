@@ -1,4 +1,4 @@
-,original_index,context,labels,prompts,gold,q_flan-t5-small,q_flan-t5-base,q_flan-t5-large,q_flan-t5-xl,q_flan-t5-xxl,q_flan-ul2,q_text-ada-001,q_text-babbage-001,q_text-curie-001,q_text-davinci-001,q_text-davinci-002,q_text-davinci-003,q_chatgpt
+,original_index,context,labels,prompts,gold,q_chatgpt,LLM_correct
 0,0,"The book that I left it here, where is it?",Resumptive Object Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -26,7 +26,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",t,c,b,a,c,s,c,a,a,a,a,c,a,m
+",t,m,0
 1,1,Now they wearing American type of dresses.,Copula Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -54,7 +54,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",b,c,c,d,c,h,c,e,a,a,c,b,a,n
+",b,n,0
 2,2,they use proper grammars there,Mass Nouns As Count Nouns,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -82,7 +82,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",n,c,n,n,n,n,n,a,a,a,n,n,n,n
+",n,n,1
 3,3,i have to make not so much adjustment,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -110,7 +110,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,c,c,a,a,a,a,b,a,l
+",w,l,0
 4,4,i don’t have to make so much adjustment,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -138,7 +138,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,c,c,a,a,a,a,b,a,k
+",w,k,0
 5,5,"and that roommate, he will do an interview",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -166,7 +166,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,a,g,h,c,a,a,a,a,c,a,m
+",m,m,1
 6,6,"the store is around the corner, no, by the post office","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -194,7 +194,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,o,s,j,a,a,a,a,c,a,v
+",i,v,0
 7,7,daytime I work for the courier service,Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -222,7 +222,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,v,v,v,v,a,a,a,a,v,a,v
+",q,v,0
 8,8,how your mother is feeling?,Lack Of Inversion In Wh-questions,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -250,7 +250,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",l,c,b,a,c,l,j,a,a,a,a,b,a,m
+",l,m,0
 9,9,"It’s come from me, hasn’t it?",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -278,7 +278,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,i,i,i,i,a,a,a,i,c,i,i
+",w,i,0
 10,10,"the store is around the corner, na, by the post office","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -306,7 +306,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,o,i,i,a,a,a,a,c,a,v
+",i,v,0
 11,11,But I did have some difficulty getting to know people among Indians themselves,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -334,7 +334,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,c,c,a,a,a,a,b,a,m
+",w,m,0
 12,12,for many years I did not travel,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -362,7 +362,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,r,r,r,r,a,a,a,a,b,a,l
+",v,l,0
 13,13,because there is no individuality in India,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -390,7 +390,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,o,d,c,a,a,a,a,b,a,m
+",w,m,0
 14,14,I was there just yesterday,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -418,7 +418,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,f,f,f,f,a,a,a,f,b,f,f
+",w,f,0
 15,15,and there are a lot of buildings in the background,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -446,7 +446,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,g,o,g,a,a,a,a,b,a,v
+",w,v,0
 16,16,person I like most is from mechanical department,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -474,7 +474,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,a,a,a,a,a,a,a,b,a,m
+",a,m,0
 17,17,So if you’re not good at communication you may get filtered at even the first level,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -502,7 +502,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,c,c,a,a,a,a,k,a,l
+",w,l,0
 18,18,Now they are wearing American type of dresses.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -530,7 +530,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,h,h,h,a,a,a,a,b,a,v
+",w,v,0
 19,19,two years I stayed alone,Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -558,7 +558,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,r,r,r,r,a,a,a,o,r,r,r
+",q,r,0
 20,20,ten years ago you didn’t operate a machine that could lift a house all by itself,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -586,7 +586,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,c,a,a,a,c,c,a,l
+",w,l,0
 21,21,I think you should start going to the gym from now itself.,Focus Itself,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -614,7 +614,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",e,c,b,a,c,e,e,a,a,a,a,b,a,v
+",e,v,0
 22,22,So my parents from Gujarat.,Copula Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -642,7 +642,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",b,c,c,d,c,d,c,a,a,a,a,c,a,m
+",b,m,0
 23,23,the school principal called me to ask when you are going back,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -670,7 +670,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,j,j,j,j,a,a,a,j,b,a,j
+",w,j,0
 24,24,Those days it was considered a good job.,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -698,7 +698,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,c,d,d,d,d,a,a,a,a,b,a,l
+",r,l,0
 25,25,"I was very scared to, na?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -726,7 +726,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,i,i,i,a,a,a,a,i,i,i
+",i,i,1
 26,26,we will be knowing how much the structure is getting deflected,Stative Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -754,7 +754,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",u,c,b,u,u,u,u,a,a,a,a,u,u,u
+",u,u,1
 27,27,"the children are playing outside, no?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -782,7 +782,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,i,i,i,a,a,a,a,c,i,l
+",i,l,0
 28,28,You get on the train and buy the ticket there only,Focus Only,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -810,7 +810,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",f,c,c,d,e,f,f,a,a,a,a,c,a,r
+",f,r,0
 29,29,you can use Hindi Gujarati and Marathi in Bombay,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -838,7 +838,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,g,g,a,a,a,a,p,a,v
+",w,v,0
 30,30,they use proper grammar there,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -866,7 +866,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,n,n,o,n,n,a,a,a,a,n,n,n
+",w,n,0
 31,31,we want to know how can we make your favorite dish,Inversion In Embedded Clause,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -894,7 +894,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",j,c,c,a,c,h,j,a,a,a,a,c,a,p
+",j,p,0
 32,32,and the production function gives you the relationship between input and output,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -922,7 +922,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,v,c,a,a,a,a,c,a,v
+",w,v,0
 33,33,you have to wait a minimum of one month,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -950,7 +950,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,h,c,a,a,a,a,b,a,l
+",w,l,0
 34,34,it was first day of term,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -978,7 +978,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,c,d,e,a,v,a,a,a,a,b,a,v
+",a,v,0
 35,35,he talks to them,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1006,7 +1006,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,k,k,k,k,a,a,a,a,k,k,k
+",w,k,0
 36,36,some informations are available free,Mass Nouns As Count Nouns,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1034,7 +1034,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",n,c,c,d,p,c,c,e,a,a,a,b,a,s
+",n,s,0
 37,37,"my father, he works for a mining company",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1062,7 +1062,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,c,d,c,s,c,a,a,a,a,m,a,m
+",m,m,1
 38,38,he likes here more,Direct Object Pronoun Drop,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1090,7 +1090,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",c,c,c,a,a,a,c,a,a,a,a,b,a,b
+",c,b,0
 39,39,I went there for one year.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1118,7 +1118,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,r,d,c,r,a,a,a,a,b,a,m
+",w,m,0
 40,40,I’m going to find my bag which I left in the room.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1146,7 +1146,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,r,c,s,c,a,a,a,a,c,a,p
+",w,p,0
 41,41,But now all kids they have a computer and all new technology.,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1174,7 +1174,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,g,g,g,g,a,a,a,f,b,a,g
+",m,g,0
 42,42,there is corruption obviously,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1202,7 +1202,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,o,o,o,a,a,a,a,b,a,r
+",w,r,0
 43,43,"first of all, we can see a plate the right side",Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1230,7 +1230,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,q,q,q,q,e,a,a,q,q,q,q
+",r,q,0
 44,44,"and that roommate, he will do an interview",Resumptive Subject Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1258,7 +1258,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",s,c,b,a,g,h,c,a,a,a,a,c,a,m
+",s,m,0
 45,45,Tirupati temple I stayed one or two days,Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1286,7 +1286,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,c,f,c,c,f,a,a,a,a,b,r,o
+",q,o,0
 46,46,I’m going to find my bag which I left it in the room.,Resumptive Object Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1314,7 +1314,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",t,c,c,a,c,s,c,a,a,a,a,c,a,p
+",t,p,0
 47,47,ten years ago you didn’t operated a machine that could lift a house all by itself,Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1342,7 +1342,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,b,a,c,c,c,a,a,a,a,b,a,l
+",k,l,0
 48,48,daytime I work for the courier service,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1370,7 +1370,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,v,v,v,v,a,a,a,a,v,a,v
+",v,v,1
 49,49,Here life is busy.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1398,7 +1398,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,b,o,b,b,a,a,a,b,b,a,v
+",w,v,0
 50,50,I can see some green colour leaves on the left side,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1426,7 +1426,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,m,p,p,p,e,a,a,a,b,l,v
+",w,v,0
 51,51,Here the life is busy.,Extraneous Article,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1454,7 +1454,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",d,c,b,b,o,b,a,e,a,a,b,b,a,v
+",d,v,0
 52,52,there are five balls,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1482,7 +1482,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,n,n,n,a,e,a,a,c,a,l
+",w,l,0
 53,53,he talk to them,Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1510,7 +1510,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,c,k,k,k,k,a,a,a,l,k,k,k
+",k,k,1
 54,54,In those days it was considered a good job.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1538,7 +1538,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,d,d,d,a,a,a,a,b,a,l
+",w,l,0
 55,55,"first of all, right side we can see a plate",Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1566,7 +1566,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,q,q,q,q,e,a,a,a,q,a,q
+",a,q,0
 56,56,recently only in April there was a big fight,Focus Only,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1594,7 +1594,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",f,c,b,a,c,f,f,a,a,a,a,b,f,l
+",f,l,0
 57,57,I think Nina must be knowing her sister,Stative Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1622,7 +1622,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",u,c,b,a,c,h,u,a,a,a,a,b,a,v
+",u,v,0
 58,58,"he liked it, right, even though you said he wouldn’t",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1650,7 +1650,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,c,c,i,i,a,a,a,a,c,a,e
+",w,e,0
 59,59,he was wondering why did the police stop him,Inversion In Embedded Clause,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1678,7 +1678,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",j,c,c,l,l,l,j,a,a,a,c,c,l,k
+",j,k,0
 60,60,two years I stayed alone,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1706,7 +1706,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,r,r,r,r,a,a,a,o,r,r,r
+",r,r,1
 61,61,some people they are very nice,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1734,7 +1734,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,s,s,s,s,a,a,a,a,b,a,v
+",m,v,0
 62,62,"My parents and siblings, they really enjoy playing board games.",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1762,7 +1762,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,g,g,g,g,a,a,a,m,m,m,m
+",w,m,0
 63,63,I did one refresher course in the month of June itself.,Focus Itself,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1790,7 +1790,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",e,c,c,e,e,e,e,a,a,a,e,e,e,e
+",e,e,1
 64,64,a recipe is simple thing,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1818,7 +1818,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,a,c,a,a,a,a,b,a,v
+",a,v,0
 65,65,the union person contacted his representative at the school,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1846,7 +1846,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,c,c,a,a,a,a,b,a,j
+",w,j,0
 66,66,Whereas we had lot of time and we didn’t have any TV and we used to play outdoor games.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1874,7 +1874,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,g,s,c,a,a,a,a,c,a,l
+",w,l,0
 67,67,recipe is a simple thing,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1902,7 +1902,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,e,a,a,a,a,a,b,a,v
+",a,v,0
 68,68,My old life I want to spend it in India.,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1930,7 +1930,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,a,c,s,c,a,a,a,a,b,a,v
+",m,v,0
 69,69,"first of all, right side we can see a plate",Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1958,7 +1958,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,q,q,q,q,e,a,a,a,q,q,q
+",q,q,1
 70,70,it was the first day of term,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -1986,7 +1986,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,e,a,v,a,a,a,a,b,a,v
+",w,v,0
 71,71,she gets nightmares,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2014,7 +2014,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,h,j,a,a,a,a,b,a,h
+",w,h,0
 72,72,My daughter she is attending the University of Delhi.,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2042,7 +2042,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,c,d,o,s,c,a,a,a,a,b,a,v
+",m,v,0
 73,73,and in the background there are a lot of buildings,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2070,7 +2070,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,d,g,o,p,a,a,a,a,b,a,v
+",v,v,1
 74,74,"if anybody gives a donation, we give a receipt",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2098,7 +2098,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,c,c,a,a,a,a,b,a,p
+",w,p,0
 75,75,You get on the train and buy the ticket there too,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2126,7 +2126,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,g,h,g,a,a,a,a,c,a,r
+",w,r,0
 76,76,They are all aggressive states.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2154,7 +2154,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,b,o,g,c,e,a,a,a,b,a,g
+",w,g,0
 77,77,"anybody giving donation, we are giving receipt",Habitual Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2182,7 +2182,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",h,c,b,a,c,h,c,e,a,a,a,c,a,p
+",h,p,0
 78,78,Because educated people get a good money.,Extraneous Article,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2210,7 +2210,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",d,c,c,d,d,d,d,a,a,a,d,b,a,d
+",d,d,1
 79,79,"first of all, we can see a plate on the right side",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2238,7 +2238,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,q,q,q,q,a,a,a,q,q,a,q
+",w,q,0
 80,80,So I did my schooling from there.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2266,7 +2266,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,d,s,c,a,a,a,a,b,a,m
+",w,m,0
 81,81,in the daytime I work for the courier service,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2294,7 +2294,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,v,v,v,v,a,a,a,a,v,a,v
+",v,v,1
 82,82,I think you should start going to the gym from now.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2322,7 +2322,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,h,p,a,a,a,a,c,a,v
+",w,v,0
 83,83,But now all kids have a computer and all new technology.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2350,7 +2350,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,g,g,g,g,a,a,a,f,g,a,g
+",w,g,0
 84,84,I’m working very near my house,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2378,7 +2378,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,h,h,a,a,a,a,b,a,v
+",w,v,0
 85,85,I did not travel for many years,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2406,7 +2406,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,r,r,c,r,a,a,a,a,b,a,l
+",w,l,0
 86,86,those who come here definitely they should learn English,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2434,7 +2434,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,t,c,t,c,e,a,a,a,b,a,l
+",m,l,0
 87,87,he likes it here more,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2462,7 +2462,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,s,a,s,c,a,a,a,a,b,a,e
+",w,e,0
 88,88,I work for the courier service in the daytime,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2490,7 +2490,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,v,v,v,v,a,a,a,a,v,a,v
+",w,v,0
 89,89,I think she a teacher.,Copula Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2518,7 +2518,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",b,c,c,d,c,a,c,a,a,a,a,b,a,a
+",b,a,0
 90,90,how is your mother feeling?,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2546,7 +2546,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,l,l,e,a,a,a,b,a,m
+",w,m,0
 91,91,only his shoes are visible,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2574,7 +2574,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,f,f,a,a,a,c,b,f,v
+",w,v,0
 92,92,my bother said that one of his favorite place is the beach nearby,Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2602,7 +2602,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,b,a,c,a,c,a,a,a,a,b,a,v
+",k,v,0
 93,93,They all aggressive states.,Copula Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2630,7 +2630,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",b,c,c,b,c,g,g,e,a,a,a,c,a,g
+",b,g,0
 94,94,Whereas we had lot of time and we didn’t have any TV and all and we used to play outdoor games.,"General Extender ""and all""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2658,7 +2658,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",g,c,b,g,g,g,g,a,a,a,a,c,a,g
+",g,g,1
 95,95,"Sorry I can’t come, everything is busy in our life.",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2686,7 +2686,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,b,b,b,b,a,a,a,b,b,b,b
+",w,b,0
 96,96,and that roommate will do an interview,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2714,7 +2714,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,g,h,c,a,a,a,a,c,a,m
+",w,m,0
 97,97,Some teachers when I was in school I liked very much.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2742,7 +2742,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,s,s,s,s,a,a,a,s,s,s,s
+",w,s,0
 98,98,"yeah, so to my parent’s house I go very often",Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2770,7 +2770,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,d,c,s,c,a,a,a,a,c,a,v
+",v,v,1
 99,99,So my parents are from Gujarat.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2798,7 +2798,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,o,d,c,a,a,a,a,c,a,m
+",w,m,0
 100,100,some information is available free,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2826,7 +2826,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,o,c,c,e,a,a,a,b,a,r
+",w,r,0
 101,101,"I was very scared to, wasn’t I?",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2854,7 +2854,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,i,i,i,a,a,a,a,b,i,l
+",w,l,0
 102,102,My daughter is attending the University of Delhi.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2882,7 +2882,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,o,d,h,a,a,a,a,b,a,v
+",w,v,0
 103,103,and the production function gives you the relationship between input and output,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2910,7 +2910,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,v,c,a,a,a,a,c,a,v
+",a,v,0
 104,104,Whereas we had lot of time and we didn’t have any TV and all that stuff and we used to play outdoor games.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2938,7 +2938,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,g,g,g,a,a,a,a,c,a,g
+",w,g,0
 105,105,only his shoes is visible,Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2966,7 +2966,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,b,a,c,f,f,a,a,a,c,b,a,v
+",k,v,0
 106,106,some flower part is there,"Non-initial Existential ""is / are there""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -2994,7 +2994,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",o,c,c,d,o,o,o,a,a,a,a,b,o,n
+",o,n,0
 107,107,they get H1B visas to come to the country,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3022,7 +3022,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,h,h,h,h,a,a,h,a,h,h,h
+",w,h,0
 108,108,"We are like we are in touch, but not before when we was in school.",Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3050,7 +3050,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,b,a,c,s,c,a,a,a,a,b,a,m
+",k,m,0
 109,109,"The cake, I like it very much.",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3078,7 +3078,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,s,c,s,c,a,a,a,a,c,a,e
+",m,e,0
 110,110,"A person living in Calcutta, which he didn’t know Hindi earlier, when he comes to Delhi he has to learn English.",Resumptive Subject Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3106,7 +3106,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",s,c,c,t,t,t,t,a,a,a,t,t,a,t
+",s,t,0
 111,111,She has business experience.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3134,7 +3134,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,o,c,c,a,a,a,f,b,a,v
+",w,v,0
 112,112,"It’s come from me, no?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3162,7 +3162,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,c,i,i,i,i,a,a,a,i,i,i,i
+",i,i,1
 113,113,Chandigarh was full of employed people.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3190,7 +3190,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,d,d,n,e,a,a,a,b,a,v
+",w,v,0
 114,114,"My parents and siblings and all, they really enjoy playing board games.",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3218,7 +3218,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,g,g,g,g,a,a,a,g,m,g,g
+",m,g,0
 115,115,Hindi Gujarati and Marathi you can use in Bombay,Object Fronting,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3246,7 +3246,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",p,c,b,d,c,g,d,a,a,a,a,c,a,v
+",p,v,0
 116,116,in our old age we can go and enjoy,Direct Object Pronoun Drop,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3274,7 +3274,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",c,c,b,a,g,p,g,a,a,a,a,c,a,v
+",c,v,0
 117,117,they are teasing the new children when they join,Habitual Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3302,7 +3302,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",h,c,b,a,o,h,h,a,a,a,a,c,a,l
+",h,l,0
 118,118,we have two tailors who can make clothes for us,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3330,7 +3330,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,o,s,p,a,a,a,a,c,a,m
+",w,m,0
 119,119,they are getting H1B visas to come to the country,Habitual Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3358,7 +3358,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",h,c,b,h,h,h,h,a,a,h,h,h,h,h
+",h,h,1
 120,120,person I like the most is from the mechanical department,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3386,7 +3386,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,a,a,a,a,a,a,a,b,a,v
+",a,v,0
 121,121,my bother said that one of his favorite places is the beach nearby,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3414,7 +3414,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,c,a,a,a,a,b,a,v
+",w,v,0
 122,122,and the production function is giving you the relationship between input and output,Stative Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3442,7 +3442,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",u,c,b,a,c,c,c,a,a,a,a,c,a,v
+",u,v,0
 123,123,you cannot ask them why are they not coming for clinic visits,Inversion In Embedded Clause,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3470,7 +3470,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",j,c,b,a,l,c,j,a,a,a,a,c,a,c
+",j,c,0
 124,124,those who come here should definitely learn English,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3498,7 +3498,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,t,c,t,c,a,a,a,a,b,a,l
+",w,l,0
 125,125,"We are like we are in touch, but not before when we was in school.",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3526,7 +3526,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,c,a,a,a,f,b,a,m
+",w,m,0
 126,126,a recipe is a simple thing,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3554,7 +3554,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,a,c,a,a,a,a,b,a,v
+",w,v,0
 127,127,"he liked it, na, even though you said he wouldn’t","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3582,7 +3582,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,c,c,i,s,i,a,a,a,a,c,i,i
+",i,i,1
 128,128,So at that time they said okay go and work for a few months.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3610,7 +3610,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,s,c,a,a,a,a,c,a,l
+",w,l,0
 129,129,I did one refresher course in the month of June.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3638,7 +3638,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,e,e,e,e,a,a,a,e,b,a,v
+",w,v,0
 130,130,"first of all, we can see a plate the right side",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3666,7 +3666,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,q,q,q,q,e,a,a,a,q,q,q
+",w,q,0
 131,131,"Sorry I can’t come, everything busy in our life.",Copula Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3694,7 +3694,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",b,c,b,b,b,b,b,a,a,a,b,b,b,b
+",b,b,1
 132,132,But I did have some difficulty getting to know people among Indians itself,Focus Itself,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3722,7 +3722,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",e,c,b,a,e,e,e,a,a,a,a,b,a,m
+",e,m,0
 133,133,why are you driving like a lorry?,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3750,7 +3750,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,l,l,j,a,a,a,a,c,a,k
+",w,k,0
 134,134,the person I like the most is from the mechanical department,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3778,7 +3778,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,a,a,a,a,a,a,a,b,a,v
+",w,v,0
 135,135,I like the cake very much.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3806,7 +3806,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,s,c,s,c,a,a,a,a,c,a,l
+",w,l,0
 136,136,I don’t know now what they are doing,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3834,7 +3834,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,l,l,h,j,a,a,a,a,b,l,l
+",w,l,0
 137,137,recipe is simple thing,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3862,7 +3862,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,c,a,a,a,a,a,b,a,v
+",a,v,0
 138,138,I stayed one or two days at the Tirupati temple,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3890,7 +3890,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,r,c,d,f,a,a,a,a,c,a,o
+",w,o,0
 139,139,my father works for a mining company,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3918,7 +3918,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,d,d,c,a,a,a,a,c,a,v
+",w,v,0
 140,140,all the musics are very good,Mass Nouns As Count Nouns,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3946,7 +3946,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",n,c,b,g,o,g,g,a,a,a,f,b,a,v
+",n,v,0
 141,141,"yeah, so I go very often to my parent’s house",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -3974,7 +3974,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,j,c,s,c,a,a,a,a,b,a,v
+",w,v,0
 142,142,in fifteen years lot of changes we have seen,Object Fronting,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4002,7 +4002,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",p,c,b,p,p,p,p,a,a,a,p,p,p,p
+",p,p,1
 143,143,some people are very nice,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4030,7 +4030,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,s,o,s,c,a,a,a,a,b,a,v
+",w,v,0
 144,144,she doesn’t like it,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4058,7 +4058,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,c,c,c,c,a,a,a,a,b,a,c
+",w,c,0
 145,145,I was there yesterday only,Focus Only,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4086,7 +4086,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",f,c,c,f,f,f,f,a,a,a,f,f,f,f
+",f,f,1
 146,146,Some teachers when I was in school I liked them very much.,Resumptive Object Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4114,7 +4114,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",t,c,c,s,s,s,s,a,a,a,s,s,s,s
+",t,s,0
 147,147,So marketing keeps its communication with the different embassies.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4142,7 +4142,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,p,h,c,a,a,a,a,b,a,v
+",w,v,0
 148,148,he was wondering why the police stopped him,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4170,7 +4170,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,l,c,h,j,a,a,a,c,c,l,k
+",w,k,0
 149,149,"The cake, I like it very much.",Resumptive Object Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4198,7 +4198,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",t,c,b,s,c,s,c,a,a,a,a,c,a,e
+",t,e,0
 150,150,in fifteen years we have seen a lot of changes,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4226,7 +4226,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,p,p,p,p,a,a,a,p,p,a,p
+",w,p,0
 151,151,why are you telling this to everybody?,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4254,7 +4254,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,l,l,j,a,a,a,a,c,a,m
+",w,m,0
 152,152,every year inflation is there,"Non-initial Existential ""is / are there""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4282,7 +4282,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",o,c,c,o,o,o,o,e,a,a,o,o,o,o
+",o,o,1
 153,153,She has a business experience.,Extraneous Article,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4310,7 +4310,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",d,c,c,d,o,d,d,a,a,a,a,b,a,m
+",d,m,0
 154,154,He is doing Engineering in Delhi itself.,Focus Itself,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4338,7 +4338,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",e,c,b,d,o,e,e,a,a,a,a,b,a,l
+",e,l,0
 155,155,why you are telling this to everybody?,Lack Of Inversion In Wh-questions,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4366,7 +4366,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",l,c,b,a,c,l,j,a,a,a,a,c,a,m
+",l,m,0
 156,156,union person contacted his representative at the school,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4394,7 +4394,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,d,c,c,c,a,a,a,a,b,a,j
+",a,j,0
 157,157,I don’t know now what are they doing,Inversion In Embedded Clause,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4422,7 +4422,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",j,c,b,l,l,h,j,a,a,a,a,b,l,l
+",j,l,0
 158,158,"The book that I left here, where is it?",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4450,7 +4450,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,c,a,a,a,a,c,a,m
+",w,m,0
 159,159,he does a lot of things,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4478,7 +4478,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,t,p,h,c,a,a,a,a,b,a,m
+",w,m,0
 160,160,"actually, this part I have not been",Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4506,7 +4506,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,a,c,s,c,a,a,a,a,b,a,i
+",q,i,0
 161,161,with your mother I love to go shopping,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4534,7 +4534,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,a,c,s,c,a,a,a,a,c,a,v
+",v,v,1
 162,162,every year there is inflation,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4562,7 +4562,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,o,o,o,o,a,a,a,o,o,o,o
+",w,o,0
 163,163,Some teachers when I was in school I liked them very much.,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4590,7 +4590,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,c,s,s,s,s,a,a,a,s,s,s,s
+",m,s,0
 164,164,"the camera, the dog is facing towards it",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4618,7 +4618,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,d,p,p,c,a,a,a,c,c,a,v
+",m,v,0
 165,165,"It’s come from me, na?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4646,7 +4646,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,i,i,i,i,i,a,a,a,i,i,i,i
+",i,i,1
 166,166,So I did my schooling and all from there.,"General Extender ""and all""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4674,7 +4674,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",g,c,c,g,g,g,g,a,a,a,a,b,a,g
+",g,g,1
 167,167,"actually, this part I have not been",Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4702,7 +4702,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,a,c,s,c,a,a,a,a,b,a,i
+",r,i,0
 168,168,as recently as April there was a big fight,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4730,7 +4730,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,e,e,c,a,a,a,a,b,a,m
+",w,m,0
 169,169,nowadays all the children are mature from a very early age,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4758,7 +4758,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,o,h,n,e,a,a,a,b,a,l
+",w,l,0
 170,170,tomorrow you have to try this cake,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4786,7 +4786,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,h,c,a,a,a,a,c,a,p
+",w,p,0
 171,171,we have two tailors who can make for us,Direct Object Pronoun Drop,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4814,7 +4814,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",c,c,b,a,c,s,p,a,a,a,a,c,a,v
+",c,v,0
 172,172,But now all kids they have a computer and all new technology.,Resumptive Subject Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4842,7 +4842,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",s,c,b,g,g,g,g,a,a,a,f,b,a,g
+",s,g,0
 173,173,person I like most is from the mechanical department,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4870,7 +4870,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,a,a,a,a,a,a,a,b,a,v
+",a,v,0
 174,174,not so much adjustment i have to make,Object Fronting,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4898,7 +4898,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",p,c,b,a,c,c,c,a,a,a,a,b,a,l
+",p,l,0
 175,175,many years I did not travel,Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4926,7 +4926,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,a,r,r,c,a,a,a,a,b,a,l
+",v,l,0
 176,176,the store is around the corner by the post office,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4954,7 +4954,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,o,d,d,a,a,a,a,c,a,v
+",w,v,0
 177,177,"and all the company people, they are my clients",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -4982,7 +4982,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,g,g,g,g,a,a,a,a,m,a,g
+",m,g,0
 178,178,nowadays all the children they are mature from a very early age,Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5010,7 +5010,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,a,c,s,g,e,a,a,a,b,a,l
+",m,l,0
 179,179,you cannot ask them why they are not coming for clinic visits,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5038,7 +5038,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,l,c,j,e,a,a,a,c,a,c
+",w,c,0
 180,180,the school principal called me to ask when are you going back,Inversion In Embedded Clause,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5066,7 +5066,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",j,c,b,j,j,j,j,a,a,a,j,j,j,j
+",j,j,1
 181,181,some people they are very nice,Resumptive Subject Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5094,7 +5094,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",s,c,b,s,s,s,s,a,a,a,a,b,a,v
+",s,v,0
 182,182,"first of all, right side we can see a plate",Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5122,7 +5122,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,q,q,q,q,e,a,a,a,q,a,q
+",r,q,0
 183,183,five balls are there,"Non-initial Existential ""is / are there""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5150,7 +5150,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",o,c,c,a,o,o,o,a,a,a,a,c,a,n
+",o,n,0
 184,184,everyone gets that vaccination in childhood,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5178,7 +5178,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,o,h,p,e,a,a,a,b,a,l
+",w,l,0
 185,185,everyone is getting that vaccination in childhood,Habitual Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5206,7 +5206,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",h,c,b,g,o,h,h,a,a,a,a,b,a,l
+",h,l,0
 186,186,why you are driving like a lorry?,Lack Of Inversion In Wh-questions,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5234,7 +5234,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",l,c,b,a,l,h,j,a,a,a,a,c,a,k
+",l,k,0
 187,187,"the children are playing outside, isn’t it?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5262,7 +5262,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,o,i,i,a,a,a,a,b,i,i
+",i,i,1
 188,188,Chandigarh was full of the employed people.,Extraneous Article,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5290,7 +5290,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",d,c,b,d,d,d,d,e,a,a,a,b,a,v
+",d,v,0
 189,189,My old life I want to spend it in India.,Resumptive Object Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5318,7 +5318,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",t,c,b,a,c,s,c,a,a,a,a,b,a,v
+",t,v,0
 190,190,"he liked it, didn’t he, even though you said he wouldn’t",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5346,7 +5346,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,c,c,i,i,a,a,a,a,c,a,c
+",w,c,0
 191,191,Because educated people get good money.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5374,7 +5374,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,d,d,d,a,a,a,d,b,a,a
+",w,a,0
 192,192,there is some flower part,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5402,7 +5402,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,o,a,n,a,a,a,a,b,a,n
+",w,n,0
 193,193,"My parents and siblings, they really enjoy playing board games.",Left Dislocation,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5430,7 +5430,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",m,c,b,g,g,g,g,a,a,a,m,m,m,m
+",m,m,1
 194,194,the person I like the most is from mechanical department,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5458,7 +5458,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,a,a,a,a,a,a,a,b,a,v
+",a,v,0
 195,195,I think she is a teacher.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5486,7 +5486,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,t,o,a,c,a,a,a,a,b,a,v
+",w,v,0
 196,196,"We are like we are in touch, but not before when we was in school and all.","General Extender ""and all""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5514,7 +5514,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",g,c,b,g,g,g,g,a,a,a,a,b,g,g
+",g,g,1
 197,197,He is doing Engineering in Delhi.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5542,7 +5542,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,o,h,h,a,a,a,a,b,a,k
+",w,k,0
 198,198,I’m working very nearby to my house only,Focus Only,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5570,7 +5570,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",f,c,b,f,f,f,f,a,a,a,a,b,f,v
+",f,v,0
 199,199,this is menial work,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5598,7 +5598,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,c,c,a,a,a,a,b,a,m
+",w,m,0
 200,200,we can only see blue sky,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5626,7 +5626,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,f,f,f,a,a,a,a,b,a,v
+",a,v,0
 201,201,he is having a television,Stative Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5654,7 +5654,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",u,c,c,a,o,h,h,a,a,a,a,b,a,p
+",u,p,0
 202,202,she is getting nightmares,Habitual Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5682,7 +5682,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",h,c,b,a,o,h,h,a,a,a,a,b,a,h
+",h,h,1
 203,203,we can only see the blue sky,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5710,7 +5710,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,f,f,f,a,a,a,a,b,a,v
+",w,v,0
 204,204,in our old age we can go and enjoy it,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5738,7 +5738,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,g,d,p,a,a,a,a,b,a,v
+",w,v,0
 205,205,I think Nina must know her sister,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5766,7 +5766,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,a,s,c,a,a,a,a,b,a,l
+",w,l,0
 206,206,"I was very scared to, no?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5794,7 +5794,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,i,i,i,a,a,a,a,b,i,i
+",i,i,1
 207,207,My old life I want to spend in India.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5822,7 +5822,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,c,c,a,a,a,a,b,a,v
+",w,v,0
 208,208,they tease the new children when they join,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5850,7 +5850,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,h,p,a,a,a,a,c,a,m
+",w,m,0
 209,209,he didn’t give me,Direct Object Pronoun Drop,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5878,7 +5878,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",c,c,c,c,c,c,c,a,a,a,c,c,c,c
+",c,c,1
 210,210,we want to know how we can make your favorite dish,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5906,7 +5906,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,c,v,a,a,a,a,c,a,p
+",w,p,0
 211,211,Tirupati temple I stayed one or two days,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5934,7 +5934,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,c,f,c,c,f,a,a,a,a,b,r,o
+",a,o,0
 212,212,So if you’re not good at communication you may get filtered at the first level itself,Focus Itself,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5962,7 +5962,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",e,c,b,a,c,c,e,a,a,a,a,k,a,l
+",e,l,0
 213,213,"yeah, so my parent’s house I go very often",Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -5990,7 +5990,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,d,c,s,f,a,a,a,a,c,a,v
+",q,v,0
 214,214,he didn’t give it to me,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6018,7 +6018,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,c,c,c,c,a,a,a,c,c,c,c
+",w,c,0
 215,215,They have pressure from their in-laws.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6046,7 +6046,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,o,c,c,a,a,a,a,c,a,m
+",w,m,0
 216,216,tomorrow this cake you have to try,Object Fronting,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6074,7 +6074,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",p,c,b,a,c,s,c,a,a,a,a,c,a,p
+",p,p,1
 217,217,many years I did not travel,Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6102,7 +6102,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,a,r,r,c,a,a,a,a,b,a,l
+",q,l,0
 218,218,all the music is very good,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6130,7 +6130,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,g,o,g,g,a,a,a,a,b,g,v
+",w,v,0
 219,219,"the children are playing outside, aren’t they?",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6158,7 +6158,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,o,i,h,a,a,a,a,c,a,l
+",w,l,0
 220,220,they speak Portuguese in Brazil,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6186,7 +6186,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,n,c,e,a,a,a,c,a,n
+",w,n,0
 221,221,I love to go shopping with your mother,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6214,7 +6214,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,c,c,a,a,a,a,c,a,v
+",w,v,0
 222,222,you can say anything but tenth I’m leaving,Prepositional Phrase Fronting With Reduction,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6242,7 +6242,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",q,c,b,a,c,c,c,a,a,a,a,b,a,m
+",q,m,0
 223,223,and the production function is giving you the relationship between input and output,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6270,7 +6270,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,c,c,a,a,a,a,c,a,v
+",a,v,0
 224,224,and all the company people are my clients,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6298,7 +6298,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,g,g,g,g,a,a,a,a,b,a,g
+",w,g,0
 225,225,this is a menial work,Mass Nouns As Count Nouns,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6326,7 +6326,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",n,c,b,d,c,c,c,a,a,a,a,b,a,r
+",n,r,0
 226,226,She was brought up there and her college was there too,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6354,7 +6354,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,g,g,g,a,a,a,a,c,a,v
+",w,v,0
 227,227,We don’t feel that we should go to any other country.,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6382,7 +6382,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,c,c,a,a,a,a,b,a,v
+",w,v,0
 228,228,"yeah, so my parent’s house I go very often",Topicalized Non-argument Constituent,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6410,7 +6410,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",v,c,b,d,c,s,f,a,a,a,a,c,a,v
+",v,v,1
 229,229,We don’t feel that we should go any other country.,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6438,7 +6438,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,c,a,c,c,c,a,a,a,a,b,a,a
+",r,a,0
 230,230,So that time they said okay go and work for a few months.,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6466,7 +6466,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,c,a,c,s,c,a,a,a,a,c,a,v
+",r,v,0
 231,231,So marketing keeps its communication with the different embassies and all.,"General Extender ""and all""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6494,7 +6494,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",g,c,b,g,g,g,g,a,a,a,a,k,g,g
+",g,g,1
 232,232,you can say anything but on the tenth I’m leaving,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6522,7 +6522,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,j,a,a,a,a,b,a,v
+",w,v,0
 233,233,we will know how much the structure is getting deflected,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6550,7 +6550,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,u,u,u,u,a,a,a,a,u,u,u
+",w,u,0
 234,234,for two years I stayed alone,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6578,7 +6578,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,r,r,r,r,a,a,a,a,r,r,r
+",w,r,0
 235,235,She was brought up there and her college was there only,Focus Only,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6606,7 +6606,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",f,c,c,d,g,f,f,a,a,a,a,b,f,m
+",f,m,0
 236,236,open a shop wherever there is a foot traffic,Mass Nouns As Count Nouns,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6634,7 +6634,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",n,c,b,a,c,p,n,a,a,a,a,c,a,v
+",n,v,0
 237,237,you can say anything but tenth I’m leaving,Article Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6662,7 +6662,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",a,c,b,a,c,c,c,a,a,a,a,b,a,m
+",a,m,0
 238,238,"the children are playing outside, na?","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6690,7 +6690,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,b,a,i,i,i,a,a,a,a,i,i,v
+",i,v,0
 239,239,open a shop wherever there is foot traffic,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6718,7 +6718,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,p,n,a,a,a,a,c,a,v
+",w,v,0
 240,240,we have two tailors who can make them for us,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6746,7 +6746,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,s,p,a,a,a,a,c,a,m
+",w,m,0
 241,241,minimum one month you have to wait,Object Fronting,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6774,7 +6774,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",p,c,b,a,c,h,c,a,a,a,a,b,a,r
+",p,r,0
 242,242,"A person living in Calcutta, who didn’t know Hindi earlier, when he comes to Delhi he has to learn English.",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6802,7 +6802,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,t,t,t,t,a,a,a,t,t,a,t
+",w,t,0
 243,243,at the Tirupati temple I stayed one or two days,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6830,7 +6830,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,r,c,d,f,a,a,a,a,b,a,v
+",w,v,0
 244,244,"We are like we are in touch, but not before when we was in school and all.",Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6858,7 +6858,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,b,g,g,g,g,a,a,a,a,b,g,g
+",k,g,0
 245,245,she doesn’t like,Direct Object Pronoun Drop,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6886,7 +6886,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",c,c,c,c,c,c,c,a,a,a,a,b,a,c
+",c,c,1
 246,246,he has a television,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6914,7 +6914,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,d,c,c,c,a,a,a,a,c,a,v
+",w,v,0
 247,247,what you are doing?,Lack Of Inversion In Wh-questions,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6942,7 +6942,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",l,c,b,l,l,l,l,a,a,a,a,c,a,l
+",l,l,1
 248,248,"first of all, on the right side we can see a plate",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6970,7 +6970,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,q,q,q,q,a,a,a,a,q,a,q
+",w,q,0
 249,249,they are speaking Portuguese in Brazil,Stative Progressive,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -6998,7 +6998,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",u,c,b,d,o,h,c,e,a,a,a,c,a,n
+",u,n,0
 250,250,the dog is facing towards the camera,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7026,7 +7026,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,d,c,h,p,a,a,a,a,b,a,v
+",w,v,0
 251,251,I went one year there.,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7054,7 +7054,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,c,r,d,r,c,a,a,a,a,b,a,o
+",r,o,0
 252,252,what are you doing?,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7082,7 +7082,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,l,l,l,l,a,a,a,l,l,l,l
+",w,l,0
 253,253,corruption is there obviously,"Non-initial Existential ""is / are there""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7110,7 +7110,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",o,c,b,a,o,o,o,a,a,a,a,o,o,o
+",o,o,1
 254,254,you can say anything but tenth I’m leaving,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7138,7 +7138,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,a,c,c,c,a,a,a,a,b,a,m
+",r,m,0
 255,255,where you will get anything?,Lack Of Inversion In Wh-questions,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7166,7 +7166,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",l,c,c,a,c,d,c,a,a,a,a,c,a,p
+",l,p,0
 256,256,"he liked it, no, even though you said he wouldn’t","Invariant Tag ""isn’t it, no, na""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7194,7 +7194,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",i,c,c,c,c,s,i,a,a,a,a,c,a,e
+",i,e,0
 257,257,because in India individuality is not there,"Non-initial Existential ""is / are there""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7222,7 +7222,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",o,c,b,a,o,o,j,a,a,a,a,b,a,v
+",o,v,0
 258,258,"My parents and siblings and all, they really enjoy playing board games.","General Extender ""and all""","
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7250,7 +7250,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",g,c,b,g,g,g,g,a,a,a,g,m,g,g
+",g,g,1
 259,259,Tirupati temple I stayed one or two days,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7278,7 +7278,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,c,f,c,c,f,a,a,a,a,b,r,o
+",r,o,0
 260,260,They have a pressure from their in-laws.,Extraneous Article,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7306,7 +7306,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",d,c,c,b,o,d,c,a,a,a,a,c,a,m
+",d,m,0
 261,261,he do a lot of things,Lack Of Agreement,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7334,7 +7334,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",k,c,c,a,p,p,c,a,a,a,a,b,a,k
+",k,k,1
 262,262,I can see some green colour leaves the left side,Preposition Omission,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7362,7 +7362,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",r,c,b,m,p,p,c,a,a,a,a,b,l,m
+",r,m,0
 263,263,where will you get anything?,None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7390,7 +7390,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,c,a,c,h,c,a,a,a,a,c,a,r
+",w,r,0
 264,264,"actually, I have not been to this part",None of the Above,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7418,7 +7418,7 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",w,c,b,a,c,c,f,a,a,a,a,b,a,m
+",w,m,0
 265,265,My daughter she is attending the University of Delhi.,Resumptive Subject Pronoun,"
     
 Which of the following features would a linguist say that the above sentence has?
@@ -7446,4 +7446,4 @@ U: Stative Progressive (e.g., 'We will be knowing how much the structure is gett
 V: Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')
 
 Constraint: Answer with only the option above that is most accurate and nothing else.
-",s,c,c,d,o,s,c,a,a,a,a,b,a,v
+",s,v,0

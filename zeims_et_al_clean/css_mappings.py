@@ -7,16 +7,16 @@ Needed to make some custom mappings.
 """
 
 binary_positive_class = {
-    'conv_go_awry': 'yes',  # conversation will derail
+    'toxicity': 'yes',  # conversation will derail
     'humor': 'true',  # joke is funny
-    'mrf-classification': 'a',  # headline is misinfo
+    'misinformation': 'a',  # headline is misinfo
     'persuasion': 'true',  # is persuasive
     'power': 'yes',  # user is admin
-    'tempowic': 'a'  # words are synonyms
+    'semantic_change': 'a'  # words are synonyms
 }
 
 embed_text_map = {
-    'conv_go_awry': {  # will conversation derail into personal attack?
+    'toxicity': {  # will conversation derail into personal attack?
         'no': 'normal conversation',
         'yes': 'conversation derail personal attack'},
     'discourse': {  # which type of utterance?
@@ -34,7 +34,7 @@ embed_text_map = {
         'd': 'sadness',
         'e': 'love',
         'f': 'surprise'},
-    'flute-classification': {  # which kind of figurative language used in hypothesis?
+    'figurative_language': {  # which kind of figurative language used in hypothesis?
         'a': 'idiom',
         'b': 'metaphor',
         'c': 'sarcasm',
@@ -49,11 +49,11 @@ embed_text_map = {
     'humor': {
         'false': 'not funny',
         'true': 'funny to most people'},
-    'ibc': {  # bias lolol
+    'ideology_books': {  # bias lolol
         'a': 'Liberal',
         'b': 'Conservative',
         'c': 'Neutral'},
-    'indian_english_dialect': {
+    'dialect_features': {
         "a": "Article Omission (e.g., 'Person I like most is here.')",
         "b": "Copula Omission (e.g., 'Everything busy in our life.')",
         "c": "Direct Object Pronoun Drop (e.g., 'He didn’t give me.')",
@@ -77,14 +77,14 @@ embed_text_map = {
         "u": "Stative Progressive (e.g., 'We will be knowing how much the structure is getting deflected.')",
         "v": "Topicalized Non-argument Constituent (e.g., 'in the daytime I work for the courier service')",
         "w": "None of the above"},
-    'media_ideology': {
+    'ideology_media': {
         "a": "Left-wing article",
         "b": "Right-wing article",
         "c": "Centrist article"},
     'mrf-classification': {
         "a": "misinformation",
         "b": "trustworthy"},
-    'persuasion': {
+    'persuasion_winning_arguments': {
         'false': 'unpersuasive',
         'true': 'persuasive'},
     'politeness': {
@@ -94,7 +94,7 @@ embed_text_map = {
     'power': {
         'no': 'powerless',
         'yes': 'powerful'},
-    'raop': {  # strategy to appeal for pizza
+    'persuasion_raop': {  # strategy to appeal for pizza
         "a": "Evidence (Providing concrete facts or evidence for the narrative or request, like 'There is a Pizza Hut and a Dominos near me.')",
         "b": "Politeness (The usage of polite language in requests, like 'Thank you so much!')",
         "c": "Reciprocity (Responding to a positive action with another positive action. People are more likely to help if they have received help themselves. Example messages are like 'I’ll pay it forward with my first check')",
@@ -102,15 +102,15 @@ embed_text_map = {
         "e": "Emotion (Making requests full of emotional valence and arousal affect to influence others, like 'I’ve been in the lowest depressive state of my life')",
         "f": "Scarcity (People emphasizing on the urgency, rare of their needs, like 'I haven’t ate a meal in two days')",
         "g": "Other"},
-    'semeval_stance': {  # stance towards trump
+    'stance': {  # stance towards trump
         "a": "Anti-Trump",
         "b": "Pro-Trump",
         "c": "Neutral towards Trump"},
-    'talklife': {  # Explorations are when a mental health counselor shows active interest in a seeker by asking about unstated experiences. What level of exploration is expressed in the counselor's message above?
+    'empathy': {  # Explorations are when a mental health counselor shows active interest in a seeker by asking about unstated experiences. What level of exploration is expressed in the counselor's message above?
         "a": "Strong exploration (specifically labels the seeker’s experiences and feelings, like 'Are you feeling alone right now?')",
         "b": "Weak exploration (a generic question, like 'What happened?')",
         "c": "No exploration"},
-    'tempowic': {  # Two words mean the same thing?
+    'semantic_change': {  # Two words mean the same thing?
         "a": "Same",
         "b": "Different"}
 }
@@ -118,22 +118,22 @@ embed_text_map = {
 # These are copied directly from eval_significance.py to avoid requiring all of their dependencies
 DATASETS = [
     "discourse",
-    "conv_go_awry",
+    "toxicity",
     "power",
     "hate",
-    "humor",
-    "flute-classification",
-    "persuasion",
+    # "humor",
+    "figurative_language",
+    "persuasion_winning_arguments",
     "politeness",
-    "media_ideology",
-    "indian_english_dialect",
-    "ibc",
-    "semeval_stance",
-    "tempowic",
-    "mrf-classification",
-    "talklife",
+    "ideology_media",
+    "dialect_features",
+    "ideology_books",
+    "stance",
+    "semantic_change",
+    "misinformation",
+    "empathy",
     "emotion",
-    "raop",
+    "persuasion_raop",
 ]
 MODELS = [
     "google/flan-t5-small",
@@ -160,11 +160,11 @@ MAPPINGS = {
         "1.0": "True",
         "0.0": "False",
     },
-    "conv_go_awry": {
+    "toxicity": {
         "true": "yes",
         "false": "no",
     },
-    "mrf-classification": {
+    "misinformation": {
         "misinformation": "A",
         "trustworthy": "B",
     },
@@ -173,23 +173,23 @@ MAPPINGS = {
         "0": "B",
         "-1": "C",
     },
-    "flute-classification": {
+    "figurative_language": {
         "idiom": "A",
         "metaphor": "B",
         "sarcasm": "C",
         "simile": "D",
     },
-    "media_ideology": {
+    "ideology_media": {
         "left": "A",
         "right": "B",
         "center": "C",
     },
-    "tempowic": {
+    "semantic_change": {
         "same": "A",
         "different": "B",
     },
-    "semeval_stance": {"against": "A", "favor": "B", "none": "C"},
-    "ibc": {
+    "stance": {"against": "A", "favor": "B", "none": "C"},
+    "ideology_books": {
         "liberal": "A",
         "conservative": "B",
         "neutral": "C",
@@ -211,7 +211,7 @@ MAPPINGS = {
         "elaboration": "F",
         "humor": "G",
     },
-    "indian_english_dialect": {
+    "dialect_features": {
         "preposition omission": "R",
         "copula omission": "B",
         "resumptive subject pronoun": "S",
