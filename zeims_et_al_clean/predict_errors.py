@@ -68,57 +68,64 @@ def roc_plot(tpr, fpr, auc_score, model_name):
     plt.legend(loc="lower right")
 
 def main():
-    X, y = load_dataset(15)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=1)
+    lasso_auc = []
+    ridge_auc = []
+    for i in range(len(DATASETS)):
+        X, y = load_dataset(i)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=1)
 
-    # Logistic Regression
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
+        # Logistic Regression
+        model = LogisticRegression(max_iter=1000)
+        model.fit(X_train, y_train)
 
-    # Logistic Regression with lasso
-    lasso_model = LogisticRegression(penalty='l1', solver='liblinear', max_iter=1000)
-    lasso_model.fit(X_train, y_train)
+        # Logistic Regression with lasso
+        lasso_model = LogisticRegression(penalty='l1', solver='liblinear', max_iter=1000)
+        lasso_model.fit(X_train, y_train)
 
-    # Logistic Regression with ridge (using instead of sklearn canned Ridge classifer)
-    ridge_model = LogisticRegression(penalty='l2', solver='liblinear', max_iter=1000)
-    ridge_model.fit(X_train, y_train)
+        # Logistic Regression with ridge (using instead of sklearn canned Ridge classifer)
+        ridge_model = LogisticRegression(penalty='l2', solver='liblinear', max_iter=1000)
+        ridge_model.fit(X_train, y_train)
 
-    # Evaluate Log reg
-    y_pred = model.predict(X_test)
-    y_probs = model.predict_proba(X_test)[:,1]
+        # Evaluate Log reg
+        y_pred = model.predict(X_test)
+        y_probs = model.predict_proba(X_test)[:,1]
 
-    fpr, tpr, thresholds = roc_curve(y_test, y_probs)
-    auc_score = auc(fpr, tpr)
-    print("Logistic Regression Accuracy:", accuracy_score(y_test, y_pred))
-    print("AUC:", auc_score)
-    print("Classification Report:\n", classification_report(y_test, y_pred))
-    
-    # Evaluate lasso 
-    y_pred_lasso = lasso_model.predict(X_test)
-    y_probs_lasso = lasso_model.predict_proba(X_test)[:,1]
+        fpr, tpr, thresholds = roc_curve(y_test, y_probs)
+        auc_score = auc(fpr, tpr)
+        print("Logistic Regression Accuracy:", accuracy_score(y_test, y_pred))
+        print("AUC:", auc_score)
+        print("Classification Report:\n", classification_report(y_test, y_pred))
+        
+        # Evaluate lasso 
+        y_pred_lasso = lasso_model.predict(X_test)
+        y_probs_lasso = lasso_model.predict_proba(X_test)[:,1]
 
-    fpr_lasso, tpr_lasso, thresholds_lasso = roc_curve(y_test, y_probs_lasso)
-    auc_score_lasso = auc(fpr_lasso, tpr_lasso)
-    print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
-    print("AUC:", auc_score_lasso)
-    print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
+        fpr_lasso, tpr_lasso, thresholds_lasso = roc_curve(y_test, y_probs_lasso)
+        auc_score_lasso = auc(fpr_lasso, tpr_lasso)
+        lasso_auc.append(auc_score_lasso)
+        print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
+        print("AUC:", auc_score_lasso)
+        print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
 
-    # Evaluate ridge
-    y_pred_ridge = ridge_model.predict(X_test)
-    y_probs_ridge = ridge_model.predict_proba(X_test)[:,1]
+        # Evaluate ridge
+        y_pred_ridge = ridge_model.predict(X_test)
+        y_probs_ridge = ridge_model.predict_proba(X_test)[:,1]
 
-    fpr_ridge, tpr_ridge, thresholds_lasso = roc_curve(y_test, y_probs_ridge)
-    auc_score_ridge = auc(fpr_ridge, tpr_ridge)
-    print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
-    print("AUC:", auc_score_ridge)
-    print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
+        fpr_ridge, tpr_ridge, thresholds_lasso = roc_curve(y_test, y_probs_ridge)
+        auc_score_ridge = auc(fpr_ridge, tpr_ridge)
+        ridge_auc.append(auc_score_ridge)
+        print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
+        print("AUC:", auc_score_ridge)
+        print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
 
     # plot auc
-    plt.figure()
-    roc_plot(tpr, fpr, auc_score=auc_score, model_name="log reg")
-    roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso")
-    roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge")
-    plt.show()
+    # plt.figure()
+    # roc_plot(tpr, fpr, auc_score=auc_score, model_name="log reg")
+    # roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso")
+    # roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge")
+    # plt.show()
+
+    
 
 if __name__ == "__main__":
     main()
