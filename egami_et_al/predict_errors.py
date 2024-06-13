@@ -12,7 +12,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 
-from css_mappings import DATASETS, DATASETS_NAMES, MODELS
+DATASETS = ["balanced", "imbalanced"]
+MODELS = ["gpt3_0shot", "gpt3_5shot"]
+MODEL_NAMES = {"gpt3_0shot": "GPT-3 0-Shot Prompting", 
+               "gpt3_5shot": "GPT-3 5-Shot Prompting"}
 
 # NLTK required downloads
 nltk.download('stopwords')
@@ -39,8 +42,8 @@ def clean_text(text):
 
 # Create BOW representation for given corpus
 def bag_of_words(data):
-    data['context'] = data['context'].astype(str)
-    data['clean_text'] = data['context'].apply(clean_text)
+    data['text'] = data['text'].astype(str)
+    data['clean_text'] = data['text'].apply(clean_text)
 
     vectorizer = CountVectorizer()
 
@@ -59,46 +62,26 @@ def load_dataset(dataset, model):
     return X, y
 
 #function to plot auc
-def roc_plot(tpr, fpr, auc_score, model_name):
+def roc_plot(tpr, fpr, auc_score, model_name, dataset, model):
     plt.plot(fpr, tpr, label='ROC for {0} (AUC = {1:0.2f})'.format(model_name, auc_score))
     plt.plot([0, 1], [0, 1], linestyle='dotted')
+    plt.title(f'{MODEL_NAMES[model]} ROC ({dataset} data)')
     plt.xlabel('FPR')
     plt.ylabel('TPR')
     plt.legend(loc="lower right")
 
-def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
-    fig, ax = plt.subplots()
-    bar_width = 0.35
-    index = np.arange(len(dataset_list))
-
-    # Plotting scores
-    bars1 = ax.bar(index, lasso_auc_list, bar_width, label='AUC Lasso')
-    bars2 = ax.bar(index + bar_width, ridge_auc_list, bar_width, label='AUC Ridge')
-
-    # Adding labels, title, and custom x-axis tick labels
-    ax.set_xlabel('Labeling Task')
-    ax.set_ylabel('AUC')
-    ax.set_title(f'AUC by Task (Labels from {model_name})')
-    ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(dataset_list, rotation=90) 
-    ax.legend()
-
-    plt.savefig(f'./figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
-
 def main():
-    for current_model in MODELS:
+    for model in MODELS:
         lasso_auc = []
         ridge_auc = []
-        datasets_included = []
-        for current_dataset in DATASETS:
+        for dataset in DATASETS:
             try:
-                X, y = load_dataset(current_dataset, current_model)
-                print(current_dataset)
+                X, y = load_dataset(dataset, model)
+                print(dataset)
             except:
-                print("LLM labels not present for {dataset}\n".format(dataset=current_dataset))
+                print("LLM labels not present for {dataset}\n".format(dataset=dataset))
                 continue
 
-            datasets_included.append(DATASETS_NAMES[current_dataset])
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=1)
             
             # Logistic Regression with lasso
@@ -131,14 +114,11 @@ def main():
             print("AUC:", auc_score_ridge)
             print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
 
-        auc_bar_graph(lasso_auc, ridge_auc, datasets_included, current_model)
-
-    # plot auc
-    # plt.figure()
-    # roc_plot(tpr, fpr, auc_score=auc_score, model_name="log reg")
-    # roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso")
-    # roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge")
-    # plt.show()
+            # plot auc
+            plt.figure()
+            roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso", dataset = dataset, model = model)
+            roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge", dataset = dataset, model = model)
+            plt.savefig(f"./figures/{dataset}/{model}.png", bbox_inches = "tight")
 
     
 
