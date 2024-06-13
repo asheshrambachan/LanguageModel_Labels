@@ -14,6 +14,7 @@ from sklearn.metrics import accuracy_score, classification_report, roc_curve, au
 
 from css_mappings import DATASETS, DATASETS_NAMES, MODELS
 import seaborn as sns
+import seaborn.objects as so
 
 # NLTK required downloads
 nltk.download('stopwords')
@@ -89,14 +90,12 @@ def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     plt.savefig(f'./figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
 
 def main():
-    heatmap_lasso = np.empty((len(DATASETS), len(MODELS)))
-    heatmap_ridge = np.empty((len(DATASETS), len(MODELS)))
-    heatmap_lasso[:] = np.NaN
-    heatmap_ridge[:] = np.NaN
-
+    # heatmap_lasso = np.empty((len(DATASETS), len(MODELS)))
+    # heatmap_ridge = np.empty((len(DATASETS), len(MODELS)))
+    # heatmap_lasso[:] = np.NaN
+    # heatmap_ridge[:] = np.NaN
+    results = []
     for current_model in MODELS:
-        lasso_auc_list = []
-        ridge_auc_list = []
         datasets_included = []
         for current_dataset in DATASETS:
             try:
@@ -123,10 +122,9 @@ def main():
 
             fpr_lasso, tpr_lasso, thresholds_lasso = roc_curve(y_test, y_probs_lasso)
             auc_score_lasso = auc(fpr_lasso, tpr_lasso)
-            lasso_auc_list.append(auc_score_lasso)
-            print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
-            print("AUC:", auc_score_lasso)
-            print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
+            # print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
+            # print("AUC:", auc_score_lasso)
+            # print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
 
             # Evaluate ridge
             y_pred_ridge = ridge_model.predict(X_test)
@@ -134,35 +132,41 @@ def main():
 
             fpr_ridge, tpr_ridge, thresholds_lasso = roc_curve(y_test, y_probs_ridge)
             auc_score_ridge = auc(fpr_ridge, tpr_ridge)
-            ridge_auc_list.append(auc_score_ridge)
-            print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
-            print("AUC:", auc_score_ridge)
-            print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
+            # print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
+            # print("AUC:", auc_score_ridge)
+            # print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
 
-            heatmap_lasso[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_lasso
-            heatmap_ridge[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_ridge
-        
-    df_lasso = pd.DataFrame(heatmap_lasso, index=DATASETS_NAMES.values(), columns=MODELS)
-    df_ridge = pd.DataFrame(heatmap_ridge, index=DATASETS_NAMES.values(), columns=MODELS)
+            results.append((DATASETS_NAMES[current_dataset], current_model, 'Lasso', auc_score_lasso))
+            results.append((DATASETS_NAMES[current_dataset], current_model, 'Ridge', auc_score_ridge))
 
-    # Plotting Lasso Heatmap
-    plt.figure(figsize=(9,8))
-    sns.heatmap(df_lasso, annot = True, cmap='rocket_r', cbar=True, annot_kws={'color': 'white', 'size': 7})
-    plt.title('AUC for LLM Label Predictions (Model with Lasso)')
-    plt.ylabel('Datasets')
-    plt.xlabel('Models')
-    plt.show()
-
-    # Plotting Ridge Heatmap
-    plt.figure(figsize=(9,8))
-    sns.heatmap(df_ridge, annot = True, cmap='rocket_r', cbar=True, annot_kws={'color': 'white', 'size': 7})
-    plt.title('AUC for LLM Label Predictions (Model with Ridge)')
-    plt.ylabel('Datasets')
-    plt.xlabel('Models')
-    plt.show()
         # auc_bar_graph(lasso_auc, ridge_auc, datasets_included, current_model)
         # auc_bar_graph(None, ridge_auc, datasets_included, current_model)
 
+    df = pd.DataFrame(results, columns=['Dataset', 'Model', 'Method', 'AUC'])
+    unique = df['Dataset'].unique()
+    mid_index = len(unique) // 2  # Find the middle index
+
+    # Split the models into two groups
+    data1 = unique[:mid_index]
+    data2 = unique[mid_index:]
+
+    # Create two DataFrames based on these splits
+    df1 = df[df['Dataset'].isin(data1)]
+    df2 = df[df['Dataset'].isin(data2)]
+
+    lasso1 = df1[df1['Method'] == 'Lasso']
+    lasso2 = df2[df2['Method'] == 'Lasso']
+    ridge1 = df1[df1['Method'] == 'Ridge']
+    ridge2 = df2[df2['Method'] == 'Ridge']
+
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='Dataset', y='AUC', hue='Model', data=ridge2, dodge=True, palette='colorblind', edgecolor = 'white')
+    plt.title('Predicted LLM Label AUC by Dataset and LLM (Ridge)')
+    plt.xlabel('Dataset')
+    plt.ylabel('AUC Score')
+    plt.legend(title='Model', loc='upper left', bbox_to_anchor=(1, 1), borderaxespad=0)
+
+    plt.show()
     # plot auc
     # plt.figure()
     # roc_plot(tpr, fpr, auc_score=auc_score, model_name="log reg")
