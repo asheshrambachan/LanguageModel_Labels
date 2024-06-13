@@ -13,6 +13,7 @@ from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 
 from css_mappings import DATASETS, DATASETS_NAMES, MODELS
+import seaborn as sns
 
 # NLTK required downloads
 nltk.download('stopwords')
@@ -68,12 +69,14 @@ def roc_plot(tpr, fpr, auc_score, model_name):
 
 def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     fig, ax = plt.subplots()
-    bar_width = 0.35
+    bar_width = 0.5
     index = np.arange(len(dataset_list))
 
     # Plotting scores
-    bars1 = ax.bar(index, lasso_auc_list, bar_width, label='AUC Lasso')
-    bars2 = ax.bar(index + bar_width, ridge_auc_list, bar_width, label='AUC Ridge')
+    if lasso_auc_list is not None:
+        bars1 = ax.bar(index, lasso_auc_list, bar_width, label='AUC Lasso')
+    if ridge_auc_list is not None:
+        bars2 = ax.bar(index + bar_width, ridge_auc_list, bar_width, label='AUC Ridge')
 
     # Adding labels, title, and custom x-axis tick labels
     ax.set_xlabel('Labeling Task')
@@ -86,9 +89,14 @@ def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     plt.savefig(f'./figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
 
 def main():
+    heatmap_lasso = np.empty((len(DATASETS), len(MODELS)))
+    heatmap_ridge = np.empty((len(DATASETS), len(MODELS)))
+    heatmap_lasso[:] = np.NaN
+    heatmap_ridge[:] = np.NaN
+
     for current_model in MODELS:
-        lasso_auc = []
-        ridge_auc = []
+        lasso_auc_list = []
+        ridge_auc_list = []
         datasets_included = []
         for current_dataset in DATASETS:
             try:
@@ -115,7 +123,7 @@ def main():
 
             fpr_lasso, tpr_lasso, thresholds_lasso = roc_curve(y_test, y_probs_lasso)
             auc_score_lasso = auc(fpr_lasso, tpr_lasso)
-            lasso_auc.append(auc_score_lasso)
+            lasso_auc_list.append(auc_score_lasso)
             print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
             print("AUC:", auc_score_lasso)
             print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
@@ -126,12 +134,34 @@ def main():
 
             fpr_ridge, tpr_ridge, thresholds_lasso = roc_curve(y_test, y_probs_ridge)
             auc_score_ridge = auc(fpr_ridge, tpr_ridge)
-            ridge_auc.append(auc_score_ridge)
+            ridge_auc_list.append(auc_score_ridge)
             print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
             print("AUC:", auc_score_ridge)
             print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
 
-        auc_bar_graph(lasso_auc, ridge_auc, datasets_included, current_model)
+            heatmap_lasso[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_lasso
+            heatmap_ridge[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_ridge
+        
+    df_lasso = pd.DataFrame(heatmap_lasso, index=DATASETS_NAMES.values(), columns=MODELS)
+    df_ridge = pd.DataFrame(heatmap_ridge, index=DATASETS_NAMES.values(), columns=MODELS)
+
+    # Plotting Lasso Heatmap
+    plt.figure(figsize=(9,8))
+    sns.heatmap(df_lasso, annot = True, cmap='rocket_r', cbar=True, annot_kws={'color': 'white', 'size': 7})
+    plt.title('AUC for LLM Label Predictions (Model with Lasso)')
+    plt.ylabel('Datasets')
+    plt.xlabel('Models')
+    plt.show()
+
+    # Plotting Ridge Heatmap
+    plt.figure(figsize=(9,8))
+    sns.heatmap(df_ridge, annot = True, cmap='rocket_r', cbar=True, annot_kws={'color': 'white', 'size': 7})
+    plt.title('AUC for LLM Label Predictions (Model with Ridge)')
+    plt.ylabel('Datasets')
+    plt.xlabel('Models')
+    plt.show()
+        # auc_bar_graph(lasso_auc, ridge_auc, datasets_included, current_model)
+        # auc_bar_graph(None, ridge_auc, datasets_included, current_model)
 
     # plot auc
     # plt.figure()
