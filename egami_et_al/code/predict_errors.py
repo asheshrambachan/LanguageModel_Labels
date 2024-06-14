@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,6 +13,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 
+# make sure we're working the code directory
+script_path = os.path.abspath(__file__)
+script_directory = os.path.dirname(script_path)
+os.chdir(script_directory)
+
+# define constants
 DATASETS = ["balanced", "imbalanced"]
 MODELS = ["gpt3_0shot", "gpt3_5shot"]
 MODEL_NAMES = {"gpt3_0shot": "GPT-3 0-Shot Prompting", 
@@ -54,7 +61,7 @@ def bag_of_words(data):
 
 # function to load dataset given dataset number
 def load_dataset(dataset, model):
-    data = pd.read_csv(dataset + '.csv')
+    data = pd.read_csv('../data/' + dataset + '.csv')
     
     X = bag_of_words(data)
     y = data[model + '_correct'].to_list()
@@ -118,7 +125,7 @@ def main():
             plt.figure()
             roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso", dataset = dataset, model = model)
             roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge", dataset = dataset, model = model)
-            plt.savefig(f"./figures/{dataset}/{model}.png", bbox_inches = "tight")
+            plt.savefig(f"../figures/{dataset}/{model}.png", bbox_inches = "tight")
 
     
 

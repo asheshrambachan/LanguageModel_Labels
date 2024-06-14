@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +15,11 @@ from sklearn.metrics import accuracy_score, classification_report, roc_curve, au
 
 from css_mappings import DATASETS, DATASETS_NAMES, MODELS
 import seaborn as sns
+
+# make sure we're working in this directory
+script_path = os.path.abspath(__file__)
+script_directory = os.path.dirname(script_path)
+os.chdir(script_directory)
 
 # NLTK required downloads
 nltk.download('stopwords')
@@ -52,7 +58,7 @@ def bag_of_words(data):
 
 # function to load dataset given dataset number
 def load_dataset(dataset, model):
-    data = pd.read_csv(dataset + '.csv')
+    data = pd.read_csv('../data/' + dataset + '.csv')
     
     X = bag_of_words(data)
     y = data[model + '_correct'].to_list()
@@ -77,19 +83,17 @@ def auc_bar_by_model(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     ax.set_xticklabels(dataset_list, rotation=90) 
     ax.legend()
 
-    plt.savefig(f'../figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
+    plt.savefig(f'../figures/auc_by_model/{model_name}_auc_by_task.png', bbox_inches='tight')
 
 # function to plot and save heatmaps
 def auc_heatmap(heatmap_array, model_type):
-    df = pd.DataFrame(heatmap_array, index=DATASETS, columns=MODELS)
+    df = pd.DataFrame(heatmap_array, index=DATASETS_NAMES.values(), columns=MODELS)
     plt.figure(figsize=(10, 8))
-    sns.heatmap(df, annot=True, fmt=".2f", cbar=True)
+    sns.heatmap(df, annot=True, fmt=".2f", cbar=True, cmap = "rocket_r")
     plt.title(f'{model_type} Model AUC Scores')
     plt.ylabel('Datasets')
     plt.xlabel('Models')
-    
     plt.savefig(f'../figures/heatmaps/model_with_{model_type}.png', bbox_inches='tight')
-
 
 # function to plot auc
 def roc_plot(tpr, fpr, auc_score, model_name):
@@ -103,8 +107,8 @@ def roc_plot(tpr, fpr, auc_score, model_name):
 def main():
 
     # for making figures
-    heatmap_lasso = np.zeros((len(DATASETS), len(MODELS)))
-    heatmap_ridge = np.zeros((len(DATASETS), len(MODELS)))
+    heatmap_lasso = np.full((len(DATASETS), len(MODELS)), np.nan)
+    heatmap_ridge = np.full((len(DATASETS), len(MODELS)), np.nan)
     results = []
 
     # iterate over LLMS
@@ -166,8 +170,8 @@ def main():
 
     # Figures
     # heatmaps
-    auc_heatmap(heatmap_lasso)
-    auc_heatmap(heatmap_ridge)
+    auc_heatmap(heatmap_lasso, 'Lasso')
+    auc_heatmap(heatmap_ridge, 'Ridge')
 
     # Summary dataframe. Can also turn this into a by-task bar chart
     df = pd.DataFrame(results, columns=['Dataset', 'Model', 'Method', 'AUC'])
