@@ -14,7 +14,6 @@ from sklearn.metrics import accuracy_score, classification_report, roc_curve, au
 
 from css_mappings import DATASETS, DATASETS_NAMES, MODELS
 import seaborn as sns
-import seaborn.objects as so
 
 # NLTK required downloads
 nltk.download('stopwords')
@@ -60,24 +59,15 @@ def load_dataset(dataset, model):
 
     return X, y
 
-#function to plot auc
-def roc_plot(tpr, fpr, auc_score, model_name):
-    plt.plot(fpr, tpr, label='ROC for {0} (AUC = {1:0.2f})'.format(model_name, auc_score))
-    plt.plot([0, 1], [0, 1], linestyle='dotted')
-    plt.xlabel('FPR')
-    plt.ylabel('TPR')
-    plt.legend(loc="lower right")
-
-def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
+# function to plot and save by model bar graphs
+def auc_bar_by_model(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     fig, ax = plt.subplots()
     bar_width = 0.5
     index = np.arange(len(dataset_list))
 
     # Plotting scores
-    if lasso_auc_list is not None:
-        bars1 = ax.bar(index, lasso_auc_list, bar_width, label='AUC Lasso')
-    if ridge_auc_list is not None:
-        bars2 = ax.bar(index + bar_width, ridge_auc_list, bar_width, label='AUC Ridge')
+    bars1 = ax.bar(index, lasso_auc_list, bar_width, label='AUC Lasso')
+    bars2 = ax.bar(index + bar_width, ridge_auc_list, bar_width, label='AUC Ridge')
 
     # Adding labels, title, and custom x-axis tick labels
     ax.set_xlabel('Labeling Task')
@@ -87,14 +77,41 @@ def auc_bar_graph(lasso_auc_list, ridge_auc_list, dataset_list, model_name):
     ax.set_xticklabels(dataset_list, rotation=90) 
     ax.legend()
 
-    plt.savefig(f'./figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
+    plt.savefig(f'../figures/auc_by_task/{model_name}_auc_by_task.png', bbox_inches='tight')
+
+# function to plot and save heatmaps
+def auc_heatmap(heatmap_array, model_type):
+    df = pd.DataFrame(heatmap_array, index=DATASETS, columns=MODELS)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df, annot=True, fmt=".2f", cbar=True)
+    plt.title(f'{model_type} Model AUC Scores')
+    plt.ylabel('Datasets')
+    plt.xlabel('Models')
+    
+    plt.savefig(f'../figures/heatmaps/model_with_{model_type}.png', bbox_inches='tight')
+
+
+# function to plot auc
+def roc_plot(tpr, fpr, auc_score, model_name):
+    plt.plot(fpr, tpr, label='ROC for {0} (AUC = {1:0.2f})'.format(model_name, auc_score))
+    plt.plot([0, 1], [0, 1], linestyle='dotted')
+    plt.xlabel('FPR')
+    plt.ylabel('TPR')
+    plt.legend(loc="lower right")
+
 
 def main():
-    
+
+    # for making figures
     heatmap_lasso = np.zeros((len(DATASETS), len(MODELS)))
+    heatmap_ridge = np.zeros((len(DATASETS), len(MODELS)))
     results = []
+
+    # iterate over LLMS
     for current_model in MODELS:
+        # keep track of which models were used to generate labels for which tasks
         datasets_included = []
+        # iterate over datasets
         for current_dataset in DATASETS:
             try:
                 X, y = load_dataset(current_dataset, current_model)
@@ -110,16 +127,17 @@ def main():
             lasso_model = LogisticRegression(penalty='l1', solver='liblinear', max_iter=1000)
             lasso_model.fit(X_train, y_train)
 
-            # Logistic Regression with ridge (using instead of sklearn canned Ridge classifer)
+            # Logistic Regression with ridge (using penalty=l2 instead of sklearn's canned Ridge classifer)
             ridge_model = LogisticRegression(penalty='l2', solver='liblinear', max_iter=1000)
             ridge_model.fit(X_train, y_train)
             
             # Evaluate lasso 
             y_pred_lasso = lasso_model.predict(X_test)
             y_probs_lasso = lasso_model.predict_proba(X_test)[:,1]
-            heatmap_lasso([DATASETS.index(current_dataset), MODELS.index(current_model)])
+
             fpr_lasso, tpr_lasso, thresholds_lasso = roc_curve(y_test, y_probs_lasso)
             auc_score_lasso = auc(fpr_lasso, tpr_lasso)
+            heatmap_lasso[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_lasso
             # print("Lasso Accuracy:", accuracy_score(y_test, y_pred_lasso))
             # print("AUC:", auc_score_lasso)
             # print("Lasso Classification Report:\n", classification_report(y_test, y_pred_lasso))
@@ -127,9 +145,10 @@ def main():
             # Evaluate ridge
             y_pred_ridge = ridge_model.predict(X_test)
             y_probs_ridge = ridge_model.predict_proba(X_test)[:,1]
-
+            
             fpr_ridge, tpr_ridge, thresholds_lasso = roc_curve(y_test, y_probs_ridge)
             auc_score_ridge = auc(fpr_ridge, tpr_ridge)
+            heatmap_ridge[DATASETS.index(current_dataset), MODELS.index(current_model)] = auc_score_ridge
             # print("Ridge Accuracy:", accuracy_score(y_test, y_pred_ridge))
             # print("AUC:", auc_score_ridge)
             # print("Ridge Classification Report:\n", classification_report(y_test, y_pred_ridge))
@@ -137,28 +156,23 @@ def main():
             results.append((DATASETS_NAMES[current_dataset], current_model, 'Lasso', auc_score_lasso))
             results.append((DATASETS_NAMES[current_dataset], current_model, 'Ridge', auc_score_ridge))
 
-    # figures
-    df_lasso = pd.DataFrame(heatmap_lasso, index=DATASETS, columns=MODELS)
+            # ROC curves 
 
-    # Plotting Lasso Heatmap
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(df_lasso, annot=True, fmt=".2f", cbar=True)
-    plt.title('Lasso Model AUC Scores')
-    plt.ylabel('Datasets')
-    plt.xlabel('Models')
-    plt.show()
+            # plt.figure()
+            # roc_plot(tpr, fpr, auc_score=auc_score, model_name="log reg")
+            # roc_plot(tpr_lasso, fpr_lasso, auc_score=auc_score_lasso, model_name="log reg w/ lasso")
+            # roc_plot(tpr_ridge, fpr_ridge, auc_score=auc_score_ridge, model_name="log reg w/ ridge")
+            # plt.show()
 
+    # Figures
+    # heatmaps
+    auc_heatmap(heatmap_lasso)
+    auc_heatmap(heatmap_ridge)
+
+    # Summary dataframe. Can also turn this into a by-task bar chart
     df = pd.DataFrame(results, columns=['Dataset', 'Model', 'Method', 'AUC'])
-    lasso = df[df['Method'] == 'Lasso']
-
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x='Dataset', y='AUC', hue='Model', data=lasso, dodge=True, palette='colorblind', edgecolor = 'white')
-    plt.title('Predicted LLM Label AUC by Dataset and LLM (Pre with Lasso)')
-    plt.xlabel('Dataset')
-    plt.ylabel('AUC Score')
-    plt.legend(title='Model', loc='upper left', bbox_to_anchor=(1, 1), borderaxespad=0)
+    # df.to_csv("../results_summary_auc.csv")
     
-
 
 if __name__ == "__main__":
     main()
