@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
-#
 # @title: Mappings for CSS Data
+# this mapping is taken from the replication package in Egami et al. (2024)
 """
 Needed to make some custom mappings.
 """

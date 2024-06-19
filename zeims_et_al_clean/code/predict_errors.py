@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score, classification_report, roc_curve, au
 from css_mappings import DATASETS, DATASETS_NAMES, MODELS
 import seaborn as sns
 
-# make sure we're working in this directory
+# make sure we're working in the code directory
 script_path = os.path.abspath(__file__)
 script_directory = os.path.dirname(script_path)
 os.chdir(script_directory)
