@@ -2,82 +2,195 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(stargazer)
+library(caret)
 
+# we have 2 versions of the data with 2 types of labels
+# set these values to whether you want balanced or imbalanced data
+# and whether you want labels from 0 or 5 shot prompting
 balanced = TRUE
 zeroshot = FALSE
 
+# setting seed to reproduce for now 
+set.seed(1)
+
+# set the file name and label type based on the above values
 filename = ifelse(balanced, "balanced", "imbalanced")
-prompt_type = ifelse(zeroshot, "q_gpt3_0shot", "q_gpt3_5shot")
-data = read.csv(paste("./data/original_", filename, "_data.csv", sep = ""))
+label_type = ifelse(zeroshot, "q_gpt3_0shot", "q_gpt3_5shot")
 
-data$senate = ifelse(data$senate == "True", 1, 0)
-data$label = ifelse(data$label == "True", 1, 0)
-data$democrat = ifelse(data$democrat == "True", 1, 0)
-data$Postal = as.factor(data$Postal)
-data[[prompt_type]] = ifelse(data[[prompt_type]] == "True", 1, 0)
+# read in the data
+data = read.csv(paste("../data/original_", filename, "_data.csv", sep = ""))
 
-# f* models for balanced data
-chamber <- lm(label ~ senate, data = data)
-party <- lm(label ~ democrat, data = data)
-score <- lm(label ~ dw1, data = data)
-dist <- lm(label ~ dist_macro, data = data)
-state <- lm(label ~ Postal, data = data)
+# convert columns to numeric
+data <- data %>%
+  mutate(
+    senate = as.integer(senate == "True"),
+    label = as.integer(label == "True"),
+    democrat = as.integer(democrat == "True"),
+    Postal = as.factor(Postal),
+    !!label_type := as.integer(.[[label_type]] == "True")
+  )
 
-# f_hat models for balanced data with 0shot labels
-chamber_llm <- lm(as.formula(paste(prompt_type, "~ senate")), data = data)
-party_llm <- lm(as.formula(paste(prompt_type, "~ democrat")), data = data)
-score_llm <- lm(as.formula(paste(prompt_type, "~ dw1")), data = data)
-dist_llm <- lm(as.formula(paste(prompt_type, "~ dist_macro")), data = data)
-state_llm <- lm(as.formula(paste(prompt_type, "~ Postal")), data = data)
+# split data into 50-50 train/test set
+train_indices <- sample(nrow(data), floor(0.5 * nrow(data)))
+train <- data[train_indices, ]
+test <- data[-train_indices, ]
 
-# (f* - f_hat) models for balanced data with 0shot labels
-chamber_error <- lm(as.formula(paste("label -", prompt_type, "~ senate")), data = data)
-chamber_b0 <- summary(chamber_error)$coefficients[1, "Estimate"]
-chamber_b1 <- summary(chamber_error)$coefficients[2, "Estimate"]
+# get f* models for each feature V
+chamber <- lm(label ~ senate, data = train)
+party <- lm(label ~ democrat, data = train)
+score <- lm(label ~ dw1, data = train)
+dist <- lm(label ~ dist_macro, data = train)
 
-party_error <- lm(as.formula(paste("label -", prompt_type, "~ democrat")), data = data)
-party_b0 <- summary(party_error)$coefficients[1, "Estimate"]
-party_b1 <- summary(party_error)$coefficients[2, "Estimate"]
+# get f_hat models for each feature V
+chamber_llm <- lm(as.formula(paste(label_type, "~ senate")), data = train)
+party_llm <- lm(as.formula(paste(label_type, "~ democrat")), data = train)
+score_llm <- lm(as.formula(paste(label_type, "~ dw1")), data = train)
+dist_llm <- lm(as.formula(paste(label_type, "~ dist_macro")), data = train)
 
-score_error <- lm(as.formula(paste("label -", prompt_type,"~ dw1")), data = data)
-score_b0 <- summary(score_error)$coefficients[1, "Estimate"]
-score_b1 <- summary(score_error)$coefficients[2, "Estimate"]
+# create empty lists to store bootstrap coefficients
+n = nrow(train)
+err_chamber_b0s <- numeric(n)
+err_chamber_b1s <- numeric(n)
+err_party_b0s <- numeric(n)
+err_party_b1s <- numeric(n)
+err_score_b0s <- numeric(n)
+err_score_b1s <- numeric(n)
+err_dist_b0s <- numeric(n)
+err_dist_b1s <- numeric(n)
 
-dist_error <- lm(as.formula(paste("label -", prompt_type, "~ dist_macro")), data = data)
-dist_b0 <- summary(dist_error)$coefficients[1, "Estimate"]
-dist_b1 <- summary(dist_error)$coefficients[2, "Estimate"]
+f1_chamber_b0s <- numeric(n)
+f1_chamber_b1s <- numeric(n)
+f1_party_b0s <- numeric(n)
+f1_party_b1s <- numeric(n)
+f1_score_b0s <- numeric(n)
+f1_score_b1s <- numeric(n)
+f1_dist_b0s <- numeric(n)
+f1_dist_b1s <- numeric(n)
 
-state_error <- lm(as.formula(paste("label -", prompt_type, "~ Postal")), data = data)
-state_b0 <- summary(state_error)$coefficients[1, "Estimate"]
-state_b1 <- summary(state_error)$coefficients
+# repeat sampling 10000 times
+for (i in (1:10000)){
+  
+  # get bootstrap sample
+  bootstrap_indices <- sample(nrow(train), replace = TRUE)
+  bootstrap <- train[bootstrap_indices, ]
+  
+  # regress (f* - f_hat) on all the Vs and store coefficients
+  chamber_error <- lm(as.formula(paste("label -", label_type, "~ senate")), data = bootstrap)
+  err_chamber_b0s[[i]] <- summary(chamber_error)$coefficients[1, "Estimate"]
+  err_chamber_b1s[[i]] <- summary(chamber_error)$coefficients[2, "Estimate"]
+  
+  party_error <- lm(as.formula(paste("label -", label_type, "~ democrat")), data = bootstrap)
+  err_party_b0s[[i]] <- summary(party_error)$coefficients[1, "Estimate"]
+  err_party_b1s[[i]] <- summary(party_error)$coefficients[2, "Estimate"]
+  
+  score_error <- lm(as.formula(paste("label -", label_type,"~ dw1")), data = bootstrap)
+  err_score_b0s[[i]] <- summary(score_error)$coefficients[1, "Estimate"]
+  err_score_b1s[[i]] <- summary(score_error)$coefficients[2, "Estimate"]
+  
+  dist_error <- lm(as.formula(paste("label -", label_type, "~ dist_macro")), data = bootstrap)
+  err_dist_b0s[[i]] <- summary(dist_error)$coefficients[1, "Estimate"]
+  err_dist_b1s[[i]] <- summary(dist_error)$coefficients[2, "Estimate"]
+  
+  # get adjusted label values using error coefficients
+  test$f1_chamber = test[[label_type]] + (err_chamber_b0s[[i]] + test$senate * err_chamber_b1s[[i]] )
+  test$f1_party = test[[label_type]] + (err_party_b0s[[i]] + test$democrat * err_party_b1s[[i]])
+  test$f1_score = test[[label_type]] + (err_score_b0s[[i]] + test$dw1 * err_score_b1s[[i]])
+  test$f1_dist = test[[label_type]] + (err_dist_b0s[[i]] + test$dist_macro * err_dist_b1s[[i]])
 
-# create unbiased LLM labels
-data$f_prime_chamber = data[[prompt_type]] + (chamber_b0 + data$senate * chamber_b1)
-data$f_prime_party = data[[prompt_type]] + (party_b0 + data$democrat * party_b1)
-data$f_prime_score = data[[prompt_type]] + (score_b0 + data$dw1 * score_b1)
-data$f_prime_dist = data[[prompt_type]] + (dist_b0 + data$dist_macro * dist_b1)
-data$f_prime_state = data[[prompt_type]] + (state_b0)
-postal_dummies <- data.frame(model.matrix(~ Postal - 1, data = data))
-for (i in 2:ncol(postal_dummies)) {
-  col_name <- colnames(postal_dummies)[i]
-  col <- postal_dummies[[col_name]]
-  coefficient <- state_b1[col_name, "Estimate"]
-  intercept <- state_b0
-  data$f_prime_state <- data$f_prime_state + col * coefficient 
+  # run debiased models (regress adjusted labels on Vs)
+  f1_chamber <- lm(f1_chamber ~ senate, data = test)
+  f1_chamber_b0s[[i]] <- summary(f1_chamber)$coefficients[1, "Estimate"]
+  f1_chamber_b1s[[i]] <- summary(f1_chamber)$coefficients[2, "Estimate"]
+  
+  f1_party <- lm(f1_party ~ democrat, data = test)
+  f1_party_b0s[[i]] <- summary(f1_party)$coefficients[1, "Estimate"]
+  f1_party_b1s[[i]] <- summary(f1_party)$coefficients[2, "Estimate"]
+  
+  f1_score <- lm(f1_score ~ dw1, data = test)
+  f1_score_b0s[[i]] <- summary(f1_score)$coefficients[1, "Estimate"]
+  f1_score_b1s[[i]] <- summary(f1_score)$coefficients[2, "Estimate"]
+  
+  f1_dist <- lm(f1_dist ~ dist_macro, data = test)
+  f1_dist_b0s[[i]] <- summary(f1_dist)$coefficients[1, "Estimate"]
+  f1_dist_b1s[[i]] <- summary(f1_dist)$coefficients[2, "Estimate"]
 }
 
-# f_prime (unbiased f_hat) models for balanced data with 0shot labels
-chamber_unbiased <- lm(f_prime_chamber ~ senate, data = data)
-party_unbiased <- lm(f_prime_party ~ democrat, data = data)
-score_unbiased <- lm(f_prime_score ~ dw1, data = data)
-dist_unbiased <- lm(f_prime_dist ~ dist_macro, data = data)
-state_unbiased <- lm(f_prime_state ~ Postal, data = data)
+# get the error coefficients
+err_chamber_b0 <- mean(err_chamber_b0s)
+err_chamber_b0se <- sd(err_chamber_b0s)
+err_chamber_b1 <- mean(err_chamber_b1s)
+err_chamber_b1se <- sd(err_chamber_b1s)
+
+err_party_b0 <- mean(err_party_b0s)
+err_party_b0se <- sd(err_party_b0s)
+err_party_b1 <- mean(err_party_b1s)
+err_party_b1se <- sd(err_party_b1s)
+
+err_score_b0 <- mean(err_score_b0s)
+err_score_b0se <- sd(err_score_b0s)
+err_score_b1 <- mean(err_score_b1s)
+err_score_b1se <- sd(err_score_b1s)
+
+err_dist_b0 <- mean(err_dist_b0s)
+err_dist_b0se <- sd(err_dist_b0s)
+err_dist_b1 <- mean(err_dist_b1s)
+err_dist_b1se <- sd(err_dist_b1s)
+
+# get the debiased model coefficients for each V
+# I'm doing it in this way because it's easier to make tables 
+# even though it looks ugly 
+f1_chamber_coef <- coef(f1_chamber)
+f1_chamber_coef[1] <- mean(f1_chamber_b0s)
+f1_chamber_coef[2] <- mean(f1_chamber_b1s)
+f1_chamber_se <- summary(f1_chamber)$coefficients[,2]
+f1_chamber_se[1] <-sd(f1_chamber_b0s)
+f1_chamber_se[2] <-sd(f1_chamber_b1s)
+
+f1_party_coef <- coef(f1_party)
+f1_party_coef[1] <- mean(f1_party_b0s)
+f1_party_coef[2] <- mean(f1_party_b1s)
+f1_party_se <- summary(f1_party)$coefficients[,2]
+f1_party_se[1] <-sd(f1_party_b0s)
+f1_party_se[2] <-sd(f1_party_b1s)
+
+f1_score_coef <- coef(f1_score)
+f1_score_coef[1] <- mean(f1_score_b0s)
+f1_score_coef[2] <- mean(f1_score_b1s)
+f1_score_se <- summary(f1_score)$coefficients[,2]
+f1_score_se[1] <-sd(f1_score_b0s)
+f1_score_se[2] <-sd(f1_score_b1s)
+
+f1_dist_coef <- coef(f1_dist)
+f1_dist_coef[1] <- mean(f1_dist_b0s)
+f1_dist_coef[2] <- mean(f1_dist_b1s)
+f1_dist_se <- summary(f1_dist)$coefficients[,2]
+f1_dist_se[1] <-sd(f1_dist_b0s)
+f1_dist_se[2] <-sd(f1_dist_b1s)
 
 
-stargazer(chamber, chamber_llm, chamber_error, chamber_unbiased)
-stargazer(party, party_llm, party_error, party_unbiased)
-stargazer(score, score_llm, score_error, score_unbiased)
-stargazer(dist, dist_llm, dist_error, dist_unbiased)
-stargazer(state, state_llm, state_error, state_unbiased)
+# make tables
+# remove type argument for latex
+stargazer(f1_chamber, chamber, chamber_llm,
+          coef = list(f1_chamber_coef, chamber$coefficients, chamber_llm$coefficients),
+          se = list(f1_chamber_se, chamber$std.error, chamber_llm$std.error),
+          type = "text")
+
+stargazer(f1_party, party, party_llm,
+          coef = list(f1_party_coef, party$coefficients, party_llm$coefficients),
+          se = list(f1_party_se, party$std.error, party_llm$std.error),
+          title = "Comparison of Models",
+          type = "text")
+
+stargazer(f1_score, score, score_llm,
+          coef = list(f1_score_coef, score$coefficients, score_llm$coefficients),
+          se = list(f1_score_se, score$std.error, score_llm$standard_error),
+          title = "Comparison of Models",
+          type = "text")
+
+stargazer(f1_dist, dist, dist_llm,
+          coef = list(f1_dist_coef, dist$coefficients, dist_llm$coefficients),
+          se = list(f1_dist_se, dist$std.error, dist_llm$std.error),
+          title = "Comparison of Models",
+          type = "text")
 
 
