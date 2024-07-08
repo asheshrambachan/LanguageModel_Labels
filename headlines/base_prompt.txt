@@ -1,0 +1,10 @@
+Here is a piece of news about %s: 
+
+%s
+
+Is this news positive, negative, or neutral about %s?
+
+Write your answer as: 
+{positive/negative/neutral}: 
+{confidence (0-1)}: 
+{magnitude of positive/negative (0-1)}:
