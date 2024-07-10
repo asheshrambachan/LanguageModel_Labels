@@ -14,7 +14,7 @@ The primary data sources are listed below. You don’t need to download the data
 
 ## Usage
 
-Open the Jupyter notebook and run all cells to perform data cleaning. The cleaned dataset will be saved as `bills.csv`. Due to GitHub data size constraints, the cleaned data in this repo is included in [this zip file](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills/01_cleaning_and_data/bills.csv.zip).
+Open the [`cleaning.ipynb`](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills/01_cleaning_and_data/cleaning.ipynb) notebook and run all cells to perform data cleaning. The cleaned dataset will be saved as `bills.csv`. Due to GitHub data size constraints, the cleaned data in this repo is included in [this zip file](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills/01_cleaning_and_data/bills.csv.zip).
 
 ## Cleaning Remarks
 
