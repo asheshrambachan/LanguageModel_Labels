@@ -14,7 +14,7 @@ The primary data sources are listed below. You don’t need to download the data
 
 ## Usage
 
-Open the Jupyter notebook and run all cells to perform data cleaning. The cleaned dataset will be saved as `bills.csv`.
+Open the Jupyter notebook and run all cells to perform data cleaning. The cleaned dataset will be saved as `bills.csv`. Due to GitHub data size constraints, the cleaned data in this repo is included in [this zip file](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills/01_cleaning_and_data/bills.csv.zip).
 
 ## Cleaning Remarks
 
@@ -32,3 +32,4 @@ While our approach shares similarities with Egami's method, we have made several
 - Decide on which data source, CAP or CBP, to rely on for `Party`, `PassS`, and `PassH`
 - Decide whether to exclude columns with any missing values as in Egami
 - Create a new major topics IDs as topic 11 is not in the data
+- Add variables codebook from ICPSR and CAP
