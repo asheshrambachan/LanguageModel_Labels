@@ -1,0 +1,337 @@
+PromptID,MajorLLM,MajorTextLLM,ConfidenceLLM,ExplanationLLM
+1,19,Government Operations,0.75,
+2,19,Government Operations,0.85,
+3,19,Government Operations,0.85,
+4,19,Government Operations,0.85,
+5,19,Government Operations,0.85,
+6,19,Government Operations,0.85,The bill pertains to government operations by aligning the fiscal year of the United States with the calendar year.
+7,19,Government Operations,0.85,The bill pertains to government operations by aligning the fiscal year of the United States with the calendar year.
+8,19,Government Operations,0.85,This bill pertains to government operations by aligning the fiscal year of the United States with the calendar year.
+9,14,"Banking, Finance, and Domestic Commerce",0.85,
+10,14,"Banking, Finance, and Domestic Commerce",0.85,
+11,14,"Banking, Finance, and Domestic Commerce",0.85,
+12,14,"Banking, Finance, and Domestic Commerce",0.85,
+13,14,"Banking, Finance, and Domestic Commerce",0.85,
+14,14,"Banking, Finance, and Domestic Commerce",0.95,"The bill focuses on amending the Internal Revenue Code to provide an exclusion for interest on savings deposits, which falls under Banking, Finance, and Domestic Commerce."
+15,14,"Banking, Finance, and Domestic Commerce",0.9,"The bill focuses on amending the Internal Revenue Code to provide an exclusion for interest on savings deposits, which falls under Banking, Finance, and Domestic Commerce."
+16,14,"Banking, Finance, and Domestic Commerce",0.95,"The bill focuses on amending the Internal Revenue Code to provide an exclusion for interest on savings deposits, which falls under Banking, Finance, and Domestic Commerce."
+17,12,Social Welfare,0.85,
+18,12,Social Welfare,0.85,
+19,12,Social Welfare,0.85,
+20,12,Social Welfare,0.85,
+21,12,Social Welfare,0.85,
+22,12,Social Welfare,0.85,"The bill pertains to the release of information from VA records systems for research purposes, which falls under social welfare."
+23,12,Social Welfare,0.85,"The bill pertains to veterans' affairs and authorizing the release of information for research purposes, which falls under social welfare."
+24,12,Social Welfare,0.85,"The bill pertains to veterans' affairs and authorizing the release of information for research purposes, which falls under social welfare."
+25,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
+26,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
+27,11,"Law, Crime, and Family Issues",0.95,
+28,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
+29,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
+30,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,This bill addresses civil rights and minority issues by aiming to protect individuals from mob violence and lynching.
+31,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,The bill addresses civil rights and minority issues by aiming to protect individuals from mob violence and lynching.
+32,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,This bill addresses civil rights and minority issues by aiming to protect individuals from mob violence and lynching.
+33,3,Health,0.85,
+34,3,Health,0.85,
+35,3,Health,0.85,
+36,3,Health,0.85,
+37,3,Health,0.85,
+38,3,Health,0.95,The bill focuses on amending the Public Health Service Act to facilitate cooperative agreements between hospitals for sharing medical equipment and services.
+39,3,Health,0.9,The bill focuses on amending the Public Health Service Act to facilitate cooperative agreements between hospitals for sharing medical equipment and services.
+40,3,Health,0.95,"The bill focuses on amending the Public Health Service Act to facilitate cooperative agreements between hospitals for sharing medical equipment, indicating a health-related issue."
+41,3,Health,0.85,
+42,3,Health,0.85,
+43,3,Health,0.85,
+44,3,Health,0.85,
+45,3,Health,0.85,
+46,3,Health,0.95,"The bill focuses on amending the Social Security Act related to Medicare hospital value-based purchasing program, indicating a health-related issue."
+47,3,Health,0.95,"The bill focuses on amending the Social Security Act related to Medicare hospital value-based purchasing program, indicating a health-related issue."
+48,3,Health,0.95,"The bill focuses on amending the Social Security Act related to Medicare hospital value-based purchasing program, indicating a health-related issue."
+49,4,Agriculture,0.85,
+50,4,Agriculture,0.95,
+51,4,Agriculture,0.95,
+52,4,Agriculture,0.95,
+53,4,Agriculture,0.95,
+54,4,Agriculture,0.95,"The bill pertains to compensation for wheat producers and elevator operators, falling under the category of Agriculture."
+55,4,Agriculture,0.95,"The bill pertains to providing compensation to wheat producers and elevator operators, falling under the category of Agriculture."
+56,4,Agriculture,0.95,"The bill pertains to providing compensation to wheat producers and elevator operators, falling under the category of Agriculture."
+57,3,Health,0.85,
+58,3,Health,0.95,
+59,3,Health,0.85,
+60,4,Agriculture,0.85,
+61,3,Health,0.95,
+62,3,Health,0.95,"The bill focuses on the safe use of growth hormones, which falls under the health category."
+63,3,Health,0.9,"The bill focuses on regulating the use of growth hormones, which falls under health-related issues."
+64,3,Health,0.95,The bill focuses on regulating the use of growth hormones for health reasons.
+65,5,Labor and Employment,0.85,
+66,5,Labor and Employment,0.95,
+67,5,Labor and Employment,0.95,
+68,5,Labor and Employment,0.95,
+69,5,Labor and Employment,0.95,
+70,5,Labor and Employment,0.95,The bill addresses labor and employment issues by prohibiting the hiring of professional strikebreakers in interstate labor disputes.
+71,5,Labor and Employment,0.95,The bill addresses labor and employment issues by prohibiting the hiring of professional strikebreakers in interstate labor disputes.
+72,5,Labor and Employment,0.95,The bill addresses labor and employment issues by prohibiting the hiring of professional strikebreakers in interstate labor disputes.
+73,4,Agriculture,0.95,
+74,4,Agriculture,0.95,
+75,4,Agriculture,0.95,
+76,4,Agriculture,0.95,
+77,4,Agriculture,0.95,
+78,4,Agriculture,0.95,The bill focuses on amending the Immigration and Nationality Act to provide for a temporary agricultural worker program.
+79,4,Agriculture,0.95,The bill focuses on amending the Immigration and Nationality Act to provide for a temporary agricultural worker program.
+80,4,Agriculture,0.95,The bill focuses on amending the Immigration and Nationality Act to provide for a temporary agricultural worker program.
+81,6,Education,0.85,
+82,6,Education,0.95,
+83,6,Education,0.85,
+84,6,Education,0.85,
+85,6,Education,0.85,
+86,6,Education,0.95,"The bill focuses on establishing a model demonstration program in the field of vocational-technical education, indicating it falls under the Education category."
+87,6,Education,0.95,"The bill focuses on vocational-technical education, indicating it falls under the Education category."
+88,6,Education,0.95,"The bill focuses on establishing a model demonstration program in the field of vocational-technical education, indicating it falls under the Education category."
+89,6,Education,0.85,
+90,6,Education,0.95,
+91,6,Education,0.85,
+92,6,Education,0.95,
+93,6,Education,0.85,
+94,6,Education,0.85,"The bill focuses on amending educational services for handicapped dependents, falling under the Education category."
+95,6,Education,0.95,"The bill focuses on amending educational services for handicapped dependents, falling under the Education category."
+96,6,Education,0.95,"The bill focuses on amending educational services for handicapped dependents, falling under the Education category."
+97,7,Environment,0.85,
+98,7,Environment,0.85,
+99,7,Environment,0.85,
+100,7,Environment,0.85,
+101,7,Environment,0.85,
+102,7,Environment,0.95,The bill focuses on amending the Endangered Species Act to address critical habitat designation and private property rights related to environmental protection.
+103,7,Environment,0.95,The bill focuses on amending the Endangered Species Act to address critical habitat designation and private property rights related to environmental protection.
+104,7,Environment,0.85,The bill focuses on amending the Endangered Species Act to address critical habitat designation and private property rights related to environmental protection.
+105,7,Environment,0.85,
+106,7,Environment,0.85,
+107,7,Environment,0.85,
+108,7,Environment,0.85,
+109,7,Environment,0.85,
+110,7,Environment,0.95,"The bill focuses on creating a National Zoological and Aquarium Corporation, which falls under the category of Environment."
+111,7,Environment,0.85,"The bill focuses on creating a National Zoological and Aquarium Corporation, which falls under the category of Environment."
+112,7,Environment,0.95,"The bill focuses on creating a National Zoological and Aquarium Corporation, which falls under the category of Environment."
+113,8,Energy,0.85,
+114,8,Energy,0.85,
+115,8,Energy,0.95,
+116,8,Energy,0.95,
+117,8,Energy,0.85,
+118,8,Energy,0.95,"The bill focuses on amending the Mineral Leasing Act to promote the development of Federal coal resources, which falls under the Energy category."
+119,8,Energy,0.9,"The bill focuses on amending the Mineral Leasing Act to promote the development of Federal coal resources, which falls under the Energy category."
+120,8,Energy,0.95,"The bill focuses on amending the Mineral Leasing Act to promote the development of Federal coal resources, which falls under the Energy category."
+121,8,Energy,0.85,
+122,8,Energy,0.95,
+123,8,Energy,0.95,
+124,8,Energy,0.95,
+125,8,Energy,0.95,
+126,8,Energy,0.95,"The bill pertains to authorizing and directing the Secretary of the Interior to reinstate an oil and gas lease, falling under the Energy category."
+127,8,Energy,0.9,"The bill pertains to authorizing and directing the Secretary of the Interior to reinstate an oil and gas lease, falling under the Energy category."
+128,8,Energy,0.95,"The bill pertains to authorizing and directing the Secretary of the Interior to reinstate an oil and gas lease, falling under the Energy category."
+129,9,Immigration,0.85,
+130,9,Immigration,0.85,
+131,11,"Law, Crime, and Family Issues",0.85,
+132,11,"Law, Crime, and Family Issues",0.85,
+133,11,"Law, Crime, and Family Issues",0.85,
+134,11,"Law, Crime, and Family Issues",0.85,"The bill pertains to amending the Immigration and Nationality Act related to criminal probation and parole, which falls under Law, Crime, and Family Issues."
+135,11,"Law, Crime, and Family Issues",0.85,"The bill pertains to criminal probation and parole, which falls under Law, Crime, and Family Issues."
+136,11,"Law, Crime, and Family Issues",0.85,"The bill pertains to amending the Immigration and Nationality Act related to criminal probation and parole, falling under Law, Crime, and Family Issues."
+137,9,Immigration,0.95,
+138,9,Immigration,0.95,
+139,9,Immigration,0.95,
+140,9,Immigration,0.95,
+141,9,Immigration,0.95,
+142,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, specifically related to the registration of birth of citizens born abroad."
+143,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, specifically related to the registration of birth of citizens born abroad."
+144,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, specifically related to the registration of birth of citizens born abroad."
+145,10,Transportation,0.95,
+146,10,Transportation,0.95,
+147,10,Transportation,0.95,
+148,10,Transportation,0.95,
+149,10,Transportation,0.85,
+150,10,Transportation,0.95,"The bill focuses on amending the Federal Aviation Act of 1958 to establish a class of commuter air carriers, indicating a transportation-related issue."
+151,10,Transportation,0.95,"The bill focuses on amending the Federal Aviation Act of 1958, specifically related to commuter air carriers, which falls under the transportation category."
+152,10,Transportation,0.95,"The bill focuses on amending the Federal Aviation Act of 1958, specifically related to commuter air carriers, which falls under the category of Transportation."
+153,10,Transportation,0.85,
+154,10,Transportation,0.85,
+155,10,Transportation,0.85,
+156,10,Transportation,0.85,
+157,10,Transportation,0.85,
+158,10,Transportation,0.95,"The bill pertains to authorizing appropriations for the Maritime Administration, which falls under the category of Transportation."
+159,10,Transportation,0.95,"The bill pertains to authorizing appropriations for the Maritime Administration, which falls under the category of Transportation."
+160,10,Transportation,0.85,"The bill pertains to authorizing appropriations for the Maritime Administration, which falls under the category of Transportation."
+161,11,"Law, Crime, and Family Issues",0.85,
+162,11,"Law, Crime, and Family Issues",0.85,
+163,11,"Law, Crime, and Family Issues",0.85,
+164,11,"Law, Crime, and Family Issues",0.85,
+165,11,"Law, Crime, and Family Issues",0.85,
+166,11,"Law, Crime, and Family Issues",0.85,"The bill focuses on strengthening firearms and explosives laws, which falls under the category of Law, Crime, and Family Issues."
+167,11,"Law, Crime, and Family Issues",0.9,"The bill focuses on strengthening firearms and explosives laws, which falls under the category of Law, Crime, and Family Issues."
+168,11,"Law, Crime, and Family Issues",0.85,"The bill focuses on strengthening firearms and explosives laws, which falls under the category of Law, Crime, and Family Issues."
+169,19,Government Operations,0.75,
+170,11,"Law, Crime, and Family Issues",0.85,
+171,19,Government Operations,0.85,
+172,19,Government Operations,0.85,
+173,19,Government Operations,0.85,
+174,19,Government Operations,0.85,"The bill pertains to the appointment of additional circuit and district judges, which falls under Government Operations."
+175,19,Government Operations,0.85,"The bill pertains to the appointment of additional circuit and district judges, which falls under Government Operations."
+176,19,Government Operations,0.85,"The bill pertains to the appointment of additional circuit and district judges, which falls under Government Operations."
+177,12,Social Welfare,0.85,
+178,12,Social Welfare,0.85,
+179,12,Social Welfare,0.85,
+180,12,Social Welfare,0.85,
+181,12,Social Welfare,0.95,
+182,12,Social Welfare,0.85,"The bill focuses on providing disability benefits under the Social Security Act, which falls under the category of Social Welfare."
+183,12,Social Welfare,0.85,"The bill focuses on providing disability benefits under the Social Security Act, which falls under social welfare issues."
+184,12,Social Welfare,0.85,"The bill focuses on providing disability insurance benefits under the Social Security Act, which falls under social welfare."
+185,12,Social Welfare,0.85,
+186,12,Social Welfare,0.95,
+187,12,Social Welfare,0.85,
+188,12,Social Welfare,0.85,
+189,12,Social Welfare,0.85,
+190,12,Social Welfare,0.95,"The bill focuses on providing tax credits for households with disabled elderly persons, which falls under social welfare issues."
+191,12,Social Welfare,0.85,"The bill focuses on providing tax credits for households with disabled elderly persons, which falls under social welfare issues."
+192,12,Social Welfare,0.95,"The bill focuses on providing tax credits for households with disabled elderly persons, which falls under social welfare."
+193,13,Community Development and Housing Issues,0.85,
+194,13,Community Development and Housing Issues,0.85,
+195,13,Community Development and Housing Issues,0.85,
+196,13,Community Development and Housing Issues,0.85,
+197,12,Social Welfare,0.85,
+198,13,Community Development and Housing Issues,0.85,"The bill focuses on amending the United States Housing Act of 1937 to address the need for low-cost housing, which falls under the category of Community Development and Housing Issues."
+199,13,Community Development and Housing Issues,0.85,"The bill focuses on amending the United States Housing Act of 1937 to address the need for low-cost housing, which falls under the category of Community Development and Housing Issues."
+200,13,Community Development and Housing Issues,0.9,"The bill focuses on amending the United States Housing Act of 1937 to address the need for low-cost housing, which falls under the category of Community Development and Housing Issues."
+201,13,Community Development and Housing Issues,0.85,
+202,13,Community Development and Housing Issues,0.85,
+203,13,Community Development and Housing Issues,0.85,
+204,13,Community Development and Housing Issues,0.85,
+205,13,Community Development and Housing Issues,0.85,
+206,13,Community Development and Housing Issues,0.85,"The bill focuses on amending Acts related to public works and economic development, indicating a focus on community development and housing issues."
+207,13,Community Development and Housing Issues,0.85,"The bill focuses on amending Acts related to public works and economic development, indicating a focus on community development and housing issues."
+208,13,Community Development and Housing Issues,0.85,"The bill focuses on amending Acts related to public works and economic development, indicating a focus on community development and housing issues."
+209,14,"Banking, Finance, and Domestic Commerce",0.85,
+210,14,"Banking, Finance, and Domestic Commerce",0.85,
+211,14,"Banking, Finance, and Domestic Commerce",0.85,
+212,14,"Banking, Finance, and Domestic Commerce",0.85,
+213,14,"Banking, Finance, and Domestic Commerce",0.85,
+214,14,"Banking, Finance, and Domestic Commerce",0.95,"The bill focuses on amending the Electronic Fund Transfer Act, which falls under Banking, Finance, and Domestic Commerce."
+215,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill focuses on amending the Electronic Fund Transfer Act, which falls under Banking, Finance, and Domestic Commerce."
+216,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill focuses on amending the Electronic Fund Transfer Act, which falls under Banking, Finance, and Domestic Commerce."
+217,14,"Banking, Finance, and Domestic Commerce",0.85,
+218,14,"Banking, Finance, and Domestic Commerce",0.85,
+219,14,"Banking, Finance, and Domestic Commerce",0.85,
+220,14,"Banking, Finance, and Domestic Commerce",0.85,
+221,14,"Banking, Finance, and Domestic Commerce",0.85,
+222,14,"Banking, Finance, and Domestic Commerce",0.95,"The bill focuses on amending the Investment Advisers Act of 1940, which falls under Banking, Finance, and Domestic Commerce."
+223,14,"Banking, Finance, and Domestic Commerce",0.9,"The bill pertains to amending the Investment Advisers Act of 1940, which falls under Banking, Finance, and Domestic Commerce."
+224,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill pertains to amending the Investment Advisers Act of 1940, which falls under Banking, Finance, and Domestic Commerce."
+225,15,Defense,0.95,
+226,15,Defense,0.95,
+227,15,Defense,0.95,
+228,15,Defense,0.95,
+229,15,Defense,0.95,
+230,15,Defense,0.95,"The bill pertains to authorizing appropriations for the Armed Forces for various purposes such as procurement, research, and maintenance."
+231,15,Defense,0.95,The bill pertains to authorizing appropriations for the Armed Forces for various purposes.
+232,15,Defense,0.95,The bill pertains to authorizing appropriations for the Armed Forces for various purposes.
+233,12,Social Welfare,0.85,
+234,12,Social Welfare,0.85,
+235,12,Social Welfare,0.85,
+236,12,Social Welfare,0.85,
+237,12,Social Welfare,0.85,
+238,12,Social Welfare,0.85,"The bill focuses on improving procurement practices for the Department of Veterans Affairs, which falls under social welfare issues."
+239,12,Social Welfare,0.85,"The bill focuses on improving procurement practices for the Department of Veterans Affairs, which falls under social welfare issues."
+240,12,Social Welfare,0.85,"The bill focuses on improving procurement practices for the Department of Veterans Affairs, which falls under social welfare."
+241,16,"Space, Science, Technology, and Communications",0.95,
+242,16,"Space, Science, Technology, and Communications",0.95,
+243,21,Arts and Entertainment,0.95,
+244,16,"Space, Science, Technology, and Communications",0.95,
+245,21,Arts and Entertainment,0.95,
+246,16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to the distribution and display of lunar rocks and materials, which falls under the category of Space, Science, Technology, and Communications."
+247,16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to the distribution and display of lunar rocks and materials, which falls under the category of Space, Science, Technology, and Communications."
+248,16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to the distribution and display of lunar rocks and materials, which falls under the category of Space, Science, Technology, and Communications."
+249,16,"Space, Science, Technology, and Communications",0.95,
+250,16,"Space, Science, Technology, and Communications",0.95,
+251,16,"Space, Science, Technology, and Communications",0.95,
+252,16,"Space, Science, Technology, and Communications",0.95,
+253,16,"Space, Science, Technology, and Communications",0.95,
+254,16,"Space, Science, Technology, and Communications",0.95,"The bill focuses on amending the Communications Act of 1934 to address satellite television communications, falling under the Space, Science, Technology, and Communications category."
+255,16,"Space, Science, Technology, and Communications",0.95,The bill focuses on amending the Communications Act of 1934 related to satellite television communications.
+256,16,"Space, Science, Technology, and Communications",0.95,The bill focuses on amending the Communications Act of 1934 related to satellite television communications.
+257,17,Foreign Trade,0.85,
+258,17,Foreign Trade,0.85,
+259,17,Foreign Trade,0.85,
+260,17,Foreign Trade,0.95,
+261,17,Foreign Trade,0.95,
+262,17,Foreign Trade,0.95,The bill pertains to foreign trade by specifically targeting the importation of furs from the Union of Soviet Socialist Republics.
+263,17,Foreign Trade,0.9,The bill pertains to foreign trade by prohibiting the importation of furs from the Union of Soviet Socialist Republics.
+264,17,Foreign Trade,0.95,The bill pertains to foreign trade by prohibiting the importation of furs from the Soviet Union.
+265,17,Foreign Trade,0.85,
+266,17,Foreign Trade,0.85,
+267,17,Foreign Trade,0.85,
+268,17,Foreign Trade,0.85,
+269,17,Foreign Trade,0.85,
+270,17,Foreign Trade,0.85,"The bill pertains to extending trade preferences for Andean countries, falling under the category of Foreign Trade."
+271,17,Foreign Trade,0.9,"The bill pertains to extending a trade preference act, which falls under foreign trade."
+272,17,Foreign Trade,0.85,"The bill pertains to trade preferences for Andean countries, falling under the category of Foreign Trade."
+273,18,International Affairs and Foreign Aid,0.85,
+274,18,International Affairs and Foreign Aid,0.95,
+275,18,International Affairs and Foreign Aid,0.85,
+276,18,International Affairs and Foreign Aid,0.85,
+277,18,International Affairs and Foreign Aid,0.95,
+278,18,International Affairs and Foreign Aid,0.9,"The bill focuses on international cultural relations, which falls under the category of International Affairs and Foreign Aid."
+279,18,International Affairs and Foreign Aid,0.9,"The bill focuses on international cultural relations, which falls under the category of International Affairs and Foreign Aid."
+280,18,International Affairs and Foreign Aid,0.95,"The bill focuses on international cultural relations, which falls under the category of International Affairs and Foreign Aid."
+281,15,Defense,0.85,
+282,15,Defense,0.85,
+283,15,Defense,0.85,
+284,15,Defense,0.85,
+285,15,Defense,0.85,
+286,15,Defense,0.85,"The bill pertains to the designation of a foreign terrorist organization, which falls under defense issues."
+287,17,Foreign Trade,0.85,"The bill pertains to the designation of a foreign terrorist organization, which falls under international affairs and foreign aid."
+288,17,Foreign Trade,0.85,"The bill pertains to the designation of a foreign terrorist organization, which falls under international affairs and foreign aid."
+289,19,Government Operations,0.85,
+290,19,Government Operations,0.85,
+291,19,Government Operations,0.85,
+292,19,Government Operations,0.85,
+293,19,Government Operations,0.85,
+294,19,Government Operations,0.85,"The bill pertains to amending a section of the Federal Election Campaign Act, which falls under Government Operations."
+295,19,Government Operations,0.85,"The bill pertains to amending a section of the Federal Election Campaign Act, which falls under Government Operations."
+296,19,Government Operations,0.85,"The bill pertains to amending a section of the Federal Election Campaign Act, which falls under Government Operations."
+297,19,Government Operations,0.85,
+298,19,Government Operations,0.85,
+299,19,Government Operations,0.85,
+300,19,Government Operations,0.85,
+301,19,Government Operations,0.85,
+302,19,Government Operations,0.85,"The bill pertains to settling claims against the District of Columbia, which falls under Government Operations."
+303,19,Government Operations,0.85,"The bill pertains to settling claims against the District of Columbia, which falls under Government Operations."
+304,19,Government Operations,0.85,"The bill pertains to settling claims against the District of Columbia, which falls under Government Operations."
+305,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
+306,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
+307,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
+308,19,Government Operations,0.85,
+309,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
+310,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,The bill focuses on civil rights and citizenship issues for the people of Puerto Rico.
+311,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,The bill focuses on civil rights and citizenship issues for the people of Puerto Rico.
+312,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,This bill pertains to civil rights and citizenship issues for the people of Puerto Rico.
+313,7,Environment,0.95,
+314,7,Environment,0.95,
+315,7,Environment,0.95,
+316,7,Environment,0.95,
+317,7,Environment,0.95,
+318,7,Environment,0.95,"The bill focuses on acquiring land for flood damage reduction and water storage in Florida, which falls under environmental concerns."
+319,7,Environment,0.95,"The bill focuses on acquiring land for flood damage reduction and water storage in Florida, which falls under environmental concerns."
+320,7,Environment,0.95,"The bill focuses on acquiring land for flood damage reduction and water storage in Florida, which falls under environmental concerns."
+321,21,Arts and Entertainment,0.85,
+322,21,Arts and Entertainment,0.95,
+323,21,Arts and Entertainment,0.95,
+324,21,Arts and Entertainment,0.95,
+325,21,Arts and Entertainment,0.95,
+326,21,Arts and Entertainment,0.95,"The bill pertains to making technical corrections to the National Foundation on the Arts and the Humanities Act of 1965, which falls under the category of Arts and Entertainment."
+327,21,Arts and Entertainment,0.95,"The bill pertains to making technical corrections to the National Foundation on the Arts and the Humanities Act of 1965, which falls under the category of Arts and Entertainment."
+328,21,Arts and Entertainment,0.95,"The bill pertains to making technical corrections to the National Foundation on the Arts and the Humanities Act of 1965, which falls under the category of Arts and Entertainment."
+329,12,Social Welfare,0.95,
+330,12,Social Welfare,0.95,
+331,12,Social Welfare,0.95,
+332,12,Social Welfare,0.95,
+333,12,Social Welfare,0.95,
+334,12,Social Welfare,0.95,"The bill focuses on increasing disability compensation for veterans and survivors, falling under social welfare."
+335,12,Social Welfare,0.95,"The bill focuses on increasing disability compensation for veterans and survivors, which falls under social welfare issues."
+336,12,Social Welfare,0.95,"The bill focuses on increasing disability compensation for veterans and survivors, falling under social welfare."

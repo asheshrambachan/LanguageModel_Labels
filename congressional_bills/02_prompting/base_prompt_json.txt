@@ -24,9 +24,7 @@ Please classify this description into one of the following categories:
 20. Public Lands and Water Management
 21. Arts and Entertainment
 
-%s
-
-Output a JSON object structured like: {
-    “category”: an integer from 1 to 21 of the bill category,
-    “confidence”: a float number from 0 to 1 with two decimal places of your confidence in your bill classification%s
+%sOutput a JSON object structured like: {
+    "category": an integer from 1 to 21 of the bill category,
+    "confidence": a number from 0 to 1 with 2 decimal places of your confidence in your bill classification%s
 }
