@@ -1,0 +1,32 @@
+%sHere is a description of a bill introduced in the U.S. Congress:
+"%s."
+
+Please classify this description into one of the following categories:
+1. Macroeconomics
+2. Civil Rights, Minority Issues, and Civil Liberties
+3. Health
+4. Agriculture
+5. Labor and Employment
+6. Education
+7. Environment
+8. Energy
+9. Immigration
+10. Transportation
+11. Law, Crime, and Family Issues
+12. Social Welfare
+13. Community Development and Housing Issues
+14. Banking, Finance, and Domestic Commerce
+15. Defense
+16. Space, Science, Technology, and Communications
+17. Foreign Trade
+18. International Affairs and Foreign Aid
+19. Government Operations
+20. Public Lands and Water Management
+21. Arts and Entertainment
+
+%s
+
+Output a JSON object structured like: {
+    “category”: an integer from 1 to 21 of the bill category,
+    “confidence”: a float number from 0 to 1 with two decimal places of your confidence in your bill classification%s
+}

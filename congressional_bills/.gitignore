@@ -1,4 +1,2 @@
 # Ignore unzipped data
-bills.csv
-
-.DS_Store
+bills*.csv
