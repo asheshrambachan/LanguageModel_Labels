@@ -1,4 +1,4 @@
 .DS_Store
 settings.json
 .env
-congressional_bills/01_cleaning_and_data/*.csv
+congressional_bills/01_bills/*.csv
