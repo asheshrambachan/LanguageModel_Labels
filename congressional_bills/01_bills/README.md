@@ -32,4 +32,4 @@ While our approach shares similarities with Egami's method, we have made several
 - [ ] Decide on which data source, CAP or CBP, to rely on for `Major`, `Description`, `Party`, `PassS`, and `PassH`. Currently, I go with CBP.
 - [ ] Decide whether to exclude columns with any missing values as in Egami et al. (2023)
 - [x] Create a new coding for major topics IDs as topic 11 is not included in the data
-- [ ] Create a codebook for the variables based on ICPSR
+- [x] Create a codebook for the variables based on ICPSR
