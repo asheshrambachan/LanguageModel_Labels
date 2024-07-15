@@ -3,3 +3,4 @@ settings.json
 .env
 congressional_bills/01_bills/*.csv
 congressional_bills/01_bills/bills80-92.txt
+congressional_bills/02_llm/*.jsonl
