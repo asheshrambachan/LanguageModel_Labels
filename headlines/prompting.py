@@ -1,97 +1,126 @@
-from openai import OpenAI
 import pandas as pd
-import numpy as np
+from openai import OpenAI
 from tqdm import tqdm
-from constants import API_KEY, MODEL, TEMPERATURE, NUM_RESPONSES, personas, thought_modifiers, explanation
+from constants import API_KEY, MODEL, TEMPERATURE, NUM_RESPONSES, personas, thought_modifiers, explanation, explanation_json
 
-# define a response function that gives us the LLM's response to a user prompt
-def get_response(content, chain_of_thought = False):
+# Configuration constants
+JSON_SWITCH = [True, False]
+CSV_FILE = "sample.csv"
+BASE_PROMPT_FILE = 'base_prompt'
+OUTPUT_FILE = "test_labels"
+
+# Initialize OpenAI client
+client = OpenAI(api_key=API_KEY)
+
+def get_response(content, JSON=False, chain_of_thought=False):
+    """
+    Fetches the response from the OpenAI model.
+    
+    Parameters:
+    - content (str): The prompt to send to the model.
+    - JSON (bool): Whether to include JSON explanation.
+    - chain_of_thought (bool): Whether to include chain of thought in the prompt.
+
+    Returns:
+    - response_text (str): The response from the model.
+    """
+    if chain_of_thought:
+        content = content[:-1] + (explanation_json if JSON else explanation)
+    
     response = client.chat.completions.create(
-        model = MODEL,
-        messages=[
-        {"role": "user", "content": content}
-        ],
-        logprobs = True,
-        n = NUM_RESPONSES,
-        temperature = TEMPERATURE
-
-    )   
-
-    response_text = response.choices[0].message.content
-    return(response_text)
-
-# define a response function that gives us the LLM's response to a user prompt
-def get_response_json(content, chain_of_thought = False):
-    system = 'Output a JSON object structured like {"headline type": "positive" or "negative" or "neutral", "confidence": 0-1 value of your confidence in the headline type, "magnitude": magnitude of positive or negative for the headline type}'
-    if(chain_of_thought):
-        system = system[:-1] + ', "explanation": once sentence explanation for your headline type answer}'
-    response = client.chat.completions.create(
-        model = MODEL,
-        messages=[
-        {"role": "system", "content": system},
-        {"role": "user", "content": content}
-        ],
-        logprobs = True,
-        n = NUM_RESPONSES,
-        temperature = TEMPERATURE
-
+        model=MODEL,
+        messages=[{"role": "user", "content": content}],
+        logprobs=True,
+        n=NUM_RESPONSES,
+        temperature=TEMPERATURE
     )
 
     response_text = response.choices[0].message.content
-    return(response_text)
+    return response_text
 
-# read in the base prompt
-with open('base_prompt_json.txt', 'r') as file:
-    content = file.read()
+def read_base_prompt(suffix):
+    """
+    Reads the base prompt from a file.
+    
+    Parameters:
+    - suffix (str): The suffix to determine the file name.
 
-# read in our sample company df
-companies = pd.read_csv("sample.csv").head(100)
+    Returns:
+    - content (str): The content of the base prompt file.
+    """
+    with open(BASE_PROMPT_FILE + suffix + '.txt', 'r') as file:
+        content = file.read()
+    return content
 
-# create open AI client with api key
-client = OpenAI(api_key = API_KEY)
+def generate_responses(companies, content, switch):
+    """
+    Generates responses for each company in the dataframe.
+    
+    Parameters:
+    - companies (DataFrame): DataFrame containing company information.
+    - content (str): The base content for the prompt.
+    - switch (bool): Whether to include JSON in the responses.
 
-prompts = []
-responses = []
-# iterate over all the companies in the sample
-for index, row in companies.iterrows():
-    company = row["company_name"]
-    headline = row["headline"]
+    Returns:
+    - prompts (list): List of prompts used.
+    - responses (list): List of responses generated.
+    """
+    prompts = []
+    responses = []
 
-    company_content = content % (company, headline, company)
+    for index, row in tqdm(companies.iterrows(), total=companies.shape[0]):
+        company = row["company_name"]
+        headline = row["headline"]
 
-    base_q = company_content
-    base_a = get_response_json(content=company_content)
+        company_content = content % (company, headline, company)
 
-    personas_q = []
-    personas_a = []
-    for persona in personas:
-        personas_q.append(persona + company_content)
-        try: 
-            personas_a.append(get_response_json(content=(persona + company_content)))
-        except:
-            personas_a.append(None)
+        base_q = company_content
+        try:
+            base_a = get_response(content=company_content, JSON=switch)
+        except Exception as e:
+            base_a = None
+            print(f"Error generating base response for {company}: {e}")
 
-    thought_q = []
-    thought_a = []
-    pt1, pt2 = company_content.split("Write", 1)[0], "Write" + company_content.split("Write", 1)[1]
-    for thought in thought_modifiers:
-        thought_q.append(pt1 + thought + pt2 + explanation)
-        try: 
-            thought_a.append(get_response_json(content=(pt1 + thought + pt2 + explanation), chain_of_thought=True))
-        except:
-            thought_a.append(None)
+        personas_q = [persona + company_content for persona in personas]
+        personas_a = []
+        for persona_q in personas_q:
+            try:
+                personas_a.append(get_response(content=persona_q, JSON=switch))
+            except Exception as e:
+                personas_a.append(None)
+                print(f"Error generating persona response: {e}")
 
+        thought_q = []
+        thought_a = []
+        pt1, pt2 = company_content.split("Write", 1)[0], "Write" + company_content.split("Write", 1)[1]
+        for thought in thought_modifiers:
+            thought_prompt = pt1 + thought + pt2 + (explanation_json if switch else explanation)
+            thought_q.append(thought_prompt)
+            try:
+                thought_a.append(get_response(content=thought_prompt, chain_of_thought=True, JSON=switch))
+            except Exception as e:
+                thought_a.append(None)
+                print(f"Error generating thought-modifier response: {e}")
 
-    prompts = prompts + [base_q] + personas_q + thought_q
-    responses = responses + [base_a] + personas_a + thought_a
+        prompts.extend([base_q] + personas_q + thought_q)
+        responses.extend([base_a] + personas_a + thought_a)
 
-    print(index)
+    return prompts, responses
 
-data = pd.DataFrame({
-    "prompt": prompts,
-    "response": responses
-})
-
-data.to_csv("test_labels_json.csv")
+def main():
+    for switch in JSON_SWITCH:
+        suffix = "_json" if switch else ""
+        content = read_base_prompt(suffix)
+        companies = pd.read_csv(CSV_FILE)
         
+        prompts, responses = generate_responses(companies, content, switch)
 
+        data = pd.DataFrame({
+            "prompt": prompts,
+            "response": responses
+        })
+
+        data.to_csv(OUTPUT_FILE + suffix + ".csv", index=False)
+
+if __name__ == "__main__":
+    main()
