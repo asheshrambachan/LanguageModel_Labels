@@ -1,379 +1,56 @@
-PromptID,MajorLLM,MajorTextLLM,ConfidenceLLM,ExplanationLLM
-1,14,"Banking, Finance, and Domestic Commerce",0.85,
-2,14,"Banking, Finance, and Domestic Commerce",0.85,
-3,14,"Banking, Finance, and Domestic Commerce",0.85,
-4,14,"Banking, Finance, and Domestic Commerce",0.85,
-5,14,"Banking, Finance, and Domestic Commerce",0.85,
-6,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill focuses on amending the Internal Revenue Code to expand the availability of industrial development bonds, which falls under Banking, Finance, and Domestic Commerce."
-7,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill focuses on amending the Internal Revenue Code to expand the availability of industrial development bonds, which falls under Banking, Finance, and Domestic Commerce."
-8,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill focuses on amending the Internal Revenue Code to expand the availability of industrial development bonds, which falls under Banking, Finance, and Domestic Commerce."
-9,14,"Banking, Finance, and Domestic Commerce",1.0,
-10,14,"Banking, Finance, and Domestic Commerce",0.85,
-11,14,"Banking, Finance, and Domestic Commerce",0.8,
-12,14,"Banking, Finance, and Domestic Commerce",0.75,
-13,14,"Banking, Finance, and Domestic Commerce",0.85,
-14,19,Government Operations,0.85,
-15,14,"Banking, Finance, and Domestic Commerce",0.8,"The bill pertains to amending tax laws, which falls under Banking, Finance, and Domestic Commerce."
-16,14,"Banking, Finance, and Domestic Commerce",0.8,"The bill pertains to amending the Internal Revenue Code, which falls under Banking, Finance, and Domestic Commerce."
-17,14,"Banking, Finance, and Domestic Commerce",0.8,"The bill is related to amending tax laws, which falls under Banking, Finance, and Domestic Commerce."
-18,6,Education,1.0,
-19,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
-20,5,Labor and Employment,0.95,
-21,5,Labor and Employment,0.85,
-22,5,Labor and Employment,0.95,
-23,5,Labor and Employment,0.95,
-24,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,The bill focuses on amending the Civil Rights Act of 1964 to address attorneys fees in cases related to equal employment opportunities.
-25,5,Labor and Employment,0.95,"The bill focuses on amending the Civil Rights Act of 1964 to address attorneys fees in employment discrimination cases, falling under the Labor and Employment category."
-26,5,Labor and Employment,0.95,The bill focuses on amending the Civil Rights Act of 1964 to address attorneys fees in employment discrimination cases.
-27,5,Labor and Employment,1.0,
-28,11,"Law, Crime, and Family Issues",0.95,
-29,11,"Law, Crime, and Family Issues",0.95,
-30,11,"Law, Crime, and Family Issues",0.95,
-31,11,"Law, Crime, and Family Issues",0.95,
-32,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,
-33,11,"Law, Crime, and Family Issues",0.95,"This bill addresses issues related to law, crime, and civil rights by aiming to prevent crimes against Negroes and civil rights workers."
-34,11,"Law, Crime, and Family Issues",0.95,"This bill addresses issues related to crimes, intimidation, violence, and murder, specifically targeting Negroes and civil rights workers."
-35,2,"Civil Rights, Minority Issues, and Civil Liberties",0.95,"This bill is related to Civil Rights, Minority Issues, and Civil Liberties as it aims to prevent crimes against Negroes and civil rights workers."
-36,2,"Civil Rights, Minority Issues, and Civil Liberties",1.0,
-37,12,Social Welfare,0.95,
-38,12,Social Welfare,0.95,
-39,12,Social Welfare,0.95,
-40,12,Social Welfare,0.95,
-41,12,Social Welfare,0.95,
-42,3,Health,0.95,"The bill focuses on expanding dental coverage under Medicaid and State children's health insurance programs, indicating a health-related issue."
-43,3,Health,0.95,"The bill focuses on expanding dental coverage under Medicaid and State children's health insurance programs, indicating a health-related issue."
-44,12,Social Welfare,0.95,"The bill focuses on expanding dental coverage under Medicaid and State children's health insurance programs, as well as funding for community oral health services, which falls under the category of Social Welfare."
-45,3,Health,1.0,
-46,3,Health,0.85,
-47,3,Health,0.95,
-48,3,Health,0.95,
-49,3,Health,0.85,
-50,3,Health,0.95,
-51,3,Health,0.95,The bill focuses on amending the Public Health Service Act to establish a national program of health research fellowships and traineeships.
-52,3,Health,0.95,"The bill focuses on amending the Public Health Service Act to establish a national program of health research fellowships and traineeships, indicating a focus on health-related issues."
-53,3,Health,0.95,"The bill focuses on amending the Public Health Service Act to establish a national program of health research fellowships and traineeships, indicating a focus on health-related issues."
-54,3,Health,1.0,
-55,19,Government Operations,0.8,
-56,19,Government Operations,0.8,
-57,19,Government Operations,0.85,
-58,19,Government Operations,0.85,
-59,19,Government Operations,0.85,
-60,19,Government Operations,0.8,"The bill is related to amending and supplementing an existing act, which falls under Government Operations."
-61,19,Government Operations,0.8,The bill is likely related to government operations as it seeks to amend and supplement an existing act.
-62,19,Government Operations,0.8,"The bill is related to amending and supplementing an existing act, which falls under Government Operations."
-63,4,Agriculture,1.0,
-64,4,Agriculture,0.95,
-65,4,Agriculture,0.95,
-66,4,Agriculture,0.95,
-67,4,Agriculture,0.95,
-68,4,Agriculture,0.95,
-69,4,Agriculture,0.95,"The bill pertains to amending agricultural acts and handling assessments, indicating it falls under the Agriculture category."
-70,4,Agriculture,0.95,The bill pertains to amending agricultural acts and handling assessments for administrative costs.
-71,4,Agriculture,0.95,"The bill pertains to amending the Agriculture Adjustment Act of 1933 and the Agricultural Marketing Agreement Act of 1937, indicating it falls under the Agriculture category."
-72,4,Agriculture,1.0,
-73,5,Labor and Employment,0.95,
-74,5,Labor and Employment,0.95,
-75,5,Labor and Employment,0.95,
-76,5,Labor and Employment,0.95,
-77,5,Labor and Employment,0.95,
-78,5,Labor and Employment,0.95,"The bill focuses on amending the Fair Labor Standards Act of 1938 to increase the minimum wage, which falls under Labor and Employment issues."
-79,5,Labor and Employment,0.95,"The bill focuses on amending the Fair Labor Standards Act of 1938 to increase the minimum wage, which falls under Labor and Employment issues."
-80,5,Labor and Employment,0.95,"The bill focuses on amending the Fair Labor Standards Act of 1938 to increase the minimum wage, which falls under Labor and Employment issues."
-81,5,Labor and Employment,1.0,
-82,5,Labor and Employment,0.85,
-83,5,Labor and Employment,0.85,
-84,5,Labor and Employment,0.85,
-85,5,Labor and Employment,0.85,
-86,5,Labor and Employment,0.95,
-87,5,Labor and Employment,0.95,"The bill relates to regulations of the Secretary of Labor, specifically regarding claims under the Black Lung Benefits Act, which falls under the category of Labor and Employment."
-88,5,Labor and Employment,0.9,"The bill pertains to regulations of the Secretary of Labor, specifically related to the Black Lung Benefits Act, indicating a focus on labor and employment issues."
-89,5,Labor and Employment,0.95,"The bill pertains to regulations of the Secretary of Labor, specifically related to the Black Lung Benefits Act, indicating a focus on labor and employment issues."
-90,5,Labor and Employment,1.0,
-91,6,Education,0.95,
-92,6,Education,0.95,
-93,6,Education,0.95,
-94,6,Education,0.95,
-95,6,Education,0.95,
-96,6,Education,0.95,"The bill focuses on amending the tax code to provide a credit for higher education expenses, which falls under the Education category."
-97,6,Education,0.95,"The bill focuses on amending the tax code to provide a credit for higher education expenses, which falls under the Education category."
-98,6,Education,0.95,"The bill focuses on amending the Internal Revenue Code to provide a credit for higher education expenses, falling under the Education category."
-99,6,Education,1.0,
-100,6,Education,0.95,
-101,6,Education,0.95,
-102,6,Education,0.95,
-103,6,Education,0.95,
-104,6,Education,0.95,
-105,6,Education,0.95,"The bill focuses on amending the tax code to allow deductions for tuition and fees for higher education, which falls under the Education category."
-106,6,Education,0.95,"The bill focuses on amending the Internal Revenue Code to allow deductions for tuition and fees for higher education, indicating an education-related issue."
-107,6,Education,0.95,"The bill focuses on amending the Internal Revenue Code to allow deductions for tuition and fees for higher education, indicating an education-related issue."
-108,6,Education,1.0,
-109,7,Environment,0.85,
-110,7,Environment,0.95,
-111,7,Environment,0.85,
-112,7,Environment,0.95,
-113,7,Environment,0.95,
-114,7,Environment,0.95,"The bill focuses on amending the Federal Water Pollution Control Act, indicating it falls under the Environment category."
-115,7,Environment,0.95,"The bill focuses on amending the Federal Water Pollution Control Act, indicating it falls under the Environment category."
-116,7,Environment,0.95,"The bill focuses on amending the Federal Water Pollution Control Act, indicating it falls under the Environment category."
-117,7,Environment,1.0,
-118,7,Environment,0.85,
-119,7,Environment,0.85,
-120,7,Environment,0.85,
-121,7,Environment,0.95,
-122,7,Environment,0.85,
-123,7,Environment,0.95,"The bill focuses on amending tax laws related to land conservation, indicating an environmental concern."
-124,7,Environment,0.85,"The bill pertains to amending the Internal Revenue Code to increase limitations on the exclusion of land subject to conservation easements, which falls under environmental issues."
-125,7,Environment,0.85,"The bill focuses on amending the Internal Revenue Code to increase limitations on the exclusion of land subject to conservation easements, indicating a focus on environmental issues."
-126,7,Environment,1.0,
-127,8,Energy,0.85,
-128,8,Energy,0.85,
-129,8,Energy,0.85,
-130,8,Energy,0.85,
-131,8,Energy,0.85,
-132,8,Energy,0.85,"The bill focuses on regulating the acquisition and operation of motor fuel service stations, which falls under the Energy category."
-133,8,Energy,0.85,"The bill focuses on energy-related issues, specifically in the motor fuel service station industry."
-134,8,Energy,0.85,"The bill focuses on regulating the acquisition and operation of motor fuel service stations, which falls under the energy sector."
-135,8,Energy,1.0,
-136,8,Energy,0.85,
-137,8,Energy,0.85,
-138,8,Energy,0.85,
-139,8,Energy,0.85,
-140,8,Energy,0.85,
-141,8,Energy,0.95,"The bill focuses on royalties for production of oil and natural gas from Federal lands, falling under the Energy category."
-142,8,Energy,0.85,"The bill pertains to the regulation of royalties for oil and natural gas production on Federal lands, falling under the Energy category."
-143,8,Energy,0.85,"The bill pertains to the production of oil and natural gas from Federal lands, making it related to energy issues."
-144,8,Energy,1.0,
-145,9,Immigration,0.85,
-146,9,Immigration,0.85,
-147,9,Immigration,0.85,
-148,9,Immigration,0.85,
-149,9,Immigration,0.85,
-150,9,Immigration,0.95,The bill pertains to immigration policy and specifically addresses the validity of driver's licenses and state identification cards for nonimmigrant aliens.
-151,9,Immigration,0.95,The bill pertains to immigration policies and regulations regarding nonimmigrant aliens.
-152,9,Immigration,0.95,The bill pertains to immigration policies and regulations regarding nonimmigrant aliens.
-153,9,Immigration,1.0,
-154,9,Immigration,0.85,
-155,9,Immigration,0.95,
-156,9,Immigration,0.95,
-157,9,Immigration,0.95,
-158,9,Immigration,0.95,
-159,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, specifically related to the naturalization process."
-160,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, indicating it falls under the Immigration category."
-161,9,Immigration,0.95,"The bill focuses on amending the Immigration and Nationality Act, specifically related to the naturalization process."
-162,9,Immigration,1.0,
-163,10,Transportation,0.85,
-164,5,Labor and Employment,0.85,
-165,10,Transportation,0.85,
-166,10,Transportation,0.85,
-167,10,Transportation,0.85,
-168,10,Transportation,0.85,"The bill focuses on expediting construction of highway projects, which falls under the category of Transportation."
-169,10,Transportation,0.95,"The bill focuses on expediting construction of highway projects, which falls under the category of Transportation."
-170,10,Transportation,0.95,"The bill focuses on expediting construction of highway projects, which falls under the category of Transportation."
-171,10,Transportation,1.0,
-172,10,Transportation,0.85,
-173,10,Transportation,0.95,
-174,10,Transportation,0.95,
-175,10,Transportation,0.95,
-176,10,Transportation,0.95,
-177,10,Transportation,0.95,The bill pertains to transportation by authorizing the acquisition of an ice cutter for the Great Lakes.
-178,10,Transportation,0.95,The bill pertains to transportation infrastructure on the Great Lakes.
-179,10,Transportation,0.95,The bill pertains to transportation by authorizing the acquisition of an ice cutter for the Great Lakes.
-180,10,Transportation,1.0,
-181,12,Social Welfare,0.85,
-182,6,Education,0.85,
-183,12,Social Welfare,0.85,
-184,12,Social Welfare,0.85,
-185,12,Social Welfare,0.85,
-186,12,Social Welfare,0.85,"This bill focuses on research and dissemination of information related to child life and development, which falls under the category of Social Welfare."
-187,6,Education,0.9,"The bill focuses on research and dissemination of information related to child life and development, which falls under the category of Education."
-188,6,Education,0.85,"The bill focuses on research and dissemination of information related to child life and development, which falls under the category of Education."
-189,3,Health,1.0,
-190,11,"Law, Crime, and Family Issues",0.85,
-191,11,"Law, Crime, and Family Issues",0.85,
-192,11,"Law, Crime, and Family Issues",0.85,
-193,11,"Law, Crime, and Family Issues",0.85,
-194,11,"Law, Crime, and Family Issues",0.85,
-195,11,"Law, Crime, and Family Issues",0.95,The bill addresses issues related to the insanity defense in federal criminal cases and federal intervention in State criminal proceedings.
-196,11,"Law, Crime, and Family Issues",0.85,The bill focuses on reforming the insanity defense in federal criminal cases and defining circumstances justifying federal intervention in State criminal proceedings.
-197,11,"Law, Crime, and Family Issues",0.95,The bill focuses on reforming the insanity defense in federal criminal cases and defining circumstances justifying federal intervention in State criminal proceedings.
-198,11,"Law, Crime, and Family Issues",1.0,
-199,12,Social Welfare,0.85,
-200,12,Social Welfare,0.85,
-201,12,Social Welfare,0.85,
-202,12,Social Welfare,0.85,
-203,12,Social Welfare,0.85,
-204,12,Social Welfare,0.95,"The bill focuses on amending the Social Security Act to increase benefits and revise the method for determining outside earnings, which falls under the category of Social Welfare."
-205,12,Social Welfare,0.9,"The bill focuses on amending the Social Security Act to increase benefits and revise the method for determining outside earnings, which falls under social welfare issues."
-206,12,Social Welfare,0.95,"The bill focuses on amending the Social Security Act to increase benefits and earnings, which falls under the category of Social Welfare."
-207,12,Social Welfare,1.0,
-208,19,Government Operations,0.7,
-209,19,Government Operations,0.75,
-210,19,Government Operations,0.85,
-211,19,Government Operations,0.85,
-212,19,Government Operations,0.85,
-213,19,Government Operations,0.8,The bill pertains to government operations and the designation of funds in State accounts.
-214,19,Government Operations,0.8,The bill pertains to government operations related to the Reed Act and state funds designation.
-215,19,Government Operations,0.8,"The bill pertains to the extension and authorization of funds in State accounts, which falls under Government Operations."
-216,19,Government Operations,1.0,
-217,18,International Affairs and Foreign Aid,0.85,
-218,18,International Affairs and Foreign Aid,0.85,
-219,18,International Affairs and Foreign Aid,0.85,
-220,18,International Affairs and Foreign Aid,0.85,
-221,18,International Affairs and Foreign Aid,0.85,
-222,18,International Affairs and Foreign Aid,0.95,"The bill focuses on establishing an International Home Loan Bank to assist in the development of savings associations and building societies in countries where they do not currently exist, indicating a focus on international affairs and foreign aid."
-223,14,"Banking, Finance, and Domestic Commerce",0.95,"The bill focuses on establishing an International Home Loan Bank to assist in the development of savings associations and building societies, which falls under Banking, Finance, and Domestic Commerce."
-224,18,International Affairs and Foreign Aid,0.85,"The bill focuses on establishing an International Home Loan Bank to assist in the development of savings associations and building societies in countries where they do not currently exist, indicating a focus on international affairs and foreign aid."
-225,18,International Affairs and Foreign Aid,1.0,
-226,12,Social Welfare,0.95,
-227,12,Social Welfare,0.95,
-228,12,Social Welfare,0.95,
-229,12,Social Welfare,0.95,
-230,12,Social Welfare,0.95,
-231,12,Social Welfare,0.95,"The bill focuses on providing rental assistance to low-income families, which falls under social welfare and housing issues."
-232,12,Social Welfare,0.95,"The bill focuses on providing rental assistance to low-income families, which falls under social welfare and housing issues."
-233,12,Social Welfare,0.95,"The bill focuses on providing rental assistance to low-income families, which falls under social welfare and housing issues."
-234,13,Community Development and Housing Issues,1.0,
-235,13,Community Development and Housing Issues,0.85,
-236,13,Community Development and Housing Issues,0.85,
-237,12,Social Welfare,0.85,
-238,12,Social Welfare,0.85,
-239,12,Social Welfare,0.85,
-240,13,Community Development and Housing Issues,0.85,"The bill focuses on requirements and restrictions related to consumer reporting agencies on individuals renting residential property, which falls under housing issues."
-241,13,Community Development and Housing Issues,0.85,"The bill focuses on requirements and restrictions related to consumer reporting agencies on individuals renting residential property, which falls under the category of Community Development and Housing Issues."
-242,13,Community Development and Housing Issues,0.85,"The bill focuses on establishing requirements and restrictions for consumer reporting agencies on individuals renting residential property, which falls under housing issues."
-243,13,Community Development and Housing Issues,1.0,
-244,20,Public Lands and Water Management,0.85,
-245,20,Public Lands and Water Management,0.85,
-246,20,Public Lands and Water Management,0.85,
-247,20,Public Lands and Water Management,0.85,
-248,20,Public Lands and Water Management,0.85,
-249,20,Public Lands and Water Management,0.85,"The bill pertains to the purchase of bonds to finance the development of water resources in the Brazos River Basin, which falls under public lands and water management."
-250,20,Public Lands and Water Management,0.85,"The bill pertains to the purchase of bonds to finance the development of water resources in the Brazos River Basin, which falls under public lands and water management."
-251,20,Public Lands and Water Management,0.85,"The bill pertains to the purchase of bonds to finance the development of water resources in the Brazos River Basin, indicating a focus on public lands and water management."
-252,20,Public Lands and Water Management,1.0,
-253,12,Social Welfare,0.85,
-254,12,Social Welfare,0.95,
-255,12,Social Welfare,0.85,
-256,12,Social Welfare,0.85,
-257,12,Social Welfare,0.85,
-258,12,Social Welfare,0.95,"The bill focuses on increasing income limitations for pension and compensation for veterans, falling under social welfare issues."
-259,12,Social Welfare,0.85,"The bill focuses on increasing income limitations for pension and compensation for veterans, falling under social welfare issues."
-260,12,Social Welfare,0.85,"The bill focuses on increasing income limitations for pension and compensation for veterans, falling under social welfare."
-261,15,Defense,1.0,
-262,15,Defense,0.85,
-263,15,Defense,0.85,
-264,15,Defense,0.85,
-265,15,Defense,0.85,
-266,15,Defense,0.85,
-267,15,Defense,0.85,The bill pertains to the military and specifically addresses the uniform requirements for Army and Air Force National Guard technicians.
-268,15,Defense,0.85,The bill pertains to the military and specifically addresses the uniform requirements for Army and Air Force National Guard technicians.
-269,15,Defense,0.85,The bill pertains to the military and specifically addresses the uniform requirements for Army and Air Force National Guard technicians.
-270,15,Defense,1.0,
-271,16,"Space, Science, Technology, and Communications",0.85,
-272,16,"Space, Science, Technology, and Communications",0.95,
-273,16,"Space, Science, Technology, and Communications",0.95,
-274,16,"Space, Science, Technology, and Communications",0.95,
-275,16,"Space, Science, Technology, and Communications",0.95,
-276,16,"Space, Science, Technology, and Communications",0.95,"The bill focuses on technology standards and the free flow of information, making it related to Space, Science, Technology, and Communications."
-277,16,"Space, Science, Technology, and Communications",0.95,"The bill focuses on technology standards and the free flow of information, which falls under the Space, Science, Technology, and Communications category."
-278,16,"Space, Science, Technology, and Communications",0.95,"The bill focuses on technology standards and the free flow of information, making it related to Space, Science, Technology, and Communications."
-279,17,Foreign Trade,1.0,
-280,16,"Space, Science, Technology, and Communications",0.85,
-281,16,"Space, Science, Technology, and Communications",0.85,
-282,16,"Space, Science, Technology, and Communications",0.85,
-283,16,"Space, Science, Technology, and Communications",0.85,
-284,16,"Space, Science, Technology, and Communications",0.85,
-285,16,"Space, Science, Technology, and Communications",0.85,"The bill pertains to amending a section of the Communication Act of 1934, specifically related to including Hawaii in the same category as other States for communication purposes."
-286,16,"Space, Science, Technology, and Communications",0.85,"The bill pertains to amending a section of the Communication Act of 1934, specifically related to including Hawaii in the same category as other States for communication purposes."
-287,16,"Space, Science, Technology, and Communications",0.85,"The bill pertains to amending a section of the Communication Act of 1934, specifically related to including Hawaii in the same category as other States, indicating a focus on communication and technology issues."
-288,16,"Space, Science, Technology, and Communications",1.0,
-289,14,"Banking, Finance, and Domestic Commerce",0.75,
-290,14,"Banking, Finance, and Domestic Commerce",0.85,
-291,14,"Banking, Finance, and Domestic Commerce",0.85,
-292,14,"Banking, Finance, and Domestic Commerce",0.85,
-293,14,"Banking, Finance, and Domestic Commerce",0.85,
-294,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill pertains to the suspension of duty on a specific chemical compound, which falls under the realm of Banking, Finance, and Domestic Commerce."
-295,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill pertains to the suspension of duty on a specific chemical compound, which falls under the realm of Banking, Finance, and Domestic Commerce."
-296,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill pertains to the suspension of duty on a specific chemical compound, which falls under the realm of Banking, Finance, and Domestic Commerce."
-297,17,Foreign Trade,1.0,
-298,17,Foreign Trade,0.85,
-299,17,Foreign Trade,0.9,
-300,17,Foreign Trade,0.85,
-301,17,Foreign Trade,0.85,
-302,17,Foreign Trade,0.85,
-303,17,Foreign Trade,0.85,"The bill focuses on amending the U.S. Tariff Code, which falls under the category of Foreign Trade."
-304,17,Foreign Trade,0.85,"The bill focuses on amending the U.S. Tariff Code, which falls under the category of Foreign Trade."
-305,17,Foreign Trade,0.85,"The bill focuses on amending the U.S. Tariff Code, which falls under the category of Foreign Trade."
-306,17,Foreign Trade,1.0,
-307,17,Foreign Trade,0.75,
-308,17,Foreign Trade,0.85,
-309,17,Foreign Trade,0.85,
-310,17,Foreign Trade,0.85,
-311,17,Foreign Trade,0.85,
-312,17,Foreign Trade,0.85,"The bill relates to a national referendum on the Panama Canal, which falls under the category of Foreign Trade."
-313,17,Foreign Trade,0.85,"The bill relates to a national referendum on the Panama Canal, which falls under the category of Foreign Trade."
-314,17,Foreign Trade,0.85,"The bill relates to a national referendum on the Panama Canal, which falls under the category of Foreign Trade."
-315,18,International Affairs and Foreign Aid,1.0,
-316,20,Public Lands and Water Management,0.85,
-317,7,Environment,0.95,
-318,7,Environment,0.85,
-319,20,Public Lands and Water Management,0.85,
-320,20,Public Lands and Water Management,0.85,
-321,20,Public Lands and Water Management,0.85,"The bill pertains to establishing fishing zones beyond territorial seas, which falls under public lands and water management."
-322,20,Public Lands and Water Management,0.85,"The bill pertains to establishing fishing zones beyond territorial seas, which falls under public lands and water management."
-323,20,Public Lands and Water Management,0.85,"The bill pertains to establishing fishing zones beyond territorial seas, which falls under public lands and water management."
-324,7,Environment,1.0,
-325,18,International Affairs and Foreign Aid,0.85,
-326,18,International Affairs and Foreign Aid,0.85,
-327,18,International Affairs and Foreign Aid,0.85,
-328,18,International Affairs and Foreign Aid,0.85,
-329,18,International Affairs and Foreign Aid,0.85,
-330,18,International Affairs and Foreign Aid,0.85,"The bill pertains to the acquisition and use of property in the District of Columbia for international organizations and foreign governments, falling under the category of International Affairs and Foreign Aid."
-331,18,International Affairs and Foreign Aid,0.85,"The bill pertains to the acquisition and use of property in the District of Columbia for international organizations and foreign governments, falling under the category of International Affairs and Foreign Aid."
-332,18,International Affairs and Foreign Aid,0.85,"The bill pertains to the acquisition and use of property in the District of Columbia for international organizations and foreign governments, falling under the category of International Affairs and Foreign Aid."
-333,18,International Affairs and Foreign Aid,1.0,
-334,21,Arts and Entertainment,0.85,
-335,21,Arts and Entertainment,0.95,
-336,21,Arts and Entertainment,0.95,
-337,21,Arts and Entertainment,0.95,
-338,21,Arts and Entertainment,0.85,
-339,21,Arts and Entertainment,0.95,"The bill pertains to commemorating the 200th anniversary of the birth of a religious figure, which falls under the Arts and Entertainment category."
-340,21,Arts and Entertainment,0.9,"The bill pertains to the issuance of a special postage stamp to commemorate a historical figure, which falls under arts and entertainment."
-341,21,Arts and Entertainment,0.85,This bill relates to the arts and entertainment category as it involves the issuance of a special postage stamp to commemorate a historical figure.
-342,2,"Civil Rights, Minority Issues, and Civil Liberties",1.0,
-343,20,Public Lands and Water Management,0.85,
-344,20,Public Lands and Water Management,0.85,
-345,20,Public Lands and Water Management,0.85,
-346,20,Public Lands and Water Management,0.85,
-347,20,Public Lands and Water Management,0.85,
-348,20,Public Lands and Water Management,0.95,"The bill pertains to the conveyance of land by the Secretary of Agriculture, falling under public lands and water management."
-349,20,Public Lands and Water Management,0.9,"The bill pertains to the conveyance of public land, falling under the category of Public Lands and Water Management."
-350,20,Public Lands and Water Management,0.95,"The bill pertains to the conveyance of land by the Secretary of Agriculture, falling under Public Lands and Water Management."
-351,4,Agriculture,1.0,
-352,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
-353,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
-354,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
-355,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
-356,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,
-357,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,"This bill relates to civil rights and minority issues by extending the time for commencing actions on behalf of an Indian tribe, band, or group."
-358,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,"This bill relates to civil rights and minority issues by extending the time for commencing actions on behalf of an Indian tribe, band, or group."
-359,2,"Civil Rights, Minority Issues, and Civil Liberties",0.85,"This bill relates to civil rights and minority issues by extending the time for commencing actions on behalf of an Indian tribe, band, or group."
-360,2,"Civil Rights, Minority Issues, and Civil Liberties",1.0,
-361,21,Arts and Entertainment,0.95,
-362,21,Arts and Entertainment,0.95,
-363,21,Arts and Entertainment,0.95,
-364,21,Arts and Entertainment,0.95,
-365,21,Arts and Entertainment,0.95,
-366,21,Arts and Entertainment,0.95,"The bill focuses on amending arts-related acts and making changes to coverage provisions, indicating it falls under the Arts and Entertainment category."
-367,21,Arts and Entertainment,0.95,"The bill focuses on amending arts-related acts and making changes to coverage provisions, indicating it falls under the Arts and Entertainment category."
-368,21,Arts and Entertainment,0.95,"The bill focuses on amending acts related to arts and museums, indicating it falls under the Arts and Entertainment category."
-369,21,Arts and Entertainment,1.0,
-370,21,Arts and Entertainment,0.85,
-371,21,Arts and Entertainment,0.95,
-372,21,Arts and Entertainment,0.85,
-373,21,Arts and Entertainment,0.95,
-374,21,Arts and Entertainment,0.95,
-375,21,Arts and Entertainment,0.95,"The bill pertains to the construction and maintenance of a fine arts center, falling under the Arts and Entertainment category."
-376,21,Arts and Entertainment,0.95,"The bill pertains to the construction and maintenance of a fine arts center, falling under the Arts and Entertainment category."
-377,21,Arts and Entertainment,0.95,"The bill pertains to the construction and maintenance of a fine arts center, falling under the Arts and Entertainment category."
-378,21,Arts and Entertainment,1.0,
+PromptID,BillID,Description,PromptingStrategy,Model,Major,MajorText,MajorLLM,MajorTextLLM,ConfidenceLLM,ExplanationLLM
+1,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,No Modification,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.75,
+2,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Persona Modification,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.7,
+3,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Persona Modification,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.75,
+4,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Persona Modification,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.75,
+5,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Persona Modification,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.75,
+6,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill description pertains to the suspension of duties on certain mixtures, which falls under Banking, Finance, and Domestic Commerce."
+7,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.85,"The bill description pertains to the suspension of duties on certain mixtures, which falls under Banking, Finance, and Domestic Commerce."
+8,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,17,Foreign Trade,14,"Banking, Finance, and Domestic Commerce",0.85,This bill relates to domestic commerce and trade by temporarily suspending duties on specific mixtures of reactive dyes.
+9,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Few-Shot Prompting,gpt-3.5-turbo,17,Foreign Trade,17,Foreign Trade,0.95,
+10,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Few-Shot Prompting,gpt-3.5-turbo,17,Foreign Trade,17,Foreign Trade,0.89,
+11,112-HR-3970,To suspend temporarily the duty on mixtures of Reactive Red 198 and Reactive Red 239.,Few-Shot Prompting,gpt-3.5-turbo,17,Foreign Trade,17,Foreign Trade,0.85,
+12,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,No Modification,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.85,
+13,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Persona Modification,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,
+14,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Persona Modification,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,
+15,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Persona Modification,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,
+16,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Persona Modification,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,
+17,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Chain-of-Thoughts Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to amending the Communications Act of 1934, specifically related to broadcast licenses."
+18,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Chain-of-Thoughts Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to amending the Communications Act of 1934, which falls under the realm of Space, Science, Technology, and Communications."
+19,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Chain-of-Thoughts Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,"The bill pertains to amending the Communications Act of 1934, specifically related to broadcast licenses."
+20,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Few-Shot Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.95,
+21,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Few-Shot Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.85,
+22,91-HR-13525,A bill to amend the Communications Act of 1934 to establish orderly procedures for the consideration of applications for renewal of broadcast licenses,Few-Shot Prompting,gpt-3.5-turbo,16,"Space, Science, Technology, and Communications",16,"Space, Science, Technology, and Communications",0.88,
+23,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",No Modification,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+24,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Persona Modification,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+25,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Persona Modification,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+26,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Persona Modification,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+27,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Persona Modification,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+28,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Chain-of-Thoughts Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,"The bill focuses on amending regulations related to the disposal of toxic substances, specifically polychlorinated biphenyls, which falls under environmental issues."
+29,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Chain-of-Thoughts Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,"The bill focuses on amending regulations related to the disposal of toxic substances, specifically polychlorinated biphenyls, falling under environmental protection and regulation."
+30,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Chain-of-Thoughts Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,"The bill focuses on amending regulations related to the disposal of toxic substances, specifically polychlorinated biphenyls, which falls under environmental protection and regulation."
+31,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Few-Shot Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+32,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Few-Shot Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+33,99-HR-5141,"A bill to amend the Toxic Substances Control Act to establish certain requirements regarding the disposal of polychlorinated biphenyls, and for other purposes.",Few-Shot Prompting,gpt-3.5-turbo,7,Environment,7,Environment,0.95,
+34,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",No Modification,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+35,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Persona Modification,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+36,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Persona Modification,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+37,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Persona Modification,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+38,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Persona Modification,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+39,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Chain-of-Thoughts Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.8,"This bill pertains to changing the timing of elections, which falls under Government Operations."
+40,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Chain-of-Thoughts Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.8,"The bill pertains to changing the timing of the election process for President, Vice President, and Representatives, which falls under Government Operations."
+41,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Chain-of-Thoughts Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,"The bill pertains to changing the time for the appointment of electors and the election of Representatives, which falls under Government Operations."
+42,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Few-Shot Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.75,
+43,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Few-Shot Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.95,
+44,80-HR-2004,"To provide for changing the time for the appointment of the electors of the President and Vice President and of the time for the election of Representatives, and for other purposes",Few-Shot Prompting,gpt-3.5-turbo,19,Government Operations,19,Government Operations,0.85,
+45,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,No Modification,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+46,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Persona Modification,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+47,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Persona Modification,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+48,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Persona Modification,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+49,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Persona Modification,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+50,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,"The bill focuses on amending the Internal Revenue Code to impose a tax on oil futures and options and deposit the revenues into the Highway Trust Fund, which falls under the Transportation category."
+51,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.9,"The bill focuses on amending the Internal Revenue Code to impose a tax on oil futures and options and deposit the revenues into the Highway Trust Fund, which falls under transportation issues."
+52,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Chain-of-Thoughts Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,"The bill focuses on amending the Internal Revenue Code to impose a tax on oil futures and options and deposit the revenues into the Highway Trust Fund, which falls under the Transportation category."
+53,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Few-Shot Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.95,
+54,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Few-Shot Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
+55,111-HR-3379,To amend the Internal Revenue Code of 1986 to impose a tax on transactions in oil futures and options and to deposit the revenues from the tax into the Highway Trust Fund.,Few-Shot Prompting,gpt-3.5-turbo,14,"Banking, Finance, and Domestic Commerce",10,Transportation,0.85,
