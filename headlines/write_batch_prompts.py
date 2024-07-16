@@ -43,7 +43,7 @@ def read_base_prompt(suffix):
         content = file.read()
     return content
 
-def write_prompt(companies, content, JSON, file):
+def write_prompt(companies, content, JSON, file, id_num):
     """
     Generates responses for each company in the dataframe.
     
@@ -64,7 +64,7 @@ def write_prompt(companies, content, JSON, file):
 
         company_content = content % (company, headline, company)
 
-        if json:
+        if JSON:
             base_json = company_content
             personas_json = [format_content(persona + company_content, JSON=JSON) for persona in personas]
 
@@ -73,15 +73,19 @@ def write_prompt(companies, content, JSON, file):
 
             prompts = [base_json] + personas_json + thought_json           
 
-
         else:
             base = company_content
             prompts = [base]
         
-        for i in range(len(prompts)):
-            prompt = '"' + prompts[i] + '"'
-            formatted_prompt = batch_template.replace('%s', str(i), 1).replace('%s', prompt, 1).replace('%s', str(i), 1)
-            file.write(json.dumps(formatted_prompt) + '\n')
+        for prompt in prompts:
+            current_template = batch_template
+            prompt = '"' + prompt + '"'
+            current_template["custom_id"] = str(id_num)
+            id_num += 1
+            current_template["body"]["messages"][0]["content"] = prompt
+            file.write(json.dumps(current_template) + '\n')
+
+    return id_num
 
 
 def main():
@@ -93,8 +97,8 @@ def main():
 
     with open(file_path, 'w') as file:
         # Pass the file object to the function that writes to it
-        write_prompt(companies=companies, content=content, JSON=False, file=file)
-        write_prompt(companies=companies, content=content_json, JSON=True, file=file)
+        new_id = write_prompt(companies=companies, content=content, JSON=False, file=file, id_num=0)
+        new_id = write_prompt(companies=companies, content=content_json, JSON=True, file=file, id_num=new_id)
 
 if __name__ == "__main__":
     main()

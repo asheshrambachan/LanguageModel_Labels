@@ -20,4 +20,18 @@ thought_modifiers = [
 explanation = '\n____ fill in with explanation (less than 25 words)'
 explanation_json = ',\n"explanation": once sentence explanation for your headline type answer}'
 
-batch_template = '{"custom_id": %s, "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-3.5-turbo-0125", "messages": [{"role": "user", "content": %s}],"temperature": 0}}'
+batch_template = {
+                    "custom_id": "%s",
+                    "method": "POST", 
+                    "url": "/v1/chat/completions", 
+                    "body": 
+                        {
+                            "model": "gpt-3.5-turbo-0125", 
+                            "messages": 
+                                [{
+                                    "role": "user",
+                                    "content": "%s"
+                                }],
+                            "temperature": 0
+                        }
+                    }
