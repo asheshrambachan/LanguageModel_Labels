@@ -1,0 +1,23 @@
+PromptingStrategyID,PromptingStrategyName,Text,TextLocation,ExamplesPath,AddExplanation,AddExamples,UseJSON,Model,Temperature
+1,No Modification,,,,False,False,True,gpt-3.5-turbo,0
+2,Persona Modification,You are a knowledgeable political analyst. ,before,,False,False,True,gpt-3.5-turbo,0
+3,Persona Modification,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,before,,False,False,True,gpt-3.5-turbo,0
+4,Persona Modification,Answer this question as if you are an expert in United States politics. ,before,,False,False,True,gpt-3.5-turbo,0
+5,Persona Modification,Answer this question as if you were a helpful research assistant for a political scientist. ,before,,False,False,True,gpt-3.5-turbo,0
+6,Chain-of-Thoughts Prompting,Think carefully. ,after,,True,False,True,gpt-3.5-turbo,0
+7,Chain-of-Thoughts Prompting,Let's think step by step. Lay out each step. ,after,,True,False,True,gpt-3.5-turbo,0
+8,Chain-of-Thoughts Prompting,Please provide an explanation for your answer. ,after,,True,False,True,gpt-3.5-turbo,0
+9,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples01.csv,False,True,True,gpt-3.5-turbo,0
+10,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples02.csv,False,True,True,gpt-3.5-turbo,0
+11,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples03.csv,False,True,True,gpt-3.5-turbo,0
+12,No Modification,,,,False,False,False,gpt-3.5-turbo,0
+13,Persona Modification,You are a knowledgeable political analyst. ,before,,False,False,False,gpt-3.5-turbo,0
+14,Persona Modification,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,before,,False,False,False,gpt-3.5-turbo,0
+15,Persona Modification,Answer this question as if you are an expert in United States politics. ,before,,False,False,False,gpt-3.5-turbo,0
+16,Persona Modification,Answer this question as if you were a helpful research assistant for a political scientist. ,before,,False,False,False,gpt-3.5-turbo,0
+17,Chain-of-Thoughts Prompting,Think carefully. ,after,,True,False,False,gpt-3.5-turbo,0
+18,Chain-of-Thoughts Prompting,Let's think step by step. Lay out each step. ,after,,True,False,False,gpt-3.5-turbo,0
+19,Chain-of-Thoughts Prompting,Please provide an explanation for your answer. ,after,,True,False,False,gpt-3.5-turbo,0
+20,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples01.csv,False,True,False,gpt-3.5-turbo,0
+21,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples02.csv,False,True,False,gpt-3.5-turbo,0
+22,Few-Shot Prompting,,,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills/02_llm/examples03.csv,False,True,False,gpt-3.5-turbo,0
