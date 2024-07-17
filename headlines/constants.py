@@ -18,7 +18,7 @@ thought_modifiers = [
 ]
 
 explanation = '\n____ fill in with explanation (less than 25 words)'
-explanation_json = ',\n"explanation": once sentence explanation for your headline type answer}'
+explanation_json = ',\n"explanation": one sentence explanation for your headline type answer}'
 
 batch_template = {
                     "custom_id": "%s",

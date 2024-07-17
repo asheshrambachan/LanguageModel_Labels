@@ -66,10 +66,10 @@ def write_prompt(companies, content, JSON, file, id_num):
 
         if JSON:
             base_json = company_content
-            personas_json = [format_content(persona + company_content, JSON=JSON) for persona in personas]
+            personas_json = [persona + company_content for persona in personas]
 
             pt1, pt2 = company_content.split("Write", 1)[0], "Write" + company_content.split("Write", 1)[1]
-            thought_json = [format_content(pt1 + thought + pt2, JSON=JSON) for thought in thought_modifiers]
+            thought_json = [format_content(pt1 + thought + pt2, JSON=JSON, chain_of_thought=True) for thought in thought_modifiers]
 
             prompts = [base_json] + personas_json + thought_json           
 
