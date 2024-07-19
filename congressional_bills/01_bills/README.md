@@ -21,18 +21,20 @@ Open the [`bills_cleaning.ipynb`](https://github.com/asheshrambachan/LanguageMod
 While our approach shares similarities with Egami's method, we have made several key modifications:
 
 1. We observed few inconsistencies in bill IDs in the datasets and corrected them. We consider bills of the same `BillID` as duplicates and drop them from both CAP and CBP. Note that coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic.
-2. Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, and `PassH` values. We also keep all major topic IDs except for topic 99. Currently, I use data from CAP to do that which has more missing values compared to CBP data. Some bills have different values in CBP and CAP and both are kept in this version.
-3. As in Egami et al. (2023), we consider bills of the same `Description` as duplicates and drop them. We also ensure descriptions are case insensitive by converting them to lowercase.
-4. Egami et al. (2023), impute missing `DW1` scores by averaging over bills. We average over unique bill sponsor `NameFull` and their `DW1` score. Both original, `DW1`, and imputed, `DW1_impute`, columns are included in the data.
-5. Egami et al. (2023) drops variables/columns with any missing values. However, we keep those that are mostly complete, with less than 10% of their observations missing. 
-
+2. Bills that varies in `Major`, `Description`, `Party`, `PassS`, `PassH`, `Chamber` in CBP and CAP are dropped version.
+3. Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, `Chamber` values. We also keep all major topic IDs except for topic 99. 
+4. As in Egami et al. (2023), we consider bills of the same `Description` as duplicates and drop them. We also ensure descriptions are case insensitive by converting them to lowercase.
+5. Egami et al. (2023), impute missing `DW1` scores by averaging over bills. We average over unique bill sponsor `NameFull` and their `DW1` score. Both original, `DW1`, and imputed, `DW1_impute`, columns are included in the data.
+6. Similar to Egami et al. (2023), we drops variables/columns with any missing values except `DW1`. 
 
 ## To-Dos
 
 - [x] Create a new coding for major topics IDs as topic 11 is not included in the data
 - [x] Create a codebook for the variables based on ICPSR
 - [x] Drop bills that varies in `Description` between CBP and CAP.
-- [ ] Drop columns with any missing values as in Egami et al. (2023)
-- [ ] Correct CAP `Chamber` ID. 
-- [ ] Figure out why `Party`, `PassS`, and `PassH` are in inconsistent between CAP and CBP.
-- [ ] Decide on which data source, CAP or CBP, to rely on for `Major`, `Description`, `Party`, `PassS`, and `PassH`. Currently, I go with CAP.
+- [x] Drop columns with any missing values as in Egami et al. (2023)
+- [x] Correct CAP `Chamber` ID. 
+- [x] Drop bills with inconsistent values in CAP and CBP: `Major`, `Description`, `Party`, `PassS`, and `PassH`.
+- [x] sample 15 example bills, and 10K bills (without those 15)
+- [x] Add seed for replication
+- [ ] Update codebook
