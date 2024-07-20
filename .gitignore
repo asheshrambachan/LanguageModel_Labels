@@ -6,5 +6,6 @@ congressional_bills/01_bills/CBP
 congressional_bills/01_bills/bills.csv
 congressional_bills/01_bills/bills_without_examples.csv
 congressional_bills/02_llm/archive
-congressional_bills/02_llm/*_10000*
-congressional_bills/02_llm/*_9000*
+congressional_bills/02_llm/prompts_batched_10000*
+congressional_bills/02_llm/prompts_10000*
+congressional_bills/02_llm/responses_*
