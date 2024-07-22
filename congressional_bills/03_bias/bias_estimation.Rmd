@@ -1,0 +1,52 @@
+---
+title: "Bias Estimattion"
+output: html_notebook
+---
+
+```{r setup}
+knitr::opts_knit$set(root.dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills")
+
+require(dplyr)
+require(nnet)
+```
+
+## Load data + train/test split
+
+```{r}
+data = read.csv("02_llm/bills_prompts_responses_10000.csv")
+
+data = data %>%
+  mutate(
+    Senate = as.integer(Chamber == 1), # 0: House, 1: Senate
+    Democrat = as.integer(Party == 100), # 100: Democrat; 200: Republican, 328: Independent
+    # label = as.integer(label == "True"),
+    Major = relevel(as.factor(Major), ref = 20),
+    Postal = as.factor(Postal),
+    Model = as.factor(Model)
+  )
+
+# split data into train/test set
+set.seed(123)
+train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
+train = data[train_idx, ]
+test = data[-train_idx, ]
+```
+
+## Multinomial Logisitic Regression
+
+Currently, we use Major topic 20 as a reference level. 
+
+```{r}
+# get f* models for each feature V
+train$Major2 = relevel(train$Major, ref = 20)
+
+model_unres = multinom(Major2 ~ 1, data=train)
+# summary(model_unres)
+
+model_res_chamber = multinom(Major2 ~ Senate, data = train)
+# summary(model_res_chamber)
+
+anova(model_unres, model_res_chamber)
+```
+
+
