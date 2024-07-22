@@ -6,6 +6,7 @@ output: html_notebook
 ```{r setup}
 knitr::opts_knit$set(root.dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills")
 
+require(R.utils)
 require(dplyr)
 require(nnet)
 ```
@@ -16,37 +17,55 @@ require(nnet)
 data = read.csv("02_llm/bills_prompts_responses_10000.csv")
 
 data = data %>%
-  mutate(
-    Senate = as.integer(Chamber == 1), # 0: House, 1: Senate
-    Democrat = as.integer(Party == 100), # 100: Democrat; 200: Republican, 328: Independent
-    # label = as.integer(label == "True"),
-    Major = relevel(as.factor(Major), ref = 20),
-    Postal = as.factor(Postal),
-    Model = as.factor(Model)
-  )
+  filter(
+    Model == "gpt-4o", 
+    PromptingStrategyID==1) %>%
+  select(
+    Model, PromptingStrategyID, PromptingStrategyName,
+    Chamber, Party, Year, Cong, Postal, State, Description, DW1, Major, MajorText, 
+    MajorLLM, MajorTextLLM, ExplanationLLM) 
 
-# split data into train/test set
-set.seed(123)
-train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
-train = data[train_idx, ]
-test = data[-train_idx, ]
+warnifnot(~any(is.na(data)))
+
+# 
+# data = data %>%
+#   mutate(
+#     Chamber = as.factor(ifelse(data$Chamber == 0, "House", "Senate")), # Senate = as.factor(Chamber == 1), # 0: House, 1: Senate
+#     Party = as.factor(Party), # Democrat = 100: Democrat; 200: Republican, 328: Independent
+#     Major = relevel(as.factor(Major), ref = 20),
+#     # Postal = as.factor(Postal),
+#   )
+# 
+# # split data into train/test set
+# set.seed(123)
+# train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
+# train = data[train_idx, ]
+# test = data[-train_idx, ]
+# 
+# head(train)
 ```
 
 ## Multinomial Logisitic Regression
 
 Currently, we use Major topic 20 as a reference level. 
 
+
+### $f^\star$: 
 ```{r}
 # get f* models for each feature V
-train$Major2 = relevel(train$Major, ref = 20)
-
-model_unres = multinom(Major2 ~ 1, data=train)
+model_unres = multinom(Major ~ 1, data=train)
 # summary(model_unres)
 
-model_res_chamber = multinom(Major2 ~ Senate, data = train)
-# summary(model_res_chamber)
+model_res_chamber = multinom(Major ~ Chamber, data=train)
+summary(model_res_chamber)
+# model_res_party = multinom(Major ~ Democrat, data=train)
+# model_res_dw1 = multinom(Major ~ DW1_impute, data=train)
+# 
+# anova(model_unres, model_res_chamber, model_res_party, model_res_dw1)
+```
 
-anova(model_unres, model_res_chamber)
+```{r}
+TukeyHSD(aov(model_res_chamber))
 ```
 
 
