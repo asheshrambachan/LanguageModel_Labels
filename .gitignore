@@ -3,6 +3,7 @@ settings.json
 .env
 congressional_bills/01_bills/CAP
 congressional_bills/01_bills/CBP
+congressional_bills/01_bills/ICPSR
 congressional_bills/01_bills/bills.csv
 congressional_bills/01_bills/bills_without_examples.csv
 congressional_bills/02_llm/archive
