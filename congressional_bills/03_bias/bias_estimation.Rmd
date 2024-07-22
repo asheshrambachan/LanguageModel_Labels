@@ -4,9 +4,9 @@ output: html_notebook
 ---
 
 ```{r setup}
-knitr::opts_knit$set(root.dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills")
+repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+knitr::opts_knit$set(root.dir = repo_dir)
 
-require(R.utils)
 require(dplyr)
 require(nnet)
 ```
@@ -14,7 +14,7 @@ require(nnet)
 ## Load data + train/test split
 
 ```{r}
-data = read.csv("02_llm/bills_prompts_responses_10000.csv")
+data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
 
 data = data %>%
   filter(
@@ -25,23 +25,24 @@ data = data %>%
     Chamber, Party, Year, Cong, Postal, State, Description, DW1, Major, MajorText, 
     MajorLLM, MajorTextLLM, ExplanationLLM) 
 
-warnifnot(~any(is.na(data)))
+if (any(is.na(data)))
+  warning("data contains NA")
 
-# 
-# data = data %>%
-#   mutate(
-#     Chamber = as.factor(ifelse(data$Chamber == 0, "House", "Senate")), # Senate = as.factor(Chamber == 1), # 0: House, 1: Senate
-#     Party = as.factor(Party), # Democrat = 100: Democrat; 200: Republican, 328: Independent
-#     Major = relevel(as.factor(Major), ref = 20),
-#     # Postal = as.factor(Postal),
-#   )
-# 
-# # split data into train/test set
-# set.seed(123)
-# train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
-# train = data[train_idx, ]
-# test = data[-train_idx, ]
-# 
+data = data %>%
+  mutate(
+    Chamber = as.factor(Chamber), # Senate = as.factor(Chamber == 1), # 0: House, 1: Senate
+    # Party = as.factor(Party), # Democrat = 100: Democrat; 200: Republican, 328: Independent
+    Democrat = as.factor(ifelse(data$Party == "Democrat", TRUE, FALSE)),
+    Major = relevel(as.factor(Major), ref = 20),
+    MajorLLM = relevel(as.factor(Major), ref = 20),
+    # Postal = as.factor(Postal),
+  )
+
+# split data into train/test set
+set.seed(123)
+train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
+train = data[train_idx, ]
+test = data[-train_idx, ]
 # head(train)
 ```
 
@@ -49,23 +50,33 @@ warnifnot(~any(is.na(data)))
 
 Currently, we use Major topic 20 as a reference level. 
 
+### $f^*$ using $\text{Major} := \text{Major}_\text{human}$
 
-### $f^\star$: 
 ```{r}
 # get f* models for each feature V
-model_unres = multinom(Major ~ 1, data=train)
-# summary(model_unres)
+model_human_unres = multinom(Major ~ 1, data=train)
+# summary(model_human_unres)
 
-model_res_chamber = multinom(Major ~ Chamber, data=train)
-summary(model_res_chamber)
-# model_res_party = multinom(Major ~ Democrat, data=train)
-# model_res_dw1 = multinom(Major ~ DW1_impute, data=train)
-# 
-# anova(model_unres, model_res_chamber, model_res_party, model_res_dw1)
+model_human_res_chamber = multinom(Major ~ Chamber, data=train)
+# summary(model_human_res_chamber)
+model_human_res_party = multinom(Major ~ Democrat, data=train)
+model_human_res_dw1 = multinom(Major ~ DW1, data=train)
+
+anova(model_human_unres, model_human_res_chamber)
+anova(model_human_unres, model_human_res_party)
+anova(model_human_unres, model_human_res_dw1)
 ```
+### $\widehat{f}$ using $\text{Major}_\text{llm}$
 
 ```{r}
-TukeyHSD(aov(model_res_chamber))
-```
+# get f* models for each feature V
+model_llm_unres = multinom(MajorLLM ~ 1, data=train)
+model_llm_res_chamber = multinom(MajorLLM ~ Chamber, data=train)
+model_llm_res_party = multinom(MajorLLM ~ Democrat, data=train)
+model_llm_res_dw1 = multinom(MajorLLM ~ DW1, data=train)
 
+anova(model_llm_unres, model_llm_res_chamber)
+anova(model_llm_unres, model_llm_res_party)
+anova(model_llm_unres, model_llm_res_dw1)
+```
 
