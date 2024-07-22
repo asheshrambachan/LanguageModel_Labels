@@ -48,9 +48,35 @@ test = data[-train_idx, ]
 
 ## Multinomial Logisitic Regression
 
+For each $m$ model and $p$ prompt modification, we run a different multinomial logistic regression model.
+
 Currently, we use Major topic 20 as a reference level. 
 
+
+#### Egami replication code
+
+Let 
+$$\sigma(x) = \frac{e^x}{1 + e^{x}}$$
+
+$$Y_i = \begin{cases} 1 & \text{Major}_i=1\\ 0 & \text{Major}_i \neq 1 \end{cases} $$
+Then, fit this model:
+$$Y_{i} = \sigma \left(\beta_{0} + \beta_{1} \text{Senate}_{i} \right)$$
+$$P[Y=1 \mid X] = \frac{e^{\beta_{1,0} + \beta_{1,1} X}}{\sum_{y=0}^1 e^{\beta_{y,0} + \beta_{y,1} X}}$$
+#### Our repo, egami_et_al
+
+$$Y_i = \begin{cases} 1 & \text{Major}_i=1\\ 0 & \text{Major}_i \neq 1 \end{cases} $$
+
+$$Y_{i} = \beta_{0} + \beta_{1} \text{Senate}_{i}$$
+#### Now that we have more than 1 major topic
+
+$$Y_i = \begin{cases} 1 & \text{Major}_i=1\\ 0 & \text{Major}_i \neq 1 \end{cases} $$
+Then, fit this model:
+
+$$Y_{i} = \sigma \left(\beta_{0} + \beta_{1} \text{Senate}_{i} \right)$$
+
+
 ### $f^*$ using $\text{Major} := \text{Major}_\text{human}$
+
 
 ```{r}
 # get f* models for each feature V
@@ -66,6 +92,7 @@ anova(model_human_unres, model_human_res_chamber)
 anova(model_human_unres, model_human_res_party)
 anova(model_human_unres, model_human_res_dw1)
 ```
+
 ### $\widehat{f}$ using $\text{Major}_\text{llm}$
 
 ```{r}
