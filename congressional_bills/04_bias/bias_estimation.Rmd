@@ -1,11 +1,11 @@
 ---
 title: "Bias Estimattion"
-output: html_notebook
+output: pdf_document
 ---
 
-<!-- This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R -->
+This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 
-```{r setup}
+```{r setup, warning=FALSE, message=FALSE}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 knitr::opts_knit$set(root.dir = repo_dir)
 
@@ -16,7 +16,7 @@ require(sandwich)
 SEED = 123
 ```
 
-## Major = 1 or not (Linear Model or Logistic Regression)
+## Models
 
 $$X_i \in \{\text{Senate}_i, \text{Democrat}_i, \text{DW1}_i\}$$
 $$\begin{cases} Y_i^\star& = 1\{ \text{Major}_i = k\} \\ \tilde{Y}_i& = 1\{\text{MajorLLM}_i= k\}\end{cases}$$
@@ -66,7 +66,8 @@ model_human = lm(Major ~ Senate, data=test) # do we do this on the entire datase
 model_llm = lm(MajorLLM ~ Senate, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
 
 train$Bias = train$Major - train$MajorLLM
-betas_bias = coef(lm(Bias ~ Senate, data = bootstrap))
+betas_bias = coef(lm(Bias ~ Senate, data = train))
+
 test$BiasPred = betas_bias[1] + betas_bias[2] * test$Senate
 test$MajorLLMDebised = test$MajorLLM + test$BiasPred
 model_debiased = lm(MajorLLMDebised ~ Senate, data=test) # why is this on the test?
@@ -89,16 +90,6 @@ for (b in (1:B)){
   # run debiased models (regress adjusted labels on Vs)
   model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ Senate, data=test))
 }
-
-# get the error coefficients
-# beta0_bias_chamber_mean = model_bias$coefficients[1] # mean(betas_bias[,1])
-# beta1_bias_chamber_mean = model_bias$coefficients[2] # mean(betas_bias[,2])
-# beta0_MajorLLMDebised_chamber_mean = model_debiased$coefficients[1] # mean(betas_MajorLLMDebised[,1])
-# beta1_MajorLLMDebised_chamber_mean = model_debiased$coefficients[2] # mean(betas_MajorLLMDebised[,2])
-
-# betas_bias_ci = t(apply(betas_bias, 2, function(col){
-#   quantile(col, probs = c(0.025, 0.975))
-# }))
 ```
 
 ```{r}
@@ -128,6 +119,7 @@ rownames(model_debised_ci_boot) = names(coef(model_debiased))
 
 ```{r}
 stargazer(
+  title = "Chamber == Senate",
   model_human, model_llm, model_debiased,
   coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
   se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
@@ -137,9 +129,153 @@ stargazer(
 ```
 
 
+
+### Party
+
+```{r}
+model_human = lm(Major ~ Democrat, data=test) # do we do this on the entire dataset? or just train? I think it should be test
+model_llm = lm(MajorLLM ~ Democrat, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
+
+train$Bias = train$Major - train$MajorLLM
+betas_bias = coef(lm(Bias ~ Democrat, data = train))
+
+test$BiasPred = betas_bias[1] + betas_bias[2] * test$Democrat
+test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+model_debiased = lm(MajorLLMDebised ~ Democrat, data=test) # why is this on the test?
+
+B = 5e3
+model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
+
+# repeat sampling 10000 times
+for (b in (1:B)){
+  # get bootstrap sample
+  bootstrap_indices = sample(nrow(train), replace = TRUE)
+  bootstrap = train[bootstrap_indices, ]
+  
+  # regress (f* - f_hat) on all the Vs and store coefficients
+  bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
+  betas_bias = coef(lm(Bias ~ Democrat, data = bootstrap))
+  test$BiasPred = betas_bias[1] + betas_bias[2] * test$Democrat
+  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+  
+  # run debiased models (regress adjusted labels on Vs)
+  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ Democrat, data=test))
+}
+```
+
+```{r}
+model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
+
+model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
+
+model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
+names(model_debised_se_boot) = names(coef(model_debiased))
+```
+
+```{r}
+
+model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
+model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
+colnames(model_human_ci) = c("2.5%", "97.5%")
+
+model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
+model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
+colnames(model_llm_ci) = c("2.5%", "97.5%")
+
+model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
+  quantile(x, probs = c(0.025, 0.975))
+  }))
+rownames(model_debised_ci_boot) = names(coef(model_debiased))
+```
+
+```{r}
+stargazer(
+  title = "Party == Democrat",
+  model_human, model_llm, model_debiased,
+  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
+  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
+  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
+  keep.stat = c("n"),
+  type = "text")
+```
+
+
+
+### DW1
+
+```{r}
+model_human = lm(Major ~ DW1, data=test) # do we do this on the entire dataset? or just train? I think it should be test
+model_llm = lm(MajorLLM ~ DW1, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
+
+train$Bias = train$Major - train$MajorLLM
+betas_bias = coef(lm(Bias ~ DW1, data = train))
+
+test$BiasPred = betas_bias[1] + betas_bias[2] * test$DW1
+test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+model_debiased = lm(MajorLLMDebised ~ DW1, data=test) # why is this on the test?
+
+B = 5e3
+model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
+
+# repeat sampling 10000 times
+for (b in (1:B)){
+  # get bootstrap sample
+  bootstrap_indices = sample(nrow(train), replace = TRUE)
+  bootstrap = train[bootstrap_indices, ]
+  
+  # regress (f* - f_hat) on all the Vs and store coefficients
+  bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
+  betas_bias = coef(lm(Bias ~ DW1, data = bootstrap))
+  test$BiasPred = betas_bias[1] + betas_bias[2] * test$DW1
+  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+  
+  # run debiased models (regress adjusted labels on Vs)
+  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ DW1, data=test))
+}
+```
+
+```{r}
+model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
+
+model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
+
+model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
+names(model_debised_se_boot) = names(coef(model_debiased))
+```
+
+```{r}
+
+model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
+model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
+colnames(model_human_ci) = c("2.5%", "97.5%")
+
+model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
+model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
+colnames(model_llm_ci) = c("2.5%", "97.5%")
+
+model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
+  quantile(x, probs = c(0.025, 0.975))
+  }))
+rownames(model_debised_ci_boot) = names(coef(model_debiased))
+```
+
+```{r}
+stargazer(
+  title = "DW1",
+  model_human, model_llm, model_debiased,
+  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
+  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
+  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
+  keep.stat = c("n"),
+  type = "text")
+```
+
+
+
 ## To-Dos:
 
-- [ ] implement the outter loop
+- [ ] implement the outer loop
 - [ ] make the inner loop a function that can be applied on any X
 - [ ] decide on CI or SE?
-- [ ] 
+- [ ] repeat for all models and all prompt modifications
+
