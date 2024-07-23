@@ -3,30 +3,38 @@ title: "Bias Estimattion"
 output: html_notebook
 ---
 
+<!-- This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R -->
+
 ```{r setup}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 knitr::opts_knit$set(root.dir = repo_dir)
 
 require(dplyr)
 require(nnet)
+require(stargazer)
+require(sandwich)
+SEED = 123
 ```
 
 ## Major = 1 or not (Linear Model or Logistic Regression)
 
 $$X_i \in \{\text{Senate}_i, \text{Democrat}_i, \text{DW1}_i\}$$
-$$Y_i = \begin{cases} 1 & \text{Major}_i=1\\ 0 & \text{Major}_i \neq 1 \end{cases}$$
+$$\begin{cases} Y_i^\star& = 1\{ \text{Major}_i = k\} \\ \tilde{Y}_i& = 1\{\text{MajorLLM}_i= k\}\end{cases}$$
 
-$$Y_{i} =  f(X_i) = \begin{cases} \beta_{0} + \beta_{1} \text{X}_{i}, \\\sigma(\beta_{0} + \beta_{1} \text{X}_{i}), &\text{where } \sigma(x) = \frac{e^x}{1+e^x}\end{cases}$$
+$$\begin{cases} Y_i^\star& =\beta_{0} + \beta_{1} \text{X}_{i} \\ \tilde{Y}_i&  = \beta_{0} + \beta_{1} \text{X}_{i}\end{cases}$$
 
 For each $m$ model and $p$ prompt modification, we fit a separate model.
 
 ```{r}
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
 
+major = 1
+
 data = data %>%
   filter(
-    Model == "gpt-4o", 
-    PromptingStrategyID==1) %>%
+    Model=="gpt-4o", 
+    PromptingStrategyID==1
+    ) %>%
   select(
     Model, PromptingStrategyID, PromptingStrategyName,
     Chamber, Party, Year, Cong, Postal, State, Description, DW1, Major, MajorText, 
@@ -39,181 +47,99 @@ data = data %>%
   mutate(
     Senate = as.integer(data$Chamber == "Senate"),
     Democrat = as.integer(data$Party == "Democrat"),
-    Major = as.integer(data$Major == 1), # as.integer(ifelse(data$Major == 1, TRUE, FALSE)) # Major = relevel(as.factor(Major), ref = 20),
-    MajorLLM = as.integer(data$MajorLLM == 1), # MajorLLM = relevel(as.factor(Major), ref = 20),
-    # Postal = as.factor(Postal),
+    Major = as.integer(data$Major == major), # as.integer(ifelse(data$Major == 1, TRUE, FALSE)) # Major = relevel(as.factor(Major), ref = 20),
+    MajorLLM = as.integer(data$MajorLLM == major), # MajorLLM = relevel(as.factor(Major), ref = 20),
   )
 
 # split data into train/test set
-set.seed(123)
+set.seed(SEED)
 train_idx = sample(x=nrow(data), size=floor(0.5 * nrow(data)))
 train = data[train_idx, ]
 test = data[-train_idx, ]
 # head(train)
 ```
 
-
-
-### $f^*$ 
-
-$$Y_i = \begin{cases} 1 & \text{Major}_i=1\\ 0 & \text{Major}_i \neq 1 \end{cases}$$
+### Chamber
 
 ```{r}
-model_human_chamber = lm(MajorLLM ~ Senate, data=train)
-model_human_party = lm(MajorLLM ~ Democrat, data=train)
-model_human_dw1 = lm(MajorLLM ~ DW1, data=train)
+model_human = lm(Major ~ Senate, data=test) # do we do this on the entire dataset? or just train? I think it should be test
+model_llm = lm(MajorLLM ~ Senate, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
 
-# create empty lists to store bootstrap coefficients
-n = nrow(train)
-err_chamber_b0s <- numeric(n)
-err_chamber_b1s <- numeric(n)
-err_party_b0s <- numeric(n)
-err_party_b1s <- numeric(n)
-err_score_b0s <- numeric(n)
-err_score_b1s <- numeric(n)
-err_dist_b0s <- numeric(n)
-err_dist_b1s <- numeric(n)
+train$Bias = train$Major - train$MajorLLM
+betas_bias = coef(lm(Bias ~ Senate, data = bootstrap))
+test$BiasPred = betas_bias[1] + betas_bias[2] * test$Senate
+test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+model_debiased = lm(MajorLLMDebised ~ Senate, data=test) # why is this on the test?
 
-f1_chamber_b0s <- numeric(n)
-f1_chamber_b1s <- numeric(n)
-f1_party_b0s <- numeric(n)
-f1_party_b1s <- numeric(n)
-f1_score_b0s <- numeric(n)
-f1_score_b1s <- numeric(n)
-f1_dist_b0s <- numeric(n)
-f1_dist_b1s <- numeric(n)
-
+B = 5e3
+model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
 
 # repeat sampling 10000 times
-B = 10000
-for (i in (1:B)){
+for (b in (1:B)){
   # get bootstrap sample
-  bootstrap_indices <- sample(nrow(train), replace = TRUE)
-  bootstrap <- train[bootstrap_indices, ]
+  bootstrap_indices = sample(nrow(train), replace = TRUE)
+  bootstrap = train[bootstrap_indices, ]
   
   # regress (f* - f_hat) on all the Vs and store coefficients
   bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
-  model_bias_chamber = lm(Bias ~ Senate, data = bootstrap)
-  err_chamber_b0s[[i]] = summary(model_bias_chamber)$coefficients[1, "Estimate"]
-  err_chamber_b1s[[i]] = summary(model_bias_chamber)$coefficients[2, "Estimate"]
-
-  party_error = lm(Bias ~ Democrat, data = bootstrap)
-  err_party_b0s[[i]] = summary(party_error)$coefficients[1, "Estimate"]
-  err_party_b1s[[i]] = summary(party_error)$coefficients[2, "Estimate"]
-
-  score_error = lm(Bias ~ DW1, data = bootstrap)
-  err_score_b0s[[i]] = summary(score_error)$coefficients[1, "Estimate"]
-  err_score_b1s[[i]] = summary(score_error)$coefficients[2, "Estimate"]
-  # 
-  # dist_error <- lm(as.formula(paste("label -", label_type, "~ dist_macro")), data = bootstrap)
-  # err_dist_b0s[[i]] <- summary(dist_error)$coefficients[1, "Estimate"]
-  # err_dist_b1s[[i]] <- summary(dist_error)$coefficients[2, "Estimate"]
+  betas_bias = coef(lm(Bias ~ Senate, data = bootstrap))
+  test$BiasPred = betas_bias[1] + betas_bias[2] * test$Senate
+  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
   
-  # get adjusted label values using error coefficients
-  test$f1_chamber = test$MajorLLM + (err_chamber_b0s[[i]] + test$Senate * err_chamber_b1s[[i]])
-  test$f1_party = test$MajorLLM + (err_party_b0s[[i]] + test$Democrat * err_party_b1s[[i]])
-  test$f1_score = test$MajorLLM + (err_score_b0s[[i]] + test$DW1 * err_score_b1s[[i]])
-  # test$f1_dist = test[[label_type]] + (err_dist_b0s[[i]] + test$dist_macro * err_dist_b1s[[i]])
-
   # run debiased models (regress adjusted labels on Vs)
-  f1_chamber <- lm(f1_chamber ~ Senate, data = test)
-  f1_chamber_b0s[[i]] <- summary(f1_chamber)$coefficients[1, "Estimate"]
-  f1_chamber_b1s[[i]] <- summary(f1_chamber)$coefficients[2, "Estimate"]
-  # 
-  f1_party <- lm(f1_party ~ Democrat, data = test)
-  f1_party_b0s[[i]] <- summary(f1_party)$coefficients[1, "Estimate"]
-  f1_party_b1s[[i]] <- summary(f1_party)$coefficients[2, "Estimate"]
-
-  f1_score <- lm(f1_score ~ DW1, data = test)
-  f1_score_b0s[[i]] <- summary(f1_score)$coefficients[1, "Estimate"]
-  f1_score_b1s[[i]] <- summary(f1_score)$coefficients[2, "Estimate"]
-
-  # f1_dist <- lm(f1_dist ~ dist_macro, data = test)
-  # f1_dist_b0s[[i]] <- summary(f1_dist)$coefficients[1, "Estimate"]
-  # f1_dist_b1s[[i]] <- summary(f1_dist)$coefficients[2, "Estimate"]
+  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ Senate, data=test))
 }
+
+# get the error coefficients
+# beta0_bias_chamber_mean = model_bias$coefficients[1] # mean(betas_bias[,1])
+# beta1_bias_chamber_mean = model_bias$coefficients[2] # mean(betas_bias[,2])
+# beta0_MajorLLMDebised_chamber_mean = model_debiased$coefficients[1] # mean(betas_MajorLLMDebised[,1])
+# beta1_MajorLLMDebised_chamber_mean = model_debiased$coefficients[2] # mean(betas_MajorLLMDebised[,2])
+
+# betas_bias_ci = t(apply(betas_bias, 2, function(col){
+#   quantile(col, probs = c(0.025, 0.975))
+# }))
 ```
-
-### $\widehat{f}$
-
-$$Y_i = \begin{cases} 1 & \text{MajorLLM}_i=1\\ 0 & \text{MajorLLM}_i \neq 1 \end{cases}$$
 
 ```{r}
-# get f* models for each feature V
-model_llm_chamber = lm(MajorLLM ~ Chamber, data=train)
-model_llm_party = lm(MajorLLM ~ Democrat, data=train)
-model_llm_dw1 = lm(MajorLLM ~ DW1, data=train)
+model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
 
+model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
 
+model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
+names(model_debised_se_boot) = names(coef(model_debiased))
 ```
-
-
-
-## Major = 1, 2, ..., 19, or 20 (Multinomial Logisitic Regression)
 
 ```{r}
-data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
 
-data = data %>%
-  filter(
-    Model == "gpt-4o", 
-    PromptingStrategyID==1) %>%
-  select(
-    Model, PromptingStrategyID, PromptingStrategyName,
-    Chamber, Party, Year, Cong, Postal, State, Description, DW1, Major, MajorText, 
-    MajorLLM, MajorTextLLM, ExplanationLLM) 
+model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
+model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
+colnames(model_human_ci) = c("2.5%", "97.5%")
 
-if (any(is.na(data)))
-  warning("data contains NA")
+model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
+model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
+colnames(model_llm_ci) = c("2.5%", "97.5%")
 
-data = data %>%
-  mutate(
-    Senate = as.factor(ifelse(data$Party == "Senate", TRUE, FALSE)),
-    Democrat = as.factor(ifelse(data$Party == "Democrat", TRUE, FALSE)),
-    Major = as.factor(ifelse(data$Major == 1, TRUE, FALSE)), # Major = relevel(as.factor(Major), ref = 20),
-    MajorLLM = as.factor(ifelse(data$MajorLLM == 1, TRUE, FALSE)), # MajorLLM = relevel(as.factor(Major), ref = 20),
-    # Postal = as.factor(Postal),
-  )
-
-# split data into train/test set
-set.seed(123)
-train_idx = sample(x=nrow(data), size=floor(0.7 * nrow(data)))
-train = data[train_idx, ]
-test = data[-train_idx, ]
-# head(train)
+model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
+  quantile(x, probs = c(0.025, 0.975))
+  }))
+rownames(model_debised_ci_boot) = names(coef(model_debiased))
 ```
-
-
-
-### $f^*$ using $\text{Major} := \text{Major}_\text{human}$
-
 
 ```{r}
-# get f* models for each feature V
-model_human_unres = multinom(Major ~ 1, data=train)
-# summary(model_human_unres)
-
-model_human_res_chamber = multinom(Major ~ Chamber, data=train)
-# summary(model_human_res_chamber)
-model_human_res_party = multinom(Major ~ Democrat, data=train)
-model_human_res_dw1 = multinom(Major ~ DW1, data=train)
-
-anova(model_human_unres, model_human_res_chamber)
-anova(model_human_unres, model_human_res_party)
-anova(model_human_unres, model_human_res_dw1)
+stargazer(
+  model_human, model_llm, model_debiased,
+  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
+  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
+  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
+  keep.stat = c("n"),
+  type = "text")
 ```
 
-### $\widehat{f}$ using $\text{Major}_\text{llm}$
 
-```{r}
-# get f* models for each feature V
-model_llm_unres = multinom(MajorLLM ~ 1, data=train)
-model_llm_res_chamber = multinom(MajorLLM ~ Chamber, data=train)
-model_llm_res_party = multinom(MajorLLM ~ Democrat, data=train)
-model_llm_res_dw1 = multinom(MajorLLM ~ DW1, data=train)
+## To-Dos:
 
-anova(model_llm_unres, model_llm_res_chamber)
-anova(model_llm_unres, model_llm_res_party)
-anova(model_llm_unres, model_llm_res_dw1)
-```
-
+- [ ] implement the outter loop
+- [ ] make the inner loop a function that can be applied on any X
+- [ ] decide on CI or SE?
+- [ ] 
