@@ -41,3 +41,4 @@ While our approach shares similarities with Egami's method, we have made several
 - [x] sample 15 example bills, and 10K bills (without those 15)
 - [x] Add seed for replication
 - [ ] Update codebook
+- [ ] Create an output folder for the data and maybe export figures to a figures folder?

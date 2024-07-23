@@ -8,3 +8,5 @@
 - [x] Run prompts with fill-in-the-blank answer format
 - [x] Use [OpenAI Batch API](https://platform.openai.com/docs/guides/batch)
 - [ ] Improve code to allow switching between batched and non-batched + add comments + readme
+- [ ] Create an output folder for the data and maybe export figures to a figures folder?
+- [ ] Change prompting_strategies to prompt_modification
