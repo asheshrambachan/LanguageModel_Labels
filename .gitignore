@@ -10,3 +10,5 @@ congressional_bills/01_bills/*.csv
 congressional_bills/02_llm/archive
 congressional_bills/02_llm/*.csv 
 congressional_bills/02_llm/*.jsonl 
+
+congressional_bills/04_bias/*.html
