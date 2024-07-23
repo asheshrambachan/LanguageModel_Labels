@@ -13,7 +13,7 @@ The primary data sources are listed below. You don’t need to download the data
 
 ## Cleaned Data
 
-Due to GitHub size limit, all data generated from this notebook can be downloaded from [here](https://drive.google.com/drive/folders/1LrlEcUn5U5U7kQw7Q-t9hoMFf8TCFoT0?usp=sharing).
+Due to GitHub size limit, all data generated from this notebook and their corresponding codebook can be downloaded from [here](https://drive.google.com/drive/folders/1LrlEcUn5U5U7kQw7Q-t9hoMFf8TCFoT0?usp=sharing).
 
 ## Usage
 

@@ -1,6 +1,7 @@
 .DS_Store
 settings.json
 .env
+
 congressional_bills/01_bills/CAP
 congressional_bills/01_bills/CBP
 congressional_bills/01_bills/ICPSR 
