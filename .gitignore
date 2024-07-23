@@ -3,11 +3,9 @@ settings.json
 .env
 congressional_bills/01_bills/CAP
 congressional_bills/01_bills/CBP
-congressional_bills/01_bills/ICPSR
-congressional_bills/01_bills/bills.csv
-congressional_bills/01_bills/bills_without_examples.csv
+congressional_bills/01_bills/ICPSR 
+congressional_bills/01_bills/*.csv 
+
 congressional_bills/02_llm/archive
-congressional_bills/02_llm/prompts_batched_10000*
-congressional_bills/02_llm/prompts_10000*
-congressional_bills/02_llm/responses_*
-congressional_bills/02_llm/bills_prompts_responses_10000.csv
+congressional_bills/02_llm/*.csv 
+congressional_bills/02_llm/*.jsonl 

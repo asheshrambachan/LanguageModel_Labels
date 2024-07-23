@@ -11,6 +11,9 @@ The primary data sources are listed below. You don’t need to download the data
 - [Comparative Agendas Project (CAP)](https://www.comparativeagendas.net/#congressional_hearings)
 - [Congressional Bills Project (CBP)](http://congressionalbills.org/download.html)
 
+## Cleaned Data
+
+Due to GitHub size limit, all data generated from this notebook can be downloaded from [here](https://drive.google.com/drive/folders/1LrlEcUn5U5U7kQw7Q-t9hoMFf8TCFoT0?usp=sharing).
 
 ## Usage
 
