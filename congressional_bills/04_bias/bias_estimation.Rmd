@@ -1,6 +1,6 @@
 ---
 title: "bias Estimattion"
-date: July 24, 2024
+date: "July 24, 2024"
 output: html_document
 ---
 
@@ -170,7 +170,7 @@ set.seed(123)
 major = 1 # TODO: I currently do it for the first major topic only
 
 iter_outter = 200
-B = 200 # of bootstrap samples
+B = 5000 # of bootstrap samples
 n_samples = 5000 # for naive
 test_train_split = 0.5 # 50% of n_sample for train and 50% for test for debiased
 return_bias = TRUE
@@ -340,4 +340,5 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
 ## To-Dos:
 
 - [ ] repeat for all models and all prompt modifications and all 3 X
-
+- [ ] change variable names, model_human_coef to beta_human or beta, 
+- [ ] seperate betas into beta0 beta1?

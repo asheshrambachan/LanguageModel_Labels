@@ -1,0 +1,119 @@
+---
+title: "Estimators Evaluation"
+output: html_document
+date: "July 25, 2024"
+---
+
+```{r, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+bias_dir = file.path(repo_dir, "04_bias")
+
+knitr::opts_knit$set(root.dir = bias_dir)
+setwd(bias_dir)
+
+require(dplyr)
+require(ggplot2)
+```
+
+
+# Evaluation Metrics
+
+For each Major topic 1 indicator, each $X$, and each $\beta \in \{\beta_0, \beta_1\}$
+
+$$\beta:= \beta^\text{human}$$
+we have two estimators for $\beta$: 
+$$\beta^\text{est} \in \{ \beta^\text{naive}, \beta^\text{debiased}\}$$ 
+
+Denote iid samples of the estimators as $\{\beta^\text{est}_i\}_{i=1}^n$. Then, the estimator's sample means
+
+$$\mathbb{E}[\beta^\text{est}] \approx \frac{1}{n} \sum_{i=1}^n \beta_i^\text{est} \triangleq \bar{\beta}^\text{est}$$
+
+## Bias
+
+$$b_\beta(\beta^\text{est}) = \mathbb{E}_\beta\left[\beta^\text{est}\right]- \beta  \approx \bar{\beta}^\text{est} - \beta$$
+
+## MSE 
+
+Use MSE as the risk of the estimator
+$$R(\beta, \beta^\text{est}) = \text{MSE}(\beta, \beta^\text{est}) = \mathbb{E}\left[(\beta^\text{est}- \beta)^2\right]  = b_\beta(\beta^\text{est}) + \text{Var}_\beta(\beta^\text{est})$$
+
+$$\text{MSE}(\beta, \beta^\text{est}) \approx \frac{1}{n} \sum_{i=1}^n (\beta^\text{est}-\beta)^2$$
+
+## Coverage Probability
+
+Let the 95% bootstrap percentile CI of $\beta^\text{est}$ be
+$$95\%CI (\beta^\text{est}) = (\text{LCI}^\text{est}, \text{UCI}^\text{est})$$
+The coverage probability of this CI is defined as:
+$$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est}) \right] = \mathbb{E}[1\{\beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est})\}] \approx \frac{1}{n} \sum_{i=1}^n 1\{\beta \in (\text{LCI}_i^\text{est}, \text{UCI}_i^\text{est})\} $$
+
+
+# Results
+
+```{r}
+get_bias = function(beta, beta_est) mean(beta_est - beta)
+get_mse = function(beta, beta_est) mean((beta_est - beta)^2)
+get_coverage = function(beta, beta_est_lci, beta_est_uci) mean((beta_est_lci < beta) & (beta < beta_est_uci))
+
+rdata_dir = file.path(bias_dir, "rds")
+rdata_paths = file.path(rdata_dir, list.files(rdata_dir)) 
+
+df = data.frame(
+  Major = numeric(),
+  X     = numeric(),
+  Model = character(),
+  PromptModificationID = numeric(),
+  beta0_naive_bias    = numeric(),
+  beta0_debiased_bias = numeric(),
+  beta0_naive_mse    = numeric(),
+  beta0_debiased_mse = numeric(),
+  beta0_naive_coverage    = numeric(),
+  beta0_debiased_coverage = numeric(),
+  beta1_naive_bias    = numeric(),
+  beta1_debiased_bias = numeric(),
+  beta1_naive_mse    = numeric(),
+  beta1_debiased_mse = numeric(),
+  beta1_naive_coverage    = numeric(),
+  beta1_debiased_coverage = numeric()
+  )
+
+for (rdata_path in rdata_paths){
+  data = readRDS(rdata_path)
+  
+  entry = data.frame(
+    Major = data$Major,
+    X     = data$X,
+    Model = data$Model,
+    PromptModificationID = data$PromptModificationID,
+    
+    beta0_naive_bias    = get_bias(data$model_human_coef[1], data$model_naive_coef[,1]),
+    beta0_debiased_bias = get_bias(data$model_human_coef[1], data$model_debiased_coef[,1]),
+    
+    beta0_naive_mse    = get_mse(data$model_human_coef[1], data$model_naive_coef[,1]),
+    beta0_debiased_mse = get_mse(data$model_human_coef[1], data$model_debiased_coef[,1]),
+    
+    beta0_naive_coverage    = get_coverage(data$model_human_coef[1], data$model_naive_lci[,1], data$model_naive_uci[,1]),
+    beta0_debiased_coverage = get_coverage(data$model_human_coef[1], data$model_debiased_lci[,1], data$model_debiased_uci[,1]),
+    
+    beta1_naive_bias    = get_bias(data$model_human_coef[2], data$model_naive_coef[,2]),
+    beta1_debiased_bias = get_bias(data$model_human_coef[2], data$model_debiased_coef[,2]),
+    
+    beta1_naive_mse    = get_mse(data$model_human_coef[2], data$model_naive_coef[,2]),
+    beta1_debiased_mse = get_mse(data$model_human_coef[2], data$model_debiased_coef[,2]),
+    
+    beta1_naive_coverage    = get_coverage(data$model_human_coef[2], data$model_naive_lci[,2], data$model_naive_uci[,2]),
+    beta1_debiased_coverage = get_coverage(data$model_human_coef[2], data$model_debiased_lci[,2], data$model_debiased_uci[,2])
+  )
+  
+  df = rbind(df, entry)
+}
+
+# sort entries
+df = df[with(df, order(Major, X, Model, PromptModificationID)), ]
+
+# save
+write.csv(df,file.path(bias_dir, "estimators_evaluation.csv"), row.names = FALSE)
+
+df
+```
