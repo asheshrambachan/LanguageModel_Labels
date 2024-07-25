@@ -1,6 +1,7 @@
 ---
-title: "Bias Estimattion"
-output: pdf_document
+title: "bias Estimattion"
+date: July 24, 2024
+output: html_document
 ---
 
 This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
@@ -8,274 +9,335 @@ This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/bl
 ```{r setup, warning=FALSE, message=FALSE}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 knitr::opts_knit$set(root.dir = repo_dir)
+setwd(repo_dir)
 
 require(dplyr)
 require(nnet)
 require(stargazer)
 require(sandwich)
-SEED = 123
-```
+require(ggplot2)
+require(gridExtra)
 
-## Models
+rdata_dir = file.path(repo_dir, "04_bias/rds")
+dir.create(rdata_dir, showWarnings=FALSE)
 
-$$X_i \in \{\text{Senate}_i, \text{Democrat}_i, \text{DW1}_i\}$$
-$$\begin{cases} Y_i^\star& = 1\{ \text{Major}_i = k\} \\ \tilde{Y}_i& = 1\{\text{MajorLLM}_i= k\}\end{cases}$$
+figures_dir = file.path(repo_dir, "04_bias/figures")
+dir.create(figures_dir, showWarnings=FALSE)
 
-$$\begin{cases} Y_i^\star& =\beta_{0} + \beta_{1} \text{X}_{i} \\ \tilde{Y}_i&  = \beta_{0} + \beta_{1} \text{X}_{i}\end{cases}$$
-
-For each $m$ model and $p$ prompt modification, we fit a separate model.
-
-```{r}
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
 
-major = 1
-
-data = data %>%
-  filter(
-    Model=="gpt-4o", 
-    PromptingStrategyID==1
-    ) %>%
-  select(
+data = data %>% select(
     Model, PromptingStrategyID, PromptingStrategyName,
-    Chamber, Party, Year, Cong, Postal, State, Description, DW1, Major, MajorText, 
-    MajorLLM, MajorTextLLM, ExplanationLLM) 
+    BillID, Description,
+    Chamber, Party, Year, Cong, Postal, State, DW1, Major, MajorText, 
+    MajorLLM, MajorTextLLM, ConfidenceLLM, ExplanationLLM  # TODO: ConfidenceLLM is not used at the moment
+    ) 
 
 if (any(is.na(data)))
   warning("data contains NA")
 
-data = data %>%
-  mutate(
-    Senate = as.integer(data$Chamber == "Senate"),
-    Democrat = as.integer(data$Party == "Democrat"),
-    Major = as.integer(data$Major == major), # as.integer(ifelse(data$Major == 1, TRUE, FALSE)) # Major = relevel(as.factor(Major), ref = 20),
-    MajorLLM = as.integer(data$MajorLLM == major), # MajorLLM = relevel(as.factor(Major), ref = 20),
-  )
-
-# split data into train/test set
-set.seed(SEED)
-train_idx = sample(x=nrow(data), size=floor(0.5 * nrow(data)))
-train = data[train_idx, ]
-test = data[-train_idx, ]
-# head(train)
 ```
 
-### Chamber
+## Functions
 
 ```{r}
-model_human = lm(Major ~ Senate, data=test) # do we do this on the entire dataset? or just train? I think it should be test
-model_llm = lm(MajorLLM ~ Senate, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
-
-train$Bias = train$Major - train$MajorLLM
-betas_bias = coef(lm(Bias ~ Senate, data = train))
-
-test$BiasPred = betas_bias[1] + betas_bias[2] * test$Senate
-test$MajorLLMDebised = test$MajorLLM + test$BiasPred
-model_debiased = lm(MajorLLMDebised ~ Senate, data=test) # why is this on the test?
-
-B = 5e3
-model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
-
-# repeat sampling 10000 times
-for (b in (1:B)){
-  # get bootstrap sample
-  bootstrap_indices = sample(nrow(train), replace = TRUE)
-  bootstrap = train[bootstrap_indices, ]
+get_model_debiased = function(data, X, test_train_split, return_bias=TRUE){
+  # split data into train/test set
+  # split 5K, 50% train, 50% test, use the 2.5K for the estimate 
+  n_train = nrow(data)*test_train_split
+  train_idx = sample(x=nrow(data), size=n_train)
+  train = data[train_idx, ]
+  test = data[-train_idx, ]
   
-  # regress (f* - f_hat) on all the Vs and store coefficients
-  bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
-  betas_bias = coef(lm(Bias ~ Senate, data = bootstrap))
-  test$BiasPred = betas_bias[1] + betas_bias[2] * test$Senate
-  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
+  # estimate bias using train data
+  train$bias = train$Y_human - train$Y_naive
+  model_bias = lm(formula=paste("bias", "~", X), data=train)
   
-  # run debiased models (regress adjusted labels on Vs)
-  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ Senate, data=test))
+  # compute Y_debiased for the test data
+  test$bias_hat = predict(model_bias, newdata=test)
+  test$Y_debiased = test$Y_naive + test$bias_hat
+  
+  # regress Y_debiased ~ X on the test data
+  model_debiased = lm(formula=paste("Y_debiased", "~", X), data=test) 
+  
+  if (return_bias)
+    return(list(
+      "model_bias"=model_bias, 
+      "model_debiased"=model_debiased
+      ))
+  else
+    return(list(
+      "model_debiased"=model_debiased
+      ))
+}
+
+get_model_debiased_coef = function(data, X, test_train_split, return_bias=TRUE){
+  models = get_model_debiased(data, X, test_train_split, return_bias)
+  if (return_bias)
+    return(list(
+      "model_bias_coef"=coef(models$model_bias), 
+      "model_debiased_coef"=coef(models$model_debiased)
+      ))
+  else
+    return(list(
+      "model_debiased_coef"=coef(models$model_debiased)
+      ))
+}
+
+draw_bootstrap_samples = function(data, B, func, ... ){
+  # Source: Efron
+  out_template = func(data, ... ) # get output dim
+  if (typeof(out_template)!="list"){
+    stop("Current implementation requires the function return to be a list")
+  }
+  n_lists = length(out_template)
+  lists = vector(mode="list", length=n_lists)
+  names(lists) = names(out_template)
+  for (n in 1:n_lists){
+    lists[[n]] = matrix(nrow=B, ncol=length(out_template[[n]]))
+    colnames(lists[[n]]) = names(out_template[[n]])
+  }
+  samples_boot = vector(mode="list", length=B)
+  for (b in 1:B){
+    idx_boot = sample(nrow(data), replace=TRUE)
+    out = func(data=data[idx_boot, ], ... ) 
+    for (n in 1:n_lists)
+      lists[[n]][b,] = out[[n]]
+  }
+  return(lists)
+}
+
+get_se_robust = function(model){
+  model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
+  return(model_output[,"Std. Error"])
+}
+
+get_ci_robust = function(model, alpha=0.05, use_t_score=FALSE){
+  if (use_t_score){
+    ci = coefci(model, level=1-alpha, vcov=vcovHC(model, type = "HC1"))
+  }
+  else{ 
+    z_score = qnorm(1 - alpha/2)
+    se_robust = get_se_robust(model)
+    ci = cbind(coef(model) - z_score * se_robust, coef(model) + z_score * se_robust)
+    colnames(ci) = c("2.5%", "97.5%")
+  }
+  return(ci)
+}
+
+get_se_boot = function(samples_boot) apply(samples_boot, 2, sd)
+
+get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
+  probs = c(alpha/2, 1-alpha/2)
+  if (method=="percentile"){
+    ci_transposed = apply(samples_boot, 2, function(x){ 
+      quantile(x, probs=probs)
+      })
+    ci = t(ci_transposed)
+  }
+  else {
+    stop("Only percentile method is implemented")
+  }
+  return(ci)
 }
 ```
 
-```{r}
-model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
+## Models
 
-model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
+For each model and each prompt modification, we perform the following:
 
-model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
-names(model_debised_se_boot) = names(coef(model_debiased))
-```
+$$X_i \in \{\text{Senate}_i, \text{Democrat}_i, \text{DW1}_i\}$$
+$$ Y_i^\text{human} = 1\{ \text{Y_human}_i = \text{major}\}$$
 
-```{r}
+$$ Y_i^\text{naive} = 1\{ \text{Y_naive}_i = k\}$$
 
-model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
-model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
-colnames(model_human_ci) = c("2.5%", "97.5%")
+$$ Y_i^\text{debiased} = Y_i^\text{naive} + \widehat{\text{bias}_i}$$
 
-model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
-model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
-colnames(model_llm_ci) = c("2.5%", "97.5%")
+where the bias is estimated by fitting this model using the training data: 
+$$\text{bias}_i =  Y_i^\text{human} - Y_i^\text{naive} = \beta_0^\text{bias} + \beta_1^\text{bias} X_i^\text{5K sample, 50% train}$$
 
-model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
-  quantile(x, probs = c(0.025, 0.975))
-  }))
-rownames(model_debised_ci_boot) = names(coef(model_debiased))
-```
+We then fit a model (currently using test data):
+
+$$Y^\text{human} = \beta_0^\text{human} + \beta_1^\text{human} X^\text{all} + \epsilon^\text{human}$$
+
+$$Y^\text{naive} = \beta_0^\text{naive} + \beta_1^\text{naive} X^\text{5K sample}  + \epsilon^\text{naive}$$
+
+$$Y^\text{debiased} = \beta_0^\text{debiased} + \beta_1^\text{debiased} X^\text{5K sample, 50% test} + \epsilon^\text{debiased}$$
+
 
 ```{r}
-stargazer(
-  title = "Chamber == Senate",
-  model_human, model_llm, model_debiased,
-  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
-  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
-  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
-  keep.stat = c("n"),
-  type = "text")
-```
+set.seed(123)
+major = 1 # TODO: I currently do it for the first major topic only
 
+iter_outter = 200
+B = 200 # of bootstrap samples
+n_samples = 5000 # for naive
+test_train_split = 0.5 # 50% of n_sample for train and 50% for test for debiased
+return_bias = TRUE
 
-
-### Party
-
-```{r}
-model_human = lm(Major ~ Democrat, data=test) # do we do this on the entire dataset? or just train? I think it should be test
-model_llm = lm(MajorLLM ~ Democrat, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
-
-train$Bias = train$Major - train$MajorLLM
-betas_bias = coef(lm(Bias ~ Democrat, data = train))
-
-test$BiasPred = betas_bias[1] + betas_bias[2] * test$Democrat
-test$MajorLLMDebised = test$MajorLLM + test$BiasPred
-model_debiased = lm(MajorLLMDebised ~ Democrat, data=test) # why is this on the test?
-
-B = 5e3
-model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
-
-# repeat sampling 10000 times
-for (b in (1:B)){
-  # get bootstrap sample
-  bootstrap_indices = sample(nrow(train), replace = TRUE)
-  bootstrap = train[bootstrap_indices, ]
-  
-  # regress (f* - f_hat) on all the Vs and store coefficients
-  bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
-  betas_bias = coef(lm(Bias ~ Democrat, data = bootstrap))
-  test$BiasPred = betas_bias[1] + betas_bias[2] * test$Democrat
-  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
-  
-  # run debiased models (regress adjusted labels on Vs)
-  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ Democrat, data=test))
+for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
+  for (prompt_mod_id in (1:12)){
+    for (X in c("Senate", "Democrat", "DW1")){
+      data_filtered = data %>%
+        mutate(
+          Senate = as.integer(Chamber == "Senate"),
+          Democrat = as.integer(Party == "Democrat"),
+          Y_human = as.integer(Major == major),
+          Y_naive = as.integer(MajorLLM == major)) %>% 
+        select(
+          Model, PromptingStrategyID, PromptingStrategyName,
+          BillID, Description,
+          Senate, Democrat, DW1, Y_human, Y_naive) %>% 
+        filter(
+          Model==model, 
+          PromptingStrategyID==prompt_mod_id)
+      
+      # Using human-labeled major topics on all 10K bills
+      model_human = lm(formula=paste("Y_human", "~", X), data=data_filtered)
+      model_human_coef = coef(model_human)
+      model_human_se = get_se_robust(model_human)
+      model_human_ci = get_ci_robust(model_human, alpha=0.05, use_t_score=FALSE)
+      model_human_lci = model_human_ci[,1] # lower ci
+      model_human_uci = model_human_ci[,2] # upper ci
+      rm(model_human_ci)
+      
+      # Using naive LLM-labeled and bias-corrected LLM-labeled major topics
+      names_betas = names(model_human_coef)
+      n_betas = length(model_human_coef)
+      
+      model_naive_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_naive_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_naive_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_naive_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      
+      model_debiased_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_debiased_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_debiased_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      model_debiased_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      
+      if (return_bias){
+        model_bias_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        model_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        model_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        model_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      }
+      
+      for (i in (1:iter_outter)){
+        # sample 5K first
+        sample_idx = sample(x=nrow(data_filtered), size=n_samples)
+        data_filtered_sample = data_filtered[sample_idx,]
+          
+        model_naive = lm(formula=paste("Y_naive", "~", X), data=data_filtered_sample) 
+        model_naive_coef[i,] = coef(model_naive)
+        model_naive_se[i,] = get_se_robust(model_naive)
+        model_naive_ci = get_ci_robust(model_naive, alpha=0.05, use_t_score=FALSE)
+        model_naive_lci[i,] = model_naive_ci[,1] # lower ci
+        model_naive_uci[i,] = model_naive_ci[,2] # upper ci
+        
+        out = get_model_debiased_coef(data_filtered_sample, X, test_train_split, return_bias) 
+        model_debiased_coef[i,] = out$model_debiased_coef
+        if (return_bias){
+          model_bias_coef[i,] = out$model_bias_coef
+        }
+        
+        out_boot = draw_bootstrap_samples(
+          data=data_filtered_sample, B=B, func=get_model_debiased_coef, X=X, 
+          test_train_split=test_train_split, return_bias=return_bias)
+        model_debiased_coef_boot = out_boot$model_debiased_coef
+        model_debiased_se[i,] = get_se_boot(model_debiased_coef_boot)
+        model_debiased_ci = get_ci_boot(model_debiased_coef_boot, alpha=0.05, method="percentile")
+        model_debiased_lci[i,] = model_debiased_ci[,1] # lower ci
+        model_debiased_uci[i,] = model_debiased_ci[,2] # upper ci
+        
+        if (return_bias){
+          model_bias_coef_boot = out_boot$model_bias_coef
+          model_bias_se[i,] = get_se_boot(model_bias_coef_boot)
+          model_bias_ci = get_ci_boot(model_bias_coef_boot, alpha=0.05, method="percentile")
+          model_bias_lci[i,] = model_bias_ci[,1] # lower ci
+          model_bias_uci[i,] = model_bias_ci[,2] # upper ci
+        }
+      }
+      
+      out = list(
+        "Model"=model,
+        "PromptModificationID"=prompt_mod_id,
+        "Major"=major,
+        "X"=X,
+        "model_human_coef"=model_human_coef,
+        "model_human_se"  =model_human_se,
+        "model_human_lci" =model_human_lci,
+        "model_human_uci" =model_human_uci,
+        "model_naive_coef"=model_naive_coef,
+        "model_naive_se"  =model_naive_se,
+        "model_naive_lci" =model_naive_lci,
+        "model_naive_uci" =model_naive_uci,
+        "model_bias_coef"=model_naive_coef,
+        "model_bias_se"  =model_naive_se,
+        "model_bias_lci" =model_naive_lci,
+        "model_bias_uci" =model_naive_uci,
+        "model_debiased_coef"=model_debiased_coef,
+        "model_debiased_se"  =model_debiased_se,
+        "model_debiased_lci" =model_debiased_lci,
+        "model_debiased_uci" =model_debiased_uci
+      )
+      # variables = ls()[grep(pattern="^model_", x=ls())]
+      filename = paste0(c("Major", major, "_", model, "_PromptModificationID", prompt_mod_id, "_", X),
+        collapse="")
+      saveRDS(out, file=file.path(rdata_dir, paste0(c(filename, ".rds"), collapse="")) )
+      print(sprintf("saved %s", filename))
+      
+      colors = c("beta_human"="black","beta_naive" = "#1f77b4", "beta_debiased" = "#ff7f0e")
+      p1 = ggplot() + 
+        geom_vline(aes(xintercept=model_human_coef[1], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=model_naive_coef[,1], color="beta_naive")) +
+        geom_density(aes(x=model_debiased_coef[,1], color="beta_debiased")) +
+        labs(title = paste("Density Plot for",names(model_human_coef[1])),
+             x = names(model_human_coef[1]),
+             y = "Density") +
+        scale_color_manual(name="", values=colors, breaks=names(colors)) +
+        theme_bw() +
+        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+        theme(legend.position = "bottom")
+      
+      p2 = ggplot() + 
+        geom_vline(aes(xintercept=model_human_coef[2], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=model_naive_coef[,2], color="beta_naive")) +
+        geom_density(aes(x=model_debiased_coef[,2], color="beta_debiased")) +
+        labs(title = paste("Density Plot for",names(model_human_coef[2])),
+             x = names(model_human_coef[2]),
+             y = "Density") +
+        scale_color_manual(name="", values=colors, breaks=names(colors)) +
+        theme_bw() +
+        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+        theme(legend.position = "bottom")
+      
+      # Arrange plots side by side
+      p = arrangeGrob(p1, p2, ncol=2) 
+      ggsave(file=file.path(figures_dir, paste0(c(filename,".pdf"), collapse="")), plot=p, width=8, height=4)
+    }
+  }
 }
+
 ```
 
 ```{r}
-model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
-
-model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
-
-model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
-names(model_debised_se_boot) = names(coef(model_debiased))
+# i = 6 # nrow(model_naive_coef)
+# stargazer(
+#   model_human, model_naive_last, model_debiased_last, # this is used to create the table template. Do not use the stats returned by models ending with _last.
+#   coef = list(model_human_coef, model_naive_coef[i,], model_debiased_coef[i,]),
+#   se = list(model_human_se, model_naive_se[i,], model_debiased_se[i,]), 
+#   p.auto=TRUE, # TODO: Verify that p values and * align with the used coef and not based on the templates
+#   ci.custom = list(
+#     matrix(c(model_human_lci, model_human_uci), ncol=2),
+#     matrix(c(model_naive_lci[i,], model_naive_uci[i,]), ncol=2),
+#     matrix(c(model_debiased_lci[i,], model_debiased_uci[i,]), ncol=2)
+#     ),
+#   keep.stat = c("n"), # TODO: verify what to use for number of observations for Y_naive and Y_debiased
+#   type = "text"
+# )
 ```
-
-```{r}
-
-model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
-model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
-colnames(model_human_ci) = c("2.5%", "97.5%")
-
-model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
-model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
-colnames(model_llm_ci) = c("2.5%", "97.5%")
-
-model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
-  quantile(x, probs = c(0.025, 0.975))
-  }))
-rownames(model_debised_ci_boot) = names(coef(model_debiased))
-```
-
-```{r}
-stargazer(
-  title = "Party == Democrat",
-  model_human, model_llm, model_debiased,
-  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
-  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
-  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
-  keep.stat = c("n"),
-  type = "text")
-```
-
-
-
-### DW1
-
-```{r}
-model_human = lm(Major ~ DW1, data=test) # do we do this on the entire dataset? or just train? I think it should be test
-model_llm = lm(MajorLLM ~ DW1, data=test)  # do we do this on the entire dataset? or just train? I think it should be test
-
-train$Bias = train$Major - train$MajorLLM
-betas_bias = coef(lm(Bias ~ DW1, data = train))
-
-test$BiasPred = betas_bias[1] + betas_bias[2] * test$DW1
-test$MajorLLMDebised = test$MajorLLM + test$BiasPred
-model_debiased = lm(MajorLLMDebised ~ DW1, data=test) # why is this on the test?
-
-B = 5e3
-model_debiased_coef_bootstrap = matrix(nrow=B, ncol=2)
-
-# repeat sampling 10000 times
-for (b in (1:B)){
-  # get bootstrap sample
-  bootstrap_indices = sample(nrow(train), replace = TRUE)
-  bootstrap = train[bootstrap_indices, ]
-  
-  # regress (f* - f_hat) on all the Vs and store coefficients
-  bootstrap$Bias = bootstrap$Major - bootstrap$MajorLLM
-  betas_bias = coef(lm(Bias ~ DW1, data = bootstrap))
-  test$BiasPred = betas_bias[1] + betas_bias[2] * test$DW1
-  test$MajorLLMDebised = test$MajorLLM + test$BiasPred
-  
-  # run debiased models (regress adjusted labels on Vs)
-  model_debiased_coef_bootstrap[b,] = coef(lm(MajorLLMDebised ~ DW1, data=test))
-}
-```
-
-```{r}
-model_human_se_robust = sqrt(diag(vcovHC(model_human, type = "HC1")))
-
-model_llm_se_robust = sqrt(diag(vcovHC(model_llm, type = "HC1")))
-
-model_debised_se_boot = apply(model_debiased_coef_bootstrap, 2, sd)
-names(model_debised_se_boot) = names(coef(model_debiased))
-```
-
-```{r}
-
-model_human_t = qt(1 - 0.05/2, df = df.residual(model_human))  # t-value for the 95%-CI
-model_human_ci = cbind(coef(model_human) - model_human_t * model_human_se_robust, coef(model_human) + model_human_t * model_human_se_robust)
-colnames(model_human_ci) = c("2.5%", "97.5%")
-
-model_llm_t = qt(1 - 0.05/2, df = df.residual(model_llm))  # t-value for the 95%-CI
-model_llm_ci = cbind(coef(model_llm) - model_llm_t * model_llm_se_robust, coef(model_llm) + model_llm_t * model_llm_se_robust)
-colnames(model_llm_ci) = c("2.5%", "97.5%")
-
-model_debised_ci_boot = t(apply(model_debiased_coef_bootstrap, 2, function(x){
-  quantile(x, probs = c(0.025, 0.975))
-  }))
-rownames(model_debised_ci_boot) = names(coef(model_debiased))
-```
-
-```{r}
-stargazer(
-  title = "DW1",
-  model_human, model_llm, model_debiased,
-  coef = list(model_human$coefficients, model_llm$coefficients, model_debiased$coefficients),
-  se = list(model_human_se_robust,  model_llm_se_robust, model_debised_se_boot),
-  ci.custom = list(model_human_ci, model_llm_ci, model_debised_ci_boot),
-  keep.stat = c("n"),
-  type = "text")
-```
-
-
 
 ## To-Dos:
 
-- [ ] implement the outer loop
-- [ ] make the inner loop a function that can be applied on any X
-- [ ] decide on CI or SE?
-- [ ] repeat for all models and all prompt modifications
+- [ ] repeat for all models and all prompt modifications and all 3 X
 
