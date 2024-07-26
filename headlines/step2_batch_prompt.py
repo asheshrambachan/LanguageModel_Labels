@@ -1,21 +1,18 @@
 from openai import OpenAI
 from step0_constants import API_KEY
-import os
-import magic
 
+QUESTION = "5"
+MONTH = "mar"
+YEAR = "19"
 
-file_path = 'batch_prompts.jsonl'
-# # testing to confirm the file is jsonl
-# if os.path.isfile(file_path):
-#     file_type = magic.from_file(file_path, mime=True)
-#     print(f"The file type of '{file_path}' is: {file_type}")
+file_path = f'./{MONTH}{YEAR}/q{QUESTION}_prompts.jsonl'
 
 # create client with api key
 client = OpenAI(api_key=API_KEY)
 
 # this is all copy-pasted from the open ai website
 batch_input_file = client.files.create(
-  file=open("batch_prompts.jsonl", "rb"),
+  file=open(file_path, "rb"),
   purpose="batch"
 )
 
@@ -25,7 +22,7 @@ batch = client.batches.create(
         endpoint="/v1/chat/completions",
         completion_window="24h",
         metadata={
-        "description": "dec 19 batch"
+        "description": "mar 19 q4"
         }
     )
 

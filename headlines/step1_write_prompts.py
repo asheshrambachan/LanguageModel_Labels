@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from openai import OpenAI
 from tqdm import tqdm
@@ -5,9 +6,18 @@ import json
 from step0_constants import API_KEY, personas, thought_modifiers, explanation, explanation_json, batch_template
 
 # Configuration constants
-CSV_FILE = "dec19.csv"
-BASE_PROMPT_FILE = 'base_prompt'
-OUTPUT_FILE = "test_labels"
+MONTH = "jan"
+QUESTION = "5"
+YEAR = "19"
+
+# Read in data
+csv_file = f"{MONTH}{YEAR}.csv"
+base_prompt_file = f'./prompt_templates/q{QUESTION}base'
+
+directory = f"./{MONTH}{YEAR}" 
+os.makedirs(directory, exist_ok=True)
+
+output_file = f"{directory}/q{QUESTION}_prompts.jsonl"
 
 # Initialize OpenAI client
 client = OpenAI(api_key=API_KEY)
@@ -39,7 +49,7 @@ def read_base_prompt(suffix):
     Returns:
     - content (str): The content of the base prompt file.
     """
-    with open(BASE_PROMPT_FILE + suffix + '.txt', 'r') as file:
+    with open(base_prompt_file + suffix + '.txt', 'r') as file:
         content = file.read()
     return content
 
@@ -90,10 +100,10 @@ def write_prompt(companies, content, JSON, file, id_num):
 
 def main():
 
-    file_path = "batch_prompts.jsonl"
+    file_path = output_file
     content = read_base_prompt("")
     content_json = read_base_prompt("_json")
-    companies = pd.read_csv(CSV_FILE)
+    companies = pd.read_csv(csv_file)
 
     with open(file_path, 'w') as file:
         # Pass the file object to the function that writes to it
