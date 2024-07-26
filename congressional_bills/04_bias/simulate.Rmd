@@ -8,8 +8,9 @@ This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/bl
 
 ```{r setup, warning=FALSE, message=FALSE}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-knitr::opts_knit$set(root.dir = repo_dir)
-setwd(repo_dir)
+bias_dir = file.path(repo_dir, "04_bias")
+knitr::opts_knit$set(root.dir = bias_dir)
+setwd(bias_dir)
 
 require(dplyr)
 require(nnet)
@@ -18,10 +19,10 @@ require(sandwich)
 require(ggplot2)
 require(gridExtra)
 
-rdata_dir = file.path(repo_dir, "04_bias/rds")
+rdata_dir = file.path(bias_dir, "rds")
 dir.create(rdata_dir, showWarnings=FALSE)
 
-figures_dir = file.path(repo_dir, "04_bias/figures")
+figures_dir = file.path(bias_dir, "figures")
 dir.create(figures_dir, showWarnings=FALSE)
 
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
@@ -41,7 +42,7 @@ if (any(is.na(data)))
 ## Functions
 
 ```{r}
-get_model_debiased = function(data, X, test_train_split, return_bias=TRUE){
+get_model_debiased = function(data, X, test_train_split){
   # split data into train/test set
   # split 5K, 50% train, 50% test, use the 2.5K for the estimate 
   n_train = nrow(data)*test_train_split
@@ -60,28 +61,18 @@ get_model_debiased = function(data, X, test_train_split, return_bias=TRUE){
   # regress Y_debiased ~ X on the test data
   model_debiased = lm(formula=paste("Y_debiased", "~", X), data=test) 
   
-  if (return_bias)
-    return(list(
-      "model_bias"=model_bias, 
-      "model_debiased"=model_debiased
-      ))
-  else
-    return(list(
-      "model_debiased"=model_debiased
-      ))
+  return(list(
+    "model_bias"=model_bias, 
+    "model_debiased"=model_debiased
+    ))
 }
 
-get_beta_debiased = function(data, X, test_train_split, return_bias=TRUE){
-  models = get_model_debiased(data, X, test_train_split, return_bias)
-  if (return_bias)
-    return(list(
-      "beta_bias"=coef(models$model_bias), 
-      "beta_debiased"=coef(models$model_debiased)
-      ))
-  else
-    return(list(
-      "beta_debiased"=coef(models$model_debiased)
-      ))
+get_beta_debiased = function(data, X, test_train_split){
+  models = get_model_debiased(data, X, test_train_split)
+  return(list(
+    "beta_bias"=coef(models$model_bias), 
+    "beta_debiased"=coef(models$model_debiased)
+    ))
 }
 
 draw_bootstrap_samples = function(data, B, func, ... ){
@@ -173,7 +164,6 @@ iter_outter = 5 # 5000
 B = 10 #1000 # of bootstrap samples
 n_samples = 5000 # for naive
 test_train_split = 0.5 # 50% of n_sample for train and 50% for test for debiased
-return_bias = TRUE
 
 for (X in c("Senate", "Democrat", "DW1")){
   for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
@@ -214,12 +204,10 @@ for (X in c("Senate", "Democrat", "DW1")){
       beta_debiased_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       beta_debiased_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
-      if (return_bias){
-        beta_bias = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        beta_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        beta_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        beta_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      }
+      beta_bias = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
       for (i in (1:iter_outter)){
         # sample 5K first
@@ -233,28 +221,24 @@ for (X in c("Senate", "Democrat", "DW1")){
         beta_naive_lci[i,] = beta_naive_ci[,1] # lower ci
         beta_naive_uci[i,] = beta_naive_ci[,2] # upper ci
         
-        out = get_beta_debiased(data_filtered_sample, X, test_train_split, return_bias) 
+        out = get_beta_debiased(data_filtered_sample, X, test_train_split) 
         beta_debiased[i,] = out$beta_debiased
-        if (return_bias){
-          beta_bias[i,] = out$beta_bias
-        }
+        beta_bias[i,] = out$beta_bias
         
         out_boot = draw_bootstrap_samples(
           data=data_filtered_sample, B=B, func=get_beta_debiased, X=X, 
-          test_train_split=test_train_split, return_bias=return_bias)
+          test_train_split=test_train_split)
         beta_debiased_boot = out_boot$beta_debiased
         beta_debiased_se[i,] = get_se_boot(beta_debiased_boot)
         beta_debiased_ci = get_ci_boot(beta_debiased_boot, alpha=0.05, method="percentile")
         beta_debiased_lci[i,] = beta_debiased_ci[,1] # lower ci
         beta_debiased_uci[i,] = beta_debiased_ci[,2] # upper ci
         
-        if (return_bias){
-          beta_bias_boot = out_boot$beta_bias
-          beta_bias_se[i,] = get_se_boot(beta_bias_boot)
-          beta_bias_ci = get_ci_boot(beta_bias_boot, alpha=0.05, method="percentile")
-          beta_bias_lci[i,] = beta_bias_ci[,1] # lower ci
-          beta_bias_uci[i,] = beta_bias_ci[,2] # upper ci
-        }
+        beta_bias_boot = out_boot$beta_bias
+        beta_bias_se[i,] = get_se_boot(beta_bias_boot)
+        beta_bias_ci = get_ci_boot(beta_bias_boot, alpha=0.05, method="percentile")
+        beta_bias_lci[i,] = beta_bias_ci[,1] # lower ci
+        beta_bias_uci[i,] = beta_bias_ci[,2] # upper ci
       }
       
       out = list(
@@ -339,5 +323,6 @@ for (X in c("Senate", "Democrat", "DW1")){
 ## To-Dos:
 
 - [ ] repeat for all major topics
-- [ ] change variable names, beta>beta, beta_naive>beta_naive, ..., beta_se>beta_se, ...
+- [x] change variable names, beta>beta, beta_naive>beta_naive, ..., beta_se>beta_se, ...
 - [ ] separate betas into beta0 beta1?
+- [ ] use purrr and furrr
