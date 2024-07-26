@@ -50,7 +50,7 @@ get_model_debiased = function(data, X, test_train_split, return_bias=TRUE){
   test = data[-train_idx, ]
   
   # estimate bias using train data
-  train$bias = train$Y_human - train$Y_naive
+  train$bias = train$Y - train$Y_naive
   model_bias = lm(formula=paste("bias", "~", X), data=train)
   
   # compute Y_debiased for the test data
@@ -71,16 +71,16 @@ get_model_debiased = function(data, X, test_train_split, return_bias=TRUE){
       ))
 }
 
-get_model_debiased_coef = function(data, X, test_train_split, return_bias=TRUE){
+get_beta_debiased = function(data, X, test_train_split, return_bias=TRUE){
   models = get_model_debiased(data, X, test_train_split, return_bias)
   if (return_bias)
     return(list(
-      "model_bias_coef"=coef(models$model_bias), 
-      "model_debiased_coef"=coef(models$model_debiased)
+      "beta_bias"=coef(models$model_bias), 
+      "beta_debiased"=coef(models$model_debiased)
       ))
   else
     return(list(
-      "model_debiased_coef"=coef(models$model_debiased)
+      "beta_debiased"=coef(models$model_debiased)
       ))
 }
 
@@ -147,7 +147,7 @@ get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
 For each model and each prompt modification, we perform the following:
 
 $$X_i \in \{\text{Senate}_i, \text{Democrat}_i, \text{DW1}_i\}$$
-$$ Y_i^\text{human} = 1\{ \text{Y_human}_i = \text{major}\}$$
+$$ Y_i^\text{human} = 1\{ \text{Y}_i = \text{major}\}$$
 
 $$ Y_i^\text{naive} = 1\{ \text{Y_naive}_i = k\}$$
 
@@ -169,57 +169,56 @@ $$Y^\text{debiased} = \beta_0^\text{debiased} + \beta_1^\text{debiased} X^\text{
 set.seed(123)
 major = 1 # TODO: I currently do it for the first major topic only
 
-iter_outter = 200
-B = 5000 # of bootstrap samples
+iter_outter = 5 # 5000
+B = 10 #1000 # of bootstrap samples
 n_samples = 5000 # for naive
 test_train_split = 0.5 # 50% of n_sample for train and 50% for test for debiased
 return_bias = TRUE
 
-for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
-  for (prompt_mod_id in (1:12)){
-    for (X in c("Senate", "Democrat", "DW1")){
+for (X in c("Senate", "Democrat", "DW1")){
+  for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
+    for (prompt_mod_id in (1:12)){
       data_filtered = data %>%
         mutate(
           Senate = as.integer(Chamber == "Senate"),
           Democrat = as.integer(Party == "Democrat"),
-          Y_human = as.integer(Major == major),
+          Y = as.integer(Major == major),
           Y_naive = as.integer(MajorLLM == major)) %>% 
         select(
           Model, PromptingStrategyID, PromptingStrategyName,
           BillID, Description,
-          Senate, Democrat, DW1, Y_human, Y_naive) %>% 
+          Senate, Democrat, DW1, Y, Y_naive) %>% 
         filter(
           Model==model, 
           PromptingStrategyID==prompt_mod_id)
       
       # Using human-labeled major topics on all 10K bills
-      model_human = lm(formula=paste("Y_human", "~", X), data=data_filtered)
-      model_human_coef = coef(model_human)
-      model_human_se = get_se_robust(model_human)
-      model_human_ci = get_ci_robust(model_human, alpha=0.05, use_t_score=FALSE)
-      model_human_lci = model_human_ci[,1] # lower ci
-      model_human_uci = model_human_ci[,2] # upper ci
-      rm(model_human_ci)
+      model_human = lm(formula=paste("Y", "~", X), data=data_filtered)
+      beta = coef(model_human)
+      beta_se = get_se_robust(model_human)
+      beta_ci = get_ci_robust(model_human, alpha=0.05, use_t_score=FALSE)
+      beta_lci = beta_ci[,1] # lower ci
+      beta_uci = beta_ci[,2] # upper ci
       
       # Using naive LLM-labeled and bias-corrected LLM-labeled major topics
-      names_betas = names(model_human_coef)
-      n_betas = length(model_human_coef)
+      names_betas = names(beta)
+      n_betas = length(beta)
       
-      model_naive_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_naive_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_naive_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_naive_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_naive = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_naive_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_naive_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_naive_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
-      model_debiased_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_debiased_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_debiased_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      model_debiased_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_debiased = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_debiased_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_debiased_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_debiased_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
       if (return_bias){
-        model_bias_coef = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        model_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        model_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-        model_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        beta_bias = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        beta_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        beta_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+        beta_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       }
       
       for (i in (1:iter_outter)){
@@ -228,33 +227,33 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
         data_filtered_sample = data_filtered[sample_idx,]
           
         model_naive = lm(formula=paste("Y_naive", "~", X), data=data_filtered_sample) 
-        model_naive_coef[i,] = coef(model_naive)
-        model_naive_se[i,] = get_se_robust(model_naive)
-        model_naive_ci = get_ci_robust(model_naive, alpha=0.05, use_t_score=FALSE)
-        model_naive_lci[i,] = model_naive_ci[,1] # lower ci
-        model_naive_uci[i,] = model_naive_ci[,2] # upper ci
+        beta_naive[i,] = coef(model_naive)
+        beta_naive_se[i,] = get_se_robust(model_naive)
+        beta_naive_ci = get_ci_robust(model_naive, alpha=0.05, use_t_score=FALSE)
+        beta_naive_lci[i,] = beta_naive_ci[,1] # lower ci
+        beta_naive_uci[i,] = beta_naive_ci[,2] # upper ci
         
-        out = get_model_debiased_coef(data_filtered_sample, X, test_train_split, return_bias) 
-        model_debiased_coef[i,] = out$model_debiased_coef
+        out = get_beta_debiased(data_filtered_sample, X, test_train_split, return_bias) 
+        beta_debiased[i,] = out$beta_debiased
         if (return_bias){
-          model_bias_coef[i,] = out$model_bias_coef
+          beta_bias[i,] = out$beta_bias
         }
         
         out_boot = draw_bootstrap_samples(
-          data=data_filtered_sample, B=B, func=get_model_debiased_coef, X=X, 
+          data=data_filtered_sample, B=B, func=get_beta_debiased, X=X, 
           test_train_split=test_train_split, return_bias=return_bias)
-        model_debiased_coef_boot = out_boot$model_debiased_coef
-        model_debiased_se[i,] = get_se_boot(model_debiased_coef_boot)
-        model_debiased_ci = get_ci_boot(model_debiased_coef_boot, alpha=0.05, method="percentile")
-        model_debiased_lci[i,] = model_debiased_ci[,1] # lower ci
-        model_debiased_uci[i,] = model_debiased_ci[,2] # upper ci
+        beta_debiased_boot = out_boot$beta_debiased
+        beta_debiased_se[i,] = get_se_boot(beta_debiased_boot)
+        beta_debiased_ci = get_ci_boot(beta_debiased_boot, alpha=0.05, method="percentile")
+        beta_debiased_lci[i,] = beta_debiased_ci[,1] # lower ci
+        beta_debiased_uci[i,] = beta_debiased_ci[,2] # upper ci
         
         if (return_bias){
-          model_bias_coef_boot = out_boot$model_bias_coef
-          model_bias_se[i,] = get_se_boot(model_bias_coef_boot)
-          model_bias_ci = get_ci_boot(model_bias_coef_boot, alpha=0.05, method="percentile")
-          model_bias_lci[i,] = model_bias_ci[,1] # lower ci
-          model_bias_uci[i,] = model_bias_ci[,2] # upper ci
+          beta_bias_boot = out_boot$beta_bias
+          beta_bias_se[i,] = get_se_boot(beta_bias_boot)
+          beta_bias_ci = get_ci_boot(beta_bias_boot, alpha=0.05, method="percentile")
+          beta_bias_lci[i,] = beta_bias_ci[,1] # lower ci
+          beta_bias_uci[i,] = beta_bias_ci[,2] # upper ci
         }
       }
       
@@ -263,24 +262,24 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
         "PromptModificationID"=prompt_mod_id,
         "Major"=major,
         "X"=X,
-        "model_human_coef"=model_human_coef,
-        "model_human_se"  =model_human_se,
-        "model_human_lci" =model_human_lci,
-        "model_human_uci" =model_human_uci,
-        "model_naive_coef"=model_naive_coef,
-        "model_naive_se"  =model_naive_se,
-        "model_naive_lci" =model_naive_lci,
-        "model_naive_uci" =model_naive_uci,
-        "model_bias_coef"=model_naive_coef,
-        "model_bias_se"  =model_naive_se,
-        "model_bias_lci" =model_naive_lci,
-        "model_bias_uci" =model_naive_uci,
-        "model_debiased_coef"=model_debiased_coef,
-        "model_debiased_se"  =model_debiased_se,
-        "model_debiased_lci" =model_debiased_lci,
-        "model_debiased_uci" =model_debiased_uci
+        "beta"=beta,
+        "beta_se"  =beta_se,
+        "beta_lci" =beta_lci,
+        "beta_uci" =beta_uci,
+        "beta_naive"=beta_naive,
+        "beta_naive_se"  =beta_naive_se,
+        "beta_naive_lci" =beta_naive_lci,
+        "beta_naive_uci" =beta_naive_uci,
+        "beta_bias"=beta_naive,
+        "beta_bias_se"  =beta_naive_se,
+        "beta_bias_lci" =beta_naive_lci,
+        "beta_bias_uci" =beta_naive_uci,
+        "beta_debiased"=beta_debiased,
+        "beta_debiased_se"  =beta_debiased_se,
+        "beta_debiased_lci" =beta_debiased_lci,
+        "beta_debiased_uci" =beta_debiased_uci
       )
-      # variables = ls()[grep(pattern="^model_", x=ls())]
+      
       filename = paste0(c("Major", major, "_", model, "_PromptModificationID", prompt_mod_id, "_", X),
         collapse="")
       saveRDS(out, file=file.path(rdata_dir, paste0(c(filename, ".rds"), collapse="")) )
@@ -288,11 +287,11 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
       
       colors = c("beta_human"="black","beta_naive" = "#1f77b4", "beta_debiased" = "#ff7f0e")
       p1 = ggplot() + 
-        geom_vline(aes(xintercept=model_human_coef[1], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=model_naive_coef[,1], color="beta_naive")) +
-        geom_density(aes(x=model_debiased_coef[,1], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(model_human_coef[1])),
-             x = names(model_human_coef[1]),
+        geom_vline(aes(xintercept=beta[1], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=beta_naive[,1], color="beta_naive")) +
+        geom_density(aes(x=beta_debiased[,1], color="beta_debiased")) +
+        labs(title = paste("Density Plot for",names(beta[1])),
+             x = names(beta[1]),
              y = "Density") +
         scale_color_manual(name="", values=colors, breaks=names(colors)) +
         theme_bw() +
@@ -300,11 +299,11 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
         theme(legend.position = "bottom")
       
       p2 = ggplot() + 
-        geom_vline(aes(xintercept=model_human_coef[2], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=model_naive_coef[,2], color="beta_naive")) +
-        geom_density(aes(x=model_debiased_coef[,2], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(model_human_coef[2])),
-             x = names(model_human_coef[2]),
+        geom_vline(aes(xintercept=beta[2], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=beta_naive[,2], color="beta_naive")) +
+        geom_density(aes(x=beta_debiased[,2], color="beta_debiased")) +
+        labs(title = paste("Density Plot for",names(beta[2])),
+             x = names(beta[2]),
              y = "Density") +
         scale_color_manual(name="", values=colors, breaks=names(colors)) +
         theme_bw() +
@@ -321,16 +320,16 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
 ```
 
 ```{r}
-# i = 6 # nrow(model_naive_coef)
+# i = 6 # nrow(beta_naive)
 # stargazer(
 #   model_human, model_naive_last, model_debiased_last, # this is used to create the table template. Do not use the stats returned by models ending with _last.
-#   coef = list(model_human_coef, model_naive_coef[i,], model_debiased_coef[i,]),
-#   se = list(model_human_se, model_naive_se[i,], model_debiased_se[i,]), 
+#   coef = list(beta, beta_naive[i,], beta_debiased[i,]),
+#   se = list(beta_se, beta_naive_se[i,], beta_debiased_se[i,]), 
 #   p.auto=TRUE, # TODO: Verify that p values and * align with the used coef and not based on the templates
 #   ci.custom = list(
-#     matrix(c(model_human_lci, model_human_uci), ncol=2),
-#     matrix(c(model_naive_lci[i,], model_naive_uci[i,]), ncol=2),
-#     matrix(c(model_debiased_lci[i,], model_debiased_uci[i,]), ncol=2)
+#     matrix(c(beta_lci, beta_uci), ncol=2),
+#     matrix(c(beta_naive_lci[i,], beta_naive_uci[i,]), ncol=2),
+#     matrix(c(beta_debiased_lci[i,], beta_debiased_uci[i,]), ncol=2)
 #     ),
 #   keep.stat = c("n"), # TODO: verify what to use for number of observations for Y_naive and Y_debiased
 #   type = "text"
@@ -339,6 +338,6 @@ for (model in c("gpt-3.5-turbo-0125", "gpt-4o")){
 
 ## To-Dos:
 
-- [ ] repeat for all models and all prompt modifications and all 3 X
-- [ ] change variable names, model_human_coef to beta_human or beta, 
-- [ ] seperate betas into beta0 beta1?
+- [ ] repeat for all major topics
+- [ ] change variable names, beta>beta, beta_naive>beta_naive, ..., beta_se>beta_se, ...
+- [ ] separate betas into beta0 beta1?

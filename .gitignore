@@ -14,3 +14,6 @@ congressional_bills/02_llm/*.jsonl
 
 congressional_bills/04_bias/rds*
 congressional_bills/04_bias/figures*
+congressional_bills/04_bias/*.csv
+*.Rhistory
+*.RData
