@@ -6,7 +6,7 @@ import json
 from step0_constants import API_KEY, personas, thought_modifiers, explanation, explanation_json, batch_template
 
 # Configuration constants
-MONTH = "jan"
+MONTH = "apr"
 QUESTION = "5"
 YEAR = "19"
 

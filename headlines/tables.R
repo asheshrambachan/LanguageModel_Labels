@@ -1,33 +1,34 @@
 library(dplyr)
-library(tidyr)
 library(ggplot2)
-library(lmtest)
+library(stargazer)
 library(sandwich)
 
-# the results in the pdf only include nov and dec, though we have other months now
-question <- "q4"
-month <- "dec"
-month1 <- "nov"
+# Define the question and the list of months
+question <- "q1"
+months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "nov", "dec")
 
-read_and_combine <- function(file_name) {
-  base_path <- function(month) paste0("./", month, "19/", question, "/", file_name)
-  df1 <- subset(read.csv(base_path(month)), headline.type != "")
-  df2 <- subset(read.csv(base_path(month1)), headline.type != "")
-  rbind(df1, df2)
+# Function to read and combine data for all months
+read_and_combine <- function(file_name, months, question) {
+  combined_df <- data.frame()  # Initialize an empty data frame to store combined data
+  for (month in months) {
+    file_path <- paste0("./", month, "19/", question, "/", file_name)
+    month_df <- read.csv(file_path)
+    month_df <- subset(month_df, headline.type != "")  # Filter out rows with empty headline.type
+    combined_df <- bind_rows(combined_df, month_df)  # Combine data frames
+  }
+  return(combined_df)
 }
 
-base_blanks <- read_and_combine("base_blanks.csv")
-base_json <- read_and_combine("base_json.csv")
-cot1 <- read_and_combine("cot1.csv")
-cot2 <- read_and_combine("cot2.csv")
-cot3 <- read_and_combine("cot3.csv")
-persona1 <- read_and_combine("persona1.csv")
-persona2 <- read_and_combine("persona2.csv")
-persona3 <- read_and_combine("persona3.csv")
-persona4 <- read_and_combine("persona4.csv")
-
-print(paste("./", month1, "19/", question, "/base_blanks.csv", sep = ""))
-#-------------------------------------------------------------------------------
+# Read and combine data for all months
+base_blanks <- read_and_combine("base_blanks.csv", months, question)
+base_json <- read_and_combine("base_json.csv", months, question)
+cot1 <- read_and_combine("cot1.csv", months, question)
+cot2 <- read_and_combine("cot2.csv", months, question)
+cot3 <- read_and_combine("cot3.csv", months, question)
+persona1 <- read_and_combine("persona1.csv", months, question)
+persona2 <- read_and_combine("persona2.csv", months, question)
+persona3 <- read_and_combine("persona3.csv", months, question)
+persona4 <- read_and_combine("persona4.csv", months, question)
 
 #-------------------------------------------------------------------------------
 #
@@ -240,10 +241,37 @@ reg3.4 <- lm(ret_fd1 ~ headline.type * confidence + ret_ld1 + ret_ld2 + ret_ld3 
 se3.4 <- vcovHC(reg3.4, type = "HC1")
 reg3.4 <- coeftest(reg3.4, vcov = se3.4)
 
-# THIS ONE IS MISSING A COEFFICIENT
-reg4.4 <- lm(ret_fd1 ~ headline.type * confidence + ret_ld1 + ret_ld2 + ret_ld3 - 1,  data = persona2)
+persona1 <- persona1 %>%
+  mutate(decrease = ifelse(headline.type == "decrease", 1, 0),
+         increase = ifelse(headline.type == "increase", 1, 0),
+         uncertain = ifelse(headline.type == "uncertain", 1, 0),
+         decrease.confidence = decrease * confidence,
+         increase.confidence = increase * confidence,
+         uncertain.confidence = uncertain * confidence )
+
+persona2 <- persona2 %>%
+  mutate(decrease = ifelse(headline.type == "decrease", 1, 0),
+         increase = ifelse(headline.type == "increase", 1, 0),
+         uncertain = ifelse(headline.type == "uncertain", 1, 0),
+         decrease.confidence = decrease * confidence,
+         increase.confidence = increase * confidence,
+         uncertain.confidence = uncertain * confidence )
+
+# not missing
+reg3.4 <- lm(ret_fd1 ~ decrease + increase + uncertain + decrease.confidence + 
+               increase.confidence + uncertain.confidence - 1, data = persona1)
+se3.4 <- vcovHC(reg3.4, type = "HC1")
+reg3.4 <- coeftest(reg3.4, vcov = se3.4)
+reg3.4
+
+
+# missing 
+reg4.4 <- lm(ret_fd1 ~ decrease + increase + uncertain + decrease.confidence + 
+               increase.confidence + uncertain.confidence - 1, data = persona2)
 se4.4 <- vcovHC(reg4.4, type = "HC1")
 reg4.4 <- coeftest(reg4.4, vcov = se4.4)
+reg4.4
+
 
 # THIS ONE IS MISSING A COEFFICIENT
 reg5.4 <- lm(ret_fd1 ~ headline.type * confidence + ret_ld1 + ret_ld2 + ret_ld3 - 1,  data = persona3)
@@ -322,3 +350,6 @@ reg9.5 <- coeftest(reg9.5, vcov = se9.5)
 stargazer(reg1.5, reg2.5, reg3.5, reg4.5, reg5.5, reg6.5, reg7.5,
           se = list(se1.5, se2.5, se3.5, se4.5, se5.5, se6.5, se7.5),
           type = "text")
+
+
+print(sum(is.na(base_blanks$ret_fd1)))
