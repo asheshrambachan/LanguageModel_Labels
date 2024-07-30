@@ -1,5 +1,5 @@
 ---
-title: "bias Estimattion"
+title: "Simulation"
 date: "July 24, 2024"
 output: html_document
 ---
@@ -16,6 +16,7 @@ require(dplyr)
 require(nnet)
 require(stargazer)
 require(sandwich)
+require(lmtest)
 require(ggplot2)
 require(gridExtra)
 
@@ -39,6 +40,7 @@ if (any(is.na(data)))
 
 ```
 
+
 ## Functions
 
 ```{r}
@@ -50,19 +52,19 @@ get_model_debiased = function(data, X, test_train_split){
   train = data[train_idx, ]
   test = data[-train_idx, ]
   
-  # estimate bias using train data
-  train$bias = train$Y - train$Y_naive
-  model_bias = lm(formula=paste("bias", "~", X), data=train)
+  # estimate error using train data
+  train$error = train$Y_human - train$Y_naive
+  model_error = lm(formula=paste("error", "~", X), data=train)
   
   # compute Y_debiased for the test data
-  test$bias_hat = predict(model_bias, newdata=test)
-  test$Y_debiased = test$Y_naive + test$bias_hat
+  test$error_hat = predict(model_error, newdata=test)
+  test$Y_debiased = test$Y_naive + test$error_hat
   
   # regress Y_debiased ~ X on the test data
   model_debiased = lm(formula=paste("Y_debiased", "~", X), data=test) 
   
   return(list(
-    "model_bias"=model_bias, 
+    "model_error"=model_error, 
     "model_debiased"=model_debiased
     ))
 }
@@ -70,10 +72,11 @@ get_model_debiased = function(data, X, test_train_split){
 get_beta_debiased = function(data, X, test_train_split){
   models = get_model_debiased(data, X, test_train_split)
   return(list(
-    "beta_bias"=coef(models$model_bias), 
+    "beta_error"=coef(models$model_error), 
     "beta_debiased"=coef(models$model_debiased)
     ))
 }
+
 
 draw_bootstrap_samples = function(data, B, func, ... ){
   # Source: Efron
@@ -88,15 +91,15 @@ draw_bootstrap_samples = function(data, B, func, ... ){
     lists[[n]] = matrix(nrow=B, ncol=length(out_template[[n]]))
     colnames(lists[[n]]) = names(out_template[[n]])
   }
-  samples_boot = vector(mode="list", length=B)
   for (b in 1:B){
     idx_boot = sample(nrow(data), replace=TRUE)
-    out = func(data=data[idx_boot, ], ... ) 
+    out = func(data=data[idx_boot, ], ... )
     for (n in 1:n_lists)
       lists[[n]][b,] = out[[n]]
   }
   return(lists)
 }
+
 
 get_se_robust = function(model){
   model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
@@ -133,6 +136,7 @@ get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
 }
 ```
 
+
 ## Models
 
 For each model and each prompt modification, we perform the following:
@@ -142,10 +146,10 @@ $$ Y_i^\text{human} = 1\{ \text{Y}_i = \text{major}\}$$
 
 $$ Y_i^\text{naive} = 1\{ \text{Y_naive}_i = k\}$$
 
-$$ Y_i^\text{debiased} = Y_i^\text{naive} + \widehat{\text{bias}_i}$$
+$$ Y_i^\text{debiased} = Y_i^\text{naive} + \widehat{\text{error}_i}$$
 
-where the bias is estimated by fitting this model using the training data: 
-$$\text{bias}_i =  Y_i^\text{human} - Y_i^\text{naive} = \beta_0^\text{bias} + \beta_1^\text{bias} X_i^\text{5K sample, 50% train}$$
+where the error is estimated by fitting this model using the training data: 
+$$\text{error}_i =  Y_i^\text{human} - Y_i^\text{naive} = \beta_0^\text{error} + \beta_1^\text{error} X_i^\text{5K sample, 50% train}$$
 
 We then fit a model (currently using test data):
 
@@ -172,73 +176,89 @@ for (X in c("Senate", "Democrat", "DW1")){
         mutate(
           Senate = as.integer(Chamber == "Senate"),
           Democrat = as.integer(Party == "Democrat"),
-          Y = as.integer(Major == major),
+          Y_human = as.integer(Major == major),
           Y_naive = as.integer(MajorLLM == major)) %>% 
         select(
           Model, PromptingStrategyID, PromptingStrategyName,
           BillID, Description,
-          Senate, Democrat, DW1, Y, Y_naive) %>% 
+          Senate, Democrat, DW1, Y_human, Y_naive) %>% 
         filter(
           Model==model, 
           PromptingStrategyID==prompt_mod_id)
       
       # Using human-labeled major topics on all 10K bills
-      model_human = lm(formula=paste("Y", "~", X), data=data_filtered)
-      beta = coef(model_human)
-      beta_se = get_se_robust(model_human)
-      beta_ci = get_ci_robust(model_human, alpha=0.05, use_t_score=FALSE)
-      beta_lci = beta_ci[,1] # lower ci
-      beta_uci = beta_ci[,2] # upper ci
+      model_human = lm(formula=paste("Y_human", "~", X), data=data_filtered)
+      beta_human = coef(model_human)
+      beta_human_se = get_se_robust(model_human)
+      beta_human_ci = get_ci_robust(model_human, alpha=0.05, use_t_score=FALSE)
+      beta_human_lci = beta_human_ci[,1] # lower ci
+      beta_human_uci = beta_human_ci[,2] # upper ci
       
-      # Using naive LLM-labeled and bias-corrected LLM-labeled major topics
-      names_betas = names(beta)
-      n_betas = length(beta)
+      # Using naive LLM-labeled and error-corrected LLM-labeled major topics
+      names_betas = names(beta_human)
+      n_betas = length(beta_human)
       
-      beta_naive = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_naive_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_naive_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_naive_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_llm = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_llm_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_llm_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_llm_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
       beta_debiased = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       beta_debiased_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       beta_debiased_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       beta_debiased_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
-      beta_bias = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_bias_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_bias_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
-      beta_bias_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_error = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_error_se = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_error_lci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
+      beta_error_uci = matrix(nrow=iter_outter, ncol=n_betas, dimnames=list(NULL, names_betas))
       
       for (i in (1:iter_outter)){
-        # sample 5K first
-        sample_idx = sample(x=nrow(data_filtered), size=n_samples)
+        sample_idx = sample(x=nrow(data_filtered), size=n_samples, replace=TRUE)
         data_filtered_sample = data_filtered[sample_idx,]
           
-        model_naive = lm(formula=paste("Y_naive", "~", X), data=data_filtered_sample) 
-        beta_naive[i,] = coef(model_naive)
-        beta_naive_se[i,] = get_se_robust(model_naive)
-        beta_naive_ci = get_ci_robust(model_naive, alpha=0.05, use_t_score=FALSE)
-        beta_naive_lci[i,] = beta_naive_ci[,1] # lower ci
-        beta_naive_uci[i,] = beta_naive_ci[,2] # upper ci
+        model_llm = lm(formula=paste("Y_naive", "~", X), data=data_filtered_sample) 
+        beta_llm[i,] = coef(model_llm)
+        beta_llm_se[i,] = get_se_robust(model_llm)
+        beta_llm_ci = get_ci_robust(model_llm, alpha=0.05, use_t_score=FALSE)
+        beta_llm_lci[i,] = beta_llm_ci[,1] # lower ci
+        beta_llm_uci[i,] = beta_llm_ci[,2] # upper ci
         
-        out = get_beta_debiased(data_filtered_sample, X, test_train_split) 
-        beta_debiased[i,] = out$beta_debiased
-        beta_bias[i,] = out$beta_bias
         
-        out_boot = draw_bootstrap_samples(
-          data=data_filtered_sample, B=B, func=get_beta_debiased, X=X, 
-          test_train_split=test_train_split)
-        beta_debiased_boot = out_boot$beta_debiased
-        beta_debiased_se[i,] = get_se_boot(beta_debiased_boot)
-        beta_debiased_ci = get_ci_boot(beta_debiased_boot, alpha=0.05, method="percentile")
-        beta_debiased_lci[i,] = beta_debiased_ci[,1] # lower ci
-        beta_debiased_uci[i,] = beta_debiased_ci[,2] # upper ci
+        # split data_filtered_sample into train/test set
+        # split 5K, 50% train, 50% test, use the 2.5K for the estimate 
+        n_train = nrow(data_filtered_sample) * test_train_split
+        train_idx = sample(x=nrow(data_filtered_sample), size=n_train)
+        train = data_filtered_sample[train_idx, ]
+        test = data_filtered_sample[-train_idx, ]
         
-        beta_bias_boot = out_boot$beta_bias
-        beta_bias_se[i,] = get_se_boot(beta_bias_boot)
-        beta_bias_ci = get_ci_boot(beta_bias_boot, alpha=0.05, method="percentile")
-        beta_bias_lci[i,] = beta_bias_ci[,1] # lower ci
-        beta_bias_uci[i,] = beta_bias_ci[,2] # upper ci
+        # estimate error using train data
+        train$error = train$Y_human - train$Y_naive
+        model_error = lm(formula=paste("error", "~", X), data=train)
+        beta_error[i,] = coef(model_error)
+        
+        
+        # compute Y_debiased for the test data and regress Y_debiased ~ X on the test data
+        test$error_hat = predict(model_error, newdata=test)
+        test$Y_debiased = test$Y_naive + test$error_hat
+        model_debiased = lm(formula=paste("Y_debiased", "~", X), data=test) 
+        beta_debiased[i,] = coef(model_debiased)
+        
+        # 
+        # out_boot = draw_bootstrap_samples(
+        #   data=data_filtered_sample, B=B, func=get_beta_debiased, X=X, 
+        #   test_train_split=test_train_split)
+        # beta_debiased_boot = out_boot$beta_debiased
+        # beta_debiased_se[i,] = get_se_boot(beta_debiased_boot)
+        # beta_debiased_ci = get_ci_boot(beta_debiased_boot, alpha=0.05, method="percentile")
+        # beta_debiased_lci[i,] = beta_debiased_ci[,1] # lower ci
+        # beta_debiased_uci[i,] = beta_debiased_ci[,2] # upper ci
+        # 
+        # beta_bias_boot = out_boot$beta_error
+        # beta_error_se[i,] = get_se_boot(beta_bias_boot)
+        # beta_error_ci = get_ci_boot(beta_bias_boot, alpha=0.05, method="percentile")
+        # beta_error_lci[i,] = beta_error_ci[,1] # lower ci
+        # beta_error_uci[i,] = beta_error_ci[,2] # upper ci
       }
       
       out = list(
@@ -246,18 +266,18 @@ for (X in c("Senate", "Democrat", "DW1")){
         "PromptModificationID"=prompt_mod_id,
         "Major"=major,
         "X"=X,
-        "beta"=beta,
-        "beta_se"  =beta_se,
-        "beta_lci" =beta_lci,
-        "beta_uci" =beta_uci,
-        "beta_naive"=beta_naive,
-        "beta_naive_se"  =beta_naive_se,
-        "beta_naive_lci" =beta_naive_lci,
-        "beta_naive_uci" =beta_naive_uci,
-        "beta_bias"=beta_naive,
-        "beta_bias_se"  =beta_naive_se,
-        "beta_bias_lci" =beta_naive_lci,
-        "beta_bias_uci" =beta_naive_uci,
+        "beta_human"=beta_human,
+        "beta_human_se"  =beta_human_se,
+        "beta_human_lci" =beta_human_lci,
+        "beta_human_uci" =beta_human_uci,
+        "beta_llm"=beta_llm,
+        "beta_llm_se"  =beta_llm_se,
+        "beta_llm_lci" =beta_llm_lci,
+        "beta_llm_uci" =beta_llm_uci,
+        "beta_error"=beta_error,
+        "beta_error_se"  =beta_error_se,
+        "beta_error_lci" =beta_error_lci,
+        "beta_error_uci" =beta_error_uci,
         "beta_debiased"=beta_debiased,
         "beta_debiased_se"  =beta_debiased_se,
         "beta_debiased_lci" =beta_debiased_lci,
@@ -269,13 +289,13 @@ for (X in c("Senate", "Democrat", "DW1")){
       saveRDS(out, file=file.path(rdata_dir, paste0(c(filename, ".rds"), collapse="")) )
       print(sprintf("saved %s", filename))
       
-      colors = c("beta_human"="black","beta_naive" = "#1f77b4", "beta_debiased" = "#ff7f0e")
+      colors = c("beta_human"="black","beta_llm" = "#1f77b4", "beta_debiased" = "#ff7f0e")
       p1 = ggplot() + 
-        geom_vline(aes(xintercept=beta[1], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=beta_naive[,1], color="beta_naive")) +
+        geom_vline(aes(xintercept=beta_human[1], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=beta_llm[,1], color="beta_llm")) +
         geom_density(aes(x=beta_debiased[,1], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(beta[1])),
-             x = names(beta[1]),
+        labs(title = paste("Density Plot for",names(beta_human[1])),
+             x = names(beta_human[1]),
              y = "Density") +
         scale_color_manual(name="", values=colors, breaks=names(colors)) +
         theme_bw() +
@@ -283,11 +303,11 @@ for (X in c("Senate", "Democrat", "DW1")){
         theme(legend.position = "bottom")
       
       p2 = ggplot() + 
-        geom_vline(aes(xintercept=beta[2], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=beta_naive[,2], color="beta_naive")) +
+        geom_vline(aes(xintercept=beta_human[2], color="beta_human"), linetype = "dashed") +
+        geom_density(aes(x=beta_llm[,2], color="beta_llm")) +
         geom_density(aes(x=beta_debiased[,2], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(beta[2])),
-             x = names(beta[2]),
+        labs(title = paste("Density Plot for",names(beta_human[2])),
+             x = names(beta_human[2]),
              y = "Density") +
         scale_color_manual(name="", values=colors, breaks=names(colors)) +
         theme_bw() +
@@ -304,15 +324,15 @@ for (X in c("Senate", "Democrat", "DW1")){
 ```
 
 ```{r}
-# i = 6 # nrow(beta_naive)
+# i = 6 # nrow(beta_llm)
 # stargazer(
 #   model_human, model_naive_last, model_debiased_last, # this is used to create the table template. Do not use the stats returned by models ending with _last.
-#   coef = list(beta, beta_naive[i,], beta_debiased[i,]),
-#   se = list(beta_se, beta_naive_se[i,], beta_debiased_se[i,]), 
+#   coef = list(beta_human, beta_llm[i,], beta_debiased[i,]),
+#   se = list(beta_human_se, beta_llm_se[i,], beta_debiased_se[i,]), 
 #   p.auto=TRUE, # TODO: Verify that p values and * align with the used coef and not based on the templates
 #   ci.custom = list(
-#     matrix(c(beta_lci, beta_uci), ncol=2),
-#     matrix(c(beta_naive_lci[i,], beta_naive_uci[i,]), ncol=2),
+#     matrix(c(beta_human_lci, beta_human_uci), ncol=2),
+#     matrix(c(beta_llm_lci[i,], beta_llm_uci[i,]), ncol=2),
 #     matrix(c(beta_debiased_lci[i,], beta_debiased_uci[i,]), ncol=2)
 #     ),
 #   keep.stat = c("n"), # TODO: verify what to use for number of observations for Y_naive and Y_debiased
