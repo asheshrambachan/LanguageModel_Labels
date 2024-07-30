@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-MONTH = "mar"
+MONTH = "octsecond"
 QUESTION = "5"
 
 # Read in data

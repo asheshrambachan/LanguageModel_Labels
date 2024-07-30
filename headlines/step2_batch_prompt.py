@@ -1,8 +1,8 @@
 from openai import OpenAI
 from step0_constants import API_KEY
 
-QUESTION = "5"
-MONTH = "sep"
+QUESTION = "1"
+MONTH = "jan"
 YEAR = "19"
 
 file_path = f'./{MONTH}{YEAR}/q{QUESTION}_prompts.jsonl'

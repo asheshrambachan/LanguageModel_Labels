@@ -1,4 +1,4 @@
-MODEL = "gpt-3.5-turbo"
+MODEL = "gpt-4o-mini"
 API_KEY = "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"
 
 
@@ -24,7 +24,7 @@ batch_template = {
                     "url": "/v1/chat/completions", 
                     "body": 
                         {
-                            "model": "gpt-3.5-turbo-0125", 
+                            "model": MODEL, 
                             "messages": 
                                 [{
                                     "role": "user",

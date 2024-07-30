@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from step0_constants import personas, thought_modifiers
 
-QUESTION = "5"
-MONTH = "apr"
+QUESTION = "1"
+MONTH = "octsecond"
 YEAR = "19"
 
 def read_jsonl(file_path, num_lines):
