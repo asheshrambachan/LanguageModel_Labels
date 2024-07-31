@@ -17,7 +17,6 @@ require(dplyr)
 require(ggplot2)
 require(gridExtra)
 require(grid)
-# require(crayon)
 ```
 
 
@@ -51,6 +50,20 @@ $$95\%CI (\beta^\text{est}) = (\text{LCI}^\text{est}, \text{UCI}^\text{est})$$
 The coverage probability of this CI is defined as:
 $$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est}) \right] = \mathbb{E}[1\{\beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est})\}] \approx \frac{1}{n} \sum_{i=1}^n 1\{\beta \in (\text{LCI}_i^\text{est}, \text{UCI}_i^\text{est})\} $$
 
+# Load data
+```{r}
+filename = "simulations_N2_B10"
+simulations_path = file.path(simulation_dir, sprintf("%s.csv", filename))
+
+if (file.exists(simulations_path)) {
+  simulations = read.csv(simulations_path)
+} else {
+  rds_dir = file.path(simulation_dir, sub("simulations", "rds", filename))
+  rds_paths =  list.files(rds_dir, pattern = "*.rds", full.names = TRUE)
+  simulations = bind_rows(lapply(rds_paths, function(rds_path) readRDS(rds_path)))
+  write.csv(simulations, simulations_path, row.names = FALSE)
+}
+```
 
 # Results
 
@@ -58,9 +71,6 @@ $$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est
 get_bias = function(beta, beta_est) mean(beta - beta_est)
 get_mse  = function(beta, beta_est) mean((beta - beta_est)^2)
 get_coverage = function(beta, beta_est_lci, beta_est_uci) mean((beta_est_lci < beta) & (beta < beta_est_uci))
-
-filename = "simulations_N10_B10.csv"
-simulations = read.csv(file.path(simulation_dir, filename))
 
 evaluations = simulations %>% 
   group_by(major_topic, variable, model, prompt, train_proportion) %>% 
@@ -90,12 +100,12 @@ evaluations = simulations %>%
     )
 
 # save
-write.csv(evaluations, file.path(simulation_dir, sub("simulations", "evaluations", filename)), row.names = FALSE)
-
+evaluations_path = sub("simulations", "evaluations", simulations_path)
+write.csv(evaluations, evaluations_path, row.names = FALSE)
 ```
 
 ```{r}
-figures_dir = file.path(simulation_dir, sub(".csv", "", sub("simulations", "figures", filename)))
+figures_dir = file.path(simulation_dir, sub("simulations", "figures", filename))
 dir.create(figures_dir, showWarnings=FALSE)
 
 colors = c("llm" = "#1f77b4", "human_train" = "#008000", "debiased" = "#ff7f0e")

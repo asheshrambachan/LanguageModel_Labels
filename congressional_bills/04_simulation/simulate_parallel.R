@@ -1,44 +1,72 @@
----
-title: "Simulations"
-date: "July 24, 2024"
-output: html_document
----
+# title: "Simulations"
+# date: "July 31, 2024"
+# output: html_document
+# This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 
-This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
+# local: cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
+# local: chmod +x copy_local2remote.sh 
+# local: ./copy_local2remote.sh haya1@supply.mit.edu
+# local: ssh haya1@supply.mit.edu
 
-```{r setup, warning=FALSE, message=FALSE}
-repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+# remote: conda create -n r_env r-essentials r-base  r-dplyr r-sandwich r-lmtest r-furrr r-progressr
+# remote: conda activate r_env
+# remote: cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
+# remote: Rscript simulate_parallel.R 1000 1000 10
+
+require(zoo, quietly=TRUE, warn.conflicts=FALSE)
+require(dplyr, quietly=TRUE, warn.conflicts=FALSE)
+require(sandwich, quietly=TRUE, warn.conflicts=FALSE)
+require(lmtest, quietly=TRUE, warn.conflicts=FALSE)
+require(furrr, quietly=TRUE, warn.conflicts=FALSE)
+require(progressr, quietly=TRUE, warn.conflicts=FALSE)
+
+repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
+
+args = commandArgs(trailingOnly = TRUE)
+if (length(args)>0){
+  N = as.numeric(args[1])
+  B = as.numeric(args[2])
+  n_cores = as.numeric(args[3])
+} else {
+  N = 2 # 1000
+  B = 10 # 1000
+  n_cores = 10
+}
+
+n_samples = 5000
+common_major_topics = c(3, 14, 15, 19, 20)
+train_proportion = c(0.1, 0.25, 0.5)
+save_rds = TRUE
+
 simulation_dir = file.path(repo_dir, "04_simulation")
-knitr::opts_knit$set(root.dir = simulation_dir)
 setwd(simulation_dir)
 
-require(dplyr)
-require(sandwich)
-require(lmtest)
-require(furrr)
-library(progressr)
-
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")) %>% 
-  # select(
-  #   Model, PromptingStrategyID, PromptingStrategyName,
-  #   BillID, Description,
-  #   Chamber, Party, Year, Cong, Postal, State, DW1, Major, MajorText, 
-  #   MajorLLM, MajorTextLLM, ConfidenceLLM, ExplanationLLM  # TODO: ConfidenceLLM is not used at the moment
-  #   ) %>%
   mutate(
     Senate = as.integer(Chamber == "Senate"),
     Democrat = as.integer(Party == "Democrat"),
     Prompt = PromptingStrategyID) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Major, MajorLLM) 
 
-if (any(is.na(data)))
-  warning("data contains NA")
-```
+rds_dir = file.path(simulation_dir, sprintf("rds_N%d_B%d", N, B)) 
+dir.create(rds_dir, showWarnings=FALSE)
 
+# bills = data %>%
+#   group_by(BillID) %>%
+#   summarise(Major = first(Major))
+# common_major_topics_table = sort(summary(as.factor(bills$Major)), decreasing=TRUE)[1:5]
+# common_major_topics = sort(as.integer(names(common_major_topics_table)))
+
+combinations = expand.grid(
+  train_proportion = train_proportion, # 10%train 90%test, ...
+  prompt = unique(data$Prompt),
+  model = unique(data$Model),
+  variable = c("Senate", "Democrat", "DW1"),
+  major_topic = common_major_topics, 
+  stringsAsFactors = FALSE
+)
 
 ## Functions
-
-```{r}
 get_se_robust = function(model){
   model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
   return(model_output[,"Std. Error"])
@@ -66,14 +94,12 @@ get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
   probs = c(alpha/2, 1-alpha/2)
   ci_transposed = apply(samples_boot, 2, function(x){ 
     quantile(x, probs=probs)
-    })
+  })
   ci = t(ci_transposed)
   
   return(ci)
 }
-```
 
-```{r}
 get_beta_debiased = function(train, test, variable){
   # estimate error using train data
   train$error = train$Y_human - train$Y_llm
@@ -201,74 +227,52 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   return(as.data.frame(betas))
 }
 
-```
-
 ## Models
+if (n_cores > parallelly::availableCores())
+  n_cores = parallelly::availableCores()
+print(sprintf("Number of cores = %d", n_cores))
+print(sprintf("N = %d, B = %d, n_samples = %d", N, B, n_samples))
+print(sprintf("Total number of combinations = %d", nrow(combinations)))
 
-```{r}
-bills = data %>% 
-  group_by(BillID) %>% 
-  summarise(Major = first(Major))
+start_time = Sys.time()
+betas_df = outer_loop_function(
+  data=data,
+  combination=combinations[1,],
+  N=1,
+  B=B,
+  n_samples=n_samples
+)
+end_time = Sys.time()
+duration_N1_combination1 = as.numeric(end_time - start_time, unit="hours")
+duration = duration_N1_combination1 * N * nrow(combinations) / n_cores
+print(sprintf("Expected run time = %.2f hours", duration))
 
-common_major_topics_table = sort(summary(as.factor(bills$Major)), decreasing=TRUE)[1:3]
-# print(common_major_topics_table)
-common_major_topics = sort(as.integer(names(common_major_topics_table)))
-
-combinations = expand.grid(
-  train_proportion = c(0.1, 0.25, 0.5), # 10%train 90%test, ...
-  prompt = unique(data$Prompt),
-  model = unique(data$Model),
-  variable = c("Senate", "Democrat", "DW1"),
-  major_topic = common_major_topics, # c(15, 19, 20)
-  stringsAsFactors = FALSE
-  )
-```
-
-```{r}
-n_cores = parallelly::availableCores()
-plan(multisession, workers = n_cores) # or simply use: plan(multisession)
-```
-
-```{r}
-# start.time = Sys.time()
-N = 1000
-B = 1000
-n_samples = 5000
-
+plan(multisession, workers = n_cores)
 set.seed(123)
 with_progress({
-  p <- progressor(along = 1:nrow(combinations))
-
+  p = progressor(along = 1:nrow(combinations))
+  
   betas_list = future_map(
-    .options = furrr_options(seed=TRUE), # instead of using a new seed for each run, it's enough to use set.seed(123), and enable random seeding here
+    .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
     .x = 1:nrow(combinations),
     .f = function(x) {
-      betas = outer_loop_function(
-        data=data, 
+      set.seed(x)
+      betas_df = outer_loop_function(
+        data=data,
         combination=combinations[x,],
         N=N,
         B=B,
         n_samples=n_samples
-        )
-      p(sprintf("combination = %g", x))
-      return(betas)
+      )
+      p(sprintf("completed and saved combination%05d.rds", x))
+      if (save_rds) saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", x)))
+      else return(betas_df)
     })
-})
-
-# end.time <- Sys.time()
-# print(end.time - start.time)
-```
-
-
-```{r}
+}, enable = TRUE, delay_stdout=TRUE, delay_conditions="condition")
 plan(sequential)
 
-betas_df = bind_rows(betas_list)
-filename = paste("simulations_N", N, "_B", B, ".csv", sep = "")
-write.csv(betas_df, file.path(simulation_dir, filename), row.names = FALSE)
-```
-
-```{r}
-# ~1.5 - 2 secs/combination for N=1 B=1000 > 
-# (1.8*1000)/60/60 = 0.5 hrs/combination, N=1000 B=1000
-```
+if (save_rds==FALSE){
+  betas_df = bind_rows(betas_list)
+  filename = paste("simulations_N", N, "_B", B, ".csv", sep = "")
+  write.csv(betas_df, file.path(simulation_dir, filename), row.names = FALSE)
+}
