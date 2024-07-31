@@ -9,8 +9,8 @@ On your local machine, run the following in the terminal to copy the required fi
 ```
 cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
 chmod +x copy_local2remote.sh 
-./copy_local2remote.sh haya1@supply.mit.edu
-ssh haya1@supply.mit.edu
+./copy_local2remote.sh username@supply.mit.edu
+ssh username@supply.mit.edu
 ```
 
 On the remote server, create a new `r_env` using `conda` (you need to install `conda` first if missing):
@@ -23,7 +23,7 @@ To start the simulation, run the following:
 ```
 Rscript simulate_parallel.R 1000 1000 10
 ```
-The passed arguments in order are `N B n_cores`. If the `n_cores` is greater than what's available, you'll be switch to the maximum number of available cores. 
+The passed arguments in order are `N B n_cores`. If `n_cores` is greater than what's available, the maximum number of available cores will be used.
 
 The code generates `rds` files that are stored in `rds_N_B` folder in the same directory. 
 
