@@ -76,29 +76,17 @@ get_ci_robust = function(model, alpha=0.05, use_z_score=TRUE){
 get_se_boot = function(samples_boot) apply(samples_boot, 2, sd)
 
 get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
-  probs = c(alpha/2, 1-alpha/2)
-  if (method=="percentile"){
-    ci_transposed = apply(samples_boot, 2, function(x){ 
-      quantile(x, probs=probs)
-      })
-    ci = t(ci_transposed)
-  }
-  else {
+  if (method!="percentile")
     stop("Only percentile method is implemented")
-  }
+  
+  probs = c(alpha/2, 1-alpha/2)
+  ci_transposed = apply(samples_boot, 2, function(x){ 
+    quantile(x, probs=probs)
+    })
+  ci = t(ci_transposed)
+  
   return(ci)
 }
-
-# draw_bootstrap_samples = function(data, B, func, ...) {
-#   out_list = future_map(
-#     .options = furrr_options(seed=TRUE), # enable change of seed as the seed is fixed by default and this will be used in a loop
-#     .x=1:B, # this is ignored
-#     .f=func,
-#     data=data,
-#     Xvar=X,
-#     test_train_split=test_train_split
-#     )
-# }
 ```
 
 ```{r}
@@ -204,20 +192,24 @@ outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
     # (iii) corrected error, and estimate debiased model
     betas$debiased$coef[i,] = get_beta_debiased(train=train, test=test, X=X)
     
-    # but since beta_debiased function is based on estimated value for Y_debiased, we can't use robust se and ci. Instead bootstrap
-    # TODO: I think we should bootstraping from the fixed train/test split instead. Otherwise, the result above is simply 1 sample since test/train split is random?
+    # but since beta_debiased function based on the predicted Y_debiased, we can't use robust se and ci. 
+    # TODO: I think we should bootstrapping from the fixed train/test split instead. Otherwise, the result above is simply 1 sample since test/train split is random?
+    
+    # We then begin the bootstrap (inner loop):
     debiased_coef_boot = as.data.frame(t(sapply(
       1:B, 
       function(b){ # ignore b
-        # resample data_sample with replacement
-        data_sample_boot = data_sample[sample(x=nrow(data_sample), replace=TRUE) ,]# TODO: double check this as train/test split is not with replacement
-        # split to train and test
+        data_sample_boot = data_sample[sample(x=nrow(data_sample), replace=TRUE) ,] # TODO: double check this as train/test split is not with replacement
+        
+        # We redraw train/test splits, and on each train/test split, we calculate corrected_beta.
         train_idx_boot = 1:(nrow(data_sample_boot)*test_train_split)
         train_boot = data_sample_boot[train_idx_boot, ]
         test_boot = data_sample_boot[-train_idx_boot, ]
         return(get_beta_debiased(train=train_boot, test=test_boot, X=X))
       }
     )))
+    
+    # We use bootstrap samples to calculate se and confidence intervals for corrected_beta.
     betas$debiased$se[i,] = get_se_boot(debiased_coef_boot)
     betas$debiased$lci[i,] = get_ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
     betas$debiased$uci[i,] = get_ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
@@ -284,9 +276,8 @@ print(round(end.time - start.time,2))
 
 
 ```{r}
-# 1.05 sec to set up 
-# 13.32 sec to run each N, with B=1000
-((1.05+13.32)*1000)/60/60
+# ~14 sec to run N=1 B=1000
+(14*1000)/60/60
 # 4 hours per combo
 ```
 
