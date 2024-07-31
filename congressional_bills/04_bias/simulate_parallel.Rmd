@@ -90,7 +90,7 @@ get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
 ```
 
 ```{r}
-# TODO: add an option to compute the coef, se, ci, off
+
 get_beta_debiased = function(train, test, X){
   # estimate error using train data
   train$error = train$Y_human - train$Y_llm
@@ -104,12 +104,10 @@ get_beta_debiased = function(train, test, X){
 }
 
 outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
-  # combo = combos[combo_index,]
   major = combo$major
   X = combo$X
   model = combo$model 
   prompt_mod_id = combo$prompt_mod_id
-  
   
   data = data %>% 
     filter(
@@ -222,12 +220,6 @@ outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
 
 ## Models
 
-
-```{r}
-# progressr::handlers(global = TRUE)
-```
-
-
 ```{r}
 combos = expand.grid(
   prompt_mod_id = (1:12),
@@ -237,16 +229,17 @@ combos = expand.grid(
   stringsAsFactors = FALSE
   )
 
+set.seed(123)
 n_cores = parallelly::availableCores()
 plan(multisession, workers = n_cores) # or simply use: plan(multisession)
 
+
 start.time = Sys.time()
 with_progress({
-  p <- progressor(along = 1:nrow(combos)) # steps = length(x)
+  p <- progressor(along = 1:nrow(combos))
 
   betas_list = future_map(
-    # .progress = TRUE,
-    .options = furrr_options(seed=123), # enable change of seed as the seed is fixed by default and this will be used in a loop
+    .options = furrr_options(seed=TRUE), # instead of using a new seed for each run, it's enough to use set.seed(123), and enable random seeding here
     .x = 1:nrow(combos),
     # .f = ~ outer_loop_function(
     #   data=data,
