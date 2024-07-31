@@ -100,7 +100,7 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   variable = combination$variable
   model = combination$model 
   prompt = combination$prompt
-  train_test_split = combination$train_test_split
+  train_proportion = combination$train_proportion
   
   data = data %>% 
     filter(Model==model, 
@@ -120,9 +120,9 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   betas = list(
     "major_topic"      = major_topic, # matrix(data=major_topic, nrow=N, ncol=1),
     "variable"         = variable, # matrix(data=variable, nrow=N, ncol=1),
-    "train_test_split" = train_test_split, # matrix(data=train_test_split, nrow=N, ncol=1),
     "model"            = model, # matrix(data=model, nrow=N, ncol=1),
     "prompt"           = prompt, # matrix(data=prompt, nrow=N, ncol=1),
+    "train_proportion" = train_proportion, # matrix(data=train_proportion, nrow=N, ncol=1),
     "sim_number" = 1:N,
     "human" = list(
       "coef" = matrix(data=human.coef, nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
@@ -163,7 +163,7 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     betas$llm$uci[i,] = get_ci_robust(model_llm, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
     
     # On the 5000 observations, we split the data into a train/test split. Since it's already a random sample, we don't do it using the sample function
-    train_idx = 1:(nrow(data_sample) * train_test_split) # sample(x=nrow(data_sample), size=nrow(data_sample) * train_test_split, replace=FALSE)
+    train_idx = 1:(nrow(data_sample) * train_proportion) # sample(x=nrow(data_sample), size=nrow(data_sample) * train_proportion, replace=FALSE)
     train = data_sample[train_idx, ]
     test = data_sample[-train_idx, ]
     
@@ -216,7 +216,7 @@ outer_loop_function = function(data, combination, N, B, n_samples){
 
 ```{r}
 combinations = expand.grid(
-  train_test_split = c(0.1, 0.2, 0.3, 0.4, 0.5), # 10%train 90%test, ...
+  train_proportion = c(0.1, 0.2, 0.3, 0.4, 0.5), # 10%train 90%test, ...
   prompt = (1:12),
   model = c("gpt-3.5-turbo-0125", "gpt-4o"),
   variable = c("Senate", "Democrat", "DW1"),
@@ -261,6 +261,8 @@ print(round(end.time - start.time,2))
 plan(sequential)
 
 betas_df = bind_rows(betas_list)
+
+betas_df = betas_df[, ]
 write.csv(betas_df, file.path(simulation_dir, "simulation_results.csv"), row.names = FALSE)
 ```
 
