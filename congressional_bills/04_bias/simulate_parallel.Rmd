@@ -8,9 +8,9 @@ This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/bl
 
 ```{r setup, warning=FALSE, message=FALSE}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-bias_dir = file.path(repo_dir, "04_bias")
-knitr::opts_knit$set(root.dir = bias_dir)
-setwd(bias_dir)
+simulation_dir = file.path(repo_dir, "04_bias")
+knitr::opts_knit$set(root.dir = simulation_dir)
+setwd(simulation_dir)
 
 require(dplyr)
 require(nnet)
@@ -22,10 +22,7 @@ require(gridExtra)
 require(furrr)
 library(progressr)
 
-rdata_dir = file.path(bias_dir, "rds")
-dir.create(rdata_dir, showWarnings=FALSE)
-
-figures_dir = file.path(bias_dir, "figures")
+figures_dir = file.path(simulation_dir, "figures")
 dir.create(figures_dir, showWarnings=FALSE)
 
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
@@ -39,22 +36,18 @@ data = data %>%
   #   ) %>%
   mutate(
     Senate = as.integer(Chamber == "Senate"),
-    Democrat = as.integer(Party == "Democrat")) %>% 
-  select(
-    Model, PromptingStrategyID, PromptingStrategyName,
-    BillID, Description,
-    Senate, Democrat, DW1, Major, MajorLLM) 
+    Democrat = as.integer(Party == "Democrat"),
+    Prompt = PromptingStrategyID) %>% 
+  select(Model, Prompt, Senate, Democrat, DW1, Major, MajorLLM) 
 
 if (any(is.na(data)))
   warning("data contains NA")
-
 ```
 
 
 ## Functions
 
 ```{r}
-
 get_se_robust = function(model){
   model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
   return(model_output[,"Std. Error"])
@@ -90,41 +83,52 @@ get_ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
 ```
 
 ```{r}
-
-get_beta_debiased = function(train, test, X){
+get_beta_debiased = function(train, test, variable){
   # estimate error using train data
   train$error = train$Y_human - train$Y_llm
-  model_error = lm(formula=paste("error", "~", X), data=train)
+  model_error = lm(formula=paste("error", "~", variable), data=train)
   
   # compute Y_debiased for the test data, regress Y_debiased ~ Xvar on the test data
   test$error = predict(model_error, newdata=test) # predict error for test data
   test$Y_debiased = test$Y_llm + test$error
-  model_debiased = lm(formula=paste("Y_debiased", "~", X), data=test) 
+  model_debiased = lm(formula=paste("Y_debiased", "~", variable), data=test) 
   return(coef(model_debiased))
 }
 
-outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
-  major = combo$major
-  X = combo$X
-  model = combo$model 
-  prompt_mod_id = combo$prompt_mod_id
+outer_loop_function = function(data, combination, N, B, n_samples){
+  major_topic = combination$major_topic
+  variable = combination$variable
+  model = combination$model 
+  prompt = combination$prompt
+  train_test_split = combination$train_test_split
   
   data = data %>% 
-    filter(
-      Model==model, 
-      PromptingStrategyID==prompt_mod_id) %>%
-    mutate(
-      Y_human = as.integer(Major == major),
-      Y_llm = as.integer(MajorLLM == major))
+    filter(Model==model, 
+           Prompt==prompt) %>%
+    mutate(Y_human = as.integer(Major == major_topic),
+           Y_llm = as.integer(MajorLLM == major_topic))
   
-  names_betas = c("(Intercept)", X)
+  # Using human-labeled major_topic topics on all 10K bills
+  model_human = lm(formula=paste("Y_human", "~", variable), data=data)
+  human.coef = coef(model_human)
+  human.se = get_se_robust(model_human)
+  human.lci = get_ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
+  human.uci = get_ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
+  
+  names_betas = c("beta0", "beta1") # names(coef(human.coef))
   n_betas = length(names_betas)
   betas = list(
+    "major_topic"      = major_topic, # matrix(data=major_topic, nrow=N, ncol=1),
+    "variable"         = variable, # matrix(data=variable, nrow=N, ncol=1),
+    "train_test_split" = train_test_split, # matrix(data=train_test_split, nrow=N, ncol=1),
+    "model"            = model, # matrix(data=model, nrow=N, ncol=1),
+    "prompt"           = prompt, # matrix(data=prompt, nrow=N, ncol=1),
+    "sim_number" = 1:N,
     "human" = list(
-      "coef" = vector(length=n_betas),
-      "se"   = vector(length=n_betas),
-      "lci"  = vector(length=n_betas),
-      "uci"  = vector(length=n_betas)),
+      "coef" = matrix(data=human.coef, nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "se"   = matrix(data=human.se,   nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "lci"  = matrix(data=human.lci,  nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "uci"  = matrix(data=human.uci,  nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE)),
     "llm" = list(
       "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
@@ -147,63 +151,53 @@ outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
       "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)))
   )
   
-  # Using human-labeled major topics on all 10K bills
-  model_human = lm(formula=paste("Y_human", "~", X), data=data)
-  betas$human$coef = coef(model_human)
-  betas$human$se = get_se_robust(model_human)
-  betas$human$lci = get_ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
-  betas$human$uci = get_ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
-  
   for (i in (1:N)){ # outer loop
     # We randomly draw 5000 observations with replacement.
     data_sample = data[sample(x=nrow(data), size=n_samples, replace=TRUE) ,]
     
     # On the 5000 observations, we calculate model_llm
-    model_llm = lm(formula=paste("Y_llm", "~", X), data=data_sample) 
+    model_llm = lm(formula=paste("Y_llm", "~", variable), data=data_sample) 
     betas$llm$coef[i,] = coef(model_llm)
     betas$llm$se[i,] = get_se_robust(model_llm)
     betas$llm$lci[i,] = get_ci_robust(model_llm, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
     betas$llm$uci[i,] = get_ci_robust(model_llm, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
     
     # On the 5000 observations, we split the data into a train/test split. Since it's already a random sample, we don't do it using the sample function
-    train_idx = 1:(nrow(data_sample) * test_train_split) # sample(x=nrow(data_sample), size=nrow(data_sample) * test_train_split, replace=FALSE)
+    train_idx = 1:(nrow(data_sample) * train_test_split) # sample(x=nrow(data_sample), size=nrow(data_sample) * train_test_split, replace=FALSE)
     train = data_sample[train_idx, ]
     test = data_sample[-train_idx, ]
     
     # Using the train/test split, we calculate 
     # (i) model_human_train using only train. We calculate the se of model_human_train using heteroskedasticity robust standard errors.
-    model_human_train = lm(formula=paste("Y_human", "~", X), data=train) # TODO: keep coef, se (robust), ci (z_score)
+    model_human_train = lm(formula=paste("Y_human", "~", variable), data=train) # TODO: keep coef, se (robust), ci (z_score)
     betas$human_train$coef[i,] = coef(model_human_train)
     betas$human_train$se[i,] = get_se_robust(model_human_train)
     betas$human_train$lci[i,] = get_ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
     betas$human_train$uci[i,] = get_ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
     
-    # (ii) estimate error from train data 
-    # TODO: verify that beta should also use robust
+    # (ii) estimate error from train data
+    # TODO: verify that error should also use robust
     train$error = train$Y_human - train$Y_llm
-    model_error = lm(formula=paste("error", "~", X), data=train)
+    model_error = lm(formula=paste("error", "~", variable), data=train)
     betas$error$coef[i,] = coef(model_error)
     betas$error$se[i,] = get_se_robust(model_error)
     betas$error$lci[i,] = get_ci_robust(model_error, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
     betas$error$uci[i,] = get_ci_robust(model_error, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
     
     # (iii) corrected error, and estimate debiased model
-    betas$debiased$coef[i,] = get_beta_debiased(train=train, test=test, X=X)
+    betas$debiased$coef[i,] = get_beta_debiased(train=train, test=test, variable=variable)
     
-    # but since beta_debiased function based on the predicted Y_debiased, we can't use robust se and ci. 
-    # TODO: I think we should bootstrapping from the fixed train/test split instead. Otherwise, the result above is simply 1 sample since test/train split is random?
-    
-    # We then begin the bootstrap (inner loop):
+    # We then begin the bootstrap (inner loop), this is beacuse beta_debiased is a function of a predicted Y_debiased and so we can't use se and ci from the lm model.
     debiased_coef_boot = as.data.frame(t(sapply(
       1:B, 
       function(b){ # ignore b
-        data_sample_boot = data_sample[sample(x=nrow(data_sample), replace=TRUE) ,] # TODO: double check this as train/test split is not with replacement
+        # We draw a bootstrap sample from each of the train and test data, keeping the train-test split fixed
+        train_boot = train[sample(x=nrow(train), replace=TRUE), ]
+        test_boot = test[sample(x=nrow(test), replace=TRUE), ]
         
-        # We redraw train/test splits, and on each train/test split, we calculate corrected_beta.
-        train_idx_boot = 1:(nrow(data_sample_boot)*test_train_split)
-        train_boot = data_sample_boot[train_idx_boot, ]
-        test_boot = data_sample_boot[-train_idx_boot, ]
-        return(get_beta_debiased(train=train_boot, test=test_boot, X=X))
+        # Calculate the coef of the debiased model
+        coef_boot = get_beta_debiased(train=train_boot, test=test_boot, variable=variable)
+        return(coef_boot)
       }
     )))
     
@@ -213,7 +207,7 @@ outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
     betas$debiased$uci[i,] = get_ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
   }
   
-  return(betas)
+  return(as.data.frame(betas))
 }
 
 ```
@@ -221,44 +215,40 @@ outer_loop_function = function(data, combo, N, B, n_samples, test_train_split){
 ## Models
 
 ```{r}
-combos = expand.grid(
-  prompt_mod_id = (1:12),
+combinations = expand.grid(
+  train_test_split = c(0.1, 0.2, 0.3, 0.4, 0.5), # 10%train 90%test, ...
+  prompt = (1:12),
   model = c("gpt-3.5-turbo-0125", "gpt-4o"),
-  X = c("Senate", "Democrat", "DW1"),
-  major = (1:20)[1:2],
+  variable = c("Senate", "Democrat", "DW1"),
+  major_topic = (1:20)[1:2],
   stringsAsFactors = FALSE
   )
+```
 
-set.seed(123)
+```{r}
 n_cores = parallelly::availableCores()
 plan(multisession, workers = n_cores) # or simply use: plan(multisession)
+```
 
-
+```{r}
 start.time = Sys.time()
+
+set.seed(123)
 with_progress({
-  p <- progressor(along = 1:nrow(combos))
+  p <- progressor(along = 1:nrow(combinations))
 
   betas_list = future_map(
     .options = furrr_options(seed=TRUE), # instead of using a new seed for each run, it's enough to use set.seed(123), and enable random seeding here
-    .x = 1:nrow(combos),
-    # .f = ~ outer_loop_function(
-    #   data=data,
-    #   combo=combos[.x,],
-    #   N=10,
-    #   B=100,
-    #   n_samples=5000, # for llm
-    #   test_train_split=0.5)
-    # )
+    .x = 1:nrow(combinations),
     .f = function(x) {
       betas = outer_loop_function(
         data=data, 
-        combo=combos[x,],
+        combination=combinations[x,],
         N=10,
-        B=100,
-        n_samples=5000, # for llm
-        test_train_split=0.5
+        B=10,
+        n_samples=5000
         )
-      p(sprintf("combo = %g", x))
+      p(sprintf("combination = %g", x))
       return(betas)
     })
 })
@@ -267,30 +257,16 @@ end.time <- Sys.time()
 print(round(end.time - start.time,2))
 ```
 
+```{r}
+plan(sequential)
+
+betas_df = bind_rows(betas_list)
+write.csv(betas_df, file.path(simulation_dir, "simulation_results.csv"), row.names = FALSE)
+```
 
 ```{r}
 # ~14 sec to run N=1 B=1000
 (14*1000)/60/60
-# 4 hours per combo
+# 4 hours per combination
 ```
 
-```{r}
-plan(sequential)
-
-for (i in 1:nrow(combos)){
-  combo = combos[i,]
-  out = list(
-      "Model"= combo$model,
-      "PromptModificationID"= combo$prompt_mod_id,
-      "Major"= combo$major,
-      "X"= combo$X,
-      "betas" = betas_list[[i]]
-    )
-  filename = paste0(c("Major", combo$major, "_", combo$model, "_PromptModificationID", combo$prompt_mod_id, "_", combo$X), collapse="")
-  saveRDS(out, file=file.path(rdata_dir, paste0(c(filename, ".rds"), collapse="")) )
-}
-```
-
-## To-Dos:
-
-- [ ] separate betas into beta0 beta1?
