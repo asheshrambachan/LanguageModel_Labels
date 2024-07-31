@@ -1,0 +1,182 @@
+---
+title: "Estimators Evaluation"
+output: html_document
+date: "July 25, 2024"
+---
+
+```{r, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+simulation_dir = file.path(repo_dir, "04_simulation")
+
+knitr::opts_knit$set(root.dir = simulation_dir)
+setwd(simulation_dir)
+
+require(dplyr)
+require(ggplot2)
+require(gridExtra)
+require(grid)
+# require(crayon)
+```
+
+
+# Evaluation Metrics
+
+For each Major topic 1 indicator, each $X$, and each $\beta \in \{\beta_0, \beta_1\}$
+
+$$\beta:= \beta^\text{human}$$
+we have two estimators for $\beta$: 
+$$\beta^\text{est} \in \{ \beta^\text{llm}, \beta^\text{debiased}\}$$ 
+
+Denote iid samples of the estimators as $\{\beta^\text{est}_i\}_{i=1}^n$. Then, the estimator's sample means
+
+$$\mathbb{E}[\beta^\text{est}] \approx \frac{1}{n} \sum_{i=1}^n \beta_i^\text{est} \triangleq \bar{\beta}^\text{est}$$
+
+## Bias
+
+$$b_\beta(\beta^\text{est}) = \mathbb{E}_\beta\left[\beta^\text{est}\right]- \beta  \approx \bar{\beta}^\text{est} - \beta$$
+
+## MSE 
+
+Use MSE as the risk of the estimator
+$$R(\beta, \beta^\text{est}) = \text{MSE}(\beta, \beta^\text{est}) = \mathbb{E}\left[(\beta^\text{est}- \beta)^2\right]  = b_\beta(\beta^\text{est}) + \text{Var}_\beta(\beta^\text{est})$$
+
+$$\text{MSE}(\beta, \beta^\text{est}) \approx \frac{1}{n} \sum_{i=1}^n (\beta^\text{est}-\beta)^2$$
+
+## Coverage Probability
+
+Let the 95% bootstrap percentile CI of $\beta^\text{est}$ be
+$$95\%CI (\beta^\text{est}) = (\text{LCI}^\text{est}, \text{UCI}^\text{est})$$
+The coverage probability of this CI is defined as:
+$$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est}) \right] = \mathbb{E}[1\{\beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est})\}] \approx \frac{1}{n} \sum_{i=1}^n 1\{\beta \in (\text{LCI}_i^\text{est}, \text{UCI}_i^\text{est})\} $$
+
+
+# Results
+
+```{r}
+get_bias = function(beta, beta_est) mean(beta - beta_est)
+get_mse  = function(beta, beta_est) mean((beta - beta_est)^2)
+get_coverage = function(beta, beta_est_lci, beta_est_uci) mean((beta_est_lci < beta) & (beta < beta_est_uci))
+
+filename = "simulations_N10_B10.csv"
+simulations = read.csv(file.path(simulation_dir, filename))
+
+evaluations = simulations %>% 
+  group_by(major_topic, variable, model, prompt, train_proportion) %>% 
+  summarise(
+    llm.bias.beta0         = get_bias(human.coef.beta0, llm.coef.beta0),
+    llm.bias.beta1         = get_bias(human.coef.beta1, llm.coef.beta1),
+    human_train.bias.beta0 = get_bias(human.coef.beta0, human_train.coef.beta0),
+    human_train.bias.beta1 = get_bias(human.coef.beta1, human_train.coef.beta1),
+    debiased.bias.beta0    = get_bias(human.coef.beta0, debiased.coef.beta0),
+    debiased.bias.beta1    = get_bias(human.coef.beta1, debiased.coef.beta1),
+    
+    llm.mse.beta0         = get_mse(human.coef.beta0, llm.coef.beta0),
+    llm.mse.beta1         = get_mse(human.coef.beta1, llm.coef.beta1),
+    human_train.mse.beta0 = get_mse(human.coef.beta0, human_train.coef.beta0),
+    human_train.mse.beta1 = get_mse(human.coef.beta1, human_train.coef.beta1),
+    debiased.mse.beta0    = get_mse(human.coef.beta0, debiased.coef.beta0),
+    debiased.mse.beta1    = get_mse(human.coef.beta1, debiased.coef.beta1),
+    
+    llm.coverage.beta0         = get_coverage(human.coef.beta0, llm.lci.beta0, llm.uci.beta0),
+    llm.coverage.beta1         = get_coverage(human.coef.beta1, llm.lci.beta1, llm.uci.beta1),
+    human_train.coverage.beta0 = get_coverage(human.coef.beta0, human_train.lci.beta0, human_train.uci.beta0),
+    human_train.coverage.beta1 = get_coverage(human.coef.beta1, human_train.lci.beta1, human_train.uci.beta1),
+    debiased.coverage.beta0    = get_coverage(human.coef.beta0, debiased.lci.beta0, debiased.uci.beta0),
+    debiased.coverage.beta1    = get_coverage(human.coef.beta1, debiased.lci.beta1, debiased.uci.beta1),
+    
+    .groups = 'drop'
+    )
+
+# save
+write.csv(evaluations, file.path(simulation_dir, sub("simulations", "evaluations", filename)), row.names = FALSE)
+
+```
+
+```{r}
+figures_dir = file.path(simulation_dir, sub(".csv", "", sub("simulations", "figures", filename)))
+dir.create(figures_dir, showWarnings=FALSE)
+
+colors = c("llm" = "#1f77b4", "human_train" = "#008000", "debiased" = "#ff7f0e")
+
+# Bias
+p1 = ggplot() +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  # geom_histogram(aes(x=llm.bias.beta0, color="llm"), alpha=0, bins = 40, data=evaluations) +
+  geom_density(aes(x=llm.bias.beta0,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.bias.beta0, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.bias.beta0,    color="debiased"), data=evaluations) +
+  # facet_wrap(~variable, ncol=1) +
+  xlab("bias.beta0") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p2 = ggplot() +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  geom_density(aes(x=llm.bias.beta1,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.bias.beta1, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.bias.beta1,    color="debiased"), data=evaluations) +
+  xlab("bias.beta1") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p = arrangeGrob(p1, p2, nrow=1, top=textGrob(sprintf("Bias density across %d combinations", nrow(evaluations))))
+ggsave(file=file.path(figures_dir, "density_bias.png"), plot=p, width=8, height=4)
+
+# MSE
+p1 = ggplot() +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  geom_density(aes(x=llm.mse.beta0,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.mse.beta0, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.mse.beta0,    color="debiased"), data=evaluations) +
+  xlab("mse.beta0") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p2 = ggplot() +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  geom_density(aes(x=llm.mse.beta1,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.mse.beta1, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.mse.beta1,    color="debiased"), data=evaluations) +
+  xlab("mse.beta1") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p = arrangeGrob(p1, p2, nrow=1, top=textGrob(sprintf("MSE density across %d combinations", nrow(evaluations))))
+ggsave(file=file.path(figures_dir, "density_mse.png"), plot=p, width=8, height=4)
+
+# Coverage
+p1 = ggplot() +
+  geom_vline(xintercept=1, color="black", linetype = "dashed") +
+  geom_density(aes(x=llm.coverage.beta0,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.coverage.beta0, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.coverage.beta0,    color="debiased"), data=evaluations) +
+  xlab("coverage.beta0") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p2 = ggplot() +
+  geom_vline(xintercept=1, color="black", linetype = "dashed") +
+  geom_density(aes(x=llm.coverage.beta1,         color="llm"), data=evaluations) +
+  geom_density(aes(x=human_train.coverage.beta1, color="human_train"), data=evaluations) +
+  geom_density(aes(x=debiased.coverage.beta1,    color="debiased"), data=evaluations) +
+  xlab("coverage.beta1") +
+  scale_color_manual(name="", values=colors, breaks=names(colors)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "bottom")
+
+p = arrangeGrob(p1, p2, nrow=1, top=textGrob(sprintf("Coverage density across %d combinations", nrow(evaluations))))
+ggsave(file=file.path(figures_dir, "density_coverage.png"), plot=p, width=8, height=4)
+```

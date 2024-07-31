@@ -8,9 +8,9 @@ This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/bl
 
 ```{r setup, warning=FALSE, message=FALSE}
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-bias_dir = file.path(repo_dir, "04_bias")
-knitr::opts_knit$set(root.dir = bias_dir)
-setwd(bias_dir)
+simulation_dir = file.path(repo_dir, "04_simulation")
+knitr::opts_knit$set(root.dir = simulation_dir)
+setwd(simulation_dir)
 
 require(dplyr)
 require(nnet)
@@ -19,10 +19,10 @@ require(sandwich)
 require(ggplot2)
 require(gridExtra)
 
-rdata_dir = file.path(bias_dir, "rds")
+rdata_dir = file.path(simulation_dir, "rds")
 dir.create(rdata_dir, showWarnings=FALSE)
 
-figures_dir = file.path(bias_dir, "figures")
+figures_dir = file.path(simulation_dir, "figures")
 dir.create(figures_dir, showWarnings=FALSE)
 
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
@@ -157,11 +157,13 @@ $$Y^\text{debiased} = \beta_0^\text{debiased} + \beta_1^\text{debiased} variable
 
 
 ```{r}
+start.time = Sys.time()
+
 set.seed(123)
 major_topic = 1 # TODO: I currently do it for the first major_topic topic only
 
-N = 3 # 5000
-B = 10 #1000 # of bootstrap samples
+N = 1 # 5000
+B = 1000 #1000 # of bootstrap samples
 n_samples = 5000 # for naive
 train_test_split = 0.5 # 50% of n_sample for train and 50% for test for debiased
 
@@ -265,38 +267,48 @@ for (variable in c("Senate", "Democrat", "DW1")){
       saveRDS(out, file=file.path(rdata_dir, paste0(c(filename, ".rds"), collapse="")) )
       print(sprintf("saved %s", filename))
       
-      colors = c("beta_human"="black","beta_llm" = "#1f77b4", "beta_debiased" = "#ff7f0e")
-      p1 = ggplot() + 
-        geom_vline(aes(xintercept=beta_human[1], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=beta_llm[,1], color="beta_llm")) +
-        geom_density(aes(x=beta_debiased[,1], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(beta_human[1])),
-             x = names(beta_human[1]),
-             y = "Density") +
-        scale_color_manual(name="", values=colors, breaks=names(colors)) +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
-        theme(legend.position = "bottom")
-      
-      p2 = ggplot() + 
-        geom_vline(aes(xintercept=beta_human[2], color="beta_human"), linetype = "dashed") +
-        geom_density(aes(x=beta_llm[,2], color="beta_llm")) +
-        geom_density(aes(x=beta_debiased[,2], color="beta_debiased")) +
-        labs(title = paste("Density Plot for",names(beta_human[2])),
-             x = names(beta_human[2]),
-             y = "Density") +
-        scale_color_manual(name="", values=colors, breaks=names(colors)) +
-        theme_bw() +
-        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
-        theme(legend.position = "bottom")
-      
-      # Arrange plots side by side
-      p = arrangeGrob(p1, p2, ncol=2) 
-      ggsave(file=file.path(figures_dir, paste0(c(filename,".pdf"), collapse="")), plot=p, width=8, height=4)
+      # colors = c("beta_human"="black","beta_llm" = "#1f77b4", "beta_debiased" = "#ff7f0e")
+      # p1 = ggplot() + 
+      #   geom_vline(aes(xintercept=beta_human[1], color="beta_human"), linetype = "dashed") +
+      #   geom_density(aes(x=beta_llm[,1], color="beta_llm")) +
+      #   geom_density(aes(x=beta_debiased[,1], color="beta_debiased")) +
+      #   labs(title = paste("Density Plot for",names(beta_human[1])),
+      #        x = names(beta_human[1]),
+      #        y = "Density") +
+      #   scale_color_manual(name="", values=colors, breaks=names(colors)) +
+      #   theme_bw() +
+      #   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+      #   theme(legend.position = "bottom")
+      # 
+      # p2 = ggplot() + 
+      #   geom_vline(aes(xintercept=beta_human[2], color="beta_human"), linetype = "dashed") +
+      #   geom_density(aes(x=beta_llm[,2], color="beta_llm")) +
+      #   geom_density(aes(x=beta_debiased[,2], color="beta_debiased")) +
+      #   labs(title = paste("Density Plot for",names(beta_human[2])),
+      #        x = names(beta_human[2]),
+      #        y = "Density") +
+      #   scale_color_manual(name="", values=colors, breaks=names(colors)) +
+      #   theme_bw() +
+      #   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+      #   theme(legend.position = "bottom")
+      # 
+      # # Arrange plots side by side
+      # p = arrangeGrob(p1, p2, ncol=2) 
+      # ggsave(file=file.path(figures_dir, paste0(c(filename,".pdf"), collapse="")), plot=p, width=8, height=4)
     }
   }
 }
 
+end.time <- Sys.time()
+print(round(end.time - start.time,2))
+
+```
+
+```{r}
+# [1] "saved major_topic1_gpt-3.5-turbo-0125_prompt1_Senate"
+# Time difference of 2.66 secs (N=1, B=1000)
+# 2.66*1000/60/60
+# 0.7388889 hours to complete (N=1000, B=1000)
 ```
 
 ```{r}
