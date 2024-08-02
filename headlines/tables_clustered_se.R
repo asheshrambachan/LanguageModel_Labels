@@ -7,7 +7,7 @@ library(modelsummary)
 rm(list = ls())
 
 # Define the question and the list of months
-question <- "q4"
+question <- "q5"
 months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec")
 
 # Function to read and combine data for all months
