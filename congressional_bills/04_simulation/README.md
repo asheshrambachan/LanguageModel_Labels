@@ -21,7 +21,7 @@ cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
 ```
 To start the simulation, run the following:
 ```
-Rscript simulate_parallel.R 1000 1000 10
+Rscript simulate_parallel.R 1000 1000 25 1>output.log 2>error.log &
 ```
 The passed arguments in order are `N B n_cores`. If `n_cores` is greater than what's available, the maximum number of available cores will be used.
 
