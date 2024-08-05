@@ -18,8 +18,8 @@ if (length(args)>0){
   B = as.numeric(args[2])
   n_cores = as.numeric(args[3])
 } else {
-  N = 2
-  B = 10
+  N = 1000
+  B = 1000
   n_cores = 10
 }
 
@@ -37,7 +37,7 @@ data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
     Prompt = PromptingStrategyID) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Major, MajorLLM) 
 
-rds_dir = file.path(simulation_dir, sprintf("rds_N%d_B%d", N, B)) 
+rds_dir = file.path(simulation_dir, sprintf("rds_lhs_N%d_B%d", N, B)) 
 dir.create(rds_dir, showWarnings=FALSE)
 
 # bills = data %>%
@@ -54,13 +54,17 @@ combinations = expand.grid(
   major_topic = common_major_topics, 
   stringsAsFactors = FALSE
 )
-combinations$id = 1:nrow(combinations)
+combinations = cbind(id=1:nrow(combinations), combinations)
+
 rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
 if (length(rds_paths_completed) != 0){
-  combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
+combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
   combinations = combinations[-combination_id_completed, ] 
   cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
 }
+
+if (nrow(combinations)==0)
+  stop("Current directory contains all rds files")
 
 ## Functions
 se_robust = function(model){
@@ -243,23 +247,22 @@ cat(sprintf("Expected run time = %.2f hours\n", duration))
 
 plan(multisession, workers = n_cores)
 set.seed(123)
-# with_progress({
-#   p = progressor(along = 1:nrow(combinations))
-future_map(
+out_list = future_map(
   .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
-  .x = combinations$id,
+  .x = 1:nrow(combinations),
   .f = function(x) {
-    set.seed(x)
+    combination_id = combinations[x,]$id
+    print(combination_id)
+    set.seed(combination_id)
     betas_df = outer_loop_function(
       data=data,
-      combination=combinations[x,],
+      combination=combinations[combination_id,],
       N=N,
       B=B,
       n_samples=n_samples
     )
-    betas_df = cbind(combination_id=x, betas_df)
-    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", x)))
-    # p(sprintf("completed and saved combination%05d.rds", x))
+    betas_df = cbind(combination_id=combination_id, betas_df)
+    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination_id)))
+    return(list("seed"=combination_id, "combination_id"=combination_id))
     }, 
-  .progress=TRUE)
-# }, enable = TRUE) # , delay_stdout=TRUE, delay_conditions="condition")
+  .progress=FALSE)

@@ -12,6 +12,7 @@ congressional_bills/02_llm/archive
 congressional_bills/02_llm/*.csv 
 congressional_bills/02_llm/*.jsonl 
 
+congressional_bills/04_simulation/archive
 congressional_bills/04_simulation/rds*
 congressional_bills/04_simulation/figures*
 congressional_bills/04_simulation/*.csv

@@ -23,7 +23,7 @@ if (length(args)>0){
   n_cores = 10
 }
 
-n_samples = 50000 # 5000 # TODO: 50K choice is wrong, but temp until we decide how to handle the missing major topics in train/test data
+n_samples = 5000 # 5000 
 train_proportion = c(0.1, 0.25, 0.5)
 
 simulation_dir = file.path(repo_dir, "04_simulation")
@@ -41,17 +41,18 @@ data = cbind(data, model.matrix(~ Y_human + 0, data=data), model.matrix(~ Y_llm 
 data[, c("Y_human", "Y_llm")] = NULL
 
 
-rds_dir = file.path(simulation_dir, sprintf("rds_N%d_B%d", N, B)) 
+rds_dir = file.path(simulation_dir, sprintf("rds_rhs_N%d_B%d", N, B)) 
 dir.create(rds_dir, showWarnings=FALSE)
 
 combinations = expand.grid(
-  train_proportion = train_proportion[3], # 10%train 90%test, ...  # TODO: remove [3]
+  train_proportion = train_proportion, # 10%train 90%test, ...  
   prompt = unique(data$Prompt),
   model = unique(data$Model),
-  variable = c("Senate", "Democrat", "DW1")[1], # TODO: remove [1]
+  variable = c("Senate", "Democrat", "DW1"), 
   stringsAsFactors = FALSE
 )
 combinations = cbind(id = 1:nrow(combinations), combinations)
+combinations = combinations[1:10,] # TODO: remove this line
 
 rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
 if (length(rds_paths_completed) != 0){
@@ -60,26 +61,36 @@ if (length(rds_paths_completed) != 0){
   cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
 }
 
+if (nrow(combinations)==0)
+  stop("Current directory contains all rds files")
+
 ## Functions
 se_robust = function(model){
+  out = as.vector(matrix(NA, nrow=1, ncol=length(coef(model))))
+  names(out) = names(coef(model))
   model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
-  return(model_output[,"Std. Error"])
+  out[rownames(model_output)] = model_output[,"Std. Error"]
+  return(out)
 }
 
 ci_robust = function(model, alpha=0.05, use_z_score=TRUE){
   if (use_z_score){
     z_score = qnorm(1 - alpha/2)
     se = se_robust(model)
-    ci = cbind(coef(model) - z_score * se, coef(model) + z_score * se)
-    colnames(ci) = c("2.5%", "97.5%")
+    out = cbind(coef(model) - z_score * se, coef(model) + z_score * se)
+    colnames(out) = sprintf("%.1f %%", c(alpha/2, 1-alpha/2)*100) 
   }
   else{ # t-score
+    out = matrix(NA, nrow=length(coef(model)), ncol=2)
+    rownames(out) = names(coef(model))
+    colnames(out) = sprintf("%.1f %%", c(alpha/2, 1-alpha/2)*100) 
     ci = coefci(model, level=1-alpha, vcov=vcovHC(model, type = "HC1"))
+    out[rownames(ci),] = ci
   }
-  return(ci)
+  return(out)
 }
 
-se_boot = function(samples_boot) apply(samples_boot, 2, sd)
+se_boot = function(samples_boot) apply(samples_boot, 2, sd, na.rm=TRUE) # TODO: check if NA remove
 
 ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
   if (method!="percentile")
@@ -87,7 +98,7 @@ ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
   
   probs = c(alpha/2, 1-alpha/2)
   ci_transposed = apply(samples_boot, 2, function(x){ 
-    quantile(x, probs=probs)
+    quantile(x, probs=probs, na.rm=TRUE) # TODO: check if NA remove
   })
   ci = t(ci_transposed)
   
@@ -95,51 +106,57 @@ ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
 }
 
 get_beta_debiased = function(train, test){
-  # ## approach 1
-  # test$Y_human = predict(model_Yhuman_Yllm, newdata=test) # predict Y_human using (Y_human ~ Y_llm)
-  # test$V_tilde1 = test$V - (predict(model_V_Yllm, newdata=test) - predict(model_V_Yhuman, newdata=test)) # V - (V ~ Yllm) - (V ~ Y_human_hat)
-  
   # train data
   
   # delta_{V, \hat{Y}}
   formula_indep = paste(sprintf("Y_llm%d", 1:20), collapse=" + ")
   formula = sprintf("V ~ %s + 0", formula_indep)
   model_V_Yllm = lm(formula, data=train) 
-  delta_V_Yllm = coef(model_V_Yllm)
   
   # beta
   formula_indep = paste(sprintf("Y_human%d", 1:20), collapse=" + ")
   formula = sprintf("V ~ %s + 0", formula_indep)
   model_V_Yhuman = lm(formula, data=train) 
-  beta = coef(model_V_Yhuman) # 20*1, Y_human * 1
   
   # delta_{Y, \hat{Y}}
   formula_dep   = paste(sprintf("Y_human%d", 1:20), collapse=", ")
   formula_indep = paste(sprintf("Y_llm%d", 1:20), collapse=" + ")
   formula = sprintf("cbind(%s) ~ %s + 0", formula_dep, formula_indep)
   model_Yhuman_Yllm = lm(formula, data=train) # still using train data
-  delta_Yhuman_Yllm = coef(model_Yhuman_Yllm) # 20*20, Y_llm * Y_human
   
-  delta_nu_Yllm = delta_V_Yllm - delta_Yhuman_Yllm %*% beta # same as: as.matrix(beta, nrow=20)
+  # coef
   # TODO: store model params? all: coef, se, ci, 
+  delta_V_Yllm = coef(model_V_Yllm)
+  beta = coef(model_V_Yhuman) # 20*1, Y_human * 1
+  delta_Yhuman_Yllm = coef(model_Yhuman_Yllm) # 20*20, Y_llm * Y_human
+  delta_nu_Yllm = delta_V_Yllm - delta_Yhuman_Yllm %*% beta # same as: as.matrix(beta, nrow=20)
   
-  # test data
+  # Predict, test data
   
-  # Y_tilde
+  # # Approach 1
+  # # Y_tilde
+  # Y_tilde_test = predict(model_Yhuman_Yllm, newdata=test)
+  # colnames(Y_tilde_test) = sub("human","tilde", colnames(Y_tilde_test))
+  # test = cbind(test, Y_tilde_test)
+  # 
+  # # V_tilde
+  # major_id_missing = (1:20)[is.na(delta_nu_Yllm)]
+  # major_id_avalible = (1:20)[!is.na(delta_nu_Yllm)]
+  # delta_nu_Yllm = delta_nu_Yllm[major_id_avalible,]
+  # Y_llm_test = as.matrix(test[sprintf("Y_llm%d", Y_llm_index_removedNA)])
+  # test$V_tilde = test$V - Y_llm_test %*% delta_nu_Yllm
+
+  # Approach 2
+  test = cbind(test, predict(model_Yhuman_Yllm, newdata=test)) # Y_tilde = Y_human_pred using (Y_human ~ Y_llm) model
+  test$V_tilde = test$V - (predict(model_V_Yllm, newdata=test) - predict(model_V_Yhuman, newdata=test)) # V_tilde = V - ((V ~ Y_llm) - (V ~ Y_human_pred))
+  # alias(model_Yhuman_Yllm)
+  # alias(model_V_Yllm)
+  # alias(model_V_Yhuman)
   
-  Y_tilde_test = predict(model_Yhuman_Yllm, newdata=test)
-  colnames(Y_tilde_test) = sub("human","tilde", colnames(Y_tilde_test))
-  test = cbind(test, Y_tilde_test)
-  
-  # V_tilde
-  Y_llm_test = as.matrix(test[sprintf("Y_llm%d",1:20)])
-  test$V_tilde = test$V - Y_llm_test %*% delta_nu_Yllm
-  
-  # regress
-  formula_indep = paste(sprintf("Y_tilde%d", 1:20), collapse=" + ")
+  # Regress
+  formula_indep = paste(sprintf("Y_human%d", 1:20), collapse=" + ")
   formula = sprintf("V_tilde ~ %s + 0", formula_indep)
-  model_debiased = lm(formula, data=test) 
-  
+  model_debiased = lm(formula, data=test)
   return(coef(model_debiased))
 }
 
@@ -186,11 +203,21 @@ outer_loop_function = function(data, combination, N, B, n_samples){
       "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
-    "error" = list(
+    "V_Yllm_train" = list(
       "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
+    "V_Yhuman_train" = list(
+      "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
+    # "Yhuman_Yllm_train" = list(
+    #   "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+    #   "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+    #   "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+    #   "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
     "debiased" = list(
       "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
       "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
@@ -215,9 +242,6 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     train_idx = 1:(nrow(data_sample) * train_proportion)
     train = data_sample[train_idx, ]
     test = data_sample[-train_idx, ]
-    
-    formula_dep   = paste(sprintf("Y_human%d", 1:20), collapse=", ")
-    formula_indep = paste(sprintf("Y_llm%d", 1:20), collapse=" + ")
     test[, sprintf("Y_human%d",1:20)] = NULL
     
     # Using the train/test split, we calculate 
@@ -229,6 +253,35 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     betas$human_train$se[i,] = se_robust(model_human_train)
     betas$human_train$lci[i,] = ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,1] 
     betas$human_train$uci[i,] = ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,2] 
+    
+    # delta_{V, \hat{Y}}
+    formula_indep = paste(sprintf("Y_llm%d", 1:20), collapse=" + ")
+    formula = sprintf("V ~ %s + 0", formula_indep)
+    model_V_Yllm = lm(formula, data=train) 
+    betas$V_Yllm_train$coef[i,] = coef(model_V_Yllm)
+    betas$V_Yllm_train$se[i,] = se_robust(model_V_Yllm)
+    betas$V_Yllm_train$lci[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,1] 
+    betas$V_Yllm_train$uci[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,2] 
+    
+    # beta
+    formula_indep = paste(sprintf("Y_human%d", 1:20), collapse=" + ")
+    formula = sprintf("V ~ %s + 0", formula_indep)
+    model_V_Yhuman = lm(formula, data=train) 
+    betas$V_Yhuman_train$coef[i,] = coef(model_V_Yhuman)
+    betas$V_Yhuman_train$se[i,] = se_robust(model_V_Yhuman)
+    betas$V_Yhuman_train$lci[i,] = ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,1] 
+    betas$V_Yhuman_train$uci[i,] = ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,2] 
+    
+    # delta_{Y, \hat{Y}}
+    formula_dep   = paste(sprintf("Y_human%d", 1:20), collapse=", ")
+    formula_indep = paste(sprintf("Y_llm%d", 1:20), collapse=" + ")
+    formula = sprintf("cbind(%s) ~ %s + 0", formula_dep, formula_indep)
+    model_Yhuman_Yllm = lm(formula, data=train) # still using train data
+    # TODO: How to store this model params
+    # betas$Yhuman_Yllm_train$coef[i,] = coef(model_Yhuman_Yllm) 
+    # betas$Yhuman_Yllm_train$se[i,] = se_robust(model_Yhuman_Yllm)
+    # betas$Yhuman_Yllm_train$lci[i,] = ci_robust(model_Yhuman_Yllm, alpha=0.05, use_z_score=TRUE)[,1] 
+    # betas$Yhuman_Yllm_train$uci[i,] = ci_robust(model_Yhuman_Yllm, alpha=0.05, use_z_score=TRUE)[,2] 
     
     betas$debiased$coef[i,] = get_beta_debiased(train=train, test=test)
     
@@ -277,19 +330,22 @@ cat(sprintf("Expected run time = %.2f hours\n", duration))
 plan(multisession, workers = n_cores)
 set.seed(123)
 
-future_map(
+out_list = future_map(
   .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
-  .progress=TRUE,
-  .x = combinations$id,
+  .x = 1:nrow(combinations),
   .f = function(x) {
-    set.seed(x)
+    combination_id = combinations[x,]$id
+    print(combination_id)
+    set.seed(combination_id)
     betas_df = outer_loop_function(
       data=data,
-      combination=combinations[x,],
+      combination=combinations[combination_id,],
       N=N,
       B=B,
       n_samples=n_samples
     )
-    betas_df = cbind(combination_id=x, betas_df)
-    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", x)))
-  })
+    betas_df = cbind(combination_id=combination_id, betas_df)
+    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination_id)))
+    return(betas_df) #list("seed"=combination_id, "combination_id"=combination_id))
+  }, 
+  .progress=FALSE)
