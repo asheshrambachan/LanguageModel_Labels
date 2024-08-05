@@ -1,8 +1,8 @@
 
 ## Usage on local machine
-Use the markdown files `simulate_parallel.Rmd` and `evaluate_parallel.Rmd`
+The `simulate_lhs_parallel.Rmd` file is not up to date. Use `simulate_lhs_parallel.R` and `simulate_rhs_parallel.R`.
 
-The files without `parallel` are older versions with incorrect implementation and will be deleted soon.
+For evaluation, currently, we only have code for the LHS simulation: `evaluate_lhs_parallel.Rmd`
 
 ## Usage on server
 On your local machine, run the following in the terminal to copy the required files to the specified remote server:
