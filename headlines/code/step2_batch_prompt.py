@@ -1,0 +1,70 @@
+from openai import OpenAI
+from step0_constants import API_KEY
+
+QUESTION = "3"
+MONTH = "dec"
+YEAR = "19"
+DESCRIPTION = QUESTION + " " + MONTH + " " + YEAR
+
+def initialize_client(api_key):
+    """
+    Initializes the OpenAI client with the provided API key.
+    
+    Parameters:
+    - api_key (str): The API key for OpenAI.
+
+    Returns:
+    - client (OpenAI): Initialized OpenAI client.
+    """
+    return OpenAI(api_key=api_key)
+
+def create_batch_input_file(client, file_path):
+    """
+    Creates a batch input file on OpenAI's servers.
+    
+    Parameters:
+    - client (OpenAI): The OpenAI client.
+    - file_path (str): The path to the local file to upload.
+
+    Returns:
+    - batch_input_file_id (str): The ID of the created batch input file.
+    """
+    with open(file_path, "rb") as file:
+        batch_input_file = client.files.create(
+            file=file,
+            purpose="batch"
+        )
+    return batch_input_file.id
+
+def create_batch(client, batch_input_file_id, description):
+    """
+    Creates a batch on OpenAI's servers.
+    
+    Parameters:
+    - client (OpenAI): The OpenAI client.
+    - batch_input_file_id (str): The ID of the batch input file.
+    - description (str): Description for the batch metadata.
+
+    Returns:
+    - batch (dict): The created batch object.
+    """
+    batch = client.batches.create(
+        input_file_id=batch_input_file_id,
+        endpoint="/v1/chat/completions",
+        completion_window="24h",
+        metadata={
+            "description": description
+        }
+    )
+    return batch
+
+def main():
+    file_path = f'./{MONTH}{YEAR}/q{QUESTION}_prompts.jsonl'
+    client = initialize_client(API_KEY)
+    batch_input_file_id = create_batch_input_file(client, file_path)
+    batch = create_batch(client, batch_input_file_id, description=DESCRIPTION)
+    print(batch)
+
+if __name__ == "__main__":
+    main()
+

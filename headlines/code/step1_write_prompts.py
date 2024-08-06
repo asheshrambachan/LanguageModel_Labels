@@ -1,0 +1,142 @@
+import os
+import pandas as pd
+from tqdm import tqdm
+import json
+from step0_constants import personas, thought_modifiers, explanation, explanation_json
+
+def format_content(content, JSON=False, chain_of_thought=False):
+    """
+    Formats the prompt based on strategy.
+    
+    Parameters:
+    - content (str): The prompt to send to the model.
+    - JSON (bool): Whether the format should be JSON or not.
+    - chain_of_thought (bool): Whether to include chain of thought explanation in the prompt.
+
+    Returns:
+    - response_text (str): The response from the model.
+    """
+    if chain_of_thought:
+        content = content[:-1] + (explanation_json if JSON else explanation)
+    
+    return content
+
+def read_base_prompt(base_prompt_file, suffix):
+    """
+    Reads the base prompt from a file.
+    
+    Parameters:
+    - base_prompt_file (str): The base file path for the prompt.
+    - suffix (str): The suffix to determine the file name.
+
+    Returns:
+    - content (str): The content of the base prompt file.
+    """
+    with open(base_prompt_file + suffix + '.txt', 'r') as file:
+        content = file.read()
+    return content
+
+def set_batch_template(model):
+    """
+    Sets the prompt template based ont the specified model.
+    
+    Parameters:
+    - model (str): eithert gpt-4o-mini, gpt-4o, or gpt-3.5-turbo.
+
+    Returns:
+    - batch_template (str): template string for batch prompt.
+    """
+    batch_template = {
+        "custom_id": "%s",
+        "method": "POST", 
+        "url": "/v1/chat/completions", 
+        "body": {
+            "model": model, 
+            "messages": [{
+                "role": "user",
+                "content": "%s"
+            }],
+            "temperature": 0
+        }
+    }
+    return batch_template
+
+def write_prompt(companies, content, JSON, file, id_num, model):
+    """
+    Generates responses for each company in the dataframe.
+    
+    Parameters:
+    - companies (DataFrame): DataFrame containing company information.
+    - content (str): The base content for the prompt.
+    - JSON (bool): Whether to include JSON in the responses.
+    - file: The file path where batch prompts will be written.
+    - id_num (int): Identifier number for the prompts.
+    - model (str): The model to use for generating prompts.
+
+    Returns:
+    - id_num (int): The updated identifier number.
+    """
+
+    batch_template = set_batch_template(model)
+    all_prompts = []
+
+    for index, row in tqdm(companies.iterrows(), total=companies.shape[0]):
+        company = row["company_name"]
+        headline = row["headline"]
+
+        company_content = content % (company, headline, company)
+
+        if JSON:
+            base_json = company_content
+            personas_json = [persona + company_content for persona in personas]
+
+            pt1, pt2 = company_content.split("Write", 1)
+            pt2 = "Write" + pt2
+            thought_json = [format_content(pt1 + thought + pt2, JSON=JSON, chain_of_thought=True) for thought in thought_modifiers]
+
+            prompts = [base_json] + personas_json + thought_json           
+
+        else:
+            prompts = [company_content]
+        
+        for prompt in prompts:
+            current_template = batch_template.copy()
+            current_template["custom_id"] = str(id_num)
+            id_num += 1
+            current_template["body"]["messages"][0]["content"] = prompt
+            all_prompts.append(json.dumps(current_template))
+
+    file.write('\n'.join(all_prompts) + '\n')
+    return id_num
+
+def generate_prompts(month, question, year, model):
+    """
+    Main function to generate prompts and write them to a file.
+    """
+    # Set input file paths
+    csv_file = f"./data/raw/{month}{year}.csv"
+    base_prompt_file = f'./data/prompt_templates/q{question}base'
+
+    # Set output file path
+    model_month_directory = f"./{model}/{month}{year}" 
+    os.makedirs(model_month_directory, exist_ok=True)
+    output_file_path = f"{model_month_directory}/q{question}_prompts.jsonl"
+
+    # Read in data and base prompt
+    content = read_base_prompt(base_prompt_file, "")
+    content_json = read_base_prompt(base_prompt_file, "_json")
+    companies = pd.read_csv(csv_file)
+
+    with open(output_file_path, 'w') as file:
+        # Pass the file object to the function that writes to it
+        new_id = write_prompt(companies=companies, content=content, JSON=False, file=file, id_num=0, model=model)
+        new_id = write_prompt(companies=companies, content=content_json, JSON=True, file=file, id_num=new_id, model=model)
+
+if __name__ == "__main__":
+    # Set constants here
+    MODEL = "gpt-4o-mini"
+    MONTH = "dec"
+    QUESTION = "5"
+    YEAR = "19"
+
+    generate_prompts(MONTH, QUESTION, YEAR, MODEL)
