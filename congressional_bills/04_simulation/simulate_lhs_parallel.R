@@ -113,6 +113,8 @@ get_beta_debiased = function(train, test, variable){
 }
 
 outer_loop_function = function(data, combination, N, B, n_samples){
+  set.seed(combination$id)
+  
   major_topic = combination$major_topic
   variable = combination$variable
   model = combination$model 
@@ -223,7 +225,9 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     betas$debiased$uci[i,] = ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
   }
   
-  return(as.data.frame(betas))
+  betas_df = cbind(combination_id=combination$id, as.data.frame(betas))
+  saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination$id)))
+  return(betas_df)
 }
 
 ## Models
@@ -251,18 +255,13 @@ out_list = future_map(
   .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
   .x = 1:nrow(combinations),
   .f = function(x) {
-    combination_id = combinations[x,]$id
-    print(combination_id)
-    set.seed(combination_id)
     betas_df = outer_loop_function(
       data=data,
-      combination=combinations[combination_id,],
+      combination=combinations[x,],
       N=N,
       B=B,
       n_samples=n_samples
     )
-    betas_df = cbind(combination_id=combination_id, betas_df)
-    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination_id)))
-    return(list("seed"=combination_id, "combination_id"=combination_id))
+    # return(x)
     }, 
   .progress=FALSE)

@@ -58,7 +58,7 @@ $$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est
 N = 1000
 B = 1000
 
-rds_dir = file.path(simulation_dir, sprintf("rds_N%d_B%d", N, B))
+rds_dir = file.path(simulation_dir, sprintf("rds_lhs_N%d_B%d", N, B))
 rds_paths = list.files(rds_dir, pattern = "*.rds", full.names = TRUE)
 
 for (rds_path in rds_paths){
@@ -72,14 +72,14 @@ for (rds_path in rds_paths){
 }
 
 simulations = bind_rows(lapply(rds_paths, function(rds_path) readRDS(rds_path)))
-simulations_path = file.path(simulation_dir, sprintf("simulations_N%d_B%d.csv", N, B))
+simulations_path = file.path(simulation_dir, sprintf("simulations_lhs_N%d_B%d.csv", N, B))
 write.csv(simulations, simulations_path, row.names = FALSE)
 ```
 
 ## Plots
 
 ```{r}
-figures_dir = file.path(simulation_dir, sprintf("figures_N%d_B%d", N, B))
+figures_dir = file.path(simulation_dir, sprintf("figures_lhs_N%d_B%d", N, B))
 dir.create(figures_dir, showWarnings=FALSE)
 
 colors = c("human"="black", "llm" = "#1f77b4", "human_train" = "#008000", "debiased" = "#ff7f0e")
@@ -154,7 +154,7 @@ evaluations = simulations %>%
     )
 
 # save
-evaluations_path = file.path(simulation_dir, sprintf("evaluations_N%d_B%d.csv", N, B))
+evaluations_path = file.path(simulation_dir, sprintf("evaluations_lhs_N%d_B%d.csv", N, B))
 write.csv(evaluations, evaluations_path, row.names = FALSE)
 ```
 

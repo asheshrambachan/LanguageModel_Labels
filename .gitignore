@@ -18,3 +18,5 @@ congressional_bills/04_simulation/figures*
 congressional_bills/04_simulation/*.csv
 *.Rhistory
 *.RData
+
+congressional_bills/04_simulation/evaluate_rhs_paralle.Rmd
