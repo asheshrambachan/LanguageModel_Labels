@@ -11,7 +11,8 @@ require(furrr, quietly=TRUE, warn.conflicts=FALSE)
 require(progressr, quietly=TRUE, warn.conflicts=FALSE)
 
 ## Functions
-recode_most_common = function(x, n_levels=6){
+recode_most_common = function(x, n_topics=5){
+  n_levels = n_topics + 1
   if (nlevels(factor(x)) > n_levels) {
     labels_curr = order(table(x), decreasing=TRUE)[1:(n_levels-1)]
     labels_curr = sort(labels_curr)
@@ -22,14 +23,13 @@ recode_most_common = function(x, n_levels=6){
   return(x_recoded)
 }
 
-recode_select_topics = function(x, topics=c(3, 14, 15, 19, 20)){
+recode_topics = function(x, topics=c(3, 14, 15, 19, 20)){
   x_recoded = addNA(factor(x, levels=topics))
   n = nlevels(x_recoded)
   if (is.na(levels(x_recoded)[n]))
     levels(x_recoded)[n] = "Other" # recode NA levels as "other"
   return(x_recoded)
 }
-
 
 se_robust = function(model){
   model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
@@ -270,7 +270,6 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   return(betas_df)
 }
 
-
 ## Run
 args = commandArgs(trailingOnly = TRUE)
 if (length(args)>0){
@@ -288,7 +287,7 @@ if (n_cores > parallelly::availableCores())
 cat(sprintf("N = %d, B = %d, n_cores = %d\n", N, B, n_cores))
 
 n_samples = 5000 # 5000 
-n_coef = 6
+sel_topics = c(3, 14, 15, 19, 20)
 train_proportion = c(0.1, 0.25, 0.5)
 variable = c("Senate", "Democrat", "DW1")
 
@@ -299,8 +298,8 @@ data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
     Senate = as.integer(Chamber == "Senate"),
     Democrat = as.integer(Party == "Democrat"),
     Prompt = PromptingStrategyID,
-    Yhuman = recode_most_common(.$Major, n_levels=n_coef),
-    Yllm = recode_most_common(.$MajorLLM, n_levels=n_coef)
+    Yhuman = recode_topics(.$Major, topics=sel_topics),
+    Yllm = recode_topics(.$MajorLLM, topics=sel_topics)
     ) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Yhuman, Yllm)
 
