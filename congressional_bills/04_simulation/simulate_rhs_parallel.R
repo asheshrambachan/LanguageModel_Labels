@@ -3,6 +3,22 @@
 # output: html_document
 # This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 
+args = commandArgs(trailingOnly = TRUE)
+if (length(args)>0){
+  N = as.numeric(args[1])
+  B = as.numeric(args[2])
+  n_cores = as.numeric(args[3])
+} else {
+  N = 10
+  B = 100
+  n_cores = 10
+}
+n_samples = 5000 # 5000 
+sel_topics = c(3, 14, 15, 19, 20)
+train_proportion = c(0.1, 0.25, 0.5)
+variable = c("Senate", "Democrat", "DW1")
+debug = TRUE
+
 require(zoo, quietly=TRUE, warn.conflicts=FALSE)
 require(dplyr, quietly=TRUE, warn.conflicts=FALSE)
 require(sandwich, quietly=TRUE, warn.conflicts=FALSE)
@@ -60,7 +76,7 @@ ci_boot = function(samples_boot, alpha=0.05, method=c("percentile")) {
   return(ci)
 }
 
-get_coefs = function(train, test, boot=c("none", "nonparametric", "bayesian")){
+get_debiased_coefs = function(train, test, boot=c("none", "nonparametric", "bayesian")){
   boot = match.arg(boot)
   if (boot=="nonparametric"){
     train$w = 1
@@ -118,61 +134,29 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   prompt = combination$prompt
   train_proportion = combination$train_proportion
   
-  levels_Yhuman = levels(data$Yhuman)
-  names_Yhuman = sprintf("Yhuman%s", levels(data$Yhuman))
-  n_Yhuman = nlevels(data$Yhuman)
+  coef_name = levels(data$Yhuman)
   
-  names_Yllm = sprintf("Yllm%s", levels(data$Yllm))
-  n_Yllm = nlevels(data$Yllm)
+  regression = c("V_Yhuman", "V_Yllm", "train_V_Yhuman", "train_V_Yllm", 
+                 "train_nu_Yllm", "test_Vtilde_Ytilde", 
+                 sprintf("train_Yhuman.%s_Yllm", coef_name))
   
-  names_Ytilde = sub("human", "tilde", names_Yhuman) 
-  n_Ytilde = n_Yhuman
+  expand.grid(regression=regression, sim_number=1:N, stringsAsFactors=FALSE)
   
-  betas = list(
-    "variable"         = variable, 
-    "model"            = model, 
-    "prompt"           = prompt, 
+  n_coef = nlevels(data$Yhuman)
+  
+  
+  betas = as.data.frame(
+    "variable" = variable, 
+    "model" = model, 
+    "prompt" = prompt, 
     "train_proportion" = train_proportion, 
-    "sim_number" = 1:N,
-    "V_Yhuman" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman))),
-    "V_Yllm" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm))),
-    "V_Yhuman_train" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yhuman, dimnames=list(NULL, names_Yhuman))),
-    "V_Yllm_train" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm))),
-    "nu_Yllm_train" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm))),
-    "Vtilde_Ytilde_test" = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Ytilde, dimnames=list(NULL, names_Ytilde)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Ytilde, dimnames=list(NULL, names_Ytilde)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Ytilde, dimnames=list(NULL, names_Ytilde)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Ytilde, dimnames=list(NULL, names_Ytilde)))
-  )
-  
-  for (level in levels_Yhuman){
-    col_name = sprintf("Yhuman%s_Yllm_train", level)
-    betas[[col_name]] = list(
-      "coef" = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "se"   = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "lci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)),
-      "uci"  = matrix(NA, nrow=N, ncol=n_Yllm, dimnames=list(NULL, names_Yllm)))
+    "sim_number" = 1:N)
+
+  for (r in regression){
+    betas$coef[[model2log]] = matrix(NA, nrow=N, ncol=length(coef_name), dimnames=list(NULL, coef_name))
+    betas$se[[model2log]] = matrix(NA, nrow=N, ncol=length(coef_name), dimnames=list(NULL, coef_name))
+    betas$lci[[model2log]] = matrix(NA, nrow=N, ncol=length(coef_name), dimnames=list(NULL, coef_name))
+    betas$uci[[model2log]] = matrix(NA, nrow=N, ncol=length(coef_name), dimnames=list(NULL, coef_name))
   }
   
   data = data %>% 
@@ -182,10 +166,10 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   
   # Using human-labeled major_topic topics on all 10K bills
   model_V_Yhuman = lm(V ~ Yhuman + 0, data=data)
-  betas$V_Yhuman$coef[1:N,] = matrix(coef(model_V_Yhuman), nrow=N, ncol=n_Yhuman, byrow=TRUE)
-  betas$V_Yhuman$se[1:N,] = matrix(se_robust(model_V_Yhuman), nrow=N, ncol=n_Yhuman, byrow=TRUE)
-  betas$V_Yhuman$lci[1:N,] = matrix(ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,1], nrow=N, ncol=n_Yhuman, byrow=TRUE)
-  betas$V_Yhuman$uci[1:N,] = matrix(ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,2], nrow=N, ncol=n_Yhuman, byrow=TRUE)
+  betas$coef$V_Yhuman[1:N,] = matrix(coef(model_V_Yhuman), nrow=N, ncol=n_coef, byrow=TRUE)
+  betas$se$V_Yhuman[1:N,] = matrix(se_robust(model_V_Yhuman), nrow=N, ncol=n_coef, byrow=TRUE)
+  betas$lci$V_Yhuman[1:N,] = matrix(ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,1], nrow=N, ncol=n_coef, byrow=TRUE)
+  betas$uci$V_Yhuman[1:N,] = matrix(ci_robust(model_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,2], nrow=N, ncol=n_coef, byrow=TRUE)
   
   for (i in (1:N)){ # outer loop
     # We randomly draw 5000 observations with replacement.
@@ -193,10 +177,10 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     
     # On the 5000 observations, we calculate model_V_Yllm
     model_V_Yllm = lm(V ~ Yllm + 0, data=data_sample) # TODO: confirm no intercept
-    betas$V_Yllm$coef[i,] = coef(model_V_Yllm)
-    betas$V_Yllm$se[i,] = se_robust(model_V_Yllm)
-    betas$V_Yllm$lci[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,1]
-    betas$V_Yllm$uci[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,2]
+    betas$coef$V_Yllm[i,] = coef(model_V_Yllm)
+    betas$se$V_Yllm[i,] = se_robust(model_V_Yllm)
+    betas$lci$V_Yllm[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,1]
+    betas$uci$V_Yllm[i,] = ci_robust(model_V_Yllm, alpha=0.05, use_z_score=TRUE)[,2]
     
     # On the 5000 observations, we split the data into a train/test split. Since it's already a random sample, we don't do it using the sample function
     train_idx = 1:(n_samples * train_proportion)
@@ -204,65 +188,61 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     test = data_sample[-train_idx, ]
     test$Yhuman = NULL
     
-    # Using the train/test split, we calculate 
-    # (i) model_V_Yhuman_train using only train. We calculate the se of model_V_Yhuman_train using heteroskedasticity robust standard errors.
-    # (ii) Debiased model coef
-    
-    # beta (this is also model_V_Yhuman_train)
-    model_V_Yhuman_train = lm(V ~ Yhuman + 0, data=train)
-    betas$V_Yhuman_train$coef[i,] = coef(model_V_Yhuman_train)
-    betas$V_Yhuman_train$se[i,] = se_robust(model_V_Yhuman_train)
-    betas$V_Yhuman_train$lci[i,] = ci_robust(model_V_Yhuman_train, alpha=0.05, use_z_score=TRUE)[,1] 
-    betas$V_Yhuman_train$uci[i,] = ci_robust(model_V_Yhuman_train, alpha=0.05, use_z_score=TRUE)[,2] 
+    # beta (this is also model_train_V_Yhuman)
+    model_train_V_Yhuman = lm(V ~ Yhuman + 0, data=train)
+    betas$coef$train_V_Yhuman[i,] = coef(model_train_V_Yhuman)
+    betas$se$train_V_Yhuman[i,] = se_robust(model_train_V_Yhuman)
+    betas$lci$train_V_Yhuman[i,] = ci_robust(model_train_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,1] 
+    betas$uci$train_V_Yhuman[i,] = ci_robust(model_train_V_Yhuman, alpha=0.05, use_z_score=TRUE)[,2] 
     
     # delta_{V, \hat{Y}}
-    model_V_Yllm_train = lm(V ~ Yllm + 0, data=train) 
-    betas$V_Yllm_train$coef[i,] = coef(model_V_Yllm_train)
-    betas$V_Yllm_train$se[i,] = se_robust(model_V_Yllm_train)
-    betas$V_Yllm_train$lci[i,] = ci_robust(model_V_Yllm_train, alpha=0.05, use_z_score=TRUE)[,1] 
-    betas$V_Yllm_train$uci[i,] = ci_robust(model_V_Yllm_train, alpha=0.05, use_z_score=TRUE)[,2] 
+    model_train_V_Yllm = lm(V ~ Yllm + 0, data=train) 
+    betas$coef$train_V_Yllm[i,] = coef(model_train_V_Yllm)
+    betas$se$train_V_Yllm[i,] = se_robust(model_train_V_Yllm)
+    betas$lci$train_V_Yllm[i,] = ci_robust(model_train_V_Yllm, alpha=0.05, use_z_score=TRUE)[,1] 
+    betas$uci$train_V_Yllm[i,] = ci_robust(model_train_V_Yllm, alpha=0.05, use_z_score=TRUE)[,2] 
     
     # delta_{Y, \hat{Y}}
-    Yhuman_train = model.matrix(~ Yhuman + 0, data=train)
-    formula_dep = paste(colnames(Yhuman_train), collapse=", ")
+    train_Yhuman = model.matrix(~ Yhuman + 0, data=train)
+    formula_dep = paste(colnames(train_Yhuman), collapse=", ")
     formula = sprintf("cbind(%s) ~ Yllm + 0", formula_dep)
-    model_Yhuman_Yllm_train = lm(formula, data=cbind(train, Yhuman_train))
-    delta_Yhuman_Yllm = coef(model_Yhuman_Yllm_train)
+    model_train_Yhuman_Yllm = lm(formula, data=cbind(train, train_Yhuman))
+    delta_Yhuman_Yllm = coef(model_train_Yhuman_Yllm)
     
     # to store the model parameter, we redo the regression, but one dependent variable at a time instead of using cbind()
-    for (level in levels_Yhuman){
+    for (level in coef_name){
       formula = sprintf("%s ~ Yllm + 0", sprintf("Yhuman%s", level))
-      model_YhumanX_Yllm_train = lm(formula, data=cbind(train, Yhuman_train)) 
+      model_train_Yhuman.X_Yllm = lm(formula, data=cbind(train, train_Yhuman)) 
       
-      beta_name = sprintf("Yhuman%s_Yllm_train", level)
-      betas[[beta_name]]$ coef[i,] = coef(model_YhumanX_Yllm_train)
-      betas[[beta_name]]$ se[i,] = se_robust(model_YhumanX_Yllm_train)
-      betas[[beta_name]]$ lci[i,] = ci_robust(model_YhumanX_Yllm_train, alpha=0.05, use_z_score=TRUE)[,1]
-      betas[[beta_name]]$ uci[i,] = ci_robust(model_YhumanX_Yllm_train, alpha=0.05, use_z_score=TRUE)[,2]
+      model_name = sprintf("train_Yhuman.%s_Yllm", level)
+      betas$coef[[model_name]][i,] = coef(model_train_Yhuman.X_Yllm)
+      betas$se[[model_name]][i,] = se_robust(model_train_Yhuman.X_Yllm)
+      betas$lci[[model_name]][i,] = ci_robust(model_train_Yhuman.X_Yllm, alpha=0.05, use_z_score=TRUE)[,1]
+      betas$uci[[model_name]][i,] = ci_robust(model_train_Yhuman.X_Yllm, alpha=0.05, use_z_score=TRUE)[,2]
     }
     
     
-    out = get_coefs(train=train, test=test)
-    betas$nu_Yllm_train$coef[i,] = out$delta_nu_Yllm # delta_{nu, \hat{Y}}
-    betas$Vtilde_Ytilde_test$coef[i,] = out$Vtilde_Ytilde_coef # coef of V_tilde ~ Ytilde
+    out = get_debiased_coefs(train=train, test=test)
+    betas$coef$train_nu_Yllm[i,] = out$delta_nu_Yllm # delta_{nu, \hat{Y}}
+    betas$coef$test_Vtilde_Ytilde[i,] = out$Vtilde_Ytilde_coef # coef of V_tilde ~ Ytilde
     
     # We then begin the bootstrap (inner loop), this is because nu_Yllm_train and Vtilde_Ytilde_test are a function of predicted coefs and so we can't use se and ci from the lm model.
-    nu_Yllm_train_coef_boot = matrix(NA, nrow=B, ncol=n_Yllm, dimnames=list(NULL, names_Yllm))
-    Vtilde_Ytilde_test_coef_boot = matrix(NA, nrow=B, ncol=n_Ytilde, dimnames=list(NULL, names_Ytilde))
+    train_nu_Yllm_coef_boot = matrix(NA, nrow=B, ncol=n_coef, dimnames=list(NULL, coef_name))
+    test_Vtilde_Ytilde_coef_boot = matrix(NA, nrow=B, ncol=n_coef, dimnames=list(NULL, coef_name))
     for (b in 1:B){
-      out_boot = get_coefs(train=train, test=test, boot="bayesian")
-      nu_Yllm_train_coef_boot[b,] = out_boot$delta_nu_Yllm
-      Vtilde_Ytilde_test_coef_boot[b,] = out_boot$Vtilde_Ytilde_coef
+      out_boot = get_debiased_coefs(train=train, test=test, boot="bayesian")
+      train_nu_Yllm_coef_boot[b,] = out_boot$delta_nu_Yllm
+      test_Vtilde_Ytilde_coef_boot[b,] = out_boot$Vtilde_Ytilde_coef
     }
     
     # We use bootstrap samples to calculate se and ci
-    betas$nu_Yllm_train$se[i,] = se_boot(nu_Yllm_train_coef_boot)
-    betas$nu_Yllm_train$lci[i,] = ci_boot(nu_Yllm_train_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
-    betas$nu_Yllm_train$uci[i,] = ci_boot(nu_Yllm_train_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
+    betas$se$train_nu_Yllm[i,] = se_boot(train_nu_Yllm_coef_boot)
+    betas$lci$train_nu_Yllm[i,] = ci_boot(train_nu_Yllm_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
+    betas$uci$train_nu_Yllm[i,] = ci_boot(train_nu_Yllm_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
     
-    betas$Vtilde_Ytilde_test$se[i,] = se_boot(Vtilde_Ytilde_test_coef_boot)
-    betas$Vtilde_Ytilde_test$lci[i,] = ci_boot(Vtilde_Ytilde_test_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
-    betas$Vtilde_Ytilde_test$uci[i,] = ci_boot(Vtilde_Ytilde_test_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
+    betas$se$test_Vtilde_Ytilde[i,] = se_boot(test_Vtilde_Ytilde_coef_boot)
+    betas$lci$test_Vtilde_Ytilde[i,] = ci_boot(test_Vtilde_Ytilde_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
+    betas$uci$test_Vtilde_Ytilde[i,] = ci_boot(test_Vtilde_Ytilde_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
   }
   
   betas_df = cbind(combination_id=combination$id, as.data.frame(betas))
@@ -271,27 +251,15 @@ outer_loop_function = function(data, combination, N, B, n_samples){
 }
 
 ## Run
-args = commandArgs(trailingOnly = TRUE)
-if (length(args)>0){
-  N = as.numeric(args[1])
-  B = as.numeric(args[2])
-  n_cores = as.numeric(args[3])
-} else {
-  N = 5
-  B = 10
-  n_cores = 10
-}
+repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
+simulation_dir = file.path(repo_dir, "04_simulation")
+setwd(simulation_dir)
+rds_dir = file.path(simulation_dir, sprintf("rhs_rds_N%d_B%d", N, B))
+dir.create(rds_dir, showWarnings=FALSE)
 
 if (n_cores > parallelly::availableCores())
   n_cores = parallelly::availableCores()
 cat(sprintf("N = %d, B = %d, n_cores = %d\n", N, B, n_cores))
-
-n_samples = 5000 # 5000 
-sel_topics = c(3, 14, 15, 19, 20)
-train_proportion = c(0.1, 0.25, 0.5)
-variable = c("Senate", "Democrat", "DW1")
-
-repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
 
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")) %>% 
   mutate(
@@ -313,19 +281,18 @@ combinations = expand.grid(
 combinations = cbind(id = 1:nrow(combinations), combinations)
 
 # check if dir contain completed runs and skip them
-simulation_dir = file.path(repo_dir, "04_simulation")
-setwd(simulation_dir)
-rds_dir = file.path(simulation_dir, sprintf("rhs_rds_N%d_B%d", N, B))
-dir.create(rds_dir, showWarnings=FALSE)
-
-rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
-if (length(rds_paths_completed) != 0){
-  combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
-  combinations = combinations %>% filter(!(id %in% combination_id_completed))
-  cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
+if (debug){
+  combinations = combinations[1:10,]
+} else {
+  rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
+  if (length(rds_paths_completed) != 0){
+    combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
+    combinations = combinations %>% filter(!(id %in% combination_id_completed))
+    cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
+  }
+  if (nrow(combinations)==0)
+    stop("Current directory contains all rds files")
 }
-if (nrow(combinations)==0)
-  stop("Current directory contains all rds files")
 cat(sprintf("Total number of combinations = %d\n", nrow(combinations)))
 
 start_time = Sys.time()

@@ -21,3 +21,4 @@ congressional_bills/04_simulation/*.csv
 
 congressional_bills/04_simulation/evaluate_rhs_paralle.Rmd
 congressional_bills/04_simulation/rhs_rds_*
+congressional_bills/04_simulation/rhs_fig*
