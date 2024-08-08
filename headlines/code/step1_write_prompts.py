@@ -114,13 +114,15 @@ def generate_prompts(month, question, year, model):
     Main function to generate prompts and write them to a file.
     """
     # Set input file paths
-    csv_file = f"./data/raw/{month}{year}.csv"
+    current_directory = os.getcwd()
+    print(f"Current working directory: {current_directory}")
+    csv_file = f"./data/step0_cumulative/{month}{year}.csv"
     base_prompt_file = f'./data/prompt_templates/q{question}base'
 
     # Set output file path
-    model_month_directory = f"./{model}/{month}{year}" 
+    model_month_directory = f"./data/step1_batch_prompts/{model}/q{question}" 
     os.makedirs(model_month_directory, exist_ok=True)
-    output_file_path = f"{model_month_directory}/q{question}_prompts.jsonl"
+    output_file_path = f"{model_month_directory}/q{question}_{month}{year}_prompts.jsonl"
 
     # Read in data and base prompt
     content = read_base_prompt(base_prompt_file, "")
@@ -134,9 +136,9 @@ def generate_prompts(month, question, year, model):
 
 if __name__ == "__main__":
     # Set constants here
-    MODEL = "gpt-4o-mini"
-    MONTH = "dec"
-    QUESTION = "5"
-    YEAR = "19"
+    MODEL = "gpt-3.5-turbo-0215" # either gpt-4o-mini, gpt-4o, or gpt-3.5-turbo-0215
+    MONTH = "jan" # 3-letter abbreviation
+    QUESTION = "5" # question number (1, 2, 3, 4, 5)
+    YEAR = "19" # 2-digit year
 
     generate_prompts(MONTH, QUESTION, YEAR, MODEL)

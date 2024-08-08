@@ -1,11 +1,6 @@
 from openai import OpenAI
 from step0_constants import API_KEY
 
-QUESTION = "3"
-MONTH = "dec"
-YEAR = "19"
-DESCRIPTION = QUESTION + " " + MONTH + " " + YEAR
-
 def initialize_client(api_key):
     """
     Initializes the OpenAI client with the provided API key.
@@ -58,13 +53,22 @@ def create_batch(client, batch_input_file_id, description):
     )
     return batch
 
-def main():
-    file_path = f'./{MONTH}{YEAR}/q{QUESTION}_prompts.jsonl'
+def main(question, model, month, year):
+
+    description = model + " " + question + " " + month + " " + year
+    
+    file_path = f'./data/step1_batch_prompts/{model}/q{question}/q{question}_{month}{year}_prompts.jsonl'
     client = initialize_client(API_KEY)
     batch_input_file_id = create_batch_input_file(client, file_path)
-    batch = create_batch(client, batch_input_file_id, description=DESCRIPTION)
+    batch = create_batch(client, batch_input_file_id, description=description)
     print(batch)
 
 if __name__ == "__main__":
-    main()
+
+    QUESTION = "5"
+    MODEL = "gpt-4o-mini"
+    MONTH = "dec"
+    YEAR = "19"
+
+    main(QUESTION, MODEL, MONTH, YEAR)
 

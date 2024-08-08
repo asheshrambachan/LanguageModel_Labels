@@ -5,11 +5,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from step0_constants import personas, thought_modifiers
 
-QUESTION = "1"
-MONTH = "octsecond"
-YEAR = "19"
-
 def read_jsonl(file_path, num_lines):
+    """
+    Reads the JSONL file from the given file path.
+    Args:
+        file_path (str): The file path.
+        num_lines (int): The number of lines to read from the file.
+    Returns:
+        list: The list of JSON objects read from the file.
+    """
+
     data = []
     with open(file_path, 'r') as file:
         for i, line in enumerate(file):
@@ -19,6 +24,15 @@ def read_jsonl(file_path, num_lines):
     return data
 
 def read_jsonl_from_line(file_path, start_line):
+    """
+    Reads the JSONL file from the given file path starting from the specified line.
+    Args:
+        file_path (str): The file path.
+        start_line (int): The line number to start reading from.
+    Returns:
+        list: The list of JSON objects read from the file.
+    """
+
     data = []
     with open(file_path, 'r') as file:
         for i, line in enumerate(file):
@@ -30,7 +44,33 @@ def read_jsonl_from_line(file_path, start_line):
                 print(line)
     return data
 
+def extract_json(json_str):
+    """
+    Extracts the JSON object from the given JSON string.
+    Args:
+        json_str (str): The JSON string.
+    Returns:
+        dict: The extracted JSON object
+    """
+
+    match = re.search(r'\{.*\}', json_str, re.DOTALL)
+    if match:
+        json_text = match.group(0)
+        try:
+            return json.loads(json_text)
+        except:
+            print(f"Offending JSON string: {repr(json_text)}")
+            return None
+    return None
+
 def extract_prompt_info(json_str):
+    """
+    Extracts the prompt information from the given JSON string.
+    Args:
+        json_str (str): The JSON string.
+    Returns:
+        dict: The extracted prompt information.
+        """
     custom_id = json_str['custom_id']
     message_content = json_str['body']['messages'][0]['content']
     
@@ -50,80 +90,173 @@ def extract_prompt_info(json_str):
     
     return {'custom_id': custom_id, 'company_name': company_name, 'headline': headline, 'prompt_type': type}
 
-def extract_json(json_str):
-    match = re.search(r'\{.*\}', json_str, re.DOTALL)
-    if match:
-        json_text = match.group(0)
-        try:
-            return json.loads(json_text)
-        except:
-            print(f"Offending JSON string: {repr(json_text)}")
-            return None
-    return None
+def construct_file_paths(question, model, month, year):
+    """
+    Constructs the input and output file paths based on the given parameters.
+    Args:
+        question (str): The question type.
+        model (str): The model name.
+        month (str): The month.
+        year (str): The year.
+    Returns:
+        tuple: The input and output file paths.
+    """
 
-# File paths
-input_file_path = f'./{MONTH}{YEAR}/q{QUESTION}_prompts.jsonl'
-output_file_path = f'./{MONTH}{YEAR}/q{QUESTION}_responses.jsonl'
+    input_file_path = f'./data/step1_batch_prompts/{model}/q{question}/q{question}_{month}{year}_prompts.jsonl'
+    output_file_path = f'./data/step2-3_batch_responses/{model}/q{question}/q{question}_{month}{year}_responses.jsonl'
+    return input_file_path, output_file_path
 
-# Read and process input data
-input_data = read_jsonl_from_line(input_file_path, 0)
-input_data = [extract_prompt_info(json_str) for json_str in input_data]
-input_df = pd.DataFrame(input_data)
-start_line = num_lines = len(input_df) // 9
+def read_and_process_input_data(input_file_path):
+    """
+    Reads the input data from the given input file path and processes it.
+    Args:
+        input_file_path (str): The input file path.
+    Returns:
+        pandas.DataFrame: The processed input data.
+    """
 
-# Read plain text responses and extract necessary columns
-outputs_plain = read_jsonl(output_file_path, num_lines)
-outputs_plain_ids = pd.DataFrame([output["custom_id"] for output in outputs_plain], columns=["custom_id"])
-outputs_plain = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_plain]
-outputs_plain = [item.split(', ') for item in outputs_plain]
-outputs_plain = [item + [None] * (4 - len(item)) for item in outputs_plain]
-output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
-outputs_plain_df = pd.DataFrame(outputs_plain, columns=output_cols)
-outputs_plain_df = pd.concat([outputs_plain_ids, outputs_plain_df], axis=1)
+    input_data = read_jsonl_from_line(input_file_path, 0)
+    input_data = [extract_prompt_info(json_str) for json_str in input_data]
+    input_df = pd.DataFrame(input_data)
+    start_line = num_lines = len(input_df) // 9
+    return input_df, start_line, num_lines
 
-# Read JSON responses and extract necessary columns
-outputs_json = read_jsonl_from_line(output_file_path, start_line)
-outputs_json_ids = pd.DataFrame([output["custom_id"] for output in outputs_json], columns=["custom_id"])
-outputs_json = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_json]
-outputs_json = [extract_json(json_str) for json_str in outputs_json]
-outputs_json = [output if output is not None else {"headline type": None} for output in outputs_json]
-outputs_json = [{key: d.get(key, None) for key in output_cols} for d in outputs_json]
-outputs_json_df = pd.DataFrame(outputs_json, columns=output_cols)
-outputs_json_df = pd.concat([outputs_json_ids, outputs_json_df], axis=1)
+def read_and_process_plain_text_responses(output_file_path, num_lines):
+    """
+    Reads the plain text responses from the given output file path and processes them.
+    Args:
+        output_file_path (str): The output file path.
+        num_lines (int): The number of lines to read from the output file.
+    Returns:
+        pandas.DataFrame: The processed plain text responses
+    """
 
-# Combine plain text and JSON responses
-combined_output = pd.concat([outputs_plain_df, outputs_json_df], ignore_index=True)
+    outputs_plain = read_jsonl(output_file_path, num_lines)
+    outputs_plain_ids = pd.DataFrame([output["custom_id"] for output in outputs_plain], columns=["custom_id"])
+    outputs_plain = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_plain]
+    outputs_plain = [item.split(', ') for item in outputs_plain]
+    outputs_plain = [item + [None] * (4 - len(item)) for item in outputs_plain]
+    output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
+    outputs_plain_df = pd.DataFrame(outputs_plain, columns=output_cols)
+    outputs_plain_df = pd.concat([outputs_plain_ids, outputs_plain_df], axis=1)
+    return outputs_plain_df
 
-# Merge input data with combined output
-data = pd.merge(input_df, combined_output, on='custom_id', how='outer')
-data['headline type'] = data['headline type'].str.lower()
-data['explanation'] = data['explanation'].str.lower()
+def read_and_process_json_responses(output_file_path, start_line):
+    """
+    Reads the JSON responses from the given output file path and processes them.
+    Args:
+        output_file_path (str): The output file path.
+        start_line (int): The start line to read the JSON responses from.
+    Returns:
+        pandas.DataFrame: The processed JSON responses.
+    """
 
-# Remove invalid 'headline type' values
-valid_headlines = ['positive', 'neutral', 'negative'] if QUESTION == "1" else ['increase', 'uncertain', 'decrease']
-data.loc[~data['headline type'].isin(valid_headlines), 'headline type'] = None
-data['headline type num'] = data['headline type'].map({'positive': 2, 'neutral': 1, 'negative': 0}) if QUESTION == "1" else data['headline type'].map({'increase': 2, 'uncertain': 1, 'decrease': 0})
+    outputs_json = read_jsonl_from_line(output_file_path, start_line)
+    outputs_json_ids = pd.DataFrame([output["custom_id"] for output in outputs_json], columns=["custom_id"])
+    outputs_json = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_json]
+    outputs_json = [extract_json(json_str) for json_str in outputs_json]
+    outputs_json = [output if output is not None else {"headline type": None} for output in outputs_json]
+    output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
+    outputs_json = [{key: d.get(key, None) for key in output_cols} for d in outputs_json]
+    outputs_json_df = pd.DataFrame(outputs_json, columns=output_cols)
+    outputs_json_df = pd.concat([outputs_json_ids, outputs_json_df], axis=1)
+    return outputs_json_df
 
-# Convert 'confidence' and 'magnitude' to numeric and filter invalid values
-data['confidence'] = pd.to_numeric(data['confidence'], errors='coerce')
-data['magnitude'] = pd.to_numeric(data['magnitude'], errors='coerce')
-data.loc[~data['confidence'].between(0, 1), 'confidence'] = None
-data.loc[~data['magnitude'].between(0, 1), 'magnitude'] = None
+def combine_responses(outputs_plain_df, outputs_json_df):
+    """
+    Combines the given plain and JSON outputs into a single DataFrame.
+    Args:
+        outputs_plain_df (pandas.DataFrame): The DataFrame containing the plain outputs.
+        outputs_json_df (pandas.DataFrame): The DataFrame containing the JSON outputs.
+    Returns:
+        pandas.DataFrame: The combined DataFrame containing both plain and JSON outputs.
+    """
 
-# Group by 'headline' and calculate statistics
-data_mean = data.groupby('headline').agg({
-    'confidence': ['mean', 'std', 'nunique'],
-    'magnitude': ['mean', 'std', 'nunique'],
-    'headline type num': ['mean', 'std', 'nunique']
-}).reset_index()
+    combined_output = pd.concat([outputs_plain_df, outputs_json_df], ignore_index=True)
+    return combined_output
 
-# Flatten MultiIndex columns
-data_mean.columns = ['_'.join(col).strip() for col in data_mean.columns.values]
+def merge_input_with_combined_output(input_df, combined_output):
+    """
+    Merge the input dataframe with the combined output dataframe based on the 'custom_id' column.
+    Args:
+        input_df (pandas.DataFrame): The input dataframe.
+        combined_output (pandas.DataFrame): The combined output dataframe.
+    Returns:
+        pandas.DataFrame: The merged dataframe with the 'headline type' and 'explanation' columns converted to lowercase.
+    """
 
-# Save the processed data to a CSV file
-data.to_csv(f"./{MONTH}{YEAR}/q{QUESTION}_processed.csv", index=False)
+    data = pd.merge(input_df, combined_output, on='custom_id', how='outer')
+    data['headline type'] = data['headline type'].str.lower()
+    data['explanation'] = data['explanation'].str.lower()
+    return data
 
-# plt.hist(data_mean['headline type num_nunique'], bins=20)
-# plt.show()
+def clean_and_filter_data(data, question):
+    """
+    Cleans and filters the given data based on the specified question.
+    Args:
+        data (pandas.DataFrame): The input data to be cleaned and filtered.
+        question (str): The question type. Should be "1" for sentiment analysis or any other value for magnitude analysis.
+    Returns:
+        pandas.DataFrame: The cleaned and filtered data.
+    """
 
-# # data_mean.to_csv("dec19_output_summary.csv")
+    valid_headlines = ['positive', 'neutral', 'negative'] if question == "1" else ['increase', 'uncertain', 'decrease']
+    data.loc[~data['headline type'].isin(valid_headlines), 'headline type'] = None
+    data['headline type num'] = data['headline type'].map({'positive': 2, 'neutral': 1, 'negative': 0}) if question == "1" else data['headline type'].map({'increase': 2, 'uncertain': 1, 'decrease': 0})
+    data['confidence'] = pd.to_numeric(data['confidence'], errors='coerce')
+    data['magnitude'] = pd.to_numeric(data['magnitude'], errors='coerce')
+    data.loc[~data['confidence'].between(0, 1), 'confidence'] = None
+    data.loc[~data['magnitude'].between(0, 1), 'magnitude'] = None
+    return data
+
+
+def calculate_statistics(data):
+    """
+    Calculate statistics for the given data.
+    Parameters:
+    - data: pandas DataFrame
+        The input data containing the following columns:
+        - 'headline': str
+            The headline text.
+        - 'confidence': float
+            The confidence score.
+        - 'magnitude': float
+            The magnitude score.
+        - 'headline type num': int
+            The headline type number.
+    Returns:
+    - data_mean: pandas DataFrame
+        The calculated statistics grouped by 'headline'
+    """
+
+    # Group by 'headline' and calculate statistics
+    data_mean = data.groupby('headline').agg({
+        'confidence': ['mean', 'std', 'nunique'],
+        'magnitude': ['mean', 'std', 'nunique'],
+        'headline type num': ['mean', 'std', 'nunique']
+    }).reset_index()
+
+    # Flatten MultiIndex columns
+    data_mean.columns = ['_'.join(col).strip() for col in data_mean.columns.values]
+    return data_mean
+
+def main(question, model, month, year):
+
+    input_file_path, output_file_path = construct_file_paths(question, model, month, year)
+    input_df, start_line, num_lines = read_and_process_input_data(input_file_path)
+    outputs_plain_df = read_and_process_plain_text_responses(output_file_path, num_lines)
+    outputs_json_df = read_and_process_json_responses(output_file_path, start_line)
+    combined_output = combine_responses(outputs_plain_df, outputs_json_df)
+    data = merge_input_with_combined_output(input_df, combined_output)
+    data = clean_and_filter_data(data, question)
+
+    # Save the processed data to a CSV file
+    data.to_csv(f"./data/step4_processed_responses/{model}/q{question}/q{question}_{month}{year}_processed.csv", index=False)
+
+if __name__ == "__main__":
+    
+    QUESTION = "5"
+    MODEL = "gpt-4o-mini"
+    MONTH = "dec"
+    YEAR = "19"
+    main(QUESTION, MODEL, MONTH, YEAR)

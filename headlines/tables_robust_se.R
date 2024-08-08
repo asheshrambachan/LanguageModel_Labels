@@ -9,12 +9,20 @@ rm(list = ls())
 # Define the question and the list of months
 question <- "q5"
 months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec")
+year = "19"
+return_type = "cumulative"
+model = "gpt-4o-mini"
 
 # Function to read and combine data for all months
 read_and_combine <- function(file_name, months, question) {
   combined_df <- data.frame()  # Initialize an empty data frame to store combined data
   for (month in months) {
-    file_path <- paste0("./", month, "19/", question, "/", file_name)
+    file_path <- paste0("./data/step5_returns_merged/", 
+                        return_type, "/", 
+                        model, "/", 
+                        question, "/",  
+                        question, "_", month, "19/", 
+                        file_name)
     month_df <- read.csv(file_path)
     month_df <- subset(month_df, headline.type != "")  # Filter out rows with empty headline.type
     combined_df <- bind_rows(combined_df, month_df)  # Combine data frames
