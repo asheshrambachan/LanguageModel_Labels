@@ -20,3 +20,4 @@ congressional_bills/04_simulation/*.csv
 *.RData
 
 congressional_bills/04_simulation/evaluate_rhs_paralle.Rmd
+congressional_bills/04_simulation/rhs_rds_*
