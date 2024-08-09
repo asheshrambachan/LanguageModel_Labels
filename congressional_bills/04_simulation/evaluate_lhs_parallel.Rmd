@@ -58,7 +58,8 @@ $$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est
 N = 1000
 B = 1000
 
-rds_dir = file.path(simulation_dir, sprintf("lhs_rds_N%d_B%d", N, B))
+# rds_dir = file.path(simulation_dir, sprintf("lhs_rds_N%d_B%d", N, B))
+rds_dir = file.path(simulation_dir, "lhs_rds_N1000_B1000_v2")
 rds_paths = list.files(rds_dir, pattern = "*.rds", full.names = TRUE)
 
 for (rds_path in rds_paths){

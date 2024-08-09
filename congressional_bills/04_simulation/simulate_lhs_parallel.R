@@ -10,25 +10,56 @@ require(lmtest, quietly=TRUE, warn.conflicts=FALSE)
 require(furrr, quietly=TRUE, warn.conflicts=FALSE)
 require(progressr, quietly=TRUE, warn.conflicts=FALSE)
 
+
+n_cores = 3 # 8
+debug = TRUE
+debug.n = 3
+# 
+# args = commandArgs(trailingOnly = TRUE)
+# if (length(args)>0){
+#   n_cores = as.numeric(args[1])
+#   debug = FALSE
+# }
+# 
+# if (length(args)>1){
+#   debug = "debug"==args[2]
+#   debug.n = as.numeric(args[3])
+# }
+
+if (n_cores > parallelly::availableCores())
+  n_cores = parallelly::availableCores()
+cat(sprintf("n_cores = %d\n", n_cores))
+
+
 repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
-
-args = commandArgs(trailingOnly = TRUE)
-if (length(args)>0){
-  N = as.numeric(args[1])
-  B = as.numeric(args[2])
-  n_cores = as.numeric(args[3])
-} else {
-  N = 1000
-  B = 1000
-  n_cores = 10
-}
-
-n_samples = 5000
-common_major_topics = c(3, 14, 15, 19, 20)
-train_proportion = c(0.1, 0.25, 0.5)
-
 simulation_dir = file.path(repo_dir, "04_simulation")
 setwd(simulation_dir)
+combinations_path = file.path(simulation_dir, "lhs_combinations.csv")
+combinations = read.csv(combinations_path)
+
+rds_dir = file.path(simulation_dir, "lhs_rds") 
+dir.create(rds_dir, showWarnings=FALSE)
+rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
+if (length(rds_paths_completed) != 0){
+  combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
+  combinations = combinations %>% filter(!(id %in% combination_id_completed))
+  cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
+  
+  if (nrow(combinations)==0)
+    stop("Current directory contains all rds files")
+}
+cat(sprintf("Total number of combinations = %d\n", nrow(combinations)))
+
+if (debug){
+  cat(sprintf("Debug mode: choose first %d combinations\n", debug.n))
+  combinations = combinations[1:debug.n, ]
+  rds_dir = sprintf("%s_debug", rds_dir) 
+  dir.create(rds_dir, showWarnings=FALSE)
+  if (length(list.files(rds_dir, pattern = "*.rds", full.names=TRUE))>0)
+    file.remove(list.files(rds_dir, pattern = "*.rds", full.names=TRUE))
+}
+cat(sprintf("Rds/results dir: %s\n", rds_dir))
+
 
 data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")) %>% 
   mutate(
@@ -36,35 +67,6 @@ data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv"))
     Democrat = as.integer(Party == "Democrat"),
     Prompt = PromptingStrategyID) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Major, MajorLLM) 
-
-rds_dir = file.path(simulation_dir, sprintf("rds_lhs_N%d_B%d", N, B)) 
-dir.create(rds_dir, showWarnings=FALSE)
-
-# bills = data %>%
-#   group_by(BillID) %>%
-#   summarise(Major = first(Major))
-# common_major_topics_table = sort(summary(as.factor(bills$Major)), decreasing=TRUE)[1:5]
-# common_major_topics = sort(as.integer(names(common_major_topics_table)))
-
-combinations = expand.grid(
-  train_proportion = train_proportion, # 10%train 90%test, ...
-  prompt = unique(data$Prompt),
-  model = unique(data$Model),
-  variable = c("Senate", "Democrat", "DW1"),
-  major_topic = common_major_topics, 
-  stringsAsFactors = FALSE
-)
-combinations = cbind(id=1:nrow(combinations), combinations)
-
-rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
-if (length(rds_paths_completed) != 0){
-combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
-  combinations = combinations[-combination_id_completed, ] 
-  cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
-}
-
-if (nrow(combinations)==0)
-  stop("Current directory contains all rds files")
 
 ## Functions
 se_robust = function(model){
@@ -112,9 +114,8 @@ get_beta_debiased = function(train, test, variable){
   return(coef(model_debiased))
 }
 
-outer_loop_function = function(data, combination, N, B, n_samples){
+outer_loop_function = function(data, combination, save.rds=FALSE){
   set.seed(combination$id)
-  
   major_topic = combination$major_topic
   variable = combination$variable
   model = combination$model 
@@ -137,42 +138,42 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   names_betas = c("beta0", "beta1") # names(human.coef)
   n_betas = length(names_betas)
   betas = list(
-    "major_topic"      = major_topic, # matrix(data=major_topic, nrow=N, ncol=1),
-    "variable"         = variable, # matrix(data=variable, nrow=N, ncol=1),
-    "model"            = model, # matrix(data=model, nrow=N, ncol=1),
-    "prompt"           = prompt, # matrix(data=prompt, nrow=N, ncol=1),
-    "train_proportion" = train_proportion, # matrix(data=train_proportion, nrow=N, ncol=1),
-    "sim_number" = 1:N,
+    "major_topic"      = major_topic, 
+    "variable"         = variable,
+    "model"            = model,
+    "prompt"           = prompt, 
+    "train_proportion" = train_proportion,
+    "sim_number" = 1:combination$N,
     "human" = list(
-      "coef" = matrix(data=human.coef, nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "se"   = matrix(data=human.se,   nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "lci"  = matrix(data=human.lci,  nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "uci"  = matrix(data=human.uci,  nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE)),
+      "coef" = matrix(data=human.coef, nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "se"   = matrix(data=human.se,   nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "lci"  = matrix(data=human.lci,  nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
+      "uci"  = matrix(data=human.uci,  nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE)),
     "llm" = list(
-      "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
+      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
     "human_train" = list(
-      "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
+      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
     "error" = list(
-      "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas))),
+      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
     "debiased" = list(
-      "coef" = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=N, ncol=n_betas, dimnames=list(NULL, names_betas)))
+      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
+      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)))
   )
   
-  for (i in (1:N)){ # outer loop
+  for (i in (1:combination$N)){ # outer loop
     # We randomly draw 5000 observations with replacement.
-    data_sample = data[sample(x=nrow(data), size=n_samples, replace=TRUE) ,]
+    data_sample = data[sample(x=nrow(data), size=combination$n_samples, replace=TRUE) ,]
     
     # On the 5000 observations, we calculate model_llm
     model_llm = lm(formula=paste("Y_llm", "~", variable), data=data_sample) 
@@ -207,7 +208,7 @@ outer_loop_function = function(data, combination, N, B, n_samples){
     
     # We then begin the bootstrap (inner loop), this is beacuse beta_debiased is a function of a predicted Y_debiased and so we can't use se and ci from the lm model.
     debiased_coef_boot = as.data.frame(t(sapply(
-      1:B, 
+      1:combination$B, 
       function(b){ # ignore b
         # We draw a bootstrap sample from each of the train and test data, keeping the train-test split fixed
         train_boot = train[sample(x=nrow(train), replace=TRUE), ]
@@ -226,42 +227,38 @@ outer_loop_function = function(data, combination, N, B, n_samples){
   }
   
   betas_df = cbind(combination_id=combination$id, as.data.frame(betas))
-  saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination$id)))
-  return(betas_df)
+  if (save.rds){
+    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination$id)))
+    return(combination$id)
+  } else 
+    return(betas_df)
 }
 
-## Models
-if (n_cores > parallelly::availableCores())
-  n_cores = parallelly::availableCores()
-cat(sprintf("N = %d, B = %d, n_cores = %d\n", N, B, n_cores))
-cat(sprintf("Total number of combinations = %d\n", nrow(combinations)))
+# Estimate run time
+combination = combinations[1,]
+N_original = combination$N
+combination$N = 1
 
 start_time = Sys.time()
-betas_df = outer_loop_function(
-  data=data,
-  combination=combinations[1,],
-  N=1,
-  B=B,
-  n_samples=n_samples
-)
+regressions_temp = outer_loop_function(
+  data = data, 
+  combination = combination,
+  save.rds = FALSE)
 end_time = Sys.time()
-duration_N1_combination1 = as.numeric(end_time - start_time, unit="hours")
-duration = duration_N1_combination1 * N * nrow(combinations) / n_cores
-cat(sprintf("Expected run time = %.2f hours\n", duration))
 
-plan(multisession, workers = n_cores)
+duration1 = as.numeric(end_time - start_time, unit="hours")
+duration = duration1 * N_original * nrow(combinations) / n_cores
+cat(sprintf("Expected run time = %.2f hours assuming N=%d and B=%d\n", duration, N_original, combination$B))
+
 set.seed(123)
-out_list = future_map(
+plan(multisession, workers = n_cores)
+regressions = future_map(
   .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
   .x = 1:nrow(combinations),
   .f = function(x) {
-    betas_df = outer_loop_function(
+    out = outer_loop_function(
       data=data,
-      combination=combinations[x,],
-      N=N,
-      B=B,
-      n_samples=n_samples
+      combination=combinations[x,]
     )
-    # return(x)
-    }, 
+    return(out)}, 
   .progress=FALSE)
