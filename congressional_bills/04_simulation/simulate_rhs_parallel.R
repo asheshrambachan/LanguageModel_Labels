@@ -189,7 +189,6 @@ outer_loop_function = function(data, combination, save.rds=TRUE){
   regression_df = summary.V_Yhuman 
   
   for (i in (1:combination$N)){ # outer loop
-    regression_list_i = list() # list of regressions in the ith simulation 
     
     # We randomly draw 5000 observations with replacement.
     data_sample = data[sample(x=nrow(data), size=combination$n_samples, replace=TRUE), ]
@@ -229,8 +228,8 @@ outer_loop_function = function(data, combination, save.rds=TRUE){
     coef.test_Vtilde_Ytilde = out$coef.test_Vtilde_Ytilde # coef of V_tilde ~ Ytilde
     
     # We then begin the bootstrap (inner loop), this is because nu_Yllm_train and Vtilde_Ytilde_test are a function of predicted coefs and so we can't use se and ci from the lm model.
-    boot.coef.train_nu_Yllm = matrix(NA, nrow=combination$B, ncol=length(levels_coef), dimnames=list(NULL, levels_coef))
-    boot.coef.test_Vtilde_Ytilde = matrix(NA, nrow=combination$B, ncol=length(levels_coef), dimnames=list(NULL, levels_coef))
+    boot.coef.train_nu_Yllm = matrix(NA, nrow=combination$B, ncol=length(coef.train_nu_Yllm))
+    boot.coef.test_Vtilde_Ytilde = matrix(NA, nrow=combination$B, ncol=length(coef.test_Vtilde_Ytilde))
     for (b in 1:combination$B){
       boot.coefs = get_debiased_coefs(train=train, test=test, boot="bayesian")
       boot.coef.train_nu_Yllm[b,] = boot.coefs$coef.train_nu_Yllm
@@ -239,10 +238,10 @@ outer_loop_function = function(data, combination, save.rds=TRUE){
     
     # We use bootstrap samples to calculate se and ci
     summary.train_nu_Yllm = summary_boot(coef.train_nu_Yllm, boot.coef.train_nu_Yllm, name="train_nu_Yllm")
-    test_Vtilde_Ytilde = summary_boot(coef.test_Vtilde_Ytilde, boot.coef.test_Vtilde_Ytilde, name="test_Vtilde_Ytilde")
+    summary.test_Vtilde_Ytilde = summary_boot(coef.test_Vtilde_Ytilde, boot.coef.test_Vtilde_Ytilde, name="test_Vtilde_Ytilde")
     
     regression_df_i = bind_rows(
-      summary.V_Yllm, summary.train_V_Yhuman, test_Vtilde_Ytilde, # regressions that we report, 
+      summary.V_Yllm, summary.train_V_Yhuman, summary.test_Vtilde_Ytilde, # regressions that we report, 
       summary.train_V_Yllm, train_Yhuman.X_Yllm_list, summary.train_nu_Yllm # other regressions in case we need them
       ) %>% 
       mutate(sim_number=i)

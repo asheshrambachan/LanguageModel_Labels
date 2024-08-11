@@ -13,23 +13,30 @@ chmod +x copy_local2remote.sh
 ssh username@supply.mit.edu
 ```
 
-On the remote server, create a new `r_env` using `conda` (you need to install `conda` first if missing):
+you need to install `conda` first, make sure to set the default channel to conda-forge to use r-base=4.4.1 rather than default of 4.3.1.
 ```
-conda create -n r_env r-essentials r-base  r-dplyr r-sandwich r-lmtest r-furrr r-progressr
-conda activate r_env
+conda update conda
+conda config --add channels conda-forge
+conda config --set channel_priority strict
+```
+On the remote server, create a new `r4.4.1` env:
+```
+conda create -n r4.4.1 r-base r-dplyr r-sandwich r-lmtest r-furrr
+conda list
+conda activate r4.4.1
 cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
 ```
-To start the simulation, run the following:
+To start the simulation, change the `n_cores` and `rds_dir` in the Rscript, then run the following:
 ```
-Rscript simulate_lhs_parallel.R 1000 1000 25 1>output.log 2>error.log &
+Rscript simulate_lhs_parallel.R 1>output.log 2>error.log &
 ```
-The passed arguments in order are `N B n_cores`. If `n_cores` is greater than what's available, the maximum number of available cores will be used.
-
-The code generates `rds` files that are stored in `rds_N_B` folder in the same directory. 
+The code generates `rds` files the specified `lhs_rds` folder.
 
 ## To-Dos:
 
 - [ ] remove shell scripts
-- [ ] resolve issue with RHS simulation
-- [ ] ensure Rmd and R files are the same
-- [ ] comments + documentations
+- [x] resolve issue with RHS simulation
+- [x] ensure Rmd and R files are the same
+- [x] comments + documentations for LHS
+- [ ] comments + documentations for RHS
+- [x] unify data structure for both RHS and LHS simulations

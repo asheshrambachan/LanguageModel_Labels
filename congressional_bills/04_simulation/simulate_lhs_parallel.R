@@ -3,262 +3,217 @@
 # output: html_document
 # This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 
-require(zoo, quietly=TRUE, warn.conflicts=FALSE)
-require(dplyr, quietly=TRUE, warn.conflicts=FALSE)
-require(sandwich, quietly=TRUE, warn.conflicts=FALSE)
-require(lmtest, quietly=TRUE, warn.conflicts=FALSE)
-require(furrr, quietly=TRUE, warn.conflicts=FALSE)
-require(progressr, quietly=TRUE, warn.conflicts=FALSE)
+# Load required packages quietly
+suppressPackageStartupMessages({
+  library(zoo)
+  library(dplyr)
+  library(sandwich)
+  library(lmtest)
+  library(furrr)
+})
 
+# Arguments not specified in combinations.csv
+n_cores <- 30
+debug <- FALSE
+sel_topics <- c(3, 14, 15, 19, 20) # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
 
-n_cores = 3 # 8
-debug = TRUE
-debug.n = 3
-# 
-# args = commandArgs(trailingOnly = TRUE)
-# if (length(args)>0){
-#   n_cores = as.numeric(args[1])
-#   debug = FALSE
-# }
-# 
-# if (length(args)>1){
-#   debug = "debug"==args[2]
-#   debug.n = as.numeric(args[3])
-# }
+# Reset processing plan
+plan(sequential)
 
-if (n_cores > parallelly::availableCores())
-  n_cores = parallelly::availableCores()
-cat(sprintf("n_cores = %d\n", n_cores))
+# Set directories and file paths
+repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
+simulation_dir <- file.path(repo_dir, "04_simulation")
+rds_dir <- file.path(simulation_dir, "lhs_rds")
+path_combinations <- file.path(simulation_dir, "lhs_combinations.csv")
+path_data <- file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")
+path_functions <- file.path(simulation_dir, "functions.R")
 
+# Load custom functions
+source(path_functions)
 
-repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
-simulation_dir = file.path(repo_dir, "04_simulation")
-setwd(simulation_dir)
-combinations_path = file.path(simulation_dir, "lhs_combinations.csv")
-combinations = read.csv(combinations_path)
+# Function to run the regression (Ytilde ~ V, data=test)
+fun.test_Ytilde_V <- function(train, test, return.intermediate_regressions=FALSE){
+  if (is.null(train$w))
+    train$w = 1
+  
+  if (is.null(test$w))
+    test$w = 1
+  
+  # Initialize a list to store summaries of intermediate regressions, e.g., error ~ V
+  regressions <- list()
+  
+  # Estimate error using train data and perform regression on error ~ V
+  train$error <- train$Yllm - train$Yhuman
+  train_error_V <- lm(error ~ V, weights=w, data=train)
+  delta_error_V <- coef(train_error_V)
+  if (return.intermediate_regressions){
+    summary.train_error_V <- summary_robust(train_error_V, name="train_error_V")
+    regressions <- append(regressions, summary.train_error_V)
+  }
+  
+  # Prepare design matrix for test data
+  V <- model.matrix(~ V, data=test)
+  
+  # Predict Ytilde for test data
+  test$Ytilde <- test$Yllm - V %*% as.matrix(delta_error_V, nrow=2)
+  
+  # Regress Ytilde ~ V and extract coefficients
+  test_Ytilde_V <- lm(Ytilde ~ V, weights=w, data=test) 
+  coef.test_Ytilde_V <- coef(test_Ytilde_V)
+  
+  return(list(coef.test_Ytilde_V=coef.test_Ytilde_V, regressions=regressions))
+}
 
-rds_dir = file.path(simulation_dir, "lhs_rds") 
+# Run LHS regressions based on the specified combination.
+# If rds_dir is provided, results will be saved as an RDS file; 
+# otherwise, they will be returned as a data.frame.
+fun.lhs_regressions <- function(combination, rds_dir=NULL, boot="nonparametric"){
+  data_filtered <- data %>% 
+    filter(Model==combination$model, 
+           Prompt==combination$prompt) %>%
+    mutate(V = .[[combination$variable]],
+           Yhuman = as.integer(Yhuman == combination$major_topic),
+           Yllm = as.integer(Yllm == combination$major_topic))
+  
+  # On all 10K bills, regress Yhuman ~ V
+  Yhuman_V <- lm(Yhuman ~ V, data=data_filtered)
+  summary.Yhuman_V <- summary_robust(Yhuman_V, name="Yhuman_V")
+  
+  # Initialize a data frame to log all regressions, starting with summary.Yhuman_V
+  regressions <- summary.Yhuman_V 
+  
+  # Set seed to combination_id for reproducibility 
+  set.seed(combination$combination_id)
+  
+  # N simulations (outer loop)
+  for (i in (1:combination$N)){ 
+    
+    # Randomly draw n_samples observations with replacement
+    data_sample <- data_filtered[sample(x=nrow(data_filtered), size=combination$n_samples, replace=TRUE), ]
+    
+    # On data_sample, regress Yllm ~ V
+    Yllm_V <- lm(Yllm ~ V, data=data_sample)
+    summary.Yllm_V <- summary_robust(Yllm_V, name="Yllm_V")
+    
+    # Split data into train and test sets based on the predefined train_proportion
+    # Note: Since data_sample is already a random sample, we don't need to randomize again.
+    train_idx <- 1:(nrow(data_sample) * combination$train_proportion)
+    train <- data_sample[train_idx, ]
+    test <- data_sample[-train_idx, ] %>% select(!Yhuman)
+    
+    # (i) On train data, regress Yhuman ~ V. Report robust standard errors
+    train_Yhuman_V <- lm(Yhuman ~ V, data=train)
+    summary.train_Yhuman_V <- summary_robust(train_Yhuman_V, name="train_Yhuman_V")
+    
+    # (ii) Using train and test data, regress Ytilde ~ V, see fun.test_Ytilde_V() for more details
+    test_Ytilde_V <- fun.test_Ytilde_V(train=train, test=test, return=TRUE)
+    coef.test_Ytilde_V <- test_Ytilde_V$coef.test_Ytilde_V
+    summary.intermediate_regressions <- test_Ytilde_V$regressions
+    
+    # Perform bootstrap on test_Ytilde_V to calculate standard errors and confidence intervals
+    boot <- match.arg(boot)
+    boot.coef.test_Ytilde_V <- matrix(NA, nrow=combination$B, ncol=length(coef.test_Ytilde_V))
+    for (b in 1:combination$B){
+      boot.train <- train
+      boot.test <- test
+      
+      # Resample or change sample weights if a bootstrap method is specified
+      if (boot=="nonparametric"){
+        boot.train <- boot.train[sample(x=nrow(boot.train), replace=TRUE), ]
+        boot.test <- boot.test[sample(x=nrow(boot.test), replace=TRUE), ]
+      } else if (boot=="bayesian") {
+        w_train <- rgamma(nrow(train), shape=1, scale=1) 
+        w_test <- rgamma(nrow(test), shape=1, scale=1)
+        boot.train$w <- w_train/sum(w_train)
+        boot.test$w <- w_test/sum(w_test)
+      } 
+      out <- fun.test_Ytilde_V(train=boot.train, test=boot.test)
+      boot.coef.test_Ytilde_V[b,] <- out$coef.test_Ytilde_V
+    }
+    
+    # Summarize results from bootstrap samples
+    summary.test_Vtilde_Ytilde <- summary_boot(coef.test_Ytilde_V, boot.coef.test_Ytilde_V, name="test_Ytilde_V")
+    
+    # Combine all regression summaries and add current iteration/sim_number
+    regression <- bind_rows(
+      summary.Yllm_V, 
+      summary.train_Yhuman_V, 
+      summary.test_Vtilde_Ytilde, 
+      summary.intermediate_regressions) %>% 
+      mutate(sim_number=i, .before=regression)
+    
+    # Append to all regressions 
+    regressions <- bind_rows(regressions, regression) 
+  }
+  
+  # Add metadata from the combination to all simulations
+  regressions <- merge(combination, regressions, all=TRUE)
+  
+  if (is.null(rds_dir)){
+    return (regressions)
+  } else {
+    path_regressions = file.path(rds_dir, sprintf("combination%05d.rds", combination$combination_id))
+    saveRDS(regressions, file=path_regressions)
+    return(data.frame(path=path_regressions))
+  }
+}
+
+# Load combinations file
+combinations <- read.csv(path_combinations)
+
+# Set up Rds file output directory
 dir.create(rds_dir, showWarnings=FALSE)
-rds_paths_completed = list.files(rds_dir, pattern = "*.rds")
-if (length(rds_paths_completed) != 0){
-  combination_id_completed = as.numeric(gsub("combination|\\.rds", "", rds_paths_completed))
-  combinations = combinations %>% filter(!(id %in% combination_id_completed))
-  cat(sprintf("Combination ID = %d has already been completed. Skipping.\n", combination_id_completed))
-  
-  if (nrow(combinations)==0)
-    stop("Current directory contains all rds files")
+
+# Count number of remaining combinations
+completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(rds_dir, pattern = "*.rds")))
+combinations <- combinations %>% filter(!(combination_id %in% completed_id))
+n_remaining_combinations <- nrow(combinations) 
+cat(sprintf("Number of remaining combinations = %d\n", n_remaining_combinations))
+
+# Debug mode adjustments
+if (debug) {
+  cat("DEBUG: Limiting to N=3 and selecting first 3 combinations\n")
+  combinations <- combinations %>% 
+    slice(1:3) %>% 
+    mutate(N=3)
+  rds_dir <- NULL
+  # rds_dir <- sprintf("%s_debug", rds_dir)
+  # dir.create(rds_dir, showWarnings = FALSE)
 }
-cat(sprintf("Total number of combinations = %d\n", nrow(combinations)))
 
-if (debug){
-  cat(sprintf("Debug mode: choose first %d combinations\n", debug.n))
-  combinations = combinations[1:debug.n, ]
-  rds_dir = sprintf("%s_debug", rds_dir) 
-  dir.create(rds_dir, showWarnings=FALSE)
-  if (length(list.files(rds_dir, pattern = "*.rds", full.names=TRUE))>0)
-    file.remove(list.files(rds_dir, pattern = "*.rds", full.names=TRUE))
-}
-cat(sprintf("Rds/results dir: %s\n", rds_dir))
-
-
-data = read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")) %>% 
+# Load and reformat data
+data <- read.csv(path_data) %>% 
   mutate(
-    Senate = as.integer(Chamber == "Senate"),
-    Democrat = as.integer(Party == "Democrat"),
-    Prompt = PromptingStrategyID) %>% 
-  select(Model, Prompt, BillID, Senate, Democrat, DW1, Major, MajorLLM) 
-
-## Functions
-se_robust = function(model){
-  model_output = coeftest(model, vcov=vcovHC(model, type = "HC1"))
-  return(model_output[,"Std. Error"])
-}
-
-ci_robust = function(model, alpha=0.05, use_z_score=TRUE){
-  if (use_z_score){
-    z_score = qnorm(1 - alpha/2)
-    se = se_robust(model)
-    ci = cbind(coef(model) - z_score * se, coef(model) + z_score * se)
-    colnames(ci) = c("2.5%", "97.5%")
-  }
-  else{ # t-score
-    ci = coefci(model, level=1-alpha, vcov=vcovHC(model, type = "HC1"))
-  }
-  return(ci)
-}
-
-se_boot = function(samples_boot) apply(samples_boot, 2, sd)
-
-ci_boot = function(samples_boot, alpha=0.05, method="percentile") {
-  if (method!="percentile")
-    stop("Only percentile method is implemented")
-  
-  probs = c(alpha/2, 1-alpha/2)
-  ci_transposed = apply(samples_boot, 2, function(x){ 
-    quantile(x, probs=probs)
-  })
-  ci = t(ci_transposed)
-  
-  return(ci)
-}
-
-get_beta_debiased = function(train, test, variable){
-  # estimate error using train data
-  train$error = train$Y_human - train$Y_llm
-  model_error = lm(formula=paste("error", "~", variable), data=train)
-  
-  # compute Y_debiased for the test data, regress Y_debiased ~ Xvar on the test data
-  test$error = predict(model_error, newdata=test) # predict error for test data
-  test$Y_debiased = test$Y_llm + test$error
-  model_debiased = lm(formula=paste("Y_debiased", "~", variable), data=test) 
-  return(coef(model_debiased))
-}
-
-outer_loop_function = function(data, combination, save.rds=FALSE){
-  set.seed(combination$id)
-  major_topic = combination$major_topic
-  variable = combination$variable
-  model = combination$model 
-  prompt = combination$prompt
-  train_proportion = combination$train_proportion
-  
-  data = data %>% 
-    filter(Model==model, 
-           Prompt==prompt) %>%
-    mutate(Y_human = as.integer(Major == major_topic),
-           Y_llm = as.integer(MajorLLM == major_topic))
-  
-  # Using human-labeled major_topic topics on all 10K bills
-  model_human = lm(formula=paste("Y_human", "~", variable), data=data)
-  human.coef = coef(model_human)
-  human.se = se_robust(model_human)
-  human.lci = ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
-  human.uci = ci_robust(model_human, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
-  
-  names_betas = c("beta0", "beta1") # names(human.coef)
-  n_betas = length(names_betas)
-  betas = list(
-    "major_topic"      = major_topic, 
-    "variable"         = variable,
-    "model"            = model,
-    "prompt"           = prompt, 
-    "train_proportion" = train_proportion,
-    "sim_number" = 1:combination$N,
-    "human" = list(
-      "coef" = matrix(data=human.coef, nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "se"   = matrix(data=human.se,   nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "lci"  = matrix(data=human.lci,  nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE),
-      "uci"  = matrix(data=human.uci,  nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas), byrow = TRUE)),
-    "llm" = list(
-      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
-    "human_train" = list(
-      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
-    "error" = list(
-      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas))),
-    "debiased" = list(
-      "coef" = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "se"   = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "lci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)),
-      "uci"  = matrix(nrow=combination$N, ncol=n_betas, dimnames=list(NULL, names_betas)))
-  )
-  
-  for (i in (1:combination$N)){ # outer loop
-    # We randomly draw 5000 observations with replacement.
-    data_sample = data[sample(x=nrow(data), size=combination$n_samples, replace=TRUE) ,]
-    
-    # On the 5000 observations, we calculate model_llm
-    model_llm = lm(formula=paste("Y_llm", "~", variable), data=data_sample) 
-    betas$llm$coef[i,] = coef(model_llm)
-    betas$llm$se[i,] = se_robust(model_llm)
-    betas$llm$lci[i,] = ci_robust(model_llm, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
-    betas$llm$uci[i,] = ci_robust(model_llm, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
-    
-    # On the 5000 observations, we split the data into a train/test split. Since it's already a random sample, we don't do it using the sample function
-    train_idx = 1:(nrow(data_sample) * train_proportion) # sample(x=nrow(data_sample), size=nrow(data_sample) * train_proportion, replace=FALSE)
-    train = data_sample[train_idx, ]
-    test = data_sample[-train_idx, ]
-    
-    # Using the train/test split, we calculate 
-    # (i) model_human_train using only train. We calculate the se of model_human_train using heteroskedasticity robust standard errors.
-    model_human_train = lm(formula=paste("Y_human", "~", variable), data=train)
-    betas$human_train$coef[i,] = coef(model_human_train)
-    betas$human_train$se[i,] = se_robust(model_human_train)
-    betas$human_train$lci[i,] = ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
-    betas$human_train$uci[i,] = ci_robust(model_human_train, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
-    
-    # (ii) estimate error from train data
-    train$error = train$Y_human - train$Y_llm
-    model_error = lm(formula=paste("error", "~", variable), data=train)
-    betas$error$coef[i,] = coef(model_error)
-    betas$error$se[i,] = se_robust(model_error)
-    betas$error$lci[i,] = ci_robust(model_error, alpha=0.05, use_z_score=TRUE)[,1] # lower ci
-    betas$error$uci[i,] = ci_robust(model_error, alpha=0.05, use_z_score=TRUE)[,2] # upper ci
-    
-    # (iii) corrected error, and estimate debiased model
-    betas$debiased$coef[i,] = get_beta_debiased(train=train, test=test, variable=variable)
-    
-    # We then begin the bootstrap (inner loop), this is beacuse beta_debiased is a function of a predicted Y_debiased and so we can't use se and ci from the lm model.
-    debiased_coef_boot = as.data.frame(t(sapply(
-      1:combination$B, 
-      function(b){ # ignore b
-        # We draw a bootstrap sample from each of the train and test data, keeping the train-test split fixed
-        train_boot = train[sample(x=nrow(train), replace=TRUE), ]
-        test_boot = test[sample(x=nrow(test), replace=TRUE), ]
-        
-        # Calculate the coef of the debiased model
-        coef_boot = get_beta_debiased(train=train_boot, test=test_boot, variable=variable)
-        return(coef_boot)
-      }
-    )))
-    
-    # We use bootstrap samples to calculate se and confidence intervals for corrected_beta.
-    betas$debiased$se[i,] = se_boot(debiased_coef_boot)
-    betas$debiased$lci[i,] = ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,1] # lower ci
-    betas$debiased$uci[i,] = ci_boot(debiased_coef_boot, alpha=0.05, method="percentile")[,2] # upper ci
-  }
-  
-  betas_df = cbind(combination_id=combination$id, as.data.frame(betas))
-  if (save.rds){
-    saveRDS(betas_df, file=file.path(rds_dir, sprintf("combination%05d.rds", combination$id)))
-    return(combination$id)
-  } else 
-    return(betas_df)
-}
+    Senate = as.factor(as.integer(Chamber == "Senate")),
+    Democrat = as.factor(as.integer(Party == "Democrat")),
+    Prompt = PromptingStrategyID,
+    Yhuman = recode_topics(.$Major, topics=sel_topics),
+    Yllm = recode_topics(.$MajorLLM, topics=sel_topics)
+  ) %>% 
+  select(Model, Prompt, BillID, Senate, Democrat, DW1, Yhuman, Yllm)
 
 # Estimate run time
-combination = combinations[1,]
-N_original = combination$N
-combination$N = 1
+start_time <- Sys.time()
+simulation_temp <- combinations %>% 
+  slice(1) %>%
+  mutate(N=10) %>% 
+  fun.lhs_regressions(combination=.)
+end_time <- Sys.time()
+duration_1 <- as.numeric(end_time - start_time, unit="hours")/10
+duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
+cat(sprintf("Expected run time = %.2f hours for N=%d and B=%d\n", duration_N, combinations[1,]$N, combinations[1,]$B))
 
-start_time = Sys.time()
-regressions_temp = outer_loop_function(
-  data = data, 
-  combination = combination,
-  save.rds = FALSE)
-end_time = Sys.time()
+# Adjust cores if necessary
+if (n_cores > parallelly::availableCores())
+  n_cores <- parallelly::availableCores()
+cat(sprintf("n_cores = %d\n", n_cores))
+plan(multisession, workers=n_cores)
 
-duration1 = as.numeric(end_time - start_time, unit="hours")
-duration = duration1 * N_original * nrow(combinations) / n_cores
-cat(sprintf("Expected run time = %.2f hours assuming N=%d and B=%d\n", duration, N_original, combination$B))
-
-set.seed(123)
-plan(multisession, workers = n_cores)
-regressions = future_map(
-  .options = furrr_options(seed=TRUE), # we also reset the seed inside .f using the combination index, e.g., set.seed(1)
-  .x = 1:nrow(combinations),
-  .f = function(x) {
-    out = outer_loop_function(
-      data=data,
-      combination=combinations[x,]
-    )
-    return(out)}, 
-  .progress=FALSE)
+# Run simulations
+simulations <- combinations %>% 
+  split(.$combination_id) %>% 
+  unname(.) %>%
+  future_map_dfr(~ fun.lhs_regressions(combination=.x, rds_dir=rds_dir), 
+    .options = furrr_options(seed=TRUE)) # We set the seed inside the function for reproducibility
+plan(sequential)
+print(simulations)

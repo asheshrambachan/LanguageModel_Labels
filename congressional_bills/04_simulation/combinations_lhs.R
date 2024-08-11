@@ -1,4 +1,6 @@
 # create list of combinations
+repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
+simulation_dir = file.path(repo_dir, "04_simulation")
 
 ## Run 1
 combinations_run1 = expand.grid(
@@ -9,21 +11,19 @@ combinations_run1 = expand.grid(
   major_topic = c(3, 14, 15, 19, 20), # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
   stringsAsFactors = FALSE) %>%
   mutate(
-    id = 1:n(), # id is used as seed 
+    combination_id = 1:n(), # combination_id is used as seed 
     N = 1000, 
     B=1000, 
     n_samples=5000
   ) %>% 
-  relocate(id)
+  relocate(combination_id)
 
-repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
-simulation_dir = file.path(repo_dir, "04_simulation")
-combinations_run1_path = file.path(simulation_dir, "lhs_combinations_run1.csv")
-write.csv(combinations_run1, combinations_run1_path, row.names = FALSE)
+# combinations_run1_path = file.path(simulation_dir, "lhs_combinations_run1.csv")
+# write.csv(combinations_run1, combinations_run1_path, row.names = FALSE)
 
 ## Run 2
 # combinations_run1 = read.csv(combinations_run1_path)
-last_id_run1 = max(combinations_run1$id)
+last_id_run1 = max(combinations_run1$combination_id)
 combinations_run2 = expand.grid(
   train_proportion = 0.05,
   prompt = 1:12,
@@ -32,15 +32,15 @@ combinations_run2 = expand.grid(
   major_topic = c(3, 14, 15, 19, 20), # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
   stringsAsFactors = FALSE) %>%
   mutate(
-    id = (1:n())+last_id_run1, # id is used as seed 
+    combination_id = (1:n())+last_id_run1, # combination_id is used as seed 
     N = 1000, 
     B=1000, 
     n_samples=5000
   ) %>% 
-  relocate(id)
+  relocate(combination_id)
 
-combinations_run2_path = file.path(simulation_dir, "lhs_combinations_run2.csv")
-write.csv(combinations_run2, combinations_run2_path, row.names = FALSE)
+# combinations_run2_path = file.path(simulation_dir, "lhs_combinations_run2.csv")
+# write.csv(combinations_run2, combinations_run2_path, row.names = FALSE)
 
 ## Merge
 combinations = bind_rows(combinations_run1, combinations_run2)
