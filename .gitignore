@@ -12,20 +12,20 @@ congressional_bills/02_llm/archive
 congressional_bills/02_llm/*.csv 
 congressional_bills/02_llm/*.jsonl 
 
-congressional_bills/04_simulation/archive
 congressional_bills/04_simulation/rds*
-congressional_bills/04_simulation/figures*
-congressional_bills/04_simulation/*.csv
 *.Rhistory
 *.RData
 
 congressional_bills/04_simulation/lhs_run1/rds_lhs*
 congressional_bills/04_simulation/lhs_run1/*.csv
-congressional_bills/04_simulation/lhs_run2/*.log
+congressional_bills/04_simulation/lhs_run1/*.log
 
 congressional_bills/04_simulation/lhs_run2/rds_lhs
 congressional_bills/04_simulation/lhs_run2/*.csv
 congressional_bills/04_simulation/lhs_run2/*.log
 congressional_bills/04_simulation/*.csv
+
+congressional_bills/evaluate_*
+congressional_bills/evaluate_*
 
 congressional_bills/05_results/fig*
