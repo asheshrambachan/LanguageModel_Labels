@@ -1,0 +1,252 @@
+---
+title: "Results"
+output:
+  pdf_document: default
+  # html_document: default
+date: "Aug 12, 2024"
+---
+
+```{r, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+results_dir = file.path(repo_dir, "05_results")
+
+knitr::opts_knit$set(root.dir = results_dir)
+setwd(results_dir)
+
+require(dplyr)
+require(ggplot2)
+require(latex2exp)
+```
+
+
+# Proxy on the LHS
+
+```{r}
+beta1 <- read.csv(file.path(repo_dir, "04_simulation/simulations_averaged_lhs.csv")) %>% 
+  filter(coef_name!="(Intercept)") # Plot only \beta_1
+```
+
+## Figures
+
+```{r}
+figures_dir <- file.path(results_dir, "figures")
+dir.create(figures_dir, showWarnings=FALSE)
+
+legend_colors <- c("Yhuman_V"="black", "Yllm_V"="#1f77b4", "train_Yhuman_V"="#008000", "test_Ytilde_V"="#ff7f0e")
+legend_labels <- c("Yhuman_V"=TeX(r"($\beta_1^*$)"),
+                   "Yllm_V"=TeX(r"($\hat{\beta}_1$ (LLM))"), 
+                   "train_Yhuman_V"=TeX(r"($\beta_1^{train}$ (Human))"), 
+                   "test_Ytilde_V"=TeX(r"($\tilde{\beta}_1$ (Debiased))"))
+
+regression_label <- TeX(r"(LHS Regression: $1\{Y=y\} = \beta_0 + \beta_1 V$)")
+```
+
+### Figure 1: Density Plot of $\text{Bias}(\beta_1, \beta_1^\star)$ by Training Proportion
+
+```{r, fig.height=4}
+# Figure 1
+p1 <- ggplot(data=beta1, aes(x=bias, color=regression)) +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  # geom_histogram(alpha=0, bins = 40, position = "identity") +
+  geom_density() +
+  labs(title=TeX(r"(Density Plots of $Bias(\beta_1, \beta_1^*)$ by Training Proportion)"),
+       subtitle=regression_label) +
+  xlab(TeX(r"($Bias(\beta_1, \beta_1^*) = E[\beta_1] - \beta_1^*$)")) +
+  facet_grid(train_proportion ~ ., scales="free_y") +
+  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
+p1
+```
+
+### Figure 2: Empirical CDF Plot of $\text{MSE}(\beta_1, \beta_1^\star)$ by Training Proportion
+
+```{r, fig.height=4}
+p2 <- ggplot(data=beta1, aes(x=mse, color=regression)) +
+  stat_ecdf() +
+  labs(title=TeX(r"(Empirical CDF of $MSE(\beta_1, \beta_1^*)$ by Training Proportion)"),
+       subtitle=regression_label) +
+  facet_grid(train_proportion ~ .) +
+  xlab(TeX(r"($MSE(\beta_1, \beta_1^*) = E[(\beta_1 - \beta_1^*)^2]$)")) +
+  scale_color_manual(name="", values=legend_colors, labels=legend_labels, breaks=names(legend_colors)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
+p2
+```
+
+### Figure 3: Density Plot of $\text{Bias}(\beta_1, \beta_1^\star)$ by Model and Training Proportion 
+
+```{r, fig.height=4*2}
+p3 <- ggplot(data=beta1, aes(x=bias, color=regression)) +
+  geom_vline(xintercept=0, color="black", linetype = "dashed") +
+  # geom_histogram(alpha=0, bins = 40, position = "identity") +
+  geom_density() +
+  labs(title=TeX(r"(Density Plots of $Bias(\beta_1, \beta_1^*)$ by Model & Training Proportion)"),
+       subtitle=regression_label) +
+  xlab(TeX(r"($Bias(\beta_1, \beta_1^*) = E[\beta_1] - \beta_1^*$)")) +
+  facet_grid(train_proportion + model ~ ., scales="free_y") +
+  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
+p3
+```
+
+### Figure 4: Empirical CDF Plot of $\text{MSE}(\beta_1, \beta_1^\star)$ by Model and Training Proportion 
+
+```{r, fig.height=4*2}
+p4 <- ggplot(data=beta1, aes(x=mse, color=regression)) +
+  stat_ecdf() +
+  labs(title=TeX(r"(Empirical CDF of $MSE(\beta_1, \beta_1^*)$ by Model & Training Proportion)"),
+       subtitle=regression_label) +
+  xlab(TeX(r"($MSE(\beta_1, \beta_1^*) = E[(\beta_1 - \beta_1^*)^2]$)")) +
+  facet_grid(train_proportion + model ~ ., scales="free_y") +
+  scale_color_manual(name="", values=legend_colors, labels=legend_labels, breaks=names(legend_colors)) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
+p4
+```
+
+<!-- ### Figure: Density Plot of Coverage Probability by Training Proportion (Not Included) -->
+
+<!-- ```{r} -->
+<!-- p <- ggplot(data=beta1, aes(x=coverage, color=regression)) + -->
+<!--   geom_vline(xintercept=1, color="black", linetype = "dashed") + -->
+<!--   # geom_histogram(alpha=0, bins = 40, position = "identity") + -->
+<!--   geom_density() + -->
+<!--   labs(title=TeX(r"(Density Plots of Coverage Probability Training Proportion)"), -->
+<!--        subtitle=regression_label) + -->
+<!--   xlab("Coverage Probability") + -->
+<!--   facet_grid(train_proportion ~ ., scales="free_y") + -->
+<!--   scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) + -->
+<!--   theme_bw() + -->
+<!--   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right") -->
+<!-- p -->
+<!-- ``` -->
+
+### Save Figures
+
+```{r}
+ggsave(plot=p1, file=file.path(figures_dir, "figure1_lhs.png"), width=6, height=4)
+ggsave(plot=p2, file=file.path(figures_dir, "figure2_lhs.png"), width=6, height=4)
+ggsave(plot=p3, file=file.path(figures_dir, "figure3_lhs.png"), width=6, height=4*2)
+ggsave(plot=p4, file=file.path(figures_dir, "figure4_lhs.png"), width=6, height=4*2)
+```
+
+## Dataframes/Tables
+
+```{r}
+tables_dir <- file.path(results_dir, "tables")
+dir.create(figures_dir, showWarnings=FALSE)
+
+alpha = 0.10 # alpha = 0.05 # TODO: in all simulations, I've been using 95%CI, with 2.5%,97.5% percentile. We don't use any of these results btw, but should we go with the same thing for consistency?
+probs = c(alpha/2, 1-alpha/2)
+```
+
+### Dataframe 1: Bias Summary Statistics by Training Proportion 
+
+```{r}
+df1.bias <- beta1 %>% 
+  mutate(statistic=bias) %>%
+  group_by(train_proportion, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df1.bias
+```
+
+### Dataframe 2: MSE Summary Statistics by Training Proportion 
+
+```{r}
+df2.mse <- beta1 %>% 
+  mutate(statistic=mse) %>%
+  group_by(train_proportion, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df2.mse
+```
+
+### Dataframe 3: Coverage Summary Statistics by Training Proportion 
+
+```{r}
+df3.coverage <- beta1 %>% 
+  mutate(statistic=coverage) %>%
+  group_by(train_proportion, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df3.coverage
+```
+
+### Dataframe 4: Bias Summary Statistics by Model & Training Proportion 
+
+```{r}
+df4.bias <- beta1 %>% 
+  mutate(statistic=bias) %>%
+  group_by(train_proportion, model, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df4.bias
+```
+
+### Dataframe 5: MSE Summary Statistics by Model & Training Proportion 
+
+```{r}
+df5.mse <- beta1 %>% 
+  mutate(statistic=mse) %>%
+  group_by(train_proportion, model, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df5.mse
+```
+
+### Dataframe 6: Coverage Summary Statistics by Model & Training Proportion 
+
+```{r}
+df6.coverage <- beta1 %>% 
+  mutate(statistic=coverage) %>%
+  group_by(train_proportion, model, regression) %>% 
+  summarise(
+    mean = mean(statistic), 
+    sd = sd(statistic),
+    median = median(statistic),
+    p05 = quantile(statistic, probs[1]), 
+    p95 = quantile(statistic, probs[2]),
+    .groups = "drop")
+df6.coverage
+```
+
+### Save Tables
+
+```{r}
+# TODO
+```
+
+\newpage
+
+# Proxy on the RHS
+

@@ -50,65 +50,6 @@ $$95\%CI (\beta^\text{est}) = (\text{LCI}^\text{est}, \text{UCI}^\text{est})$$
 The coverage probability of this CI is defined as:
 $$\gamma = P_\beta \left[ \beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est}) \right] = \mathbb{E}[1\{\beta \in (\text{LCI}^\text{est}, \text{UCI}^\text{est})\}] \approx \frac{1}{n} \sum_{i=1}^n 1\{\beta \in (\text{LCI}_i^\text{est}, \text{UCI}_i^\text{est})\} $$
 
-# For each combination
-
-## CSV file
-
-```{r}
-N = 10
-B = 100
-
-# rds_dir = file.path(simulation_dir, sprintf("rhs_rds_N%d_B%d", N, B))
-rds_dir = file.path(simulation_dir, "RHS rds N10 B100 2024-08-09 12:07:55.50729")
-rds_paths = list.files(rds_dir, pattern = "*.rds", full.names = TRUE)
-
-simulations = bind_rows(lapply(rds_paths, function(rds_path) readRDS(rds_path)))
-
-regression.ref = simulations %>% 
-  filter(regression=="V_Yhuman") %>% 
-  select(combination_id, coef_name, regression, coef, se, t_stat, lci, uci) 
-
-regression = simulations %>% 
-  filter(regression %in% c("V_Yllm","train_V_Yhuman", "test_Vtilde_Ytilde"))
-
-simulations = merge(regression, regression.ref, by=c("combination_id", "coef_name"), suffixes = c("",".ref")) %>% 
-  mutate(
-    bias = coef.ref - coef,
-    mse = (coef.ref - coef)^2,
-    coverage = as.integer((lci <= coef.ref) & (coef.ref <= uci)),
-  ) %>%
-  select(!c(t_stat, t_stat.ref)) %>%
-  relocate(coef_name, .before=coef) %>%
-  relocate(sim_number, .before=regression) %>%
-  arrange(combination_id, sim_number, coef_name)
-
-simulations_path = file.path(simulation_dir, sprintf("rhs_simulations_N%d_B%d.csv", N, B))
-write.csv(simulations, simulations_path, row.names = FALSE)
-
-```
-
-## Plots
-
-```{r}
-figures_dir = file.path(simulation_dir, sprintf("rhs_figures_N%d_B%d", N, B))
-dir.create(figures_dir, showWarnings=FALSE)
-
-colors = c("V_Yhuman"="black", "V_Yllm" = "#1f77b4", "train_V_Yhuman" = "#008000", "test_Vtilde_Ytilde" = "#ff7f0e")
-
-for (i in unique(simulations$combination_id)){
-  simulation = simulations %>% filter(combination_id==i)
-  p = ggplot(simulation, aes(x=coef, color=regression)) +
-    geom_vline(aes(xintercept=coef.ref, color=regression.ref), linetype = "dashed") +
-    geom_density(aes(x=coef)) +
-    labs(title = sprintf("Density Plot, combination_id=%d", i)) +
-    facet_wrap(~ coef_name, nrow=1, ncol=6, scales="free") +
-    scale_color_manual(name="", values=colors, breaks=names(colors)) +
-    theme_bw() +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-    theme(legend.position = "bottom")
-  ggsave(plot=p, file=file.path(figures_dir, sprintf("combination%05d.png",i)), width=12, height=3)
- }
-```
 
 # Summary
 

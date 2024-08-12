@@ -57,3 +57,4 @@ summary_boot = function(coef.values, boot.coef.values, name.regression, alpha=0.
     regression=name.regression, coef_name=coef.names, coef=coef.values, 
     se=se, t_stat=t_stat, lci=ci[,1], uci=ci[,2], row.names = NULL)))
 }
+

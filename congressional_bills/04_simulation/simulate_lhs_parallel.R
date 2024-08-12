@@ -22,11 +22,10 @@ plan(sequential)
 
 # Set directories and file paths
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-simulation_dir <- file.path(repo_dir, "04_simulation")
-rds_dir <- file.path(simulation_dir, "lhs_rds")
-path_combinations <- file.path(simulation_dir, "lhs_combinations.csv")
 path_data <- file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")
-path_functions <- file.path(simulation_dir, "functions.R")
+rds_dir <- file.path(repo_dir, "04_simulation/lhs_rds")
+path_combinations <- file.path(repo_dir, "04_simulation/combinations_lhs.csv")
+path_functions <- file.path(repo_dir, "04_simulation/functions.R")
 
 # Load custom functions
 source(path_functions)
