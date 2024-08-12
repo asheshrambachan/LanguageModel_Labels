@@ -25,7 +25,7 @@ congressional_bills/04_simulation/lhs_run2/*.csv
 congressional_bills/04_simulation/lhs_run2/*.log
 congressional_bills/04_simulation/*.csv
 
-congressional_bills/evaluate_*
-congressional_bills/evaluate_*
+congressional_bills/04_simulation/evaluate_*
+congressional_bills/04_simulation/evaluate_*
 
 congressional_bills/05_results/fig*
