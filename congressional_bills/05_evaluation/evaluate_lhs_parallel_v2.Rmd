@@ -8,7 +8,7 @@ date: "July 25, 2024"
 knitr::opts_chunk$set(echo = TRUE)
 
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-simulation_dir = file.path(repo_dir, "04_simulation")
+results_dir = file.path(repo_dir, "04_simulation")
 
 knitr::opts_knit$set(root.dir = simulation_dir)
 setwd(simulation_dir)

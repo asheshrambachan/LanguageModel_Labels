@@ -2,8 +2,6 @@
 ## Usage on local machine
 The `simulate_lhs_parallel.Rmd` file is not up to date. Use `simulate_lhs_parallel.R` and `simulate_rhs_parallel.R`.
 
-For evaluation, currently, we only have code for the LHS simulation: `evaluate_lhs_parallel.Rmd`
-
 ## Usage on server
 On your local machine, run the following in the terminal to copy the required files to the specified remote server:
 ```

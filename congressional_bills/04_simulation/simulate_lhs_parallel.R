@@ -33,8 +33,8 @@ source(path_functions)
 
 # Function to run the regression (Ytilde ~ V, data=test)
 fun.test_Ytilde_V <- function(train, test, return.intermediate_regressions=FALSE){
-  if (is.null(train$w))
-    train$w = 1
+  if (is.null(train$w)) # if no Bayesian bootstrap weights are provided, don't perform weighted LS by setting w=1
+    train$w = 1 
   
   if (is.null(test$w))
     test$w = 1
@@ -67,7 +67,7 @@ fun.test_Ytilde_V <- function(train, test, return.intermediate_regressions=FALSE
 # Run LHS regressions based on the specified combination.
 # If rds_dir is provided, results will be saved as an RDS file; 
 # otherwise, they will be returned as a data.frame.
-fun.lhs_regressions <- function(combination, rds_dir=NULL, boot="nonparametric"){
+fun.lhs_regressions <- function(combination, rds_dir=NULL, boot=c("nonparametric", "bayesian")){
   data_filtered <- data %>% 
     filter(Model==combination$model, 
            Prompt==combination$prompt) %>%
