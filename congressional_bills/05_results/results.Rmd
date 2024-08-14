@@ -24,7 +24,7 @@ require(latex2exp)
 # Proxy on the LHS
 
 ```{r}
-beta1 <- read.csv(file.path(repo_dir, "04_simulation/simulations_averaged_lhs.csv")) %>% 
+beta1 <- read.csv(file.path(repo_dir, "04_simulation/lhs/nonparametric/simulations_averaged_lhs.csv")) %>% 
   filter(coef_name!="(Intercept)") # Plot only \beta_1
 ```
 
@@ -108,22 +108,23 @@ p4 <- ggplot(data=beta1, aes(x=mse, color=regression)) +
 p4
 ```
 
-<!-- ### Figure: Density Plot of Coverage Probability by Training Proportion (Not Included) -->
+### Figure: Density Plot of Coverage Probability by Training Proportion (Not Included)
 
-<!-- ```{r} -->
-<!-- p <- ggplot(data=beta1, aes(x=coverage, color=regression)) + -->
-<!--   geom_vline(xintercept=1, color="black", linetype = "dashed") + -->
-<!--   # geom_histogram(alpha=0, bins = 40, position = "identity") + -->
-<!--   geom_density() + -->
-<!--   labs(title=TeX(r"(Density Plots of Coverage Probability Training Proportion)"), -->
-<!--        subtitle=regression_label) + -->
-<!--   xlab("Coverage Probability") + -->
-<!--   facet_grid(train_proportion ~ ., scales="free_y") + -->
-<!--   scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) + -->
-<!--   theme_bw() + -->
-<!--   theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right") -->
-<!-- p -->
-<!-- ``` -->
+```{r}
+p <- ggplot(data=beta1, aes(x=coverage, color=regression)) +
+  geom_vline(xintercept=1, color="black", linetype = "dashed") +
+  # geom_histogram(alpha=0, bins = 40, position = "identity") +
+  geom_density() +
+  labs(title=TeX(r"(Density Plots of Coverage Probability Training Proportion)"),
+       subtitle=regression_label) +
+  xlab("Coverage Probability") +
+  facet_grid(train_proportion ~ ., scales="free_y") +
+  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
+p
+```
+
 
 ### Save Figures
 

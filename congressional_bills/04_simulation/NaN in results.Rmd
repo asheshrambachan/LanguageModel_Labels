@@ -1,0 +1,105 @@
+---
+title: "NaN in Results"
+output: pdf_document
+date: "2024-08-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+simulation_dir <- file.path(repo_dir, "04_simulation")
+
+# Set the working directory to the simulation directory
+knitr::opts_knit$set(root.dir=simulation_dir)
+setwd(simulation_dir)
+
+require(dplyr)
+require(ggplot2)
+```
+
+# Proxy on the LHS
+
+## Non-parametric Boot (all 1440 combinations)
+
+```{r}
+# very large data. Do it in a for loop
+rds_dir <- file.path(simulation_dir, "lhs_nonParamBoot/rds_lhs_merged/")
+rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+simulations_na_nonparam <- list()
+for (rds_path in rds_paths){
+  simulation <- readRDS(rds_path) 
+  not_na = simulation %>% select(!sim_number) %>% complete.cases(.)
+  simulation_na <- simulation[!not_na, ]
+  if (nrow(simulation_na)>0)
+    simulations_na_nonparam <- bind_rows(simulations_na_nonparam, simulation_na)
+}
+
+simulations_na_nonparam = simulations_na_nonparam %>% 
+  mutate(coef_name=if_else(coef_name=="V1", "V", coef_name))
+```
+
+```{r}
+rds_dir <- file.path(simulation_dir, "lhs_nonParamBoot/rds_lhs_merged/")
+rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+simulations_nonparam <- bind_rows(lapply(rds_paths, readRDS))
+
+simulations_na_nonparam %>% 
+  group_by(regression, coef_name) %>%
+  summarise(count = n(),
+            share_from_all_simulations = sprintf("%.4f%%", n()/nrow(simulations_nonparam)*100),
+            coef.mean = mean(coef), .groups="drop")
+
+simulations_nonparam %>% 
+  filter(regression=="train_error_V", coef_name=="(Intercept)") %>%
+  group_by(regression, variable, coef_name) %>%
+  summarise(beta0_mean = mean(coef))
+```
+
+## Bayesian Boot (currently 468 combinations)
+
+```{r}
+# Define the directory containing the RDS files
+rds_dir <- file.path(simulation_dir, "rds_lhs")
+
+# Read all RDS files and combine them into a single data frame
+rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+simulations_bayes <- bind_rows(lapply(rds_paths, readRDS))
+
+simulations_na_bayes <- simulations_bayes %>%
+    filter(regression!="Yhuman_V") %>% .[!complete.cases(.),]
+
+simulations_na_bayes %>%
+  group_by(regression, coef_name) %>%
+  summarise(count = n(), share_from_all_simulations = sprintf("%.4f%%", n()/nrow(simulations_bayes)*100),
+            coef.mean = mean(coef))
+
+simulations_bayes %>% 
+  filter(regression=="train_error_V", coef_name=="(Intercept)") %>%
+  group_by(regression, variable, coef_name) %>%
+  summarise(beta0_mean = mean(coef), .groups="drop")
+```
+
+
+## Bayesian Boot (currently 468 combinations)
+
+```{r}
+# Define the directory containing the RDS files
+rds_dir <- file.path(simulation_dir, "rds_lhs")
+
+# Read all RDS files and combine them into a single data frame
+rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+simulations_bayes <- bind_rows(lapply(rds_paths, readRDS))
+
+simulations_na_bayes <- simulations_bayes %>%
+    filter(regression!="Yhuman_V") %>% .[!complete.cases(.),]
+
+simulations_na_bayes %>%
+  group_by(regression, coef_name) %>%
+  summarise(count = n(), share_from_all_simulations = sprintf("%.4f%%", n()/nrow(simulations_bayes)*100),
+            coef.mean = mean(coef))
+
+simulations_bayes %>% 
+  filter(regression=="train_error_V", coef_name=="(Intercept)") %>%
+  group_by(regression, variable, coef_name) %>%
+  summarise(beta0_mean = mean(coef), .groups="drop")
+```

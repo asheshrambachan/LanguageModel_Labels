@@ -1,0 +1,103 @@
+---
+title: "Pre-Simulation"
+output: html_document
+date: "Aug 13, 2024"
+---
+
+```{r, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+
+# Define directory paths
+repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+
+# Set the working directory to the simulation directory
+knitr::opts_knit$set(root.dir=repo_dir)
+setwd(repo_dir)
+
+require(dplyr)
+require(ggplot2)
+# require(tidyr)
+```
+
+# Overview
+
+This notebook generates the `combinations_lhs.csv` and `combinations_rhs.csv` files, which are then used in the simulation R scripts that we run on the server:  
+
+- `simulate_lhs.R`: These involve placing `Y` on the left-hand side as the dependent variable (`Y ~ V`).
+- `simulate_rhs.R`: These involve placing `Y` on the right-hand side as the independent variable (`V ~ Y`).
+
+Each combination is executed on a separate core, with the results saved as `*.rds` files in the corresponding directories, `rds_lhs` or `rds_rhs`.
+
+# Proxy on the LHS
+
+## Create `combinations_lhs.csv`
+
+The code generates `combinations_lhs.csv`. To ensure reproducibility, the file is generated the way we do below. 
+
+```{r}
+simulation_dir <- file.path(repo_dir, "04_simulation/lhs/bayesian")
+
+# Run 1: Generate the first set of combinations
+combinations_run1 <- expand.grid(
+  train_proportion = c(0.1, 0.25, 0.5), # Proportions for training data: 10%, 25%, 50%
+  prompt = 1:12, # List of prompt IDs
+  model = c("gpt-3.5-turbo-0125", "gpt-4o"), # Model types
+  variable = c("Senate", "Democrat", "DW1"), # Independent variables of interest
+  major_topic = c(3, 14, 15, 19, 20), # Dependent variables of interest. These are the most common major topics based on Major/Yhuman column.
+  stringsAsFactors = FALSE) %>%
+  mutate(
+    combination_id = 1:n(), # Assign a unique ID to each combination; used as seed for reproducibility
+    N = 1000, # Number of simulations per a single combination
+    B = 1000, # Number of bootstrap samples
+    n_samples = 5000 # Number of samples drawn from 10K bill in each of the N simulations
+  ) %>% relocate(combination_id) # Move combination_id to the first column
+
+# Run 2: Generate the second set of combinations
+run1_last_id <- max(combinations_run1$combination_id)
+combinations_run2 <- expand.grid(
+  train_proportion = 0.05, # New training proportion added in this run
+  prompt = 1:12,
+  model = c("gpt-3.5-turbo-0125", "gpt-4o"),
+  variable = c("Senate", "Democrat", "DW1"), 
+  major_topic = c(3, 14, 15, 19, 20),
+  stringsAsFactors = FALSE) %>%
+  mutate(
+    combination_id = (1:n()) + run1_last_id, # Continue the ID sequence from Run 1
+    N = 1000, 
+    B = 1000, 
+    n_samples = 5000
+  ) %>% relocate(combination_id)
+
+# Merge Run 1 and Run 2 combinations into a single data frame
+combinations <- bind_rows(combinations_run1, combinations_run2)
+
+# Save the merged combinations to a csv file
+write.csv(combinations, file.path(simulation_dir, "combinations_lhs.csv"), row.names=FALSE)
+```
+
+
+# Proxy on the RHS
+
+## Create `combinations_rhs.csv`
+
+```{r}
+simulation_dir <- file.path(repo_dir, "04_simulation/rhs/bayesian")
+
+# Generate the first set of combinations
+combinations <- expand.grid(
+  # TODO: Add 0.05 train_proportion? 
+  train_proportion = c(0.05, 0.1, 0.25, 0.5), # Proportions for training data: 10%, 25%, 50%. 
+  prompt = 1:12, # List of prompt IDs
+  model = c("gpt-3.5-turbo-0125", "gpt-4o"), # Model types
+  variable = c("Senate", "Democrat", "DW1"), # Independent variables of interest
+  stringsAsFactors = FALSE) %>%
+  mutate(
+    combination_id = 1:n(), # Assign a unique ID to each combination; used as seed for reproducibility
+    N = 1000, # Number of simulations per a single combination
+    B = 1000, # Number of bootstrap samples
+    n_samples = 5000 # Number of samples drawn from 10K bill in each of the N simulations
+  ) %>% relocate(combination_id) # Move combination_id to the first column
+
+# Save the merged combinations to a csv file
+write.csv(combinations, file.path(simulation_dir, "combinations_rhs.csv"), row.names=FALSE)
+```

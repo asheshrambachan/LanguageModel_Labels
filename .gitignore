@@ -3,6 +3,9 @@ settings.json
 .env
 .Rapp.history
 
+.rds
+*.rds
+
 congressional_bills/01_bills/CAP
 congressional_bills/01_bills/CBP
 congressional_bills/01_bills/ICPSR 
@@ -16,16 +19,17 @@ congressional_bills/04_simulation/rds*
 *.Rhistory
 *.RData
 
-congressional_bills/04_simulation/lhs_run1/rds_lhs*
-congressional_bills/04_simulation/lhs_run1/*.csv
-congressional_bills/04_simulation/lhs_run1/*.log
-
-congressional_bills/04_simulation/lhs_run2/rds_lhs
-congressional_bills/04_simulation/lhs_run2/*.csv
-congressional_bills/04_simulation/lhs_run2/*.log
-congressional_bills/04_simulation/*.csv
+congressional_bills/04_simulation/lhs/nonparametric/rds*
+congressional_bills/04_simulation/lhs/nonparametric/pre_post_simulation*
+congressional_bills/04_simulation/lhs/nonparametric/*.csv
+congressional_bills/04_simulation/lhs/bayesian/*.csv
+congressional_bills/04_simulation/lhs/bayesian/rds*
 
 congressional_bills/04_simulation/evaluate_*
 congressional_bills/04_simulation/evaluate_*
+
+
+congressional_bills/04_simulation/rhs/bayesian/*.csv
+
 
 congressional_bills/05_results/fig*

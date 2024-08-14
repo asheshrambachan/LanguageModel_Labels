@@ -16,6 +16,7 @@ suppressPackageStartupMessages({
 n_cores <- 30
 debug <- FALSE
 sel_topics <- c(3, 14, 15, 19, 20) # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
+boot <- "bayesian" # "nonparametric"
 
 # Reset processing plan
 plan(sequential)
@@ -23,20 +24,22 @@ plan(sequential)
 # Set directories and file paths
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 path_data <- file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")
-rds_dir <- file.path(repo_dir, "04_simulation/lhs_rds")
-path_combinations <- file.path(repo_dir, "04_simulation/combinations_lhs.csv")
 path_functions <- file.path(repo_dir, "04_simulation/functions.R")
+
+simulations_dir <- file.path(repo_dir, sprintf("04_simulation/lhs/%s", boot))
+rds_dir <- file.path(simulations_dir, "rds")
+path_combinations <- file.path(simulations_dir, "combinations_lhs.csv")
 
 # Load custom functions
 source(path_functions)
 
 # Function to run the regression (Ytilde ~ V, data=test)
 fun.test_Ytilde_V <- function(train, test, return.intermediate_regressions=FALSE){
-  if (is.null(train$w)) # if no Bayesian bootstrap weights are provided, don't perform weighted LS by setting w=1
+# if no Bayesian bootstrap weights are provided, don't perform weighted LS by setting w=1
+  if ( (is.null(train$w)) | (is.null(test$w)) ){
     train$w = 1 
-  
-  if (is.null(test$w))
     test$w = 1
+  }
   
   # Initialize a list to store summaries of intermediate regressions, e.g., error ~ V
   regressions <- list()
@@ -196,7 +199,7 @@ start_time <- Sys.time()
 simulation_temp <- combinations %>% 
   slice(1) %>%
   mutate(N=10) %>% 
-  fun.lhs_regressions(combination=.)
+  fun.lhs_regressions(combination=., boot=boot)
 end_time <- Sys.time()
 duration_1 <- as.numeric(end_time - start_time, unit="hours")/10
 duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
@@ -212,7 +215,8 @@ plan(multisession, workers=n_cores)
 simulations <- combinations %>% 
   split(.$combination_id) %>% 
   unname(.) %>%
-  future_map_dfr(~ fun.lhs_regressions(combination=.x, rds_dir=rds_dir), 
+  future_map_dfr(~ fun.lhs_regressions(combination=.x, rds_dir=rds_dir, boot=boot), 
     .options = furrr_options(seed=TRUE)) # We set the seed inside the function for reproducibility
 plan(sequential)
 print(simulations)
+print(warnings())
