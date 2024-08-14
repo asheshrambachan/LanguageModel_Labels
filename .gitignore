@@ -24,12 +24,15 @@ congressional_bills/04_simulation/lhs/nonparametric/pre_post_simulation*
 congressional_bills/04_simulation/lhs/nonparametric/*.csv
 congressional_bills/04_simulation/lhs/bayesian/*.csv
 congressional_bills/04_simulation/lhs/bayesian/rds*
+congressional_bills/04_simulation/lhs/bayesian/figures*
 
 congressional_bills/04_simulation/evaluate_*
 congressional_bills/04_simulation/evaluate_*
 
 
 congressional_bills/04_simulation/rhs/bayesian/*.csv
+congressional_bills/04_simulation/rhs/bayesian/figures*
 
 
 congressional_bills/05_results/fig*
+congressional_bills/05_results/tables*

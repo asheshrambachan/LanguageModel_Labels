@@ -13,7 +13,7 @@ suppressPackageStartupMessages({
 })
 
 # Arguments not specified in combinations.csv
-n_cores <- 8
+n_cores <- 50
 debug <- FALSE
 sel_topics <- c(3, 14, 15, 19, 20) # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
 boot <- "bayesian" # "nonparametric"
@@ -104,7 +104,7 @@ fun.rhs_regressions <- function(combination, rds_dir=NULL, boot=c("bayesian", "n
   data_filtered <- data %>% 
     filter(Model==combination$model, 
            Prompt==combination$prompt) %>%
-    mutate(V = as.integer(.[[combination$variable]]),
+    mutate(V = .[[combination$variable]],
            # Yhuman = relevel(.$Yhuman, ref="Other"),
            # Yllm = relevel(.$Yllm, ref="Other"),
            )
@@ -121,7 +121,7 @@ fun.rhs_regressions <- function(combination, rds_dir=NULL, boot=c("bayesian", "n
   
   # N simulations (outer loop)
   for (i in (1:combination$N)){ 
-    
+    # browser()
     # Randomly draw n_samples observations with replacement
     data_sample <- data_filtered[sample(x=nrow(data_filtered), size=combination$n_samples, replace=TRUE), ]
     
@@ -207,44 +207,45 @@ combinations <- combinations %>% filter(!(combination_id %in% completed_id))
 n_remaining_combinations <- nrow(combinations) 
 cat(sprintf("Number of remaining combinations = %d\n", n_remaining_combinations))
 
-# Debug mode adjustments
-if (debug) {
-  cat("DEBUG: Limiting to N=3 and selecting first 3 combinations\n")
-  combinations <- combinations %>% 
-    slice(1:3) %>% 
-    mutate(N=3)
-  # rds_dir <- NULL
-  # rds_dir <- sprintf("%s_debug", rds_dir)
-  # dir.create(rds_dir, showWarnings = FALSE)
-}
-
-# Load and reformat data
+# Load and reformat data (a global variable)
 data <- read.csv(path_data) %>% 
   mutate(
-    Senate = as.factor(as.integer(Chamber == "Senate")),
-    Democrat = as.factor(as.integer(Party == "Democrat")),
+    # Unlike LHS, we keep categorical variables as.integer since it's the dependent variable
+    Senate = as.integer(Chamber == "Senate"), 
+    Democrat = as.integer(Party == "Democrat"),
     Prompt = PromptingStrategyID,
     Yhuman = recode_topics(.$Major, topics=sel_topics),
     Yllm = recode_topics(.$MajorLLM, topics=sel_topics)
   ) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Yhuman, Yllm)
 
-# Estimate run time
-start_time <- Sys.time()
-simulation_temp <- combinations %>% 
-  slice(1) %>%
-  mutate(N=3) %>% 
-  fun.rhs_regressions(combination=., boot=boot)
-end_time <- Sys.time()
-duration_1 <- as.numeric(end_time - start_time, unit="hours")/3
-duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
-cat(sprintf("Expected run time = %.2f hours for N=%d and B=%d\n", duration_N, combinations[1,]$N, combinations[1,]$B))
-
-# Adjust cores if necessary
-if (n_cores > parallelly::availableCores())
-  n_cores <- parallelly::availableCores()
-cat(sprintf("n_cores = %d\n", n_cores))
-plan(multisession, workers=n_cores)
+# Debug mode adjustments
+if (debug) {
+  cat("DEBUG: Limiting to N and selecting first few combinations\n")
+  combinations <- combinations %>% 
+    slice(c(1, 217, 218, 219, 220, 253, 254, 255, 256)) %>% 
+    mutate(N=1)
+  # rds_dir <- NULL
+  # rds_dir <- sprintf("%s_debug", rds_dir)
+  # dir.create(rds_dir, showWarnings = FALSE)
+} else {
+  # Estimate run time
+  start_time <- Sys.time()
+  simulation_temp <- combinations %>% 
+    slice(1) %>%
+    mutate(N=3) %>% 
+    fun.rhs_regressions(combination=., boot=boot)
+  end_time <- Sys.time()
+  duration_1 <- as.numeric(end_time - start_time, unit="hours")/3
+  duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
+  cat(sprintf("Expected run time = %.2f hours for N=%d and B=%d\n", duration_N, combinations[1,]$N, combinations[1,]$B))
+  
+  # Adjust cores if necessary
+  if (n_cores > parallelly::availableCores())
+    n_cores <- parallelly::availableCores()
+  cat(sprintf("n_cores = %d\n", n_cores))
+  plan(multisession, workers=n_cores)
+}
 
 # Run simulations
 simulations <- combinations %>% 

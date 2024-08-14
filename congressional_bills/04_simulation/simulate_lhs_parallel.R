@@ -25,7 +25,6 @@ plan(sequential)
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 path_data <- file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")
 path_functions <- file.path(repo_dir, "04_simulation/functions.R")
-
 simulations_dir <- file.path(repo_dir, sprintf("04_simulation/lhs/%s", boot))
 rds_dir <- file.path(simulations_dir, "rds")
 path_combinations <- file.path(simulations_dir, "combinations_lhs.csv")
@@ -89,7 +88,6 @@ fun.lhs_regressions <- function(combination, rds_dir=NULL, boot=c("nonparametric
   
   # N simulations (outer loop)
   for (i in (1:combination$N)){ 
-    
     # Randomly draw n_samples observations with replacement
     data_sample <- data_filtered[sample(x=nrow(data_filtered), size=combination$n_samples, replace=TRUE), ]
     
@@ -172,18 +170,7 @@ combinations <- combinations %>% filter(!(combination_id %in% completed_id))
 n_remaining_combinations <- nrow(combinations) 
 cat(sprintf("Number of remaining combinations = %d\n", n_remaining_combinations))
 
-# Debug mode adjustments
-if (debug) {
-  cat("DEBUG: Limiting to N=3 and selecting first 3 combinations\n")
-  combinations <- combinations %>% 
-    slice(1:3) %>% 
-    mutate(N=3)
-  rds_dir <- NULL
-  # rds_dir <- sprintf("%s_debug", rds_dir)
-  # dir.create(rds_dir, showWarnings = FALSE)
-}
-
-# Load and reformat data
+# Load and reformat data (global data, no need to pass to fun.lhs_regressions())
 data <- read.csv(path_data) %>% 
   mutate(
     Senate = as.factor(as.integer(Chamber == "Senate")),
@@ -194,22 +181,33 @@ data <- read.csv(path_data) %>%
   ) %>% 
   select(Model, Prompt, BillID, Senate, Democrat, DW1, Yhuman, Yllm)
 
-# Estimate run time
-start_time <- Sys.time()
-simulation_temp <- combinations %>% 
-  slice(1) %>%
-  mutate(N=10) %>% 
-  fun.lhs_regressions(combination=., boot=boot)
-end_time <- Sys.time()
-duration_1 <- as.numeric(end_time - start_time, unit="hours")/10
-duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
-cat(sprintf("Expected run time = %.2f hours for N=%d and B=%d\n", duration_N, combinations[1,]$N, combinations[1,]$B))
-
-# Adjust cores if necessary
-if (n_cores > parallelly::availableCores())
-  n_cores <- parallelly::availableCores()
-cat(sprintf("n_cores = %d\n", n_cores))
-plan(multisession, workers=n_cores)
+# Debug mode adjustments
+if (debug) {
+  cat("DEBUG: Limiting to N=3 and selecting first 3 combinations\n")
+  combinations <- combinations %>% 
+    slice(c(144, 145)) %>% 
+    mutate(N=1)
+  rds_dir <- NULL
+  # rds_dir <- sprintf("%s_debug", rds_dir)
+  # dir.create(rds_dir, showWarnings = FALSE)
+} else {
+  # Estimate run time
+  start_time <- Sys.time()
+  simulation_temp <- combinations %>% 
+    slice(1) %>%
+    mutate(N=10) %>% 
+    fun.lhs_regressions(combination=., boot=boot)
+  end_time <- Sys.time()
+  duration_1 <- as.numeric(end_time - start_time, unit="hours")/10
+  duration_N <- duration_1 * combinations[1,]$N * n_remaining_combinations / n_cores
+  cat(sprintf("Expected run time = %.2f hours for N=%d and B=%d\n", duration_N, combinations[1,]$N, combinations[1,]$B))
+  
+  # Adjust cores if necessary
+  if (n_cores > parallelly::availableCores())
+    n_cores <- parallelly::availableCores()
+  cat(sprintf("n_cores = %d\n", n_cores))
+  plan(multisession, workers=n_cores)
+}
 
 # Run simulations
 simulations <- combinations %>% 
