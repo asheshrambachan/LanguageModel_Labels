@@ -116,7 +116,7 @@ def generate_prompts(month, question, year, model):
     # Set input file paths
     current_directory = os.getcwd()
     print(f"Current working directory: {current_directory}")
-    csv_file = f"./data/step0_cumulative/{month}{year}.csv"
+    csv_file = f"./data/step0_cumulative/{month}{year}_cumulative.csv"
     base_prompt_file = f'./data/prompt_templates/q{question}base'
 
     # Set output file path
@@ -136,8 +136,8 @@ def generate_prompts(month, question, year, model):
 
 if __name__ == "__main__":
     # Set constants here
-    MODEL = "gpt-3.5-turbo-0215" # either gpt-4o-mini, gpt-4o, or gpt-3.5-turbo-0215
-    MONTH = "jan" # 3-letter abbreviation
+    MODEL = "gpt-4o" # either gpt-4o-mini, gpt-4o, or gpt-3.5-turbo-0215
+    MONTH = "dec" # 3-letter abbreviation
     QUESTION = "5" # question number (1, 2, 3, 4, 5)
     YEAR = "19" # 2-digit year
 

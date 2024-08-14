@@ -55,10 +55,20 @@ def main(question, model, month, year, return_type):
 
 if __name__ == "__main__":
 
-    QUESTION = "5"
-    MODEL = "gpt-3.5-turbo-0215"
-    MONTH = "jan"
-    YEAR = "19"
-    RETURN_TYPE = "CAPM"
+    QUESTION = [1,2,3,4,5]
+    MODEL = ["gpt-3.5-turbo-0215", "gpt-4o-mini"]
+    MONTH = ["apr"]
+    YEAR = ["19"]
+    RETURN_TYPE = ["FF3", "CAPM"]
 
-    main(QUESTION, MODEL, MONTH, YEAR, RETURN_TYPE)
+
+    for question in QUESTION:
+        for model in MODEL:
+            for month in MONTH:
+                for year in YEAR:
+                    for return_type in RETURN_TYPE:
+                        main(question=question, 
+                             model=model, 
+                             month=month, 
+                             year=year, 
+                             return_type=return_type)
