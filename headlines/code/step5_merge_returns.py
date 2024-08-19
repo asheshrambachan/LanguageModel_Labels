@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     QUESTION = [1,2,3,4,5]
     MODEL = ["gpt-3.5-turbo-0215", "gpt-4o-mini"]
-    MONTH = ["apr"]
+    MONTH = ["sep"]
     YEAR = ["19"]
     RETURN_TYPE = ["FF3", "CAPM"]
 

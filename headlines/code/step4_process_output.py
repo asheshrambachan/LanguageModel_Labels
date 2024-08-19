@@ -44,6 +44,7 @@ def read_jsonl_from_line(file_path, start_line):
                 print(line)
     return data
 
+
 def extract_json(json_str):
     """
     Extracts the JSON object from the given JSON string.
@@ -57,7 +58,7 @@ def extract_json(json_str):
     if match:
         json_text = match.group(0)
         try:
-            return json.loads(json_text)
+            return json.loads(json_text)  
         except:
             print(f"Offending JSON string: {repr(json_text)}")
             return None
@@ -133,12 +134,22 @@ def read_and_process_plain_text_responses(output_file_path, num_lines):
 
     outputs_plain = read_jsonl(output_file_path, num_lines)
     outputs_plain_ids = pd.DataFrame([output["custom_id"] for output in outputs_plain], columns=["custom_id"])
+
+    outputs_tokens = [output["response"]["body"]["usage"] for output in outputs_plain]
+    outputs_input_tokens = [output["prompt_tokens"] for output in outputs_tokens]
+    outputs_output_tokens = [output["completion_tokens"] for output in outputs_tokens]
+    usage_data = pd.DataFrame(list(zip(outputs_input_tokens, outputs_output_tokens)), columns=["input_tokens", "output_tokens"])
+
     outputs_plain = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_plain]
     outputs_plain = [item.split(', ') for item in outputs_plain]
     outputs_plain = [item + [None] * (4 - len(item)) for item in outputs_plain]
+
     output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
     outputs_plain_df = pd.DataFrame(outputs_plain, columns=output_cols)
     outputs_plain_df = pd.concat([outputs_plain_ids, outputs_plain_df], axis=1)
+
+    outputs_plain_df = pd.concat([outputs_plain_df, usage_data], axis=1)
+
     return outputs_plain_df
 
 def read_and_process_json_responses(output_file_path, start_line):
@@ -153,13 +164,23 @@ def read_and_process_json_responses(output_file_path, start_line):
 
     outputs_json = read_jsonl_from_line(output_file_path, start_line)
     outputs_json_ids = pd.DataFrame([output["custom_id"] for output in outputs_json], columns=["custom_id"])
+
+    outputs_tokens = [output["response"]["body"]["usage"] for output in outputs_json]
+    outputs_input_tokens = [output["prompt_tokens"] for output in outputs_tokens]
+    outputs_output_tokens = [output["completion_tokens"] for output in outputs_tokens]
+    usage_data = pd.DataFrame(list(zip(outputs_input_tokens, outputs_output_tokens)), columns=["input_tokens", "output_tokens"])
+
     outputs_json = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_json]
     outputs_json = [extract_json(json_str) for json_str in outputs_json]
     outputs_json = [output if output is not None else {"headline type": None} for output in outputs_json]
+
     output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
     outputs_json = [{key: d.get(key, None) for key in output_cols} for d in outputs_json]
     outputs_json_df = pd.DataFrame(outputs_json, columns=output_cols)
     outputs_json_df = pd.concat([outputs_json_ids, outputs_json_df], axis=1)
+
+    outputs_json_df = pd.concat([outputs_json_df, usage_data], axis=1)
+
     return outputs_json_df
 
 def combine_responses(outputs_plain_df, outputs_json_df):
@@ -255,8 +276,8 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
     
-    QUESTION = "5"
-    MODEL = "gpt-4o-mini"
-    MONTH = "dec"
+    QUESTION = "1"
+    MODEL = "gpt-3.5-turbo-0215"
+    MONTH = "octsecond"
     YEAR = "19"
     main(QUESTION, MODEL, MONTH, YEAR)

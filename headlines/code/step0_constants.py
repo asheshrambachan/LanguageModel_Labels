@@ -1,5 +1,4 @@
-MODEL = "gpt-4o-mini"
-API_KEY = "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"
+API_KEY = "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"
 
 
 personas = [

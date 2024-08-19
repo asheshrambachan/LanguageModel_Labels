@@ -1,18 +1,18 @@
 library(dplyr)
 library(ggplot2)
 library(stargazer)
-library(lmtest)
-library(sandwich)
 library(broom)
+library(fixest)
+library(modelsummary)
 
 rm(list = ls())
 
 # Define the question and the list of months
-question <- "q4"
+question <- "q1"
 months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec")
 year = "19"
-return_type = "FF3"
-model = "gpt-3.5-turbo-0215"
+return_type = "CAPM"
+model = "gpt-4o-mini"
 
 # Function to read and combine data for all months
 read_and_combine <- function(file_name, months, question) {
@@ -67,24 +67,39 @@ mutate_data <- function(df) {
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", 
                 "persona1", "persona2", "persona3", "persona4")
 
-# Read, combine, and mutate data for all files
+# Step 1: Read, combine, and mutate data for all files
 combined_data <- lapply(file_names, function(file_name) {
   df <- read_and_combine(paste0(file_name, ".csv"), months, question)
-  mutate_data(df)
+  df <- mutate_data(df)
+  df$headline  # Return only the headlines column
 })
 
-# Assign the combined and mutated data to respective variables
-base_blanks <- combined_data[[1]]
-base_json <- combined_data[[2]]
-cot1 <- combined_data[[3]]
-cot2 <- combined_data[[4]]
-cot3 <- combined_data[[5]]
-persona1 <- combined_data[[6]]
-persona2 <- combined_data[[7]]
-persona3 <- combined_data[[8]]
-persona4 <- combined_data[[9]]
+# Step 2: Find the intersection of headlines across all datasets
+common_headlines <- Reduce(intersect, combined_data)
 
-rm(combined_data)
+# Step 3: Re-read, combine, mutate, and filter each dataset based on common headlines
+filtered_data <- lapply(file_names, function(file_name) {
+  df <- read_and_combine(paste0(file_name, ".csv"), months, question)
+  df <- mutate_data(df)
+  df <- df %>% 
+    filter(headline %in% common_headlines) %>%
+    filter(!is.na(sum_exret_1) & !is.na(sum_exret_5) & !is.na(sum_exret_10))
+  return(df)
+})
+
+# Assign the filtered and mutated data to respective variables
+base_blanks <- filtered_data[[1]]
+base_json <- filtered_data[[2]]
+cot1 <- filtered_data[[3]]
+cot2 <- filtered_data[[4]]
+cot3 <- filtered_data[[5]]
+persona1 <- filtered_data[[6]]
+persona2 <- filtered_data[[7]]
+persona3 <- filtered_data[[8]]
+persona4 <- filtered_data[[9]]
+
+rm(filtered_data)
+
 
 # List of datasets
 data_list <- list(base_blanks, base_json, persona1, persona2, persona3, persona4, cot1, cot2, cot3)
@@ -144,56 +159,39 @@ plot_regression_coefficients <- function(reg_list, file_names, title = "Regressi
 #-------------------------------------------------------------------------------
 # Placeholder lists for regression results and standard errors
 reg_list <- list()
-se_list <- list()
-n_list <- list()
-
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_1", "FF3_CAR_1")
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ increase + 
+    reg <- feols(sum_exret_1 ~ increase + 
                 decrease +
                 uncertain +
                 increase.magnitude +
                 decrease.magnitude +
                 uncertain.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+                cluster = ~company_name + date,
+                data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
   else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
+    reg <- feols(sum_exret_1 ~ 
                 positive + 
                 negative +
                 neutral +
                 positive.magnitude +
                 negative.magnitude +
                 neutral.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+                cluster = ~company_name + date,
+                data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
-
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, " ", "1 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
-          covariate.labels = magnitude_labels,
-          dep.var.labels = "CAR FD1",
-          model.names = TRUE,
-          notes = obs_note)
+modelsummary(reg_list, 
+             coef_rename = magnitude_labels,
+             stars = TRUE)
 
 plot_regression_coefficients(reg_list, file_names, paste0("1-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
 ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret1_magnitude.jpeg"),
@@ -251,7 +249,7 @@ obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
 
 # Create stargazer tables
 stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, " ", "5 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
+          title = paste0(model, " ", question, ": ", "5 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
           covariate.labels = magnitude_labels,
           dep.var.labels = "CAR FD5",
           model.names = TRUE,
@@ -323,7 +321,7 @@ obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
 
 # Create stargazer tables
 stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, " ", "10 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
+          title = paste0(model, " ", question, ": ", "10 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
           covariate.labels = magnitude_labels,
           dep.var.labels = "CAR FD10",
           model.names = TRUE,
@@ -509,7 +507,7 @@ obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
 
 # Create stargazer tables
 stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, " ","10 Day Post Headline Returns Regressed on Headline Type (with Confidence)"),
+          title = paste0(model, " ", question, ": ","10 Day Post Headline Returns Regressed on Headline Type (with Confidence)"),
           covariate.labels = confidence_labels,
           dep.var.labels = "CAR FD10",
           model.names = TRUE,
