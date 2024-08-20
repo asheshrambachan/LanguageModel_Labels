@@ -16,7 +16,6 @@ setwd(repo_dir)
 
 require(dplyr)
 require(ggplot2)
-# require(tidyr)
 ```
 
 # Overview
@@ -36,10 +35,11 @@ The code generates `combinations_lhs.csv`. To ensure reproducibility, the file i
 
 ```{r}
 simulation_dir <- file.path(repo_dir, "04_simulation/lhs/bayesian")
+dir.create(simulation_dir, showWarnings=FALSE)
 
 # Run 1: Generate the first set of combinations
-combinations_run1 <- expand.grid(
-  train_proportion = c(0.1, 0.25, 0.5), # Proportions for training data: 10%, 25%, 50%
+combinations <- expand.grid(
+  train_proportion = c(0.05, 0.1, 0.25, 0.5), # Proportions for training data: 5%, 10%, 25%, 50%
   prompt = 1:12, # List of prompt IDs
   model = c("gpt-3.5-turbo-0125", "gpt-4o"), # Model types
   variable = c("Senate", "Democrat", "DW1"), # Independent variables of interest
@@ -52,29 +52,9 @@ combinations_run1 <- expand.grid(
     n_samples = 5000 # Number of samples drawn from 10K bill in each of the N simulations
   ) %>% relocate(combination_id) # Move combination_id to the first column
 
-# Run 2: Generate the second set of combinations
-run1_last_id <- max(combinations_run1$combination_id)
-combinations_run2 <- expand.grid(
-  train_proportion = 0.05, # New training proportion added in this run
-  prompt = 1:12,
-  model = c("gpt-3.5-turbo-0125", "gpt-4o"),
-  variable = c("Senate", "Democrat", "DW1"), 
-  major_topic = c(3, 14, 15, 19, 20),
-  stringsAsFactors = FALSE) %>%
-  mutate(
-    combination_id = (1:n()) + run1_last_id, # Continue the ID sequence from Run 1
-    N = 1000, 
-    B = 1000, 
-    n_samples = 5000
-  ) %>% relocate(combination_id)
-
-# Merge Run 1 and Run 2 combinations into a single data frame
-combinations <- bind_rows(combinations_run1, combinations_run2)
-
 # Save the merged combinations to a csv file
 write.csv(combinations, file.path(simulation_dir, "combinations_lhs.csv"), row.names=FALSE)
 ```
-
 
 # Proxy on the RHS
 
@@ -82,11 +62,11 @@ write.csv(combinations, file.path(simulation_dir, "combinations_lhs.csv"), row.n
 
 ```{r}
 simulation_dir <- file.path(repo_dir, "04_simulation/rhs/bayesian")
+dir.create(simulation_dir, showWarnings=FALSE)
 
 # Generate the first set of combinations
 combinations <- expand.grid(
-  # TODO: Add 0.05 train_proportion? 
-  train_proportion = c(0.05, 0.1, 0.25, 0.5), # Proportions for training data: 10%, 25%, 50%. 
+  train_proportion = c(0.05, 0.1, 0.25, 0.5), # Proportions for training data: 5%, 10%, 25%, 50%. 
   prompt = 1:12, # List of prompt IDs
   model = c("gpt-3.5-turbo-0125", "gpt-4o"), # Model types
   variable = c("Senate", "Democrat", "DW1"), # Independent variables of interest

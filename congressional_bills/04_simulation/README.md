@@ -23,7 +23,7 @@ conda config --set channel_priority strict
 
 4. On the remote server, create a new `r4.4.1` env:
 ```
-conda create -n r4.4.1 r-base r-dplyr r-sandwich r-lmtest r-furrr
+conda create -n r4.4.1 r-base r-dplyr r-sandwich r-lmtest r-furrr r-Matrix
 conda list
 conda activate r4.4.1
 cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation

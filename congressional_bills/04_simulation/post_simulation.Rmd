@@ -18,7 +18,6 @@ setwd(simulation_dir)
 require(dplyr)
 require(ggplot2)
 require(latex2exp)
-# require(tidyr)
 
 # Bias 
 bias = function(coef, coef.ref) return(coef - coef.ref) # Calculate bias
@@ -30,78 +29,132 @@ coverage = function(coef.ref, lci, uci) return(as.integer((lci <= coef.ref) & (c
 
 This notebook merges the resulting `*.rds` files to produce the `simulations_lhs.csv` and `simulations_rhs.csv` files. Lastly, we plot the t-scores and the density of the regression coefficients for each combination, using the N=1000 simulations.
 
+# Average Estimates Across N=1000 Simulations and Generate 
+
+The following calculates the average estimates for the bias, MSE, and coverage probabiliy for each regression model across `N=1000` simulations. The results are saved in the `simulations_averaged_*.csv` file, which will be used for further analysis.
+
+Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{train}, \tilde{\beta}}$, where:
+
+- $\hat{\beta}$ is the estimate using a 5K sample of LLM labels,
+- $\beta^\text{train}$ is the estimate using human labels from the training data at a specific training proportion from the 5K bills,
+- $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
+
+The bias is defined as:
+$$\text{Bias}(\beta, \beta^\star) = \mathbb{E}[\beta] - \beta^\star \approx \frac{1}{N} \sum_{i=1}^N (\beta_i - \beta^\star)$$
+
+The mean squared error (MSE) is defined as:
+$$\text{MSE}(\beta, \beta^\star) = \mathbb{E}[(\beta - \beta^\star)^2] \approx \frac{1}{N} \sum_{i=1}^N (\beta_i-\beta^\star)^2$$
+
+Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
+$$\gamma = \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) = \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\} $$
+
+
 # Proxy on the LHS
 
+$$\hat{\beta} \sim \mathcal{N}(\mathbb{E}\hat{\beta}, \text{Var}\hat{\beta})$$
+$$\mathbb{E}\hat{\beta} \approx \frac{1}{N} \sum_{i=1}^N \hat{\beta}^{(i)}$$
+
+TODO: which of those is the right way to estimate the sd of beta hat
+$$\text{Var}\hat{\beta} \approx \frac{1}{N-1} \sum_{i=1}^N (\hat{\beta}^{(i)} - \mathbb{E}\hat{\beta})^2$$
+$$\text{Var}\hat{\beta} \approx \frac{1}{N} \sum_{i=1}^N \text{Var}\hat{\beta}^{(i)}$$
+
+Next, we want to find the bias between 
+$$\beta^\star \sim \mathcal{N}(\mathbb{E}\beta^\star, \text{Var}\beta^\star)$$
+
+$$\hat{\beta} \sim \mathcal{N}(\mathbb{E}\hat{\beta}, \text{Var}\hat{\beta})$$
+$$\text{bias} = \mathbb{E}\hat{\beta} - \beta^\star$$
+$$\text{standarized bias} = t = \frac{\mathbb{E}\hat{\beta} - \beta^\star}{\sqrt{\text{Var}\hat{\beta}}}$$
 ```{r}
 lhs_simulation_dir <- file.path(simulation_dir, "lhs/bayesian")
-```
 
-## Generate `simulations_lhs.csv`
-
-```{r}
 # Define the directory containing the RDS files
 rds_dir <- file.path(lhs_simulation_dir, "rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
 simulations <- bind_rows(lapply(rds_paths, readRDS)) %>% 
-  rename(c(t=t_stat))
+  rename(c(t=t_stat, Y=major_topic, V=variable)) %>% 
+  mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", model),
+         coef_name = as.factor(if_else(coef_name=="V1", "V", coef_name)))
 
-# Simulations we don't use
-simulations %>% 
-  filter(!(regression %in% c("Yhuman_V", "Yllm_V","train_Yhuman_V", "test_Ytilde_V"))) %>%
-  write.csv(file.path(lhs_simulation_dir, "simulations_other.csv"), row.names=FALSE)
-
-# Simulations we do use
-simulations <- simulations %>% 
-  filter(regression %in% c("Yhuman_V", "Yllm_V","train_Yhuman_V", "test_Ytilde_V"))
-
-# Check nans
+# Check NaNs
 n_simulation_grouped = simulations %>% 
   group_by(regression, coef_name) %>% 
-  summarise(n = n(), 
-            n_nan.t = sum(is.nan(t)),
-            share = sprintf("%.2f%%", n_nan.t/n*100),
+  summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
             .groups="drop") %>%
-  filter(n_nan.t>0) %>%
+  filter(share.nan_t>0) %>%
   as.data.frame(.)
+print(n_simulation_grouped)
 
 simulations_nan <- simulations %>% 
   .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ]
 write.csv(simulations_nan, file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
 
-summary.simulations_nan <- simulations_nan %>% 
-  group_by(combination_id, regression, coef_name) %>%
-  summarise(n_nan = n(),
-            # share_from_all_simulations = sprintf("%.4f%%", n()/n_simulations_per_regression_coef*100),
-            coef.mean = mean(coef), 
-            .groups="drop")
-write.csv(summary.simulations_nan, file.path(lhs_simulation_dir, "summary.simulations_nan.csv"), row.names=FALSE)
+# Simulations we don't use
+regressions_of_intreset = c("10k_Yhuman_V", "10k_Yllm_V", "5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")
 
-# Extract reference regression results (Yhuman_V)
+simulations %>% 
+  filter(!(regression %in% regressions_of_intreset)) %>%
+  write.csv(file.path(lhs_simulation_dir, "simulations_other.csv"), row.names=FALSE)
+
+# Simulations we do use
+simulations <- simulations %>% 
+  filter(regression %in% regressions_of_intreset)
+
+# Extract reference regression results (10k_Yhuman_V)
 regression.ref <- simulations %>% 
-  filter(regression=="Yhuman_V") %>% 
-  select(combination_id,  regression, coef_name, coef, se, t, lci, uci) 
+  filter(regression=="10k_Yhuman_V") %>%
+  group_by(V, Y, coef_name) %>%
+  summarise(
+    regression = first(regression),
+    coef = first(coef),
+    se = first(se),
+    t = first(t), 
+    lci = first(lci),
+    uci = first(uci), .groups="drop")
 
-# Filter out the specific regressions of interest
-regression <- simulations %>% 
-  filter(regression %in% c("Yllm_V","train_Yhuman_V", "test_Ytilde_V"))
+# Compute the bias/mse/coverage relative to the reference regression. 
+# Save the 10k_Yllm_V results in a separate file. 
+simulations %>% 
+  filter(regression=="10k_Yllm_V") %>%
+  select(!c(sim_number, train_proportion, N, B, n_samples)) %>%
+  group_by(V, Y, coef_name, model, prompt) %>%
+  summarise(
+    regression = first(regression),
+    coef = first(coef),
+    se = first(se),
+    t = first(t), 
+    lci = first(lci),
+    uci = first(uci), .groups="drop") %>%
+  merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
+  relocate(coef_name, .before=coef) %>%
+  write.csv(file.path(lhs_simulation_dir, "10k_llm_lhs.csv"), row.names=FALSE)
 
-# Merge the filtered regressions with the reference regression data, and compute the bias/mse/coverage
-simulations <- merge(regression, regression.ref, by=c("combination_id", "coef_name"), suffixes=c("",".ref")) %>% 
-  mutate(
-    bias = bias(coef, coef.ref), # Calculate bias
-    mse = mse(coef, coef.ref),  # Calculate Mean Squared Error (MSE)
-    coverage = coverage(coef.ref, lci, uci), # Check if the confidence interval covers the reference coefficient
-  ) %>%
+# Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
+regressions <- simulations %>% 
+  filter(regression %in% c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")) %>%
+  merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
   arrange(combination_id, sim_number, coef_name) %>%
   relocate(coef_name, .before=coef) %>%
   relocate(sim_number, .before=regression) 
 
 # Define the output path and write the combined results to a CSV file
-write.csv(simulations, file.path(lhs_simulation_dir, "simulations_lhs.csv"), row.names=FALSE)
-```
+write.csv(regressions, file.path(lhs_simulation_dir, "simulations_lhs.csv"), row.names=FALSE)
 
+# For all other regressions, calculate the average of bias, MSE, and coverage for each combination, and save the averaged results to a new CSV file
+regressions %>% 
+  group_by(combination_id, train_proportion, model, prompt, V, Y, regression, coef_name) %>% 
+  summarise(
+    coef_mean = mean(coef),
+    # coef_sd = sd(coef), 
+    # se_mean = sqrt(mean(se^2)),
+    bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
+    mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
+    coverage_mean = mean(coverage(coef.ref, lci, uci)), # Check if the confidence interval covers the reference coefficient
+    .groups = "drop") %>%
+  select(!contains(".ref")) %>%
+  write.csv(file.path(lhs_simulation_dir, "simulations_averaged_lhs.csv"), row.names=FALSE)
+```
 
 <!-- ## Density Plot for `simulations_lhs.csv` -->
 
@@ -139,230 +192,96 @@ write.csv(simulations, file.path(lhs_simulation_dir, "simulations_lhs.csv"), row
 <!-- ``` -->
 
 
-## Figure: t-stats
-
-For each model $m$, and prompt $p$, we average the t-statistic across the $N=1000$ simulations:
-$$\bar{t}_{m,p}  = \frac{1}{N \times \vert \texttt{train_proportion}\vert} \sum_{i} t_{m,p}^{(i)}$$
-
-The 95%-CI is then estimated using the percentile method.
-
-```{r}
-# simulations <- read.csv(file.path(lhs_simulation_dir, "simulations_lhs.csv"))
-
-figures_dir <- file.path(lhs_simulation_dir, "figures")
-dir.create(figures_dir, showWarnings=FALSE)
-
-alpha = 0.05
-probs = c(alpha/2, 1-alpha/2)
-
-t_score <- simulations %>% 
-  filter(regression=="Yllm_V", coef_name!="(Intercept)") %>%
-  select(c("combination_id", "major_topic", "variable", "model", "prompt", "train_proportion",
-           "sim_number", "regression", "t", "regression.ref", "t.ref")) %>%
-  group_by(major_topic, variable) %>%
-  mutate(figure_id = cur_group_id()) %>%
-  ungroup()
-
-# Check that we don't have NA's in any of t_scores
-if(any(!complete.cases(t_score))){
-  stop("Missing t-scores")
-}
-
-t_score.ref <- t_score %>% 
-  group_by(figure_id, major_topic, variable) %>% 
-  summarise(
-    regression.ref = first(regression.ref),
-    t.ref = first(t.ref),
-    .groups="drop")
-
-summary.t_score = t_score %>%
-  group_by(figure_id, major_topic, variable, model, prompt) %>%
-  summarise(
-    figure_id = first(figure_id),
-    major_topic = first(major_topic),
-    variable = first(variable),
-    model = first(model),
-    prompt = first(prompt),
-    t.mean = mean(t), 
-    t.sd = sd(t),
-    t.median = median(t),
-    t.p05 = quantile(t, probs[1]), 
-    t.p95 = quantile(t, probs[2]),
-    .groups = "drop") %>%
-  arrange(figure_id, t.mean) %>%
-  group_by(figure_id) %>%
-  mutate(model.prompt_id = row_number())
-
-t_score <- summary.t_score %>% 
-  select(figure_id, model, prompt, model.prompt_id) %>%
-  merge(x=t_score, y=., by=c("figure_id", "model", "prompt"))
-
-legend_colors <- c("human"="red",
-                   "llm_mean"="black", 
-                   "95%CI"="black",
-                   "points"="blue")
-legend_labels <- c("human"=TeX(r"($t^*_{m,p}$)"),
-                   "llm_mean"=TeX(r"($\bar{t}_{m,p}$)"),
-                   "95%CI"=TeX(r"(95% Percentile CI)"),
-                   "points"=TeX(r"($t_{m,p}^{(i)}$)"))
-
-for (i in unique(summary.t_score$figure_id)){
-  t_score.i = t_score %>% filter(figure_id==i)
-  summary.t_score.i = summary.t_score %>% filter(figure_id==i)
-  t_score.ref.i = t_score.ref %>% filter(figure_id==i)
-  V = summary.t_score.i$variable[1]
-  Y = summary.t_score.i$major_topic[1]
-  regression_label = TeX(sprintf(r"(LHS Regression: $1\{Y=%d\} = \beta_0 + \beta_1 %s$)", Y, V))
-  
-  p <- ggplot(data=summary.t_score.i, aes(x=model.prompt_id)) + # , color=regression
-    geom_point(aes(x=model.prompt_id, y=t, color="points"), shape=".", alpha=0.5, data=t_score.i) +
-    geom_hline(aes(yintercept=t.ref, color="human"), data=t_score.ref.i) +
-    geom_point(aes(y=t.mean, color="llm"), size=0.5) +
-    geom_line(aes(y=t.mean, color="llm_mean"), linewidth=0.5) +
-    geom_line(aes(y=t.p05, color="95%CI"), linewidth=0.5, linetype="dashed") +
-    geom_line(aes(y=t.p95, color="95%CI"), linewidth=0.5, linetype="dashed") +
-    labs(title=TeX(r"(Ordered t-scores of $\hat{\beta}_1$ vs. model-prompt index)"),
-         subtitle=regression_label) +
-    xlab("Model-Prompt Index") +
-    scale_x_continuous(breaks=summary.t_score.i$model.prompt_id) +
-    ylab("t-score") + 
-    scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-    theme_bw() +
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-  ggsave(plot=p, file=file.path(figures_dir, sprintf("tscore%i.png",i)), width=6, height=4)
-}
-
-p <- ggplot(data=summary.t_score, aes(x=model.prompt_id)) +
-  geom_errorbar(aes(ymin=t.p05, ymax=t.p95, color="95%CI"), position="dodge", width=0.4, alpha=0.5) +
-  geom_point(aes(y=t.mean, color="llm_mean"), size=0.5 ) +
-  geom_hline(aes(yintercept=t.ref, color="human"), data=t_score.ref) +
-  # geom_ribbon(aes(ymin=t.p05, ymax=t.p95), alpha=1/10) +
-  labs(title=TeX(r"(Ordered t-scores of $\hat{\beta}_1$ plotted versus model-prompt index)"),
-         subtitle=TeX(r"(LHS Regression: $1\{Y=y\} = \beta_0 + \beta_1 V$)")) +
-  xlab("Model-Prompt Index") +
-  scale_x_continuous(breaks=unique(summary.t_score$model.prompt_id)) +
-  ylab("t-score") + 
-  facet_grid(major_topic ~ variable) +
-  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), 
-        panel.grid.minor=element_blank(), 
-        legend.position="top", 
-        axis.text.x = element_text(size=5))
-
-ggsave(plot=p, file=file.path(figures_dir, "tscore_combined.png"), width=8, height=10)
-```
-
-
-## Average Estimates Across N=1000 Simulations and Generate `simulations_averaged_lhs.csv`
-
-The following calculates the average estimates for the bias, MSE, and coverage probabiliy for each regression model across `N=1000` simulations. The results are saved in the `simulations_averaged_*.csv` file, which will be used for further analysis.
-
-Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{train}, \tilde{\beta}}$, where:
-
-- $\hat{\beta}$ is the estimate using a 5K sample of LLM labels,
-- $\beta^\text{train}$ is the estimate using human labels from the training data at a specific training proportion from the 5K bills,
-- $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
-
-The bias is defined as:
-$$\text{Bias}(\beta, \beta^\star) = \mathbb{E}[\beta] - \beta^\star \approx \frac{1}{N} \sum_{i=1}^N (\beta_i - \beta^\star)$$
-
-The mean squared error (MSE) is defined as:
-$$\text{MSE}(\beta, \beta^\star) = \mathbb{E}[(\beta - \beta^\star)^2] \approx \frac{1}{N} \sum_{i=1}^N (\beta_i-\beta^\star)^2$$
-
-Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
-$$\gamma = \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) = \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\} $$
-
-```{r}
-# Read the simulations CSV file
-# simulations <- read.csv(file.path(lhs_simulation_dir, "simulations_lhs.csv"))
-
-# Read the simulation results and calculate the average of bias, MSE, and coverage for each combination
-simulations_averaged <- simulations %>% 
-  group_by(combination_id, train_proportion, model, prompt, variable, major_topic, regression, coef_name) %>% 
-  summarise(bias = mean(bias), 
-            mse = mean(mse), 
-            coverage = mean(coverage), 
-            .groups = "drop") 
-
-# Save the averaged results to a new CSV file
-write.csv(simulations_averaged, file.path(lhs_simulation_dir, "simulations_averaged_lhs.csv"), row.names=FALSE)
-```
-
 
 # Proxy on the RHS
 
 ```{r}
-rhs_simulation_dir <- file.path(simulation_dir, "rhs/bayesian")
-```
-
-## Generate `simulations_rhs.csv`
-
-```{r}
 # Define the directory containing the RDS files
+rhs_simulation_dir <- file.path(simulation_dir, "rhs/bayesian")
 rds_dir <- file.path(rhs_simulation_dir, "rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
 simulations <- bind_rows(lapply(rds_paths, readRDS)) %>% 
-  rename(c(t=t_stat))
+  rename(c(t=t_stat, V=variable)) %>% 
+  mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", model))
+
+# Check NANs
+n_simulation_grouped = simulations %>% 
+  group_by(regression, coef_name) %>% 
+  summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
+            .groups="drop") %>%
+  filter(share.nan_t>0) %>%
+  as.data.frame(.)
+print(n_simulation_grouped)
+
+simulations_nan <- simulations %>% 
+  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ]
+write.csv(simulations_nan, file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
 
 # Regressions we don't use
+regressions_of_intreset = c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde")
 simulations %>% 
-  filter(!(regression %in% c("V_Yhuman", "V_Yllm","train_V_Yhuman", "test_Vtilde_Ytilde"))) %>%
+  filter(!(regression %in% regressions_of_intreset)) %>%
   write.csv(file.path(rhs_simulation_dir, "simulations_other.csv"), row.names=FALSE)
 
 # Regressions we do use
 simulations <- simulations %>% 
-  filter(regression %in% c("V_Yhuman", "V_Yllm","train_V_Yhuman", "test_Vtilde_Ytilde"))
+  filter(regression %in% regressions_of_intreset)
 
-# Check nans
-n_simulation_grouped = simulations %>% 
-  group_by(regression, coef_name) %>% 
-  summarise(n = n(), 
-            n_nan.t = sum(is.nan(t)),
-            share = sprintf("%.2f%%", n_nan.t/n*100),
-            .groups="drop") %>%
-  filter(n_nan.t>0) %>%
-  as.data.frame(.)
+# Extract reference regression results (10k_V_Yhuman)
+regression.ref <- simulations %>% 
+  filter(regression=="10k_V_Yhuman") %>%
+  group_by(V, coef_name) %>%
+  summarise(
+    regression = first(regression),
+    coef = first(coef),
+    se = first(se),
+    t = first(t), 
+    lci = first(lci),
+    uci = first(uci), .groups="drop")
 
-simulations_nan <- simulations %>% 
-  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ]
-write.csv(simulations_nan, file.path(rhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
+# Compute the bias/mse/coverage relative to the reference regression. 
+# Save the 10k_V_Yllm results in a separate file. 
+simulations %>% 
+  filter(regression=="10k_V_Yllm") %>%
+  select(!c(sim_number, train_proportion, N, B, n_samples)) %>%
+  group_by(V, coef_name, model, prompt) %>%
+  summarise(
+    regression = first(regression),
+    coef = first(coef),
+    se = first(se),
+    t = first(t), 
+    lci = first(lci),
+    uci = first(uci), .groups="drop") %>%
+  merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
+  arrange(V, model, prompt, coef_name) %>%
+  relocate(coef_name, .before=coef) %>%
+  write.csv(file.path(rhs_simulation_dir, "10k_llm_rhs.csv"), row.names=FALSE)
 
-summary.simulations_nan <- simulations_nan %>% 
-  group_by(combination_id, regression, coef_name) %>%
-  summarise(n_nan = n(),
-            # share_from_all_simulations = sprintf("%.4f%%", n()/n_simulations_per_regression_coef*100),
-            coef.mean = mean(coef), 
-            .groups="drop")
-write.csv(summary.simulations_nan, file.path(rhs_simulation_dir, "summary.simulations_nan.csv"), row.names=FALSE)
-
-# Extract reference regression results (V_Yhuman)
-regression.ref <- simulations %>%
-  filter(regression=="V_Yhuman") %>%
-  select(combination_id,  regression, coef_name, coef, se, t, lci, uci)
-
-# Filter out the specific regressions of interest
-regression <- simulations %>%
-  filter(regression %in% c("V_Yllm","train_V_Yhuman", "test_Vtilde_Ytilde"))
-
-
-# Merge the filtered regressions with the reference regression data, and compute the bias/mse/coverage
-simulations <- merge(regression, regression.ref, by=c("combination_id", "coef_name"), suffixes=c("",".ref")) %>%
-   mutate(
-    bias = bias(coef, coef.ref), # Calculate bias
-    mse = mse(coef, coef.ref),  # Calculate Mean Squared Error (MSE)
-    coverage = coverage(coef.ref, lci, uci), # Check if the confidence interval covers the reference coefficient
-  ) %>%
+# Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
+regressions <- simulations %>% 
+  filter(regression %in% regressions_of_intreset[3:5]) %>%
+  merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
   arrange(combination_id, sim_number, coef_name) %>%
   relocate(coef_name, .before=coef) %>%
-  relocate(sim_number, .before=regression)
+  relocate(sim_number, .before=regression) 
 
 # Define the output path and write the combined results to a CSV file
-write.csv(simulations, file.path(rhs_simulation_dir, "simulations_rhs.csv"), row.names=FALSE)
-```
+write.csv(regressions, file.path(rhs_simulation_dir, "simulations_rhs.csv"), row.names=FALSE)
 
+# For all other regressions, calculate the average of bias, MSE, and coverage for each combination, and save the averaged results to a new CSV file
+regressions %>% 
+  group_by(combination_id, train_proportion, model, prompt, V, regression, coef_name) %>% 
+  summarise(
+    coef_mean = mean(coef),
+    bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
+    mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
+    coverage_mean = mean(coverage(coef.ref, lci, uci)),  # Check if the confidence interval covers the reference coefficient
+    .groups = "drop") %>%
+  select(!contains(".ref")) %>%
+  write.csv(file.path(rhs_simulation_dir, "simulations_averaged_rhs.csv"), row.names=FALSE)
+```
 
 
 <!-- ### Density Plot for `simulations_rhs.csv` -->
@@ -399,139 +318,3 @@ write.csv(simulations, file.path(rhs_simulation_dir, "simulations_rhs.csv"), row
 <!--   } -->
 <!-- ``` -->
 
-## Figure: t-stats
-
-```{r}
-# simulations <- read.csv(file.path(rhs_simulation_dir, "simulations_rhs.csv"))
-
-figures_dir <- file.path(rhs_simulation_dir, "figures")
-dir.create(figures_dir, showWarnings=FALSE)
-
-alpha = 0.05
-probs = c(alpha/2, 1-alpha/2)
-
-t_score <- simulations %>% 
-  filter(regression=="V_Yllm") %>%
-  select(c("combination_id", "coef_name", "variable", "model", "prompt", "train_proportion",
-           "sim_number", "regression", "t", "regression.ref", "t.ref")) %>%
-  mutate(coef_name = sub("Y","", coef_name)) %>%
-  group_by(coef_name, variable) %>%
-  mutate(figure_id = cur_group_id()) %>%
-  ungroup()
-
-# Check that we don't have NA's in any of t_scores
-if(any(!complete.cases(t_score))){
-  stop("Missing t-scores")
-}
-
-t_score.ref <- t_score %>% 
-  group_by(figure_id, coef_name, variable) %>% 
-  summarise(
-    regression.ref = first(regression.ref),
-    t.ref = first(t.ref),
-    .groups="drop")
-
-summary.t_score = t_score %>%
-  group_by(figure_id, coef_name, variable, model, prompt) %>%
-  summarise(
-    figure_id = first(figure_id),
-    coef_name = first(coef_name),
-    variable = first(variable),
-    model = first(model),
-    prompt = first(prompt),
-    t.mean = mean(t), 
-    t.sd = sd(t),
-    t.median = median(t),
-    t.p05 = quantile(t, probs[1]), 
-    t.p95 = quantile(t, probs[2]),
-    .groups = "drop") %>%
-  arrange(figure_id, t.mean) %>%
-  group_by(figure_id) %>%
-  mutate(model.prompt_id = row_number())
-
-t_score <- summary.t_score %>% 
-  select(figure_id, model, prompt, model.prompt_id) %>%
-  merge(x=t_score, y=., by=c("figure_id", "model", "prompt"))
-
-legend_colors <- c("human"="red",
-                   "llm_mean"="black", 
-                   "95%CI"="black",
-                   "points"="blue")
-legend_labels <- c("human"=TeX(r"($t^*_{m,p}$)"),
-                   "llm_mean"=TeX(r"($\bar{t}_{3,m,p}$)"),
-                   "95%CI"=TeX(r"(95% Percentile CI)"),
-                   "points"=TeX(r"($t_{m,p}^{(i)}$)"))
-
-for (i in unique(summary.t_score$figure_id)){
-  t_score.i = t_score %>% filter(figure_id==i)
-  summary.t_score.i = summary.t_score %>% filter(figure_id==i)
-  t_score.ref.i = t_score.ref %>% filter(figure_id==i)
-  V = summary.t_score.i$variable[1]
-  Y = unique(summary.t_score$coef_name)
-  regression_label <- TeX(
-    sprintf(r"(RHS Regression: $%s=%s$)", V, 
-            paste(sapply(1:6, function(i){ sprintf(r"($\beta_{%s}1\{Y=%s\}$)", Y[i], Y[i])}), collapse = " + ")))
-
-  p <- ggplot(data=summary.t_score.i, aes(x=model.prompt_id)) + # , color=regression
-    geom_point(aes(x=model.prompt_id, y=t), color="blue", shape=".", alpha=0.5, data=t_score.i) +
-    geom_hline(aes(yintercept=t.ref, color="human"), data=t_score.ref.i) +
-    geom_point(aes(y=t.mean, color="llm"), size=0.5) +
-    geom_line(aes(y=t.mean, color="llm_mean"), linewidth=0.5) +
-    geom_line(aes(y=t.p05, color="95%CI"), linewidth=0.5, linetype="dashed") +
-    geom_line(aes(y=t.p95, color="95%CI"), linewidth=0.5, linetype="dashed") +
-    labs(title=TeX(r"(Ordered t-scores of $\hat{\beta}$'s plotted vs. model-prompt index)"),
-         subtitle=regression_label) +
-    xlab("Model-Prompt Index") +
-    scale_x_continuous(breaks=summary.t_score.i$model.prompt_id) +
-    ylab("t-score") +
-    scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-    theme_bw() +
-    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-  ggsave(plot=p, file=file.path(figures_dir, sprintf("tscore%i.png",i)), width=6, height=4)
-}
-
-Y = unique(summary.t_score$coef_name)
-regression_label <- TeX(
-  sprintf(r"(RHS Regression: $V=%s$)", 
-          paste(sapply(1:6, function(i){ sprintf(r"($\beta_{%s} 1\{Y=%s\}$)", Y[i], Y[i])}), collapse = " + ")))
-
-p <- ggplot(data=summary.t_score, aes(x=model.prompt_id)) +
-  geom_errorbar(aes(ymin=t.p05, ymax=t.p95, color="95%CI"), position="dodge", width=0.4, alpha=0.5) +
-  geom_point(aes(y=t.mean, color="llm_mean"), size=0.5 ) +
-  geom_hline(aes(yintercept=t.ref, color="human"), data=t_score.ref) +
-  # geom_ribbon(aes(ymin=t.p05, ymax=t.p95), alpha=1/10) +
-  labs(title=TeX(r"(Ordered t-scores of $\hat{\beta}$'s plotted vs. model-prompt index)"),
-         subtitle=regression_label) +
-  xlab("Model-Prompt Index") +
-  scale_x_continuous(breaks=unique(summary.t_score$model.prompt_id)) +
-  ylab("t-score") + 
-  facet_grid(coef_name ~ variable) +
-  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), 
-        panel.grid.minor=element_blank(), 
-        legend.position="top", 
-        axis.text.x = element_text(size=5))
-
-ggsave(plot=p, file=file.path(figures_dir, "tscore_combined.png"), width=8, height=10)
-```
-
-
-## Generate `simulations_averaged_rhs.csv`
-
-```{r}
-# Read the simulations CSV file
-# simulations <- read.csv(file.path(rhs_simulation_dir, "simulations_rhs.csv"))
-
-# Read the simulation results and calculate the average of bias, MSE, and coverage for each combination
-simulations_averaged <- simulations %>%
-  group_by(combination_id, train_proportion, model, regression, coef_name) %>%
-  summarise(bias = mean(bias),
-            mse = mean(mse),
-            coverage = mean(coverage),
-            .groups = "drop") %>%
-  as.data.frame(.)
-
-# Save the averaged results to a new CSV file
-write.csv(simulations_averaged, file.path(rhs_simulation_dir, "simulations_averaged_rhs.csv"), row.names = FALSE)
-```

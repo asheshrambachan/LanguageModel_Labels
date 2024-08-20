@@ -1,5 +1,10 @@
 ---
 title: "Results"
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{floatrow}
+  - \floatsetup[figure]{capposition=top}
+  - \floatsetup[table]{capposition=top}
 output:
   pdf_document: default
   # html_document: default
@@ -13,108 +18,380 @@ repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 results_dir = file.path(repo_dir, "05_results")
 
 knitr::opts_knit$set(root.dir = results_dir)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo = FALSE, dev = "cairo_pdf")
 
-# options(knitr.table.format = "latex")
 setwd(results_dir)
 
 require(dplyr)
 require(ggplot2)
 require(latex2exp)
 require(kableExtra)
+require(extrafont)
+require(lemon)
+
+# download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
+# install on mac 
+# Run once in R: 
+# font_import(paths="/Users/haya1/Library/Fonts/", pattern="cmun*")
+loadfonts(quiet=T)
+# names(pdfFonts()) # uncomment to get list of fonts
+
+my_theme <- theme_bw() + 
+  theme(panel.grid.major.x=element_blank(), 
+        panel.grid.minor.x=element_blank(), 
+        panel.grid.major.y=element_line(linewidth=0.3),
+        panel.grid.minor.y=element_line(linewidth=0.1),
+        legend.position="top", 
+        axis.text=element_text(size=7),
+        axis.ticks=element_line(linewidth=0.3),
+        text=element_text(size=12, family="CMU Sans Serif"),
+        legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
+        plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
+        plot.subtitle=element_text(size=12, family="CMU Sans Serif")
+        )
+
+
+figures_dir <- file.path(results_dir, "figures")
+dir.create(figures_dir, showWarnings=FALSE)
 ```
 
+<!-- # Accuracy -->
+
+```{r fig_tscore, echo=FALSE, fig.height=4, fig.width=4, fig.cap="Accuracy of Topic Predictions vs. Prompt. Accuracy = $P[\\hat{Y}=Y^*] = \\frac{1}{10k} \\sum_{i=1}^{10k} 1\\{\\hat{Y}_i=Y_i^*\\}$"}
+levels.model = c("gpt-3.5-turbo-0125", "gpt-4o")
+labels.model = c("GPT-3.5", "GPT-4o")
+
+bills_prompts_responses <- read.csv(file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")) %>%
+  rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
+  mutate(model = factor(model, levels=levels.model, labels=labels.model)) %>%
+  select(c(prompt, model, Yhuman, Yllm)) %>%
+  group_by(model, prompt) %>%
+  summarise(accuracy = mean(Yhuman==Yllm), .groups="drop")
+
+model.colors <- c("GPT-3.5"="#97BD59", "GPT-4o"="#277BB6")
+model.shapes <- c("GPT-3.5"=16, "GPT-4o"=17)
+
+p <- ggplot(bills_prompts_responses, aes(x=as.factor(prompt), y=accuracy, fill=model)) +
+  geom_col(position=position_dodge()) +
+  scale_fill_manual(name="Model", values=model.colors) +
+  # labs(title="Accuracy of Topic Predictions vs. Prompt",
+  #      subtitle=TeX("($Accuracy = P[\\hat{Y}=Y^*] = \\frac{1}{10^4} \\sum_{i=1}^{10^4} 1\\{\\hat{Y}_i=Y_i^*\\}$)")) +
+  xlab("Prompt Index") +
+  ylab("Accuracy") +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+
+p
+# ggsave(plot=p, file=file.path(figures_dir, "coef_lhs.png"), height=5, width=5)
+```
+
+\clearpage
 
 # Proxy on the LHS
 
-Number of combinations = 1370/1440
+<!-- ## Coefficients -->
 
-Bootstrap = Bayesian 
 
-```{r, echo = FALSE}
-beta1 <- read.csv(file.path(repo_dir, "04_simulation/lhs/bayesian/simulations_averaged_lhs.csv")) %>% 
-  filter(coef_name!="(Intercept)") %>% # Plot only \beta_1
-  mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", model))
+```{r, echo=FALSE, fig.height=5.4, fig.width=8, fig.cap="Ordered $\\hat{\\beta}$ vs. Prompt. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+csv_path <- file.path(repo_dir, "04_simulation/lhs/bayesian")
+levels.Y = c(3, 14, 15, 19, 20)
+labels.Y = c(TeX("$Y_3$"), TeX("$Y_{14}$"), TeX("$Y_{15}$"), TeX("$Y_{19}$"), TeX("$Y_{20}$"))
+
+levels.V = c("Democrat", "Senate", "DW1")
+labels.V = c(TeX("$Y = \\beta_{0} + \\beta_{1} Democrat$"), TeX("$Y = \\beta_{0} + \\beta_{1} Senate$"), TeX("$Y = \\beta_{0} + \\beta_{1} DW1$")) 
+
+levels.coef = c("(Intercept)", "V")
+labels.coef = c(TeX("$\\beta_{0}$"), TeX("$\\beta_{1}$"))
+
+levels.model = c("gpt-3.5", "gpt-4o")
+labels.model = c("GPT-3.5", "GPT-4o")
+
+df.10k_llm <- read.csv(file.path(csv_path, "10k_llm_lhs.csv")) %>%
+  select(!c(se, se.ref)) %>%
+  filter(coef_name!="(Intercept)") %>%
+  mutate(Y = factor(Y, levels=levels.Y, labels=labels.Y),
+         V = factor(V, levels=levels.V, labels=labels.V),
+         coef_name = factor(coef_name, levels=levels.coef, labels=labels.coef),
+         model = factor(model, levels=levels.model, labels=labels.model),
+         ) %>%
+  group_by(V, Y, model, coef_name) %>%
+  arrange(V, Y, model, coef_name, coef) %>%
+  mutate(prompt_coef.ordered = row_number()) %>%
+  group_by(V, Y, model, coef_name) %>%
+  arrange(V, Y, model, coef_name, t) %>%
+  mutate(prompt_t.ordered = row_number()) %>%
+  ungroup()
+
+# Check that we don't have NA's in any of t_scores
+if(any(!complete.cases(df.10k_llm)))
+  stop("Missing t-scores")
+
+# yellow "#FFD166"
+
+line_shapes <- c("star"="solid")
+line_labels <- c("star"=TeX("$\\beta^*$"))
+
+model.labels <-c("GPT-3.5"=TeX("$\\hat{\\beta}_{GPT-3.5}$"), "GPT-4o"=TeX("$\\hat{\\beta}_{GPT-4o}$"))
+
+subtitle <- TeX("Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$")
+
+p <- df.10k_llm %>%
+  ggplot(aes(x=as.factor(prompt_coef.ordered), color=model, shape=model)) +
+  geom_hline(yintercept=0, color="#262626", linewidth=0.2) +
+  
+  # geom_ribbon(aes(ymin=lci.ref, ymax=uci.ref), alpha=0.2, fill="#C74B08", linetype="dashed", linewidth=0.0) +
+  geom_hline(aes(yintercept=lci.ref), color="#F85427", linetype="dashed", linewidth=0.3) +
+  geom_hline(aes(yintercept=uci.ref), color="#F85427", linetype="dashed", linewidth=0.3) +
+  geom_hline(aes(yintercept=coef.ref, linetype="star"), color="#F85427", linewidth=0.5) +
+  
+  geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width = 0.5, linewidth=0.3) +
+  geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  
+  scale_linetype_manual(name="", values=line_shapes, labels=line_labels) +
+  scale_color_manual(name="", values=model.colors, labels=model.labels) +
+  scale_shape_manual(name="", values=model.shapes, labels=model.labels) +
+  
+  # labs(title=TeX("Ordered $\\hat{\\beta}$ vs. Prompt"),
+  #      subtitle=subtitle) +
+  xlab("Prompt Index") +
+  ylab("Coefficients") +
+  
+  facet_grid(V + coef_name ~ Y, labeller=label_parsed) +
+  
+  scale_y_continuous(breaks=seq(-1,1, by=0.025)) +
+  my_theme +
+  theme(panel.grid.minor.y=element_blank(),
+        panel.grid.major.y=element_line(linewidth=0.2))
+p
+
+# ggsave(plot=p, file=file.path(figures_dir, "coef_lhs.png"), height=6, width=8)
 ```
 
-<!-- ## Figures -->
+
+<!-- ## t-scores -->
+
+```{r, echo=FALSE, fig.height=5.4, fig.width=8, fig.cap="Ordered t-scores vs. Prompt. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+line_labels <- c("star"=TeX("$t^*$"))
+
+model.labels <-c("GPT-3.5"=TeX("$\\hat{t}_{GPT-3.5}$"), "GPT-4o"=TeX("$\\hat{t}_{GPT-4o}$"))
+
+p <- df.10k_llm %>%
+  ggplot(aes(x=as.factor(prompt_t.ordered), color=model, shape=model)) +
+  geom_hline(yintercept=0, color="#262626", linewidth=0.2) +
+  
+  geom_hline(aes(yintercept=t.ref, linetype="star"), color="#F85427", linewidth=0.5) +
+  geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  
+  scale_linetype_manual(name="", values=line_shapes, labels=line_labels) +
+  scale_color_manual(name="", values=model.colors, labels=model.labels) +
+  scale_shape_manual(name="", values=model.shapes, labels=model.labels) +
+  
+  # labs(title=TeX("Ordered t-scores vs. Prompt"),
+  #      subtitle=subtitle) +
+  xlab("Prompt Index") +
+  ylab("t-scores") +
+  
+  facet_grid(V + coef_name ~ Y, labeller=label_parsed) +
+  
+  # scale_y_continuous(breaks=seq(-1,1, by=0.025)) +
+  my_theme +
+  theme(panel.grid.minor.y=element_blank(),
+        panel.grid.major.y=element_line(linewidth=0.2))
+p
+```
+
+\clearpage
+<!-- ## Empirical PDFs of the Bias -->
 
 ```{r, echo=FALSE}
-figures_dir <- file.path(results_dir, "figures")
-dir.create(figures_dir, showWarnings=FALSE)
+csv_path <- file.path(repo_dir, "04_simulation/lhs/bayesian")
+results <- read.csv(file.path(csv_path, "simulations_averaged_lhs.csv")) %>%
+  filter(coef_name!="(Intercept)") %>% # Plot only beta_1
+   mutate(
+     Y = factor(Y, levels=levels.Y, labels=labels.Y),
+     V = factor(V, levels=levels.V, labels=labels.V),
+     model = factor(model, levels=levels.model, labels=labels.model),
+     coef_name = factor(coef_name, levels=levels.coef, labels=labels.coef),
+     regression = factor(regression, levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"))) 
 
-legend_colors <- c("Yhuman_V"="black", "Yllm_V"="#1f77b4", "train_Yhuman_V"="#008000", "test_Ytilde_V"="#ff7f0e")
-legend_labels <- c("Yhuman_V"=TeX(r"($\beta_1^*$)"),
-                   "Yllm_V"=TeX(r"($\hat{\beta}_1$ (LLM))"), 
-                   "train_Yhuman_V"=TeX(r"($\beta_1^{train}$ (Human))"), 
-                   "test_Ytilde_V"=TeX(r"($\tilde{\beta}_1$ (Debiased))"))
+line_colors <- c("5k_Yllm_V"      = "#F85427", 
+                 "train_Yhuman_V" = "#277BB6", 
+                 "test_Ytilde_V"  = "#97BD59")
 
-regression_label <- TeX(r"(LHS Regression: $1\{Y=y\} = \beta_0 + \beta_1 V$)")
+line_labels <- c("5k_Yllm_V"      = TeX("Bias($\\hat{\\beta}_1, \\beta_1^*$)"), 
+                 "train_Yhuman_V" = TeX("Bias($\\beta_1^{t}, \\beta_1^*$)"), 
+                 "test_Ytilde_V"  = TeX("Bias($\\tilde{\\beta}_1, \\beta_1^*$)"))
+
+bias.data <- results %>% 
+  filter(train_proportion!=0.25) %>%
+  mutate(train_proportion = factor(
+    train_proportion, 
+    levels=c(0.05, 
+             0.1, 
+             # 0.25, 
+             0.5), 
+    labels=c("Training sample proportion = 5%", 
+             "Training sample proportion = 10%", 
+             # "Training sample proportion = 25%", 
+             "Training sample proportion = 50%")))
+
+n_bins = 20
 ```
 
-<!-- ### Figure 1: Density Plot of $\text{Bias}(\beta_1, \beta_1^\star)$ by Training Proportion -->
-
-```{r, fig.height=4, echo=FALSE}
-# Figure 1
-p1 <- ggplot(data=beta1, aes(x=bias, color=regression)) +
-  geom_vline(xintercept=0, color="black", linetype = "dashed") +
-  # geom_histogram(alpha=0, bins = 40, position = "identity") +
-  geom_density() +
-  labs(title=TeX(r"(Density Plots of $Bias(\beta_1, \beta_1^*)$ by Training Proportion)"),
-       subtitle=regression_label) +
-  xlab(TeX(r"($Bias(\beta_1, \beta_1^*) = E[\beta_1] - \beta_1^*$)")) +
-  facet_grid(train_proportion ~ ., scales="free_y") +
-  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-p1
+```{r, echo=FALSE, fig.height=3, fig.width=8, fig.cap="Bias Density Plots by Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+bias1 <- bias.data %>%
+  ggplot(aes(x=bias_mean, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(. ~ train_proportion) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+        bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Bias Density Plots by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0, breaks=seq(-10,10, by=0.01))+
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+bias1
 ```
 
-<!-- ### Figure 2: Empirical CDF Plot of $\text{MSE}(\beta_1, \beta_1^\star)$ by Training Proportion -->
 
-```{r, fig.height=4, echo=FALSE}
-p2 <- ggplot(data=beta1, aes(x=mse, color=regression)) +
-  stat_ecdf() +
-  labs(title=TeX(r"(Empirical CDF of $MSE(\beta_1, \beta_1^*)$ by Training Proportion)"),
-       subtitle=regression_label) +
-  facet_grid(train_proportion ~ .) +
-  xlab(TeX(r"($MSE(\beta_1, \beta_1^*) = E[(\beta_1 - \beta_1^*)^2]$)")) +
-  scale_color_manual(name="", values=legend_colors, labels=legend_labels, breaks=names(legend_colors)) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-p2
+<!-- $$\frac{\mathbb{E}[\hat{\beta}] - \beta^\star}{\sqrt{\text{Var}[\hat{\beta}]}}$$ -->
+<!-- $$\mathbb{E}[\hat{\beta}] \approx \frac{1}{N} \sum_{i=1}^N \hat{\beta}^{(i)} \triangleq \bar{\hat{\beta}}$$ -->
+<!-- $$\text{Var}[\hat{\beta}] \approx \frac{1}{N-1} \sum_{i=1}^N \left(\hat{\beta}^{(i)}-\bar{\hat{\beta}}\right)^2$$ -->
+
+```{r, echo=FALSE, fig.height=3, fig.width=8, fig.cap="Standarized Bias Density Plots by Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+bias1_standarized <- bias.data %>%
+  group_by(train_proportion) %>%
+  mutate(standarized_bias = bias_mean/sd(bias_mean)) %>%
+  ungroup() %>%
+  ggplot(aes(x=standarized_bias, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(. ~ train_proportion) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Standarized Bias Density Plots by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Standarized Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0, breaks=seq(-10,10, by=1)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+bias1_standarized
 ```
 
-<!-- ### Figure 3: Density Plot of $\text{Bias}(\beta_1, \beta_1^\star)$ by Model and Training Proportion  -->
+\clearpage
 
-```{r, fig.height=4*2, echo=FALSE}
-p3 <- ggplot(data=beta1, aes(x=bias, color=regression)) +
-  geom_vline(xintercept=0, color="black", linetype = "dashed") +
-  # geom_histogram(alpha=0, bins = 40, position = "identity") +
-  geom_density() +
-  labs(title=TeX(r"(Density Plots of $Bias(\beta_1, \beta_1^*)$ by Model & Training Proportion)"),
-       subtitle=regression_label) +
-  xlab(TeX(r"($Bias(\beta_1, \beta_1^*) = E[\beta_1] - \beta_1^*$)")) +
-  facet_grid(train_proportion + model ~ ., scales="free_y") +
-  scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-p3
+```{r echo=FALSE, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density by Model and Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+bias2 <- bias.data %>%
+  ggplot(aes(x=bias_mean, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(model ~ train_proportion) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Bias Density Plots by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0, breaks=seq(-4,4, by=0.01)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+
+bias2
 ```
 
-<!-- ### Figure 4: Empirical CDF Plot of $\text{MSE}(\beta_1, \beta_1^\star)$ by Model and Training Proportion  -->
+```{r echo=FALSE, fig.height=3*1.5, fig.width=8, fig.cap="Standarized Bias Density by Model and Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+bias2_standarized <- bias.data %>%
+  group_by(train_proportion, model) %>%
+  mutate(standarized_bias = bias_mean/sd(bias_mean)) %>%
+  ungroup() %>%
+  ggplot(aes(x=standarized_bias, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(model ~ train_proportion) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Standarized Bias Density Plots by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Standarized Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0, breaks=seq(-10,10, by=1)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
 
-```{r, fig.height=4*2, echo=FALSE}
-p4 <- ggplot(data=beta1, aes(x=mse, color=regression)) +
-  stat_ecdf() +
-  labs(title=TeX(r"(Empirical CDF of $MSE(\beta_1, \beta_1^*)$ by Model & Training Proportion)"),
-       subtitle=regression_label) +
-  xlab(TeX(r"($MSE(\beta_1, \beta_1^*) = E[(\beta_1 - \beta_1^*)^2]$)")) +
-  facet_grid(train_proportion + model ~ ., scales="free_y") +
-  scale_color_manual(name="", values=legend_colors, labels=legend_labels, breaks=names(legend_colors)) +
-  theme_bw() +
-  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="right")
-p4
+bias2_standarized
 ```
+
+\clearpage
+<!-- ## Empirical CDF of the MSE -->
+
+```{r, echo=FALSE, fig.height=3, fig.width=8, fig.cap="MSE Empirical CDF by Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+mse.data <- results %>% 
+  filter(
+    regression!="5k_Yllm_V",
+    train_proportion!=0.25
+    ) %>%
+  mutate(train_proportion = factor(
+    train_proportion, 
+    levels=c(0.05, 
+             0.1, 
+             # 0.25, 
+             0.5), 
+    labels=c("Training sample proportion = 5%", 
+             "Training sample proportion = 10%", 
+             # "Training sample proportion = 25%", 
+             "Training sample proportion = 50%"))
+    )
+
+line_colors <- c("train_Yhuman_V" = "#277BB6", 
+                 "test_Ytilde_V"  = "#97BD59")
+line_types <- c("train_Yhuman_V" = "dashed", 
+                 "test_Ytilde_V"  = "solid")
+line_labels <- c("train_Yhuman_V"=TeX(r"(MSE($\beta_1^{t}, \beta_1^*$))"), # TODO: change labels
+                 "test_Ytilde_V"=TeX(r"(MSE($\tilde{\beta}_1, \beta_1^*$))"))
+
+mse1 <- mse.data %>%
+  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
+  stat_ecdf(linewidth=0.5) +
+  # labs(title=TeX(r"(MSE Empirical CDF by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  facet_grid(. ~ train_proportion) +
+  xlab("MSE") +
+  ylab("Empirical CDF") + 
+  scale_x_continuous(minor_breaks = seq(0,0.004,0.0001)) +
+  scale_color_manual(name="", values=line_colors, labels=line_labels) +
+  scale_linetype_manual(name="", values=line_types, labels=line_labels) +
+  my_theme + theme(
+    panel.grid.major.x=element_line(linewidth=0.3),
+    panel.grid.minor.x=element_line(linewidth=0.1))
+mse1
+```
+
+```{r, echo=FALSE, fig.height=3*1.5, fig.width=8, fig.cap="MSE Empirical CDF by Model and Proportion of Training Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
+mse2 <- mse.data %>%
+  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
+  stat_ecdf(linewidth=0.5) +
+  # labs(title=TeX(r"(MSE Empirical CDF by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  facet_grid(model ~ train_proportion) +
+  xlab("MSE") +
+  ylab("Empirical CDF") + 
+  scale_x_continuous(minor_breaks = seq(0,0.004,0.0001)) +
+  scale_color_manual(name="", values=line_colors, labels=line_labels) +
+  scale_linetype_manual(name="", values=line_types, labels=line_labels) +
+  my_theme + theme(
+    panel.grid.major.x=element_line(linewidth=0.3),
+    panel.grid.minor.x=element_line(linewidth=0.1))
+mse2
+```
+
 
 <!-- ### Figure: Density Plot of Coverage Probability by Training Proportion (Not Included) -->
 
@@ -134,120 +411,167 @@ p4
 <!-- ``` -->
 
 
-<!-- ### Save Figures -->
-
-<!-- ```{r} -->
-<!-- ggsave(plot=p1, file=file.path(figures_dir, "figure1_lhs.png"), width=6, height=4) -->
-<!-- ggsave(plot=p2, file=file.path(figures_dir, "figure2_lhs.png"), width=6, height=4) -->
-<!-- ggsave(plot=p3, file=file.path(figures_dir, "figure3_lhs.png"), width=6, height=4*2) -->
-<!-- ggsave(plot=p4, file=file.path(figures_dir, "figure4_lhs.png"), width=6, height=4*2) -->
-<!-- ``` -->
-
-\newpage
-
-<!-- ## Dataframes/Tables -->
+\clearpage
 
 ```{r echo=FALSE, results='asis'}
+p.data <- results %>%
+  # filter(regression!="5k_Yllm_V", train_proportion!=0.25) %>%
+  mutate(
+    train_proportion = factor(
+      train_proportion,
+      levels=c(0.05, 0.1, 0.25, 0.50),
+      labels=c("5\\%", "10\\%", "25\\%", "50\\%")))
+
 alpha = 0.10
 probs = c(alpha/2, 1-alpha/2)
 
-df1 <- beta1 %>% 
-  mutate(statistic=bias) %>%
+df1 <- p.data %>% 
+  mutate(statistic=bias_mean) %>%
   group_by(train_proportion, regression) %>% 
   summarise(
     "Mean" = mean(statistic), 
     "SD" = sd(statistic),
     "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
     .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Regression"=regression))
-kbl(df1, caption="Bias Summary Statistics by Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:3, 7:9))
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("Bias($\\hat{\\beta}_1, \\beta_1^*$)", "Bias($\\beta^t_1, \\beta_1^*$)", "Bias($\\tilde{\\beta}_1, \\beta_1^*$)")
+      )) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=regression))
+  
+
+stripe = as.vector(t(cbind((6*(0:30)+1), (6*(0:30)+2), (6*(0:30)+3))))
+
+kbl(df1, align="rlrrrrr", 
+    caption="Bias Summary Statistics by Proportion of Training Samples", 
+    digits=6, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = "striped", stripe_index = stripe)
+```
+
+```{r echo=FALSE, results='asis'}
+df4 <- p.data %>% 
+  mutate(statistic=bias_mean) %>%
+  group_by(model, train_proportion, regression) %>% 
+  summarise(
+    "Mean" = mean(statistic), 
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("Bias($\\hat{\\beta}_1, \\beta_1^*$)", "Bias($\\beta^t_1, \\beta_1^*$)", "Bias($\\tilde{\\beta}_1, \\beta_1^*$)")
+      )) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=regression))
+kbl(df4, align="lrlrrrrr", 
+    caption="Bias Summary Statistics by Model and Proportion of Training Samples", 
+    digits=6, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
 ```
 
 
 ```{r echo=FALSE, results='asis'}
-df2 <- beta1 %>% 
-  mutate(statistic=mse) %>%
+df2 <- p.data %>% 
+  mutate(statistic=mse_mean) %>%
   group_by(train_proportion, regression) %>% 
   summarise(
     "Mean" = mean(statistic), 
     "SD" = sd(statistic),
     "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
     .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Regression"=regression))
-kbl(df2, caption="MSE Summary Statistics by Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:3, 7:9))
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("MSE($\\hat{\\beta}_1, \\beta_1^*$)", "MSE($\\beta^t_1, \\beta_1^*$)", "MSE($\\tilde{\\beta}_1, \\beta_1^*$)")
+      )) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=regression))
+kbl(df2, align="rlrrrrr", 
+    caption="MSE Summary Statistics by Proportion of Training Samples", 
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = "striped", stripe_index = stripe)
 ```
 
 
 ```{r echo=FALSE, results='asis'}
-df3 <- beta1 %>% 
-  mutate(statistic=coverage) %>%
+df5 <- p.data %>% 
+  mutate(statistic=mse_mean) %>%
+  group_by(model, train_proportion, regression) %>% 
+  summarise(
+    "Mean" = mean(statistic), 
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("MSE($\\hat{\\beta}_1, \\beta_1^*$)", "MSE($\\beta^t_1, \\beta_1^*$)", "MSE($\\tilde{\\beta}_1, \\beta_1^*$)")
+      )) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=regression))
+kbl(df5, align="lrlrrrrr", 
+    caption="MSE Summary Statistics by Model and Proportion of Training Samples", 
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = "striped", stripe_index = stripe)
+```
+
+
+```{r echo=FALSE, results='asis'}
+df3 <- p.data %>% 
+  mutate(statistic=coverage_mean) %>%
   group_by(train_proportion, regression) %>% 
   summarise(
     "Mean" = mean(statistic), 
     "SD" = sd(statistic),
     "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
     .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Regression"=regression))
-kbl(df3, caption="Coverage Summary Statistics by Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:3, 7:9))
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("$P(\\beta_1^*\\in [\\hat{\\beta}_{1, (0.025)}, \\hat{\\beta}_{1, 0.975}])$", 
+               "$P(\\beta_1^*\\in [\\beta_{1, (0.025)}^{t}, \\beta_{1, 0.975}^{t} ] )$", 
+               "$P(\\beta_1^*\\in [\\tilde{\\beta}_{1, (0.025)}, \\tilde{\\beta}_{1, 0.975} ] )$")
+      )) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=regression))
+kbl(df3, align="rllrrrrr", 
+    caption="Coverage Summary Statistics by Proportion of Training Samples", 
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = "striped", stripe_index = stripe)
 ```
 
 
 ```{r echo=FALSE, results='asis'}
-df4 <- beta1 %>% 
-  mutate(statistic=bias) %>%
-  group_by(train_proportion, model, regression) %>% 
+df6 <- p.data %>% 
+  mutate(statistic=coverage_mean) %>%
+  group_by(model, train_proportion, regression) %>% 
   summarise(
     "Mean" = mean(statistic), 
     "SD" = sd(statistic),
     "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
     .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Model"=model, "Regression"=regression))
-kbl(df4, caption="Bias Summary Statistics by Model and Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:6, 13:18))
-```
-
-```{r echo=FALSE, results='asis'}
-df5 <- beta1 %>% 
-  mutate(statistic=mse) %>%
-  group_by(train_proportion, model, regression) %>% 
-  summarise(
-    "Mean" = mean(statistic), 
-    "SD" = sd(statistic),
-    "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
-    .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Model"=model, "Regression"=regression))
-kbl(df5, caption="MSE Summary Statistics by Model and Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:6, 13:18))
-```
-
-
-```{r echo=FALSE, results='asis'}
-df6 <- beta1 %>% 
-  mutate(statistic=coverage) %>%
-  group_by(train_proportion, model, regression) %>% 
-  summarise(
-    "Mean" = mean(statistic), 
-    "SD" = sd(statistic),
-    "Median" = median(statistic),
-    "5%" = quantile(statistic, probs[1]), 
-    "95%" = quantile(statistic, probs[2]),
-    .groups = "drop") %>%
-  rename(c("Train Proportion"=train_proportion, "Model"=model, "Regression"=regression))
-kbl(df6, caption="Coverage Summary Statistics by Model and Training Proportion", digits=5, booktabs=T, linesep = "") %>%
-  kable_styling(latex_options = "striped", stripe_index = c(1:6, 13:18))
+  mutate(regression = factor(
+      regression, 
+      levels=c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V"), 
+      labels=c("$P(\\beta_1^*\\in [\\hat{\\beta}_{1, (0.025)}, \\hat{\\beta}_{1, 0.975}])$", 
+               "$P(\\beta_1^*\\in [\\beta_{1, (0.025)}^{t}, \\beta_{1, 0.975}^{t} ] )$", 
+               "$P(\\beta_1^*\\in [\\tilde{\\beta}_{1, (0.025)}, \\tilde{\\beta}_{1, 0.975} ] )$")
+      )) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=regression))
+kbl(df6, align="lrlrrrrr", 
+    caption="Coverage Summary Statistics by Model and Proportion of Training Samples", 
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = "striped", stripe_index = stripe)
 ```
 
 <!-- ### Save Tables -->
@@ -264,7 +588,600 @@ kbl(df6, caption="Coverage Summary Statistics by Model and Training Proportion",
 <!-- write.csv(df6, file=file.path(tables_dir, "df6.csv"), row.names=FALSE) -->
 <!-- ``` -->
 
-<!-- \newpage -->
+\clearpage
 
-<!-- # Proxy on the RHS -->
+# Proxy on the RHS
+
+<!-- ## Coefficients -->
+
+```{r, echo=FALSE, fig.height=11, fig.width=8, fig.cap="Ordered $\\hat{\\beta}$ vs. Prompt. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+csv_path <- file.path(repo_dir, "04_simulation/rhs/bayesian")
+levels.coef = c("Y3", "Y14", "Y15", "Y19", "Y20", "YOther")
+labels.coef = c(TeX("$\\beta_3$"), TeX("$\\beta_{14}$"), TeX("$\\beta_{15}$"), TeX("$\\beta_{19}$"), TeX("$\\beta_{20}$"), TeX("$\\beta_{Other}$"))
+
+levels.V = c("Democrat", "Senate", "DW1")
+labels.V = c(TeX("$Democrat=Y^T\\beta$"), TeX("$Senate=Y^T\\beta$"), TeX("$DW1=Y^T\\beta$"))
+
+levels.model = c("gpt-3.5", "gpt-4o")
+labels.model = c("GPT-3.5", "GPT-4o")
+
+model.colors <- c("GPT-3.5"="#97BD59", "GPT-4o"="#277BB6")
+model.shapes <- c("GPT-3.5"=16, "GPT-4o"=17)
+model.labels <-c("GPT-3.5"=TeX("$\\hat{\\beta}_{GPT-3.5}$"), "GPT-4o"=TeX("$\\hat{\\beta}_{GPT-4o}$"))
+
+df.10k_llm <- read.csv(file.path(csv_path, "10k_llm_rhs.csv")) %>%
+  select(!c(se, se.ref)) %>%
+  # filter(coef_name!="YOther") %>%
+  mutate(V = factor(V, levels=levels.V, labels=labels.V),
+         coef_name = factor(coef_name, levels=levels.coef, labels=labels.coef),
+         model = factor(model, levels=levels.model, labels=labels.model),
+         ) %>%
+  group_by(V, model, coef_name) %>%
+  arrange(V, model, coef_name, coef) %>%
+  mutate(prompt_coef.ordered = row_number()) %>%
+  group_by(V, model, coef_name) %>%
+  arrange(V, model, coef_name, t) %>%
+  mutate(prompt_t.ordered = row_number()) %>%
+  ungroup()
+
+# Check that we don't have NA's in any of t_scores
+if(any(!complete.cases(df.10k_llm)))
+  stop("Missing t-scores")
+
+line_shapes <- c("star"="solid")
+line_labels <- c("star"=TeX("$\\beta^*$"))
+
+subtitle <- TeX(r"(Proxy on the RHS: $V = Y^T \beta = Y_3 \beta_3 + Y_{14} \beta_{14} + Y_{15} \beta_{15} + Y_{19}  \beta_{19}+ Y_{20} \beta_{20} + Y_{Other} \beta_{Other}$)")
+
+p <- df.10k_llm %>%
+  ggplot(aes(x=as.factor(prompt_coef.ordered), color=model, shape=model)) +
+  geom_hline(yintercept=0, color="#262626", linewidth=0.2) +
+  
+  # geom_ribbon(aes(ymin=lci.ref, ymax=uci.ref), alpha=0.2, fill="#C74B08", linetype="dashed", linewidth=0.0) +
+  geom_hline(aes(yintercept=lci.ref), color="#F85427", linetype="dashed", linewidth=0.3) +
+  geom_hline(aes(yintercept=uci.ref), color="#F85427", linetype="dashed", linewidth=0.3) +
+  geom_hline(aes(yintercept=coef.ref, linetype="star"), color="#F85427", linewidth=0.5) +
+  
+  geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width = 0.5, linewidth=0.3) +
+  geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  
+  scale_linetype_manual(name="", values=line_shapes, labels=line_labels) +
+  scale_color_manual(name="", values=model.colors, labels=model.labels) +
+  scale_shape_manual(name="", values=model.shapes, labels=model.labels) +
+  
+  # labs(title=TeX("Ordered $\\hat{\\beta}$ vs. Prompt"),
+  #      subtitle=subtitle) +
+  xlab("Prompt Index") +
+  ylab("Coefficients") +
+  
+  facet_grid(coef_name ~ V, labeller=label_parsed, scale="free_y") +
+  
+  # scale_y_continuous(breaks=seq(-1,1, by=0.025)) +
+  my_theme +
+  theme(panel.grid.minor.y=element_blank(),
+        panel.grid.major.y=element_line(linewidth=0.2))
+p
+```
+
+<!-- ## t-scores -->
+
+```{r, echo=FALSE, fig.height=11, fig.width=8, fig.cap="Ordered t-scores vs. Prompt. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+line_labels <- c("star"=TeX("$t^*$"))
+
+model.labels <-c("GPT-3.5"=TeX("$\\hat{t}_{GPT-3.5}$"), "GPT-4o"=TeX("$\\hat{t}_{GPT-4o}$"))
+
+p <- df.10k_llm %>%
+  ggplot(aes(x=as.factor(prompt_t.ordered), color=model, shape=model)) +
+  geom_hline(yintercept=0, color="#262626", linewidth=0.2) +
+  
+  geom_hline(aes(yintercept=t.ref, linetype="star"), color="#F85427", linewidth=0.5) +
+  geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  
+  scale_linetype_manual(name="", values=line_shapes, labels=line_labels) +
+  scale_color_manual(name="", values=model.colors, labels=model.labels) +
+  scale_shape_manual(name="", values=model.shapes, labels=model.labels) +
+  
+  # labs(title=TeX("Ordered t-scores vs. Prompt"),
+  #      subtitle=subtitle) +
+  xlab("Prompt Index") +
+  ylab("t-scores") +
+  
+  facet_grid(coef_name ~ V, labeller=label_parsed, scale="free_y") +
+  
+  # scale_y_continuous(breaks=seq(-1,1, by=0.025)) +
+  my_theme +
+  theme(panel.grid.minor.y=element_blank(),
+        panel.grid.major.y=element_line(linewidth=0.2))
+p
+```
+
+
+
+<!-- ## Empirical PDFs of the Bias -->
+
+```{r, echo=FALSE}
+levels.model <- c("gpt-3.5", "gpt-4o")
+labels.model <- c(TeX("$GPT-3.5$"), TeX("$GPT-4o$"))
+results <- read.csv(file.path(csv_path, "simulations_averaged_rhs.csv")) %>%
+   mutate(
+     V = factor(V, levels=levels.V, labels=labels.V),
+     model = factor(model, levels=levels.model, labels=labels.model),
+     coef_name = factor(coef_name, levels=levels.coef, labels=labels.coef),
+     regression = factor(regression, levels=c("5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde"))) 
+
+line_colors <- c("5k_V_Yllm"      = "#F85427", 
+                 "train_V_Yhuman" = "#277BB6", 
+                 "test_Vtilde_Ytilde"  = "#97BD59")
+
+line_labels <- c("5k_V_Yllm"      = TeX("Bias($\\hat{gamma}, \\beta^*$)"), 
+                 "train_V_Yhuman" = TeX("Bias($\\beta^{t}, \\beta^*$)"), 
+                 "test_Vtilde_Ytilde"  = TeX("Bias($\\tilde{\\beta}, \\beta^*$)"))
+
+bias.data <- results %>% 
+  filter(train_proportion!=0.25) %>%
+  mutate(train_proportion = factor(
+    train_proportion, 
+    levels=c(0.05, 
+             0.1, 
+             # 0.25,
+             0.5), 
+    # labels=c(TeX("Training sample proportion = 5\\%"), 
+    #          TeX("Training sample proportion = 10\\%"), 
+    #          TeX("Training sample proportion = 25\\%"),
+    #          TeX("Training sample proportion = 50\\%"))
+    labels=c(TeX("Training prop = 5\\%"), 
+         TeX("Training prop = 10\\%"), 
+         # TeX("Training prop = 25\\%"),
+         TeX("Training prop = 50\\%"))
+    ))
+
+
+n_bins = 14
+```
+
+```{r, echo=FALSE, fig.height=11, fig.width=8, fig.cap="Bias Density Plots by Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+bias1 <- bias.data %>%
+  ggplot(aes(x=bias_mean, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(coef_name ~ train_proportion, labeller=label_parsed) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Bias Density Plots by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0) + # , breaks=seq(-10,10, by=0.01))+
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+bias1
+```
+
+```{r, echo=FALSE, fig.height=11, fig.width=8, fig.cap="Standarized Bias Density Plots by Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+bias1_standarized <- bias.data %>%
+  group_by(coef_name, train_proportion) %>%
+  mutate(standarized_bias = bias_mean/sd(bias_mean)) %>%
+  ungroup() %>%
+  ggplot(aes(x=standarized_bias, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(coef_name ~ train_proportion, labeller=label_parsed, scales="free_x") +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Standarized Bias Density Plots by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Standarized Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0) + # breaks=seq(-10,10, by=2)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+bias1_standarized
+```
+
+```{r echo=FALSE, fig.height=11, fig.width=12, fig.cap="Bias Density Plots by Model and Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+bias2 <- bias.data %>%
+  ggplot(aes(x=bias_mean, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(coef_name  ~  train_proportion+ model, labeller=label_parsed) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Bias Density Plots by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0) + # , breaks=seq(-4,4, by=0.01)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme 
+
+bias2
+```
+
+```{r echo=FALSE, fig.height=11, fig.width=12, fig.cap="Standarized Bias Density Plots by Model and Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+bias2_standarized <- bias.data %>%
+  group_by(model, coef_name, train_proportion) %>%
+  mutate(standarized_bias = bias_mean/sd(bias_mean)) %>%
+  ggplot(aes(x=standarized_bias, group=regression, fill=regression)) +
+  geom_vline(xintercept=0, color="#262626", linewidth=0.2) +
+  facet_grid(coef_name ~ train_proportion + model, labeller=label_parsed) +
+  geom_histogram(
+    aes(y=(..count..)/tapply(..count..,..PANEL..,sum)[..PANEL..] * nlevels(bias.data$regression)), 
+    bins=n_bins, position=position_dodge()) +
+  # labs(title=TeX(r"(Standarized Bias Density Plots by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  xlab("Standarized Bias") +
+  ylab("Probability Densities") +
+  scale_fill_manual(name="", values=line_colors, labels=line_labels) +
+  scale_x_symmetric(mid=0) + # , breaks=seq(-10,10, by=1)) +
+  scale_y_continuous(breaks=seq(0,1, by=0.25), minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  my_theme
+
+bias2_standarized
+```
+
+<!-- ## Empirical CDF of the MSE -->
+
+```{r, echo=FALSE, fig.height=11, fig.width=8, fig.cap="MSE Empirical CDF by Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+mse.data <- bias.data %>% 
+  filter(
+    regression!="5k_Yllm_V",
+    # train_proportion!=levels(bias.data$train_proportion)[3]
+    )
+
+line_colors <- c("train_V_Yhuman" = "#277BB6", 
+                 "test_Vtilde_Ytilde"  = "#97BD59")
+line_types <- c("train_V_Yhuman" = "dashed", 
+                "test_Vtilde_Ytilde"  = "solid")
+line_labels <- c(
+  "train_V_Yhuman"=TeX(r"(MSE($\beta^{t}, \beta^*$))"), 
+  "test_Vtilde_Ytilde"=TeX(r"(MSE($\tilde{\beta}, \beta^*$))"))
+
+mse1 <- mse.data %>%
+  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
+  stat_ecdf(linewidth=0.5) +
+  # labs(title=TeX(r"(MSE Empirical CDF by Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  facet_grid(coef_name ~ train_proportion, labeller=label_parsed, scales="free_x") +
+  xlab("MSE") +
+  ylab("Empirical CDF") + 
+  # xlim(c(0, 0.3)) +
+  # scale_x_continuous(minor_breaks = seq(0,0.004,0.0001)) +
+  scale_color_manual(name="", values=line_colors, labels=line_labels) +
+  scale_linetype_manual(name="", values=line_types, labels=line_labels) +
+  my_theme + theme(
+    panel.grid.major.x=element_line(linewidth=0.3),
+    panel.grid.minor.x=element_line(linewidth=0.1))
+mse1
+```
+
+```{r, echo=FALSE, fig.height=11, fig.width=12, fig.cap="MSE Empirical CDF by Model and Proportion of Training Samples. Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_{Other} \\beta_{Other}$"}
+mse2 <- mse.data %>%
+  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
+  stat_ecdf(linewidth=0.5) +
+  # labs(title=TeX(r"(MSE Empirical CDF by Model and Proportion of Training Samples)"),
+  #      subtitle=subtitle) +
+  facet_grid(coef_name ~ train_proportion + model, labeller=label_parsed, scales="free_x") +
+  xlab("MSE") +
+  ylab("Empirical CDF") + 
+  # scale_x_continuous(minor_breaks = seq(0,0.004,0.0001)) +
+  scale_color_manual(name="", values=line_colors, labels=line_labels) +
+  scale_linetype_manual(name="", values=line_types, labels=line_labels) +
+  my_theme + theme(
+    panel.grid.major.x=element_line(linewidth=0.3),
+    panel.grid.minor.x=element_line(linewidth=0.1))
+mse2
+```
+
+\newpage
+
+```{r echo=FALSE, results='asis'}
+
+p.data <- read.csv(file.path(csv_path, "simulations_averaged_rhs.csv")) %>%
+   mutate(
+     V = factor(V, levels=levels.V, labels=labels.V),
+     coef_name = factor(coef_name, levels=levels.coef, labels=labels.coef),
+     regression = factor(regression, levels=c("5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde")),
+     train_proportion = factor(
+      train_proportion,
+      levels=c(0.05, 0.1, 0.25, 0.50),
+      labels=c("5\\%", "10\\%", "25\\%", "50\\%")),
+     model = factor(model, levels=c("gpt-3.5", "gpt-4o"), labels=c("GPT-3.5", "GPT-4o"))
+    )
+      
+  
+p.data <- p.data %>% mutate(
+    statistic_label = if_else(
+      regression=="5k_V_Yllm",
+        if_else(coef_name=="beta[3]",
+          "Bias($\\hat{\\beta}_{3}, \\beta_{3}^*$)",
+          if_else(coef_name=="beta[14]",
+            "Bias($\\hat{\\beta}_{14}, \\beta_{14}^*$)",
+            if_else(coef_name=="beta[15]",
+              "Bias($\\hat{\\beta}_{15}, \\beta_{15}^*$)",
+              if_else(coef_name=="beta[19]",
+                "Bias($\\hat{\\beta}_{19}, \\beta_{19}^*$)",
+                if_else(coef_name=="beta[20]",
+                  "Bias($\\hat{\\beta}_{20}, \\beta_{20}^*$)",
+                  "Bias($\\hat{\\beta}_{Other}, \\beta_{Other}^*$)"
+                  )
+                )
+              )
+            )
+          ),
+      if_else(regression=="train_V_Yhuman",
+          if_else(coef_name=="beta[3]",
+            "Bias(${\\beta}^t_{3}, \\beta_{3}^*$)",
+            if_else(coef_name=="beta[14]",
+              "Bias(${\\beta}^t_{14}, \\beta_{14}^*$)",
+              if_else(coef_name=="beta[15]",
+                "Bias(${\\beta}^t_{15}, \\beta_{15}^*$)",
+                if_else(coef_name=="beta[19]",
+                  "Bias(${\\beta}^t_{19}, \\beta_{19}^*$)",
+                  if_else(coef_name=="beta[20]",
+                    "Bias(${\\beta}^t_{20}, \\beta_{20}^*$)",
+                    "Bias(${\\beta}^t_{Other}, \\beta_{Other}^*$)"
+                    )
+                  )
+                )
+              )
+            ),
+          if_else(coef_name=="beta[3]",
+            "Bias($\\tilde{\\beta}_{3}, \\beta_{3}^*$)",
+            if_else(coef_name=="beta[14]",
+              "Bias($\\tilde{\\beta}_{14}, \\beta_{14}^*$)",
+              if_else(coef_name=="beta[15]",
+                "Bias($\\tilde{\\beta}_{15}, \\beta_{15}^*$)",
+                if_else(coef_name=="beta[19]",
+                  "Bias($\\tilde{\\beta}_{19}, \\beta_{19}^*$)",
+                  if_else(coef_name=="beta[20]",
+                    "Bias($\\tilde{\\beta}_{20}, \\beta_{20}^*$)",
+                    "Bias($\\tilde{\\beta}_{Other}, \\beta_{Other}^*$)"
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+    )
+alpha = 0.10
+probs = c(alpha/2, 1-alpha/2)
+df1 <- p.data %>% 
+  mutate(statistic=bias_mean) %>%
+  group_by(train_proportion, coef_name, regression, statistic_label) %>% 
+  summarise(
+    "Mean" = mean(statistic), 
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]), 
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop")  %>%
+  select(!c(coef_name, regression)) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=statistic_label))
+
+kbl(df1, longtable = TRUE, align="rlrrrrr",
+    caption="Bias Summary Statistics by Proportion of Training Samples",
+    digits=6, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
+
+\clearpage
+
+```{r echo=FALSE, results='asis'}
+df4 <- p.data %>%
+  mutate(statistic=bias_mean) %>%
+  group_by(model, train_proportion, coef_name, regression, statistic_label) %>%
+  summarise(
+    "Mean" = mean(statistic),
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]),
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  select(!c(regression, coef_name)) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=statistic_label))
+kbl(df4, longtable = TRUE, align="lrlrrrrr",
+    caption="Bias Summary Statistics by Model and Proportion of Training Samples",
+    digits=6, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
+
+\clearpage
+
+```{r echo=FALSE, results='asis'}
+p.data <- p.data %>% mutate(
+    statistic_label = if_else(
+      regression=="5k_V_Yllm",
+        if_else(coef_name=="beta[3]",
+          "MSE($\\hat{\\beta}_{3}, \\beta_{3}^*$)",
+          if_else(coef_name=="beta[14]",
+            "MSE($\\hat{\\beta}_{14}, \\beta_{14}^*$)",
+            if_else(coef_name=="beta[15]",
+              "MSE($\\hat{\\beta}_{15}, \\beta_{15}^*$)",
+              if_else(coef_name=="beta[19]",
+                "MSE($\\hat{\\beta}_{19}, \\beta_{19}^*$)",
+                if_else(coef_name=="beta[20]",
+                  "MSE($\\hat{\\beta}_{20}, \\beta_{20}^*$)",
+                  "MSE($\\hat{\\beta}_{Other}, \\beta_{Other}^*$)"
+                  )
+                )
+              )
+            )
+          ),
+      if_else(regression=="train_V_Yhuman",
+          if_else(coef_name=="beta[3]",
+            "MSE(${\\beta}^t_{3}, \\beta_{3}^*$)",
+            if_else(coef_name=="beta[14]",
+              "MSE(${\\beta}^t_{14}, \\beta_{14}^*$)",
+              if_else(coef_name=="beta[15]",
+                "MSE(${\\beta}^t_{15}, \\beta_{15}^*$)",
+                if_else(coef_name=="beta[19]",
+                  "MSE(${\\beta}^t_{19}, \\beta_{19}^*$)",
+                  if_else(coef_name=="beta[20]",
+                    "MSE(${\\beta}^t_{20}, \\beta_{20}^*$)",
+                    "MSE(${\\beta}^t_{Other}, \\beta_{Other}^*$)"
+                    )
+                  )
+                )
+              )
+            ),
+          if_else(coef_name=="beta[3]",
+            "MSE($\\tilde{\\beta}_{3}, \\beta_{3}^*$)",
+            if_else(coef_name=="beta[14]",
+              "MSE($\\tilde{\\beta}_{14}, \\beta_{14}^*$)",
+              if_else(coef_name=="beta[15]",
+                "MSE($\\tilde{\\beta}_{15}, \\beta_{15}^*$)",
+                if_else(coef_name=="beta[19]",
+                  "MSE($\\tilde{\\beta}_{19}, \\beta_{19}^*$)",
+                  if_else(coef_name=="beta[20]",
+                    "MSE($\\tilde{\\beta}_{20}, \\beta_{20}^*$)",
+                    "MSE($\\tilde{\\beta}_{Other}, \\beta_{Other}^*$)"
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+    )
+
+df2 <- p.data %>%
+  mutate(statistic=mse_mean) %>%
+  group_by(train_proportion, coef_name, regression, statistic_label) %>%
+  summarise(
+    "Mean" = mean(statistic),
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]),
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  select(!c(coef_name, regression)) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=statistic_label))
+kbl(df2, longtable=T, align="rlrrrrr",
+    caption="MSE Summary Statistics by Proportion of Training Samples",
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
+
+\clearpage
+
+```{r echo=FALSE, results='asis'}
+df5 <- p.data %>%
+  mutate(statistic=mse_mean) %>%
+  group_by(model, train_proportion, coef_name, regression, statistic_label) %>%
+  summarise(
+    "Mean" = mean(statistic),
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]),
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  select(!c(coef_name, regression)) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=statistic_label))
+kbl(df5, longtable=T, align="lrlrrrrr",
+    caption="MSE Summary Statistics by Model and Proportion of Training Samples",
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
+
+\clearpage
+
+```{r echo=FALSE, results='asis'}
+p.data <- p.data %>% mutate(
+    statistic_label = if_else(
+      regression=="5k_V_Yllm",
+        if_else(coef_name=="beta[3]",
+          "$P(\\beta_3^*\\in [\\hat{\\beta}_{3, (0.025)}, \\hat{\\beta}_{3, 0.975}])$",
+          if_else(coef_name=="beta[14]",
+            "$P(\\beta_{14}^*\\in [\\hat{\\beta}_{14, (0.025)}, \\hat{\\beta}_{14, 0.975}])$",
+            if_else(coef_name=="beta[15]",
+              "$P(\\beta_{15}^*\\in [\\hat{\\beta}_{15, (0.025)}, \\hat{\\beta}_{15, 0.975}])$",
+              if_else(coef_name=="beta[19]",
+                "$P(\\beta_{19}^*\\in [\\hat{\\beta}_{19, (0.025)}, \\hat{\\beta}_{19, 0.975}])$",
+                if_else(coef_name=="beta[20]",
+                  "$P(\\beta_{20}^*\\in [\\hat{\\beta}_{20, (0.025)}, \\hat{\\beta}_{20, 0.975}])$",
+                  "$P(\\beta_{Other}^*\\in [\\hat{\\beta}_{Other, (0.025)}, \\hat{\\beta}_{Other, 0.975}])$"
+                  )
+                )
+              )
+            )
+          ),
+      if_else(regression=="train_V_Yhuman",
+          if_else(coef_name=="beta[3]",
+            "$P(\\beta_3^*\\in [{\\beta}^t_{3, (0.025)}, {\\beta}^t_{3, 0.975}])$",
+            if_else(coef_name=="beta[14]",
+              "$P(\\beta_{14}^*\\in [{\\beta}^t_{14, (0.025)}, {\\beta}^t_{14, 0.975}])$",
+              if_else(coef_name=="beta[15]",
+                "$P(\\beta_{15}^*\\in [{\\beta}^t_{15, (0.025)}, {\\beta}^t_{15, 0.975}])$",
+                if_else(coef_name=="beta[19]",
+                  "$P(\\beta_{19}^*\\in [{\\beta}^t_{19, (0.025)}, {\\beta}^t_{19, 0.975}])$",
+                  if_else(coef_name=="beta[20]",
+                    "$P(\\beta_{20}^*\\in [{\\beta}^t_{20, (0.025)}, {\\beta}^t_{20, 0.975}])$",
+                    "$P(\\beta_{Other}^*\\in [{\\beta}^t_{Other, (0.025)}, {\\beta}^t_{Other, 0.975}])$"
+                    )
+                  )
+                )
+              )
+            ),
+          if_else(coef_name=="beta[3]",
+            "$P(\\beta_3^*\\in [\\tilde{\\beta}_{3, (0.025)}, \\tilde{\\beta}_{3, 0.975}])$",
+            if_else(coef_name=="beta[14]",
+              "$P(\\beta_{14}^*\\in [\\tilde{\\beta}_{14, (0.025)}, \\tilde{\\beta}_{14, 0.975}])$",
+              if_else(coef_name=="beta[15]",
+                "$P(\\beta_{15}^*\\in [\\tilde{\\beta}_{15, (0.025)}, \\tilde{\\beta}_{15, 0.975}])$",
+                if_else(coef_name=="beta[19]",
+                  "$P(\\beta_{19}^*\\in [\\tilde{\\beta}_{19, (0.025)}, \\tilde{\\beta}_{19, 0.975}])$",
+                  if_else(coef_name=="beta[20]",
+                    "$P(\\beta_{20}^*\\in [\\tilde{\\beta}_{20, (0.025)}, \\tilde{\\beta}_{20, 0.975}])$",
+                    "$P(\\beta_{Other}^*\\in [\\tilde{\\beta}_{Other, (0.025)}, \\tilde{\\beta}_{Other, 0.975}])$"
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+    )
+
+df3 <- p.data %>%
+  mutate(statistic=coverage_mean) %>%
+  group_by(train_proportion, coef_name, regression, statistic_label) %>%
+  summarise(
+    "Mean" = mean(statistic),
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]),
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  select(!c(coef_name, regression)) %>%
+  rename(c("Train Prop"=train_proportion, "Statistic"=statistic_label))
+kbl(df3, longtable=T, align="rllrrrrr",
+    caption="Coverage Summary Statistics by Proportion of Training Samples",
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
+
+\clearpage
+
+```{r echo=FALSE, results='asis'}
+df6 <- p.data %>%
+  mutate(statistic=coverage_mean) %>%
+  group_by(model, train_proportion, coef_name, regression, statistic_label) %>%
+  summarise(
+    "Mean" = mean(statistic),
+    "SD" = sd(statistic),
+    "Median" = median(statistic),
+    "5\\%" = quantile(statistic, probs[1]),
+    "95\\%" = quantile(statistic, probs[2]),
+    .groups = "drop") %>%
+  select(!c(coef_name, regression)) %>%
+  rename(c("Model"=model, "Train Prop"=train_proportion, "Statistic"=statistic_label))
+kbl(df6, longtable = T, align="lrlrrrrr",
+    caption="Coverage Summary Statistics by Model and Proportion of Training Samples",
+    digits=5, booktabs=T, linesep = "", escape=F) %>%
+  kable_styling(latex_options = c("striped", "scale_down"), stripe_index = stripe)
+```
 
