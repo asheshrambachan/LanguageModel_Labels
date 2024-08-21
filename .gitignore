@@ -19,13 +19,9 @@ congressional_bills/04_simulation/rds*
 *.Rhistory
 *.RData
 
-congressional_bills/04_simulation/lhs/nonparametric/rds*
-congressional_bills/04_simulation/lhs/nonparametric/pre_post_simulation*
-congressional_bills/04_simulation/lhs/nonparametric/*.csv
-congressional_bills/04_simulation/lhs/bayesian/*.csv
-congressional_bills/04_simulation/lhs/bayesian/rds*
-congressional_bills/04_simulation/lhs/bayesian/figures*
+congressional_bills/04_simulation/lhs/nonparametric/*
 congressional_bills/04_simulation/lhs/bayesian_*
+congressional_bills/04_simulation/lhs/bayesian/*
 
 congressional_bills/04_simulation/evaluate_*
 congressional_bills/04_simulation/evaluate_*
