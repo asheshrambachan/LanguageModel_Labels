@@ -132,7 +132,8 @@ The estimated bias of $\beta$ is
 ```math
 \begin{aligned}
 \text{bias}(\beta) 
-    &= \mathbb{E}[\beta - \beta^\star] \approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
+    &= \mathbb{E}[\beta - \beta^\star] \\
+    &\approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
     &= \beta_\text{mean} - \beta^\star
 \end{aligned}
 ```
@@ -148,7 +149,11 @@ The estimated  normalized bias of $\beta$ is given by:
 
 The estimated MSE of $\beta$ is defined as:
 ```math
-\text{mse}(\beta) = \mathbb{E}[(\beta - \beta^\star)^2] \approx \frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
+\begin{aligned}
+\text{mse}(\beta) 
+    &= \mathbb{E}[(\beta - \beta^\star)^2] \\
+    &\approx \frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
+\end{aligned}
 ```
 
 The estimated coverage probability of $\beta$ is given by:
@@ -156,10 +161,12 @@ The estimated coverage probability of $\beta$ is given by:
 \begin{aligned}
 \text{coverage}(\beta) 
     &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
-    &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\}.
+    &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \\
+    &\approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\}.
 \end{aligned}
 ```
 
 
-#### 4.5. **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**: These files contain intermediate regressions that we don't use in our analysis
+#### 4.5. **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**
+These files contain intermediate regressions that we don't use in our analysis
 
