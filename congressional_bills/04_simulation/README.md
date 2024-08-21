@@ -81,7 +81,7 @@ This R markdown merges the results of the simulations and generating the followi
     - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
 
     The bias for the $i^\text{th}$ simulation is defined as:
-    $$
+    $$\displaystyle
     \text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
     $$
 
