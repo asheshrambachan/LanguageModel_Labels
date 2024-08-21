@@ -49,16 +49,21 @@ This R markdown generates the set of combinations for the simulations, generatin
 ```math
 Y = \beta_0 + \beta_1 V + \epsilon
 ```
-Where $Y\in\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$ and
-```math
-Y_3 = \mathbbm{1}\{Y = 3\}
-```
 
 - **`combinations_rhs.csv`**: Defines combinations where the major topic, $Y$, is on the right-hand side (RHS) as an independent variable: 
 ```math
 V = Y^\top\beta + \nu = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
 ```
 
+Note that $V\in\{\text{Democrat}, \text{Senate}, \text{DW1}\}$, where
+```math
+\text{Democrat} := 1\{\text{Party} = \text{Democrat}\}
+\text{Senate} := 1\{\text{Chamber} = \text{Senate}\}
+```
+and $\text{DW1}$ is a float number of the imputed DW1 score for the bill sponsor. $Y \in \{ Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$ where
+```math
+Y_\text{topic} = 1\{Y = \text{topic}\}
+```
 
 These combinations are used in subsequent simulation scripts and ensure reproducibility by using the combination unique IDs as a seed.
 
@@ -79,9 +84,14 @@ These scripts runs parallel simulations for combinations where $Y$ is in the LHS
 ### 4. `post_simulation.Rmd`
 This R markdown merges the results of the simulations and generating the following outputs:
 
-- **`10k_human_lhs.csv` and `10k_human_rhs.csv`**: These files contain the regression results using `Yhuman` across all 10,000 bills.
-- **`10k_llm_lhs.csv` and `10k_llm_rhs.csv`**: These files contain the regression results using `Yllm` across all 10,000 bills.
-- **`simulations_lhs.csv` and `simulations_rhs.csv`**: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
+#### 4.1. `10k_human_lhs.csv` and `10k_human_rhs.csv`**
+These files contain the regression results using `Yhuman` across all 10,000 bills.
+
+#### 4.2. `10k_llm_lhs.csv` and `10k_llm_rhs.csv`**
+These files contain the regression results using `Yllm` across all 10,000 bills.
+
+#### 4.3. **`simulations_lhs.csv` and `simulations_rhs.csv`**
+These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
 
 Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{human}, \tilde{\beta}}$, where:
 
@@ -104,27 +114,52 @@ Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(
 \text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
 ```
 
+#### 4.4. **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**
 
-- **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
+These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
 
-    The sample mean of $\beta$ is given by
-    $$\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$$
+The sample mean of $\beta$ is given by
+```math
+\beta_\text{mean} := \frac{1}{N} \sum_{i=1}^N \beta^{(i)}
+```
 
-    The sample SD of $\beta$ is given by:
-    $$\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N-1} (\beta^{(i)} - \beta_\text{mean})^2$$
+The sample SD of $\beta$ is given by:
+```math
+\beta_\text{SD} := \frac{1}{N-1} \sum_{i=1}^{N-1} (\beta^{(i)} - \beta_\text{mean})^2
+```
 
-    The estimated bias of $\beta$ is
-    $$\text{bias}(\beta) = \mathbb{E}[\beta - \beta^\star] \approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) = \beta_\text{mean} - \beta^\star$$
+The estimated bias of $\beta$ is
+```math
+\begin{aligned}
+\text{bias}(\beta) 
+    &= \mathbb{E}[\beta - \beta^\star] \approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
+    &= \beta_\text{mean} - \beta^\star
+\end{aligned}
+```
 
-    The estimated  normalized bias of $\beta$ is given by: 
-    $$\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.
+The estimated  normalized bias of $\beta$ is given by: 
+```math
+\begin{aligned}
+\text{bias}_\text{norm}(\beta) 
+    &= \frac{\text{bias}(\beta)}{\beta_\text{SD}} \\
+    &= \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.
+\end{aligned}
+```
 
-    The estimated MSE of $\beta$ is defined as:
-    $$\text{mse}(\beta) = \mathbb{E}[(\beta - \beta^\star)^2] \approx \frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$$.
+The estimated MSE of $\beta$ is defined as:
+```math
+\text{mse}(\beta) = \mathbb{E}[(\beta - \beta^\star)^2] \approx \frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
+```
 
-    The estimated coverage probability of $\beta$ is given by:
-    $$\text{coverage}(\beta) = \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) = \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\}.$$
+The estimated coverage probability of $\beta$ is given by:
+```math
+\begin{aligned}
+\text{coverage}(\beta) 
+    &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
+    &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\}.
+\end{aligned}
+```
 
 
-- **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**: These files contain intermediate regressions that we don't use in our analysis
+#### 4.5. **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**: These files contain intermediate regressions that we don't use in our analysis
 
