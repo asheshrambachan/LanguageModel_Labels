@@ -122,6 +122,11 @@ data %>%
 regressions <- data %>% 
   filter(regression %in% c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")) %>%
   merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
+  mutate(
+    bias = bias(coef, coef.ref), # Calculate bias
+    mse = mse(coef, coef.ref),  # Calculate Mean Squared Error (MSE)
+    coverage = coverage(coef.ref, lci, uci),  # Check if the confidence interval covers the reference coefficient
+  ) %>%
   arrange(combination_id, sim_number, coef_name) %>%
   relocate(coef_name, .before=coef) %>%
   relocate(sim_number, .before=regression) 
@@ -134,10 +139,11 @@ regressions %>%
   group_by(combination_id, train_proportion, model, prompt, V, Y, regression, coef_name) %>% 
   summarise(
     coef_mean = mean(coef),
-    coef_sd = sd(coef),
-    bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
-    mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
-    coverage_mean = mean(coverage(coef.ref, lci, uci)), # Check if the confidence interval covers the reference coefficient
+    coef_sd = sd(coef), 
+    bias_mean = mean(bias), 
+    bias_norm = bias_mean/coef_sd,
+    mse_mean = mean(mse), 
+    coverage_mean = mean(coverage), 
     .groups = "drop") %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(lhs_simulation_dir, "simulations_averaged_lhs.csv"), row.names=FALSE)
@@ -200,6 +206,11 @@ data %>%
 regressions <- data %>% 
   filter(regression %in% regressions_of_intreset[3:5]) %>%
   merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
+  mutate(
+    bias = bias(coef, coef.ref), # Calculate bias
+    mse = mse(coef, coef.ref),  # Calculate Mean Squared Error (MSE)
+    coverage = coverage(coef.ref, lci, uci),  # Check if the confidence interval covers the reference coefficient
+  ) %>%
   arrange(combination_id, sim_number, coef_name) %>%
   relocate(coef_name, .before=coef) %>%
   relocate(sim_number, .before=regression) 
@@ -213,9 +224,10 @@ regressions %>%
   summarise(
     coef_mean = mean(coef),
     coef_sd = sd(coef), 
-    bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
-    mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
-    coverage_mean = mean(coverage(coef.ref, lci, uci)),  # Check if the confidence interval covers the reference coefficient
+    bias_mean = mean(bias), 
+    bias_norm = bias_mean/coef_sd,
+    mse_mean = mean(mse), 
+    coverage_mean = mean(coverage), 
     .groups = "drop") %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(rhs_simulation_dir, "simulations_averaged_rhs.csv"), row.names=FALSE)

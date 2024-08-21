@@ -14,7 +14,7 @@ summary_robust <- function(model, name.regression, alpha=0.05, z.score=TRUE){
   coef.values <- coef(model)
   
   # Simplify coefficient names
-  coef.names <- gsub("Yhuman|Yllm|Ytilde", "Y",  names(coef.values))
+  coef.names <- gsub("Yhuman|Yllm|Ytilde", "",  names(coef.values))
   
   # Compute robust SEs
   robust.model <- coeftest(model, vcov=vcovHC(model, type = "HC1"))
@@ -39,7 +39,7 @@ summary_robust <- function(model, name.regression, alpha=0.05, z.score=TRUE){
 summary_boot = function(coef.values, boot.coef.values, name.regression, alpha=0.05){
   
   # Simplify coefficient names
-  coef.names <- gsub("Yhuman|Yllm|Ytilde", "Y",  names(coef.values))
+  coef.names <- gsub("Yhuman|Yllm|Ytilde", "",  names(coef.values))
   
   # Calculate standard errors from bootstrap samples
   se <- apply(boot.coef.values, 2, sd)
@@ -91,7 +91,7 @@ fun.test_Ytilde_V <- function(train, test, return.intermediate_regressions=FALSE
 }
 
 # (2.2) Run LHS regressions based on the specified combination.
-fun.lhs_regressions <- function(combination, boot=c("nonparametric", "bayesian"), rds_dir=NULL) {
+fun.lhs_regressions <- function(combination, boot=c("bayesian", "nonparametric"), path.rds_dir=NULL) {
   boot <- match.arg(boot)
   
   # Reformat and filter the local data from global DATA based on the current combination
@@ -179,11 +179,11 @@ fun.lhs_regressions <- function(combination, boot=c("nonparametric", "bayesian")
   # Add metadata from the combination to all simulations
   regressions <- merge(combination, regressions, all=TRUE)
   
-  # If rds_dir is provided, results will be saved as an RDS file; otherwise, they will be returned as a data.frame.
-  if (is.null(rds_dir)){
+  # If path.rds_dir is provided, results will be saved as an RDS file; otherwise, they will be returned as a data.frame.
+  if (is.null(path.rds_dir)){
     return (regressions)
   } else {
-    path_regressions <- file.path(rds_dir, sprintf("combination%05d.rds", combination$combination_id))
+    path_regressions <- file.path(path.rds_dir, sprintf("combination%05d.rds", combination$combination_id))
     saveRDS(regressions, file=path_regressions)
     return(data.frame(path=path_regressions))
   }
@@ -258,7 +258,7 @@ fun.test_Vtilde_Ytilde <- function(train, test, return.intermediate_regressions=
 }
 
 # (3.2) Run RHS regressions based on the specified combination.
-fun.rhs_regressions <- function(combination, rds_dir=NULL, boot=c("bayesian", "nonparametric"), all_reg=TRUE){
+fun.rhs_regressions <- function(combination, path.rds_dir=NULL, boot=c("bayesian", "nonparametric"), all_reg=TRUE){
   boot <- match.arg(boot)
   
   # Reformat and filter the local data from global DATA based on the current combination
@@ -364,11 +364,11 @@ fun.rhs_regressions <- function(combination, rds_dir=NULL, boot=c("bayesian", "n
   # Add metadata from the combination to all simulations
   regressions <- merge(combination, regressions, all=TRUE)
   
-  # If rds_dir is provided, results will be saved as an RDS file; otherwise, they will be returned as a data.frame.
-  if (is.null(rds_dir)){
+  # If path.rds_dir is provided, results will be saved as an RDS file; otherwise, they will be returned as a data.frame.
+  if (is.null(path.rds_dir)){
     return(regressions)
   } else {
-    path_regressions <- file.path(rds_dir, sprintf("combination%05d.rds", combination$combination_id))
+    path_regressions <- file.path(path.rds_dir, sprintf("combination%05d.rds", combination$combination_id))
     saveRDS(regressions, file=path_regressions)
     return(data.frame(path=path_regressions))
   }

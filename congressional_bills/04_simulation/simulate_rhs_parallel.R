@@ -1,15 +1,32 @@
-# title: "RHS Simulations"
-# date: "July 31, 2024"
-# output: html_document
-# This code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
+# ------------------------------------------------------------------
+# Script Name: simulate_rhs_parallel.R
+# Date: Jul 31, 2024
+# Last update: Aug 21, 2024
+# 
+# Instructions:
+# 1. Ensure R version is up to date and that all necessary libraries are installed as explained in the README.md file before running the script.
+# 1. Lines 17-26 contain parameters and paths that can be customized by the user.
+# 2. After the "End of User Configurable Parameters", no changes are necessary unless you intend to modify the core functionality.
+# 
+# Note: This code is based on  https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
+# -------------------------------------------------------------------
 
-# Arguments not specified in combinations.csv
+
+# --- User Configurable Parameters ----------------------------------
 n_cores <- 50
-debug <- FALSE
-sel_topics <- c(3, 14, 15, 19, 20) # these are the most common major topics based on Major/Yhuman column (not MajorLLM/Yllm)
+sel_topics <- c(3, 14, 15, 19, 20) # These topics, along with "Other", are used as the Y indicators (topic dummies) for RHS regressions. The current list represents the most common major topics based on the Major/Yhuman column. 
 boot <- "bayesian" # "nonparametric"
 
-# Load required packages quietly
+# Set directories and file paths
+path.repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
+path.data <- file.path(path.repo_dir, "02_llm/bills_prompts_responses_10000.csv")
+path.combinations <- file.path(path.repo_dir, sprintf("04_simulation/rhs/%s/combinations_rhs.csv", boot))
+path.functions <- file.path(path.repo_dir, "04_simulation/functions.R")
+path.rds_dir <- file.path(path.repo_dir, sprintf("04_simulation/rhs/%s/rds", boot))
+# --- End of User Configurable Parameters ---------------------------
+
+
+# Load required packages quietly and custom functions
 suppressPackageStartupMessages({
   library(zoo)
   library(dplyr)
@@ -17,33 +34,25 @@ suppressPackageStartupMessages({
   library(lmtest)
   library(furrr)
 })
+source(path.functions)
 
 # Reset processing plan
 plan(sequential)
 
-# Set directories and file paths
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-path_data <- file.path(repo_dir, "02_llm/bills_prompts_responses_10000.csv")
-simulations_dir <- file.path(repo_dir, sprintf("04_simulation/rhs/%s", boot))
-rds_dir <- file.path(simulations_dir, "rds")
-
-# Load custom functions
-source(file.path(repo_dir, "04_simulation/functions.R"))
-
 # Load combinations file
-combinations <- read.csv(file.path(simulations_dir, "combinations_rhs.csv"))
+combinations <- read.csv(path.combinations)
 
 # Set up Rds file output directory
-dir.create(rds_dir, showWarnings=FALSE)
+dir.create(path.rds_dir, showWarnings=FALSE)
 
 # Count number of remaining combinations
-completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(rds_dir, pattern = "*.rds")))
+completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(path.rds_dir, pattern = "*.rds")))
 combinations <- combinations %>% filter(!(combination_id %in% completed_id))
 n_remaining_combinations <- nrow(combinations) 
 cat(sprintf("Number of remaining combinations = %d\n", n_remaining_combinations))
 
 # Load and reformat data (a global variable)
-DATA <- read.csv(path_data) %>% 
+DATA <- read.csv(path.data) %>% 
   mutate(
     # Unlike LHS, we keep categorical variables as.integer since it's the dependent variable
     Senate = as.integer(Chamber == "Senate"), 
@@ -75,8 +84,13 @@ plan(multisession, workers=n_cores)
 simulations <- combinations %>%
   split(.$combination_id) %>%
   unname(.) %>%
-  future_map_dfr(~ fun.rhs_regressions(combination=.x, rds_dir=rds_dir, boot=boot),
-                 .options = furrr_options(seed=TRUE)) # We set the seed inside the function for reproducibility
+  future_map_dfr(~ fun.rhs_regressions(
+      combination=.x, 
+      path.rds_dir=path.rds_dir, 
+      boot=boot
+      ),
+    .options = furrr_options(seed=TRUE) # We set the seed inside the function for reproducibility
+    ) 
 
 print(warnings())
 plan(sequential)
