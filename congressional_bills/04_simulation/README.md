@@ -84,7 +84,9 @@ Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills,
 - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
 
 The bias for the $i^\text{th}$ simulation is defined as:
-$$\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$$
+```math
+\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
+```
 
 The mean squared error (MSE) for the $i^\text{th}$ is defined as:
 $$
