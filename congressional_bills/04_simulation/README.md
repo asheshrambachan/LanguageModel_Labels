@@ -74,26 +74,22 @@ This R markdown merges the results of the simulations and generating the followi
 - **`10k_llm_lhs.csv` and `10k_llm_rhs.csv`**: These files contain the regression results using `Yllm` across all 10,000 bills.
 - **`simulations_lhs.csv` and `simulations_rhs.csv`**: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
 
-    Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{human}, \tilde{\beta}}$, where:
+Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{human}, \tilde{\beta}}$, where:
 
-    - $\hat{\beta}$ is the estimate using a 5K sample of LLM labels,
-    - $\beta^\text{human}$ is the estimate using human labels from the training data at a specific training proportion from the 5K bills,
-    - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
+- $\hat{\beta}$ is the estimate using a 5K sample of LLM labels,
+- $\beta^\text{human}$ is the estimate using human labels from the training data at a specific training proportion from the 5K bills,
+- $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
 
-    The bias for the $i^\text{th}$ simulation is defined as:
-    ```math
-    \text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
-    ```
+The bias for the $i^\text{th}$ simulation is defined as:
+$$\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$$
 
-    The mean squared error (MSE) for the $i^\text{th}$ is defined as:
-    ```math
-    \text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
-    ```
+The mean squared error (MSE) for the $i^\text{th}$ is defined as:
+$$\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$$
 
-    Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
-    ```math
-    \text{coverage}(\beta^{(i)}) := 1\left\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \right\}.
-    ```
+Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
+```math
+\text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
+```
 
 
 - **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
