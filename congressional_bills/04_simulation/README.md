@@ -57,11 +57,11 @@ V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  
 
 Note that \(V\in\{\text{Democrat}, \text{Senate}, \text{DW1}\}\), where
 ```math
-\begin{aligend}
-\text{Democrat} &= 1\{\text{Party} = \text{Democrat}\}\\
-\text{Senate} &= 1\{\text{Chamber} = \text{Senate}\}\\
+\begin{aligned}
+\text{Democrat} &= 1\{\text{Party} = \text{Democrat}\} \\
+\text{Senate} &= 1\{\text{Chamber} = \text{Senate}\} \\
 \text{DW1} &= \text{a float number of the imputed DW1 score for the bill sponsor.}
-\end{aligend}
+\end{aligned}
 ```
 $$Y_\text{topic} \in \{ Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$$ and
 ```math
