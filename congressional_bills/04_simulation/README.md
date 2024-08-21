@@ -47,12 +47,12 @@ This R markdown generates the set of combinations for the simulations, generatin
 
 - **`combinations_lhs.csv`**: Defines combinations where the major topic, $Y$, is on the left-hand side (LHS) as the dependent variable:
 ```math
-Y = \beta_0 + \beta_1 V + \epsilon
+Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon
 ```
 
 - **`combinations_rhs.csv`**: Defines combinations where the major topic, $Y$, is on the right-hand side (RHS) as an independent variable: 
 ```math
-V = Y^\top\beta + \nu = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
+V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
 ```
 
 Note that $V\in\{\text{Democrat}, \text{Senate}, \text{DW1}\}$, where
@@ -60,7 +60,7 @@ Note that $V\in\{\text{Democrat}, \text{Senate}, \text{DW1}\}$, where
 \text{Democrat} := 1\{\text{Party} = \text{Democrat}\}
 \text{Senate} := 1\{\text{Chamber} = \text{Senate}\}
 ```
-and $\text{DW1}$ is a float number of the imputed DW1 score for the bill sponsor. $Y \in \{ Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$ where
+and $\text{DW1}$ is a float number of the imputed DW1 score for the bill sponsor. $$Y_\text{topic} \in \{ Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$$ and
 ```math
 Y_\text{topic} = 1\{Y = \text{topic}\}
 ```
@@ -91,7 +91,7 @@ These files contain the regression results using `Yhuman` across all 10,000 bill
 These files contain the regression results using `Yllm` across all 10,000 bills.
 
 #### 4.3. **`simulations_lhs.csv` and `simulations_rhs.csv`**
-These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
+These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $$i \in \{1, \ldots, N = 1000\}$$ simulation runs, relative to the `10k_Yhuman` regressions.
 
 Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{human}, \tilde{\beta}}$, where:
 
