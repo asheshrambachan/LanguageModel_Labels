@@ -72,66 +72,54 @@ rds_dir <- file.path(lhs_simulation_dir, "rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
-simulations <- bind_rows(lapply(rds_paths, readRDS)) %>% 
+data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
   rename(c(t=t_stat, Y=major_topic, V=variable)) %>% 
   mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", model),
          coef_name = as.factor(if_else(coef_name=="V1", "V", coef_name)))
 
 # Check NaNs
-n_simulation_grouped = simulations %>% 
+data %>% 
   group_by(regression, coef_name) %>% 
   summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
             .groups="drop") %>%
   filter(share.nan_t>0) %>%
-  as.data.frame(.)
-print(n_simulation_grouped)
+  as.data.frame(.) %>%
+  print(.)
 
-simulations_nan <- simulations %>% 
-  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ]
-write.csv(simulations_nan, file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
+data %>% 
+  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ] %>%
+  write.csv(file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
 
 # Simulations we don't use
 regressions_of_intreset = c("10k_Yhuman_V", "10k_Yllm_V", "5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")
 
-simulations %>% 
+data %>% 
   filter(!(regression %in% regressions_of_intreset)) %>%
   write.csv(file.path(lhs_simulation_dir, "simulations_other.csv"), row.names=FALSE)
 
 # Simulations we do use
-simulations <- simulations %>% 
+data <- data %>% 
   filter(regression %in% regressions_of_intreset)
 
 # Extract reference regression results (10k_Yhuman_V)
-regression.ref <- simulations %>% 
-  filter(regression=="10k_Yhuman_V") %>%
-  group_by(V, Y, coef_name) %>%
-  summarise(
-    regression = first(regression),
-    coef = first(coef),
-    se = first(se),
-    t = first(t), 
-    lci = first(lci),
-    uci = first(uci), .groups="drop")
+regression.ref <- data %>% 
+    filter(regression=="10k_Yhuman_V") %>%
+    select(regression, V, Y, coef_name, coef, se, t, lci, uci) %>%
+    distinct()
+write.csv(regression.ref, file.path(lhs_simulation_dir, "10k_human_lhs.csv"), row.names=FALSE)
 
 # Compute the bias/mse/coverage relative to the reference regression. 
 # Save the 10k_Yllm_V results in a separate file. 
-simulations %>% 
+data %>% 
   filter(regression=="10k_Yllm_V") %>%
-  select(!c(sim_number, train_proportion, N, B, n_samples)) %>%
-  group_by(V, Y, coef_name, model, prompt) %>%
-  summarise(
-    regression = first(regression),
-    coef = first(coef),
-    se = first(se),
-    t = first(t), 
-    lci = first(lci),
-    uci = first(uci), .groups="drop") %>%
-  merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
-  relocate(coef_name, .before=coef) %>%
+  select(c("prompt", "model", "V", "Y", "regression", "coef_name", "coef", "se", "t", "lci", "uci")) %>%
+  distinct() %>%
+  # merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
+  # relocate(coef_name, .before=coef) %>%
   write.csv(file.path(lhs_simulation_dir, "10k_llm_lhs.csv"), row.names=FALSE)
 
 # Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
-regressions <- simulations %>% 
+regressions <- data %>% 
   filter(regression %in% c("5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")) %>%
   merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
   arrange(combination_id, sim_number, coef_name) %>%
@@ -146,8 +134,7 @@ regressions %>%
   group_by(combination_id, train_proportion, model, prompt, V, Y, regression, coef_name) %>% 
   summarise(
     coef_mean = mean(coef),
-    # coef_sd = sd(coef), 
-    # se_mean = sqrt(mean(se^2)),
+    coef_sd = sd(coef),
     bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
     mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
     coverage_mean = mean(coverage(coef.ref, lci, uci)), # Check if the confidence interval covers the reference coefficient
@@ -155,43 +142,6 @@ regressions %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(lhs_simulation_dir, "simulations_averaged_lhs.csv"), row.names=FALSE)
 ```
-
-<!-- ## Density Plot for `simulations_lhs.csv` -->
-
-<!-- ```{r} -->
-<!-- simulations_path <- file.path(simulation_dir, "simulations_lhs.csv") -->
-<!-- simulations <- read.csv(simulations_path) -->
-
-<!-- figures_dir <- file.path(simulation_dir, "density_lhs") -->
-<!-- dir.create(figures_dir, showWarnings=FALSE) -->
-
-<!-- legend_colors <- c("Yhuman_V"="black", "Yllm_V"="#1f77b4", "train_Yhuman_V"="#008000", "test_Ytilde_V"="#ff7f0e") -->
-<!-- legend_labels <- c("Yhuman_V"=TeX(r"($\beta_1^*$)"), -->
-<!--                    "Yllm_V"=TeX(r"($\hat{\beta}_1$ (LLM))"), -->
-<!--                    "train_Yhuman_V"=TeX(r"($\beta_1^{train}$ (Human))"), -->
-<!--                    "test_Ytilde_V"=TeX(r"($\tilde{\beta}_1$ (Debiased))")) -->
-
-<!-- for (i in unique(simulations$combination_id)){ -->
-<!--   simulation <- simulations %>% filter(combination_id==i) -->
-<!--   N <- simulation$N[1] -->
-<!--   V <- simulation$variable[1] -->
-<!--   Y <- simulation$major_topic[1] -->
-<!--   regression_label = TeX(sprintf(r"(LHS Regression: $1\{Y=%d\} = \beta_0 + \beta_1 %s$)", Y, V)) -->
-
-<!--   p <- ggplot(simulation, aes(x=coef, color=regression)) + -->
-<!--     geom_vline(aes(xintercept=coef.ref, color=regression.ref), linetype="dashed") + -->
-<!--     geom_density() + -->
-<!--     labs(title=sprintf("Kernel Density of Regression Coefficients, N=%d", N), -->
-<!--          subtitle=regression_label) + -->
-<!--     facet_wrap(~ coef_name, nrow=1, scales="free") + -->
-<!--     scale_color_manual(name="", values=legend_colors, labels=legend_labels, breaks=names(legend_colors)) + -->
-<!--     theme_bw() + -->
-<!--     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="bottom") -->
-<!--   ggsave(plot=p, file=file.path(figures_dir, sprintf("combination%05d.png",i)), width=6, height=3) -->
-<!--   } -->
-<!-- ``` -->
-
-
 
 # Proxy on the RHS
 
@@ -202,65 +152,52 @@ rds_dir <- file.path(rhs_simulation_dir, "rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
-simulations <- bind_rows(lapply(rds_paths, readRDS)) %>% 
+data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
   rename(c(t=t_stat, V=variable)) %>% 
   mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", model))
 
 # Check NANs
-n_simulation_grouped = simulations %>% 
+data %>% 
   group_by(regression, coef_name) %>% 
   summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
             .groups="drop") %>%
   filter(share.nan_t>0) %>%
-  as.data.frame(.)
-print(n_simulation_grouped)
+  as.data.frame(.) %>%
+  print(.)
 
-simulations_nan <- simulations %>% 
-  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ]
-write.csv(simulations_nan, file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
+data %>% 
+  .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ] %>%
+  write.csv(file.path(lhs_simulation_dir, "simulations_nan.csv"), row.names=FALSE)
 
 # Regressions we don't use
 regressions_of_intreset = c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde")
-simulations %>% 
+data %>% 
   filter(!(regression %in% regressions_of_intreset)) %>%
   write.csv(file.path(rhs_simulation_dir, "simulations_other.csv"), row.names=FALSE)
 
 # Regressions we do use
-simulations <- simulations %>% 
+data <- data %>% 
   filter(regression %in% regressions_of_intreset)
 
 # Extract reference regression results (10k_V_Yhuman)
-regression.ref <- simulations %>% 
+regression.ref <- data %>% 
   filter(regression=="10k_V_Yhuman") %>%
-  group_by(V, coef_name) %>%
-  summarise(
-    regression = first(regression),
-    coef = first(coef),
-    se = first(se),
-    t = first(t), 
-    lci = first(lci),
-    uci = first(uci), .groups="drop")
+  select(regression, V, coef_name, coef, se, t, lci, uci) %>%
+  distinct()
+write.csv(regression.ref, file.path(rhs_simulation_dir, "10k_human_rhs.csv"), row.names=FALSE)
 
 # Compute the bias/mse/coverage relative to the reference regression. 
 # Save the 10k_V_Yllm results in a separate file. 
-simulations %>% 
+data %>% 
   filter(regression=="10k_V_Yllm") %>%
-  select(!c(sim_number, train_proportion, N, B, n_samples)) %>%
-  group_by(V, coef_name, model, prompt) %>%
-  summarise(
-    regression = first(regression),
-    coef = first(coef),
-    se = first(se),
-    t = first(t), 
-    lci = first(lci),
-    uci = first(uci), .groups="drop") %>%
-  merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
-  arrange(V, model, prompt, coef_name) %>%
-  relocate(coef_name, .before=coef) %>%
+  select(c("prompt", "model", "V", "regression", "coef_name", "coef", "se", "t", "lci", "uci")) %>%
+  distinct() %>%
+  # merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
+  # relocate(coef_name, .before=coef) %>%
   write.csv(file.path(rhs_simulation_dir, "10k_llm_rhs.csv"), row.names=FALSE)
 
 # Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
-regressions <- simulations %>% 
+regressions <- data %>% 
   filter(regression %in% regressions_of_intreset[3:5]) %>%
   merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
   arrange(combination_id, sim_number, coef_name) %>%
@@ -275,6 +212,7 @@ regressions %>%
   group_by(combination_id, train_proportion, model, prompt, V, regression, coef_name) %>% 
   summarise(
     coef_mean = mean(coef),
+    coef_sd = sd(coef), 
     bias_mean = mean(bias(coef, coef.ref)), # Calculate bias
     mse_mean = mean(mse(coef, coef.ref)),  # Calculate Mean Squared Error (MSE)
     coverage_mean = mean(coverage(coef.ref, lci, uci)),  # Check if the confidence interval covers the reference coefficient
@@ -282,39 +220,4 @@ regressions %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(rhs_simulation_dir, "simulations_averaged_rhs.csv"), row.names=FALSE)
 ```
-
-
-<!-- ### Density Plot for `simulations_rhs.csv` -->
-
-<!-- ```{r} -->
-<!-- simulations_path <- file.path(simulation_dir, "simulations_rhs.csv") -->
-<!-- simulations <- read.csv(simulations_path) -->
-
-<!-- figures_dir <- file.path(simulation_dir, "density_rhs") -->
-<!-- dir.create(figures_dir, showWarnings=FALSE) -->
-
-<!-- colors <- c("V_Yhuman"="black", "V_Yllm"="#1f77b4", "train_V_Yhuman"="#008000", "test_Vtilde_Ytilde"="#ff7f0e") -->
-
-<!-- Y <- unique(simulations$major_topic) -->
-
-<!-- for (i in unique(simulations$combination_id)){ -->
-<!--   simulation <- simulations %>% filter(combination_id==i) -->
-<!--   N <- simulation$N[1] -->
-<!--   V <- simulation$variable[1] -->
-<!--   regression_label <- TeX( -->
-<!--     sprintf(r"(RHS Regression: $%s = %s$)", V, -->
-<!--             paste(sapply(1:6, function(i){ sprintf(r"(\beta_{%s} 1\{Y=%s\})", Y[i], Y[i])}), collapse = " + "))) -->
-
-<!--   p <- ggplot(simulation, aes(x=coef, color=regression)) + -->
-<!--     geom_vline(aes(xintercept=coef.ref, color=regression.ref), linetype="dashed") + -->
-<!--     geom_density() + -->
-<!--     labs(title=sprintf("Kernel Density of Regression Coefficients, N=%d", N), -->
-<!--          subtitle=regression_label) + -->
-<!--     facet_wrap(~ coef_name, nrow=1, scales="free") + -->
-<!--     scale_color_manual(name="", values=legend_colors, breaks=names(legend_colors), labels=legend_labels) + -->
-<!--     theme_bw() + -->
-<!--     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="bottom") -->
-<!--   ggsave(plot=p, file=file.path(figures_dir, sprintf("combination%05d.png",i)), width=12, height=3) -->
-<!--   } -->
-<!-- ``` -->
 
