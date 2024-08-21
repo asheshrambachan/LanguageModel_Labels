@@ -109,7 +109,7 @@ The mean squared error (MSE) for the $i^\text{th}$ is defined as:
 \text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
 ```
 
-Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [\beta^{(i)}_{(0.025)}, \beta^{(i)}_{(0.975)}]$. The coverage is defined as:
+Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [{\beta^{(i)}}_{(0.025)}, {\beta^{(i)}}_{(0.975)}]$. The coverage is defined as:
 ```math
 \text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
 ```
