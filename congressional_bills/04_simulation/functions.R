@@ -1,5 +1,14 @@
-# (1) Generic Functions
+# ------------------------------------------------------------------
+# Script Name: functions.R
+# Date: Jul 31, 2024
+# Last update: Aug 21, 2024
+# 
+# This file contains utility functions used when running the simulations.
+#
+# Note: This code is based on  https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
+# -------------------------------------------------------------------
 
+# (1) Generic Functions
 # (1.1) Recode using provided list of topics, converting the non-included topics to "Other"
 recode_topics <- function(x, topics){
   x_recoded <- addNA(factor(x, levels=topics))  # Recode factor levels, including NA

@@ -7,10 +7,8 @@ date: "Aug 13, 2024"
 ```{r, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo=TRUE)
 
-# Define directory paths
+# Set the working directory 
 repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-
-# Set the working directory to the simulation directory
 knitr::opts_knit$set(root.dir=repo_dir)
 setwd(repo_dir)
 
@@ -20,18 +18,9 @@ require(ggplot2)
 
 # Overview
 
-This notebook generates the `combinations_lhs.csv` and `combinations_rhs.csv` files, which are then used in the simulation R scripts that we run on the server:  
+This notebook generates the `combinations_lhs.csv` and `combinations_rhs.csv` files, which are then used in the simulation R scripts.
 
-- `simulate_lhs.R`: These involve placing `Y` on the left-hand side as the dependent variable (`Y ~ V`).
-- `simulate_rhs.R`: These involve placing `Y` on the right-hand side as the independent variable (`V ~ Y`).
-
-Each combination is executed on a separate core, with the results saved as `*.rds` files in the corresponding directories, `rds_lhs` or `rds_rhs`.
-
-# Proxy on the LHS
-
-## Create `combinations_lhs.csv`
-
-The code generates `combinations_lhs.csv`. To ensure reproducibility, the file is generated the way we do below. 
+# Create `combinations_lhs.csv`
 
 ```{r}
 simulation_dir <- file.path(repo_dir, "04_simulation/lhs/bayesian")
@@ -56,9 +45,7 @@ combinations <- expand.grid(
 write.csv(combinations, file.path(simulation_dir, "combinations_lhs.csv"), row.names=FALSE)
 ```
 
-# Proxy on the RHS
-
-## Create `combinations_rhs.csv`
+# Create `combinations_rhs.csv`
 
 ```{r}
 simulation_dir <- file.path(repo_dir, "04_simulation/rhs/bayesian")

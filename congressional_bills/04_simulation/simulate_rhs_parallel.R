@@ -5,12 +5,10 @@
 # 
 # Instructions:
 # 1. Ensure R version is up to date and that all necessary libraries are installed as explained in the README.md file before running the script.
-# 1. Lines 17-26 contain parameters and paths that can be customized by the user.
-# 2. After the "End of User Configurable Parameters", no changes are necessary unless you intend to modify the core functionality.
+# 2. Update parameters and paths within "User Configurable Parameters" block below. After the "End of User Configurable Parameters", no changes are necessary unless you intend to modify the core functionality.
 # 
 # Note: This code is based on  https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 # -------------------------------------------------------------------
-
 
 # --- User Configurable Parameters ----------------------------------
 n_cores <- 50
@@ -24,7 +22,6 @@ path.combinations <- file.path(path.repo_dir, sprintf("04_simulation/rhs/%s/comb
 path.functions <- file.path(path.repo_dir, "04_simulation/functions.R")
 path.rds_dir <- file.path(path.repo_dir, sprintf("04_simulation/rhs/%s/rds", boot))
 # --- End of User Configurable Parameters ---------------------------
-
 
 # Load required packages quietly and custom functions
 suppressPackageStartupMessages({
