@@ -46,10 +46,19 @@ Rscript simulate_rhs_parallel.R 1>output_rhs.log 2>error_rhs.log &
 This R markdown generates the set of combinations for the simulations, generating two files:
 
 - **`combinations_lhs.csv`**: Defines combinations where the major topic, $Y$, is on the left-hand side (LHS) as the dependent variable:
-$$Y = \beta_0 + \beta_1 V + \epsilon$$
+```math
+Y = \beta_0 + \beta_1 V + \epsilon
+```
+Where $Y\in\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20} \}$ and
+```math
+Y_3 = \mathbbm{1}\{Y = 3\}
+```
 
 - **`combinations_rhs.csv`**: Defines combinations where the major topic, $Y$, is on the right-hand side (RHS) as an independent variable: 
-$$V = Y^\top\beta + \nu = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$$
+```math
+V = Y^\top\beta + \nu = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
+```
+
 
 These combinations are used in subsequent simulation scripts and ensure reproducibility by using the combination unique IDs as a seed.
 
@@ -81,10 +90,14 @@ Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills,
 - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
 
 The bias for the $i^\text{th}$ simulation is defined as:
-$$\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$$
+```math
+\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
+```
 
 The mean squared error (MSE) for the $i^\text{th}$ is defined as:
-$$\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$$
+```math
+\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
+```
 
 Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
 ```math
