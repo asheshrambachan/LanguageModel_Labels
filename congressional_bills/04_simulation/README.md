@@ -125,7 +125,7 @@ The sample mean of $\beta$ is given by
 
 The sample SD of $\beta$ is given by:
 ```math
-\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N-1} (\beta^{(i)} - \beta_\text{mean})^2
+\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2
 ```
 
 The estimated bias of $\beta$ is
