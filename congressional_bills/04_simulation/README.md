@@ -81,14 +81,19 @@ This R markdown merges the results of the simulations and generating the followi
     - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
 
     The bias for the $i^\text{th}$ simulation is defined as:
-    $$\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$$
+    $$
+    \text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
+    $$
 
     The mean squared error (MSE) for the $i^\text{th}$ is defined as:
-    $$\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$$
+    $$
+    \text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
+    $$
 
     Let the 95%CI of $\beta$ be $\text{CI}(\beta) := [\text{LCI}(\beta), \text{UCI}(\beta)]$. The coverage probability is defined as:
-    
-    $$\text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.$$
+    $$
+    \text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
+    $$
 
 
 - **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
