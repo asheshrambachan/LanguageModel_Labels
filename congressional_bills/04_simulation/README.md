@@ -109,7 +109,7 @@ The mean squared error (MSE) for the $i^\text{th}$ is defined as:
 \text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
 ```
 
-Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [\beta^{(i)}_{(0.025)}, \beta^{(i)}_{(0.975)}]$. The coverage probability is defined as:
+Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [\beta^{(i)}_{(0.025)}, \beta^{(i)}_{(0.975)}]$. The coverage is defined as:
 ```math
 \text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
 ```
@@ -130,38 +130,26 @@ The sample SD of $\beta$ is given by:
 
 The estimated bias of $\beta$ is
 ```math
-\begin{aligned}
-\text{bias}(\beta) 
-    &= \mathbb{E}[\beta - \beta^\star] \approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
-    &= \mathbb{E}[\beta] - \beta^\star \approx \beta_\text{mean} - \beta^\star
-\end{aligned}
+\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star
 ```
 
 The estimated  normalized bias of $\beta$ is given by: 
 ```math
-\begin{aligned}
-\text{bias}_\text{norm}(\beta) 
-    &= \frac{\text{bias}(\beta)}{\beta_\text{SD}} \\
-    &= \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.
-\end{aligned}
+\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.
 ```
 
 The estimated MSE of $\beta$ is defined as:
 ```math
-\begin{aligned}
-\text{mse}(\beta) 
-    &= \mathbb{E}[(\beta - \beta^\star)^2] \\
-    &\approx \frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
-\end{aligned}
+\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
 ```
 
 The estimated coverage probability of $\beta$ is given by:
 ```math
 \begin{aligned}
 \text{coverage}(\beta) 
-    &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
-    &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \\
-    &\approx \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).
+    % &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
+    % &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \\
+    &= \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).
 \end{aligned}
 ```
 
