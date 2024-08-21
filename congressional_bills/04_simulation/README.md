@@ -45,7 +45,7 @@ This R markdown merges the results of the simulations and generating the followi
 
 ## Execution Workflow
 
-1. **Data Preparation**: Run the appropriate script to generate the necessary `combinations_*.csv` files. Then, copy the repository from your local machine to the server.
+1. **Data Preparation**: Run `pre_simulation.Rmd` to generate the necessary `combinations_*.csv` files. Then, copy the repository from your local machine to the server.
 
 2. **Server Environment Setup**: Ensure that `conda` is installed on the server. If not, install it. Make sure to set the default channel to `conda-forge` to use `r-base=4.4.1` rather than the default `4.3.1`, which has incompatibility issues with `dplyr`'s `slice/filter/indexing` and `furrr::future_map`. Use the following commands:
 ```
