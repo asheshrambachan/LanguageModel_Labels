@@ -261,14 +261,14 @@ bias1 <- regressions.averaged %>%
 bias1
 ```
 
-
 ```{r lhs_fig_bias1_norm, echo=FALSE, fig.height=3, fig.width=8, fig.cap="Normalized Bias Density by Proportion of Validation Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$"}
 
 bias1_norm <- regressions.averaged %>%
   filter(proportion!=0.25) %>%
-  ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
+  ggplot(aes(x=bias_norm, 
+             y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(. ~ proportion, labeller=facet.labeller) +
   
   xlab("Normalized Bias") +
@@ -281,6 +281,7 @@ bias1_norm <- regressions.averaged %>%
 
 bias1_norm
 ```
+
 
 \clearpage
 
@@ -310,7 +311,7 @@ bias2_norm <- regressions.averaged %>%
   filter(proportion!=0.25) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller) +
   
   xlab("Normalized Bias") +
@@ -733,7 +734,7 @@ bias1_norm <- regressions.averaged %>%
   # filter(proportion!=0.25) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(Y ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -899,7 +900,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -922,7 +923,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -945,7 +946,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -968,7 +969,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -991,7 +992,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
@@ -1014,7 +1015,7 @@ bias2_norm <- regressions.averaged %>%
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(binwidth=0.09, position=position_dodge()) +
   facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
   
   xlab("Normalized Bias") +
