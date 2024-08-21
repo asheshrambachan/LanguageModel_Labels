@@ -132,9 +132,8 @@ The estimated bias of $\beta$ is
 ```math
 \begin{aligned}
 \text{bias}(\beta) 
-    &= \mathbb{E}[\beta - \beta^\star] \\
-    &\approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
-    &= \beta_\text{mean} - \beta^\star
+    &= \mathbb{E}[\beta - \beta^\star] \approx \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)})\\
+    &= \mathbb{E}[\beta] - \beta^\star \approx \beta_\text{mean} - \beta^\star
 \end{aligned}
 ```
 
@@ -162,7 +161,7 @@ The estimated coverage probability of $\beta$ is given by:
 \text{coverage}(\beta) 
     &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
     &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \\
-    &\approx \frac{1}{N} \sum_{i=1}^N 1\left\{\beta^\star \in \text{CI}\left(\beta_i\right)\right\}.
+    &\approx \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).
 \end{aligned}
 ```
 
