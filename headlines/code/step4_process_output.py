@@ -60,7 +60,7 @@ def extract_json(json_str):
         try:
             return json.loads(json_text)  
         except:
-            print(f"Offending JSON string: {repr(json_text)}")
+            # print(f"Offending JSON string: {repr(json_text)}")
             return None
     return None
 
@@ -180,7 +180,6 @@ def read_and_process_json_responses(output_file_path, start_line):
     outputs_json_df = pd.concat([outputs_json_ids, outputs_json_df], axis=1)
 
     outputs_json_df = pd.concat([outputs_json_df, usage_data], axis=1)
-
     return outputs_json_df
 
 def combine_responses(outputs_plain_df, outputs_json_df):
@@ -206,7 +205,7 @@ def merge_input_with_combined_output(input_df, combined_output):
         pandas.DataFrame: The merged dataframe with the 'headline type' and 'explanation' columns converted to lowercase.
     """
 
-    data = pd.merge(input_df, combined_output, on='custom_id', how='outer')
+    data = pd.merge(input_df, combined_output, on='custom_id', how='left')
     data['headline type'] = data['headline type'].str.lower()
     data['explanation'] = data['explanation'].str.lower()
     return data
@@ -268,6 +267,9 @@ def main(question, model, month, year):
     outputs_plain_df = read_and_process_plain_text_responses(output_file_path, num_lines)
     outputs_json_df = read_and_process_json_responses(output_file_path, start_line)
     combined_output = combine_responses(outputs_plain_df, outputs_json_df)
+    if len(input_df) != len(combined_output):
+        print(f"Length mismatch: input_df: {len(input_df)}, combined_output: {len(combined_output)}")
+        print(question, model, month)
     data = merge_input_with_combined_output(input_df, combined_output)
     data = clean_and_filter_data(data, question)
 
@@ -276,8 +278,12 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
     
-    QUESTION = "1"
-    MODEL = "gpt-3.5-turbo-0215"
-    MONTH = "octsecond"
+    QUESTION = ["4"]
+    MODEL = ["gpt-3.5-turbo"]
+    MONTH = ["feb"]
     YEAR = "19"
-    main(QUESTION, MODEL, MONTH, YEAR)
+
+    for question in QUESTION:
+        for model in MODEL:
+            for month in MONTH:
+                main(question=question, model=model, month=month, year=YEAR)

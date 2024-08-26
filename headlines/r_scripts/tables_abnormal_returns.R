@@ -5,31 +5,16 @@ library(broom)
 library(fixest)
 library(modelsummary)
 
+# reset workspace
 rm(list = ls())
 
-# Define the question and the list of months
-question <- "q1"
-months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec")
-year = "19"
+question = "q2"
 return_type = "CAPM"
-model = "gpt-4o-mini"
+model = "gpt-3.5-turbo"
 
-# Function to read and combine data for all months
-read_and_combine <- function(file_name, months, question) {
-  combined_df <- data.frame()  # Initialize an empty data frame to store combined data
-  for (month in months) {
-    file_path <- paste0("./data/step5_returns_merged/", 
-                        return_type, "/", 
-                        model, "/", 
-                        question, "/",  
-                        question, "_", month, "19/", 
-                        file_name)
-    month_df <- read.csv(file_path)
-    month_df <- subset(month_df, headline.type != "")  # Filter out rows with empty headline.type
-    combined_df <- bind_rows(combined_df, month_df)  # Combine data frames
-  }
-  return(combined_df)
-}
+#-------------------------------------------------------------------------------
+# helper functions
+#-------------------------------------------------------------------------------
 
 # Function to mutate the data frame with new columns
 mutate_data <- function(df) {
@@ -63,47 +48,6 @@ mutate_data <- function(df) {
   }
 }
 
-# List of file names
-file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", 
-                "persona1", "persona2", "persona3", "persona4")
-
-# Step 1: Read, combine, and mutate data for all files
-combined_data <- lapply(file_names, function(file_name) {
-  df <- read_and_combine(paste0(file_name, ".csv"), months, question)
-  df <- mutate_data(df)
-  df$headline  # Return only the headlines column
-})
-
-# Step 2: Find the intersection of headlines across all datasets
-common_headlines <- Reduce(intersect, combined_data)
-
-# Step 3: Re-read, combine, mutate, and filter each dataset based on common headlines
-filtered_data <- lapply(file_names, function(file_name) {
-  df <- read_and_combine(paste0(file_name, ".csv"), months, question)
-  df <- mutate_data(df)
-  df <- df %>% 
-    filter(headline %in% common_headlines) %>%
-    filter(!is.na(sum_exret_1) & !is.na(sum_exret_5) & !is.na(sum_exret_10))
-  return(df)
-})
-
-# Assign the filtered and mutated data to respective variables
-base_blanks <- filtered_data[[1]]
-base_json <- filtered_data[[2]]
-cot1 <- filtered_data[[3]]
-cot2 <- filtered_data[[4]]
-cot3 <- filtered_data[[5]]
-persona1 <- filtered_data[[6]]
-persona2 <- filtered_data[[7]]
-persona3 <- filtered_data[[8]]
-persona4 <- filtered_data[[9]]
-
-rm(filtered_data)
-
-
-# List of datasets
-data_list <- list(base_blanks, base_json, persona1, persona2, persona3, persona4, cot1, cot2, cot3)
-
 if (question != "q1") {
   magnitude_labels <- c("Increase", "Decrease", "Uncertain", "Increase Magnitude",
                         "Decrease Magnitude", "Uncertain Magnitude")
@@ -115,7 +59,6 @@ if (question != "q1") {
   confidence_labels <- c("Positive", "Negative", "Neutral", "Positive Confidence",
                          "Negative Confidence", "Neutral Confidence")
 }
-
 
 plot_regression_coefficients <- function(reg_list, file_names, title = "Regression Coefficients with Confidence Intervals") {
  
@@ -151,13 +94,28 @@ plot_regression_coefficients <- function(reg_list, file_names, title = "Regressi
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
 
+#-------------------------------------------------------------------------------
+# read in data 
+#-------------------------------------------------------------------------------
+path = paste0("../data/step6_common_sample/", return_type, "/", model, "/", question, "/")
 
+base_blanks <- read.csv(paste0(path, "base_blanks.csv"))
+base_json <- read.csv(paste0(path, "base_json.csv"))
+cot1 <- read.csv(paste0(path, "cot1.csv"))
+cot2 <- read.csv(paste0(path, "cot2.csv"))
+cot3 <- read.csv(paste0(path, "cot3.csv"))
+persona1 <- read.csv(paste0(path, "persona1.csv"))
+persona2 <- read.csv(paste0(path, "persona2.csv"))
+persona3 <- read.csv(paste0(path, "persona3.csv"))
+persona4 <- read.csv(paste0(path, "persona4.csv"))
+
+data_list <- list(base_blanks, base_json, cot1, cot2, cot3, persona1, persona2, persona3, persona4)
+data_list <- lapply(data_list, mutate_data)
+file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", "persona1", "persona2", "persona3", "persona4")
 #-------------------------------------------------------------------------------
-#
 # returns 1 day post-headline (with magnitude)
-#
 #-------------------------------------------------------------------------------
-# Placeholder lists for regression results and standard errors
+# Placeholder lists for regression results 
 reg_list <- list()
 
 # Run regressions in a loop
@@ -191,10 +149,12 @@ for (i in 1:length(data_list)) {
 
 modelsummary(reg_list, 
              coef_rename = magnitude_labels,
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             title = paste0(question, " Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
              stars = TRUE)
 
-plot_regression_coefficients(reg_list, file_names, paste0("1-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret1_magnitude.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret1_magnitude.jpeg"),
        units = "in", width = 8, height = 5)
 
 #-------------------------------------------------------------------------------
@@ -204,70 +164,46 @@ ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_r
 #-------------------------------------------------------------------------------
 # Placeholder lists for regression results and standard errors
 reg_list <- list()
-se_list <- list()
-n_list <- list()
-
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_5", "FF3_CAR_5")
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ increase + 
-                decrease +
-                uncertain +
-                increase.magnitude +
-                decrease.magnitude +
-                uncertain.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_5 ~ increase + 
+                   decrease +
+                   uncertain +
+                   increase.magnitude +
+                   decrease.magnitude +
+                   uncertain.magnitude - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
   else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                positive + 
-                negative +
-                neutral +
-                positive.magnitude +
-                negative.magnitude +
-                neutral.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_5 ~ 
+                   positive + 
+                   negative +
+                   neutral +
+                   positive.magnitude +
+                   negative.magnitude +
+                   neutral.magnitude - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
+modelsummary(reg_list, 
+             coef_rename = magnitude_labels,
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             # output = "latex",
+             title =  paste0(question, " Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
+             stars = TRUE)
 
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, ": ", "5 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
-          covariate.labels = magnitude_labels,
-          dep.var.labels = "CAR FD5",
-          model.names = TRUE,
-          notes = obs_note)
-
-plot_regression_coefficients(reg_list, file_names, paste0("5-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret5_magnitude.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret5_magnitude.jpeg"),
        units = "in", width = 8, height = 5)
-
-# ## TEMP BEIGN
-# reg_list[1:9] %>%
-#   purrr::map(function(x) matrix(as.double(x), ncol = ncol(x), dimnames = dimnames(x))) %>%
-#   purrr::map(t) %>%
-#   purrr::map(as_tibble, rownames = "name")
-#   purrr::map(class)
-# 
-# ## TEMP END
-
 
 #-------------------------------------------------------------------------------
 #
@@ -276,59 +212,45 @@ ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_r
 #-------------------------------------------------------------------------------
 # Placeholder lists for regression results and standard errors
 reg_list <- list()
-se_list <- list()
-n_list <- list()
-
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_10", "FF3_CAR_10")
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                increase + 
-                decrease +
-                uncertain +
-                increase.magnitude +
-                decrease.magnitude +
-                uncertain.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_10 ~ increase + 
+                   decrease +
+                   uncertain +
+                   increase.magnitude +
+                   decrease.magnitude +
+                   uncertain.magnitude - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
-  } else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                positive + 
-                negative +
-                neutral +
-                positive.magnitude +
-                negative.magnitude +
-                neutral.magnitude - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+  }
+  else {
+    reg <- feols(sum_exret_10 ~ 
+                   positive + 
+                   negative +
+                   neutral +
+                   positive.magnitude +
+                   negative.magnitude +
+                   neutral.magnitude - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
+modelsummary(reg_list, 
+             coef_rename = magnitude_labels,
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             # output = "latex",
+             title = paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
+             stars = TRUE)
 
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, ": ", "10 Day Post Headline Returns Regressed on Headline Type (with Magnitude)"),
-          covariate.labels = magnitude_labels,
-          dep.var.labels = "CAR FD10",
-          model.names = TRUE,
-          notes = obs_note)
-
-plot_regression_coefficients(reg_list, file_names, paste0("10-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret10_magnitude.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret10_magnitude.jpeg"),
        units = "in", width = 8, height = 5)
 
 #-------------------------------------------------------------------------------
@@ -336,61 +258,46 @@ ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_r
 # returns 1 day post-headline (with confidence)
 #
 #-------------------------------------------------------------------------------
-# Placeholder lists for regression results and standard errors
 reg_list <- list()
-se_list <- list()
-n_list <- list()
-
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_1", "FF3_CAR_1")
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                increase + 
-                decrease +
-                uncertain +
-                increase.confidence +
-                decrease.confidence +
-                uncertain.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_1 ~ increase + 
+                   decrease +
+                   uncertain +
+                   increase.confidence +
+                   decrease.confidence +
+                   uncertain.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
-  } else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                positive + 
-                negative +
-                neutral +
-                positive.confidence +
-                negative.confidence +
-                neutral.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+  }
+  else {
+    reg <- feols(sum_exret_1 ~ 
+                   positive + 
+                   negative +
+                   neutral +
+                   positive.confidence +
+                   negative.confidence +
+                   neutral.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
+modelsummary(reg_list, 
+             coef_rename = confidence_labels,
+             gof_omit = "AIC|BIC",  
+             # output = "latex",
+             title = paste0("Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+             stars = TRUE)
 
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, ": ", "1 Day Post Headline Returns Regressed on Headline Type (with Confidence)"),
-          covariate.labels = confidence_labels,
-          dep.var.labels = "CAR FD1",
-          model.names = TRUE,
-          notes = obs_note)
-
-plot_regression_coefficients(reg_list, file_names, paste0("1-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret1_confidence.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret1_confidence.jpeg"),
        units = "in", width = 8, height = 5)
 
 #-------------------------------------------------------------------------------
@@ -399,60 +306,47 @@ ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_r
 #
 #-------------------------------------------------------------------------------
 # Placeholder lists for regression results and standard errors
-reg_list <- list()
-se_list <- list()
-n_list <- list()
 
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_5", "FF3_CAR_5")
+reg_list <- list()
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                increase + 
-                decrease +
-                uncertain +
-                increase.confidence +
-                decrease.confidence +
-                uncertain.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_5 ~ increase + 
+                   decrease +
+                   uncertain +
+                   increase.confidence +
+                   decrease.confidence +
+                   uncertain.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
-  } else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                positive + 
-                negative +
-                neutral +
-                positive.confidence +
-                negative.confidence +
-                neutral.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+  }
+  else {
+    reg <- feols(sum_exret_5 ~ 
+                   positive + 
+                   negative +
+                   neutral +
+                   positive.confidence +
+                   negative.confidence +
+                   neutral.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
+modelsummary(reg_list, 
+             coef_rename = confidence_labels,
+             gof_omit = "AIC|BIC",  
+             # output = "latex",
+             title = paste0("Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+             stars = TRUE)
 
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, ": ", "5 Day Post Headline Returns Regressed on Headline Type (with Confidence)"),
-          covariate.labels = confidence_labels,
-          dep.var.labels = "CAR FD5",
-          model.names = TRUE,
-          notes = obs_note)
-
-plot_regression_coefficients(reg_list, file_names, paste0("5-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret5_confidence.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret5_confidence.jpeg"),
        units = "in", width = 8, height = 5)
 
 #-------------------------------------------------------------------------------
@@ -462,57 +356,43 @@ ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_r
 #-------------------------------------------------------------------------------
 # Placeholder lists for regression results and standard errors
 reg_list <- list()
-se_list <- list()
-n_list <- list()
-
-outcome = ifelse(return_type == "CAPM", "CAPM_CAR_10", "FF3_CAR_10")
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                increase + 
-                decrease +
-                uncertain +
-                increase.confidence +
-                decrease.confidence +
-                uncertain.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+    reg <- feols(sum_exret_10 ~ increase + 
+                   decrease +
+                   uncertain +
+                   increase.confidence +
+                   decrease.confidence +
+                   uncertain.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
-  } else {
-    reg <- lm(data_list[[i]][[outcome]] ~ 
-                positive + 
-                negative +
-                neutral +
-                positive.confidence +
-                negative.confidence +
-                neutral.confidence - 1,
-              data = data_list[[i]])
-    se <- vcovHC(reg, type = "HC1")
-    reg <- coeftest(reg, vcov = se)
+  }
+  else {
+    reg <- feols(sum_exret_10 ~ 
+                   positive + 
+                   negative +
+                   neutral +
+                   positive.confidence +
+                   negative.confidence +
+                   neutral.confidence - 1,
+                 cluster = ~company_name + date,
+                 data = data_list[[i]])
     
     reg_list[[i]] <- reg
-    se_list[[i]] <- se
-    n_list[[i]] <- nobs(reg)
   }
 }
 
-# Create custom note with the number of observations
-obs_note <- paste("Observations: ", paste(n_list[1:9], collapse = ", "))
+modelsummary(reg_list, 
+             coef_rename = confidence_labels,
+             gof_omit = "AIC|BIC",  
+             # output = "latex",
+             title = paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+             stars = TRUE)
 
-# Create stargazer tables
-stargazer(reg_list[1:9], type = "latex", se = se_list[1:9], 
-          title = paste0(model, " ", question, ": ","10 Day Post Headline Returns Regressed on Headline Type (with Confidence)"),
-          covariate.labels = confidence_labels,
-          dep.var.labels = "CAR FD10",
-          model.names = TRUE,
-          notes = obs_note)
-
-plot_regression_coefficients(reg_list, file_names, paste0("10-day CAR Regression Coefficients with Confidence Intervals (", return_type, ")"))
-ggsave(filename = paste0("temp_figs/coefficients/", model, "/", return_type, "_robust_ses/", question, "/ret10_confidence.jpeg"),
+plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret10_confidence.jpeg"),
        units = "in", width = 8, height = 5)

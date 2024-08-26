@@ -36,31 +36,6 @@ def read_base_prompt(base_prompt_file, suffix):
         content = file.read()
     return content
 
-def set_batch_template(model):
-    """
-    Sets the prompt template based ont the specified model.
-    
-    Parameters:
-    - model (str): eithert gpt-4o-mini, gpt-4o, or gpt-3.5-turbo.
-
-    Returns:
-    - batch_template (str): template string for batch prompt.
-    """
-    batch_template = {
-        "custom_id": "%s",
-        "method": "POST", 
-        "url": "/v1/chat/completions", 
-        "body": {
-            "model": model, 
-            "messages": [{
-                "role": "user",
-                "content": "%s"
-            }],
-            "temperature": 0
-        }
-    }
-    return batch_template
-
 def write_prompt(companies, content, JSON, file, id_num, model):
     """
     Generates responses for each company in the dataframe.
@@ -76,8 +51,6 @@ def write_prompt(companies, content, JSON, file, id_num, model):
     Returns:
     - id_num (int): The updated identifier number.
     """
-
-    batch_template = set_batch_template(model)
     all_prompts = []
 
     for index, row in tqdm(companies.iterrows(), total=companies.shape[0]):
@@ -94,18 +67,34 @@ def write_prompt(companies, content, JSON, file, id_num, model):
             pt2 = "Write" + pt2
             thought_json = [format_content(pt1 + thought + pt2, JSON=JSON, chain_of_thought=True) for thought in thought_modifiers]
 
-            prompts = [base_json] + personas_json + thought_json           
+            prompts = [base_json] + personas_json + thought_json  
+            incl_max_token = [1] + [1] * len(personas_json) + [0] * len(thought_json) 
 
         else:
             prompts = [company_content]
+            incl_max_token = [1]
         
-        for prompt in prompts:
-            current_template = batch_template.copy()
-            current_template["custom_id"] = str(id_num)
-            id_num += 1
-            current_template["body"]["messages"][0]["content"] = prompt
-            all_prompts.append(json.dumps(current_template))
+        for prompt, token_indicator in zip(prompts, incl_max_token):
 
+            current_template = {
+                "custom_id": str(id_num),
+                "method": "POST", 
+                "url": "/v1/chat/completions", 
+                "body": {
+                    "model": model, 
+                    "messages": [{
+                        "role": "user",
+                        "content": prompt
+                    }],
+                    "temperature": 0
+                }
+            }
+            if token_indicator:
+                current_template["body"]["max_tokens"] = 35
+            
+            id_num += 1
+            all_prompts.append(json.dumps(current_template))
+            
     file.write('\n'.join(all_prompts) + '\n')
     return id_num
 
@@ -137,8 +126,8 @@ def generate_prompts(month, question, year, model):
 if __name__ == "__main__":
     # Set constants here
     MODEL = "gpt-4o" # either gpt-4o-mini, gpt-4o, or gpt-3.5-turbo-0215
-    MONTH = "dec" # 3-letter abbreviation
-    QUESTION = "5" # question number (1, 2, 3, 4, 5)
+    MONTH = "apr" # 3-letter abbreviation
+    QUESTION = "2" # question number (1, 2, 3, 4, 5)
     YEAR = "19" # 2-digit year
 
     generate_prompts(MONTH, QUESTION, YEAR, MODEL)

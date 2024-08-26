@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 
-
 def read_data(question, model, month, year, return_type):
     labels = pd.read_csv(f"./data/step4_processed_responses/{model}/q{question}/q{question}_{month}{year}_processed.csv")
     headlines = pd.read_csv(f"./data/step0_{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
@@ -55,11 +54,11 @@ def main(question, model, month, year, return_type):
 
 if __name__ == "__main__":
 
-    QUESTION = [1,2,3,4,5]
-    MODEL = ["gpt-3.5-turbo-0215", "gpt-4o-mini"]
-    MONTH = ["sep"]
+    QUESTION = ["4"]
+    MODEL = ["gpt-3.5-turbo"]
+    MONTH = ["feb"]
     YEAR = ["19"]
-    RETURN_TYPE = ["FF3", "CAPM"]
+    RETURN_TYPE = ["cumulative", "CAPM", "FF3"]
 
 
     for question in QUESTION:
