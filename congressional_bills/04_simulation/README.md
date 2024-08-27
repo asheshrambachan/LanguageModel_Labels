@@ -13,17 +13,12 @@ This directory contains the code to run regressions with proxy on the LHS and RH
 
 1. **Data Preparation**: Run `pre_simulation.Rmd` to generate the necessary `combinations_*.csv` files. Then, copy the repository from your local machine to the server.
 
-2. **Server Environment Setup**: Ensure that `conda` is installed on the server. If not, install it. Make sure to set the default channel to `conda-forge` to use `r-base=4.4.1` rather than the default `4.3.1`, which has incompatibility issues with `dplyr`'s `slice/filter/indexing` and `furrr::future_map`. Use the following commands:
+2. **Server Environment Setup**: Ensure that `conda` is installed on the server (see https://github.com/gentzkow/template_archive/tree/master). If not, install it. Make sure to set the default channel to `conda-forge` to use `r-base=4.4.1` rather than the default `4.3.1`, which has incompatibility issues with `dplyr`'s `slice/filter/indexing` and `furrr::future_map`. Use the following commands:
 ```
 conda update conda
-conda config --add channels conda-forge
 conda config --set channel_priority strict
-```
-On the remote server, create a new `r4.4.1` environment:
-```
-conda create -n r4.4.1 r-base r-dplyr r-sandwich r-lmtest r-furrr r-Matrix
-conda list
-conda activate r4.4.1
+conda env create -f setup/conda_env.yaml
+conda activate env_cb
 cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
 ```
 
@@ -54,8 +49,9 @@ Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon
 ```math
 V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
 ```
+These combinations are used in subsequent simulation scripts and we ensure reproducibility by using the combination unique IDs as a seed.
 
-Note that $$Y_\text{topic} \in$$ { $$Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}$$ } where 
+Note that $$Y_\text{topic} \in$$ { $$Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}$$ }, where 
 ```math
 Y_\text{topic} = 1\{Y = \text{topic}\},
 ``` 
@@ -67,8 +63,6 @@ and $$V \in$$ { $$\text{Democrat}, \text{Senate}, \text{DW1}$$ }, where
 \text{DW1} &= \text{imputed DW1 score for the bill sponsor.}
 \end{aligned}
 ```
-
-These combinations are used in subsequent simulation scripts and ensure reproducibility by using the combination unique IDs as a seed.
 
 ### 2. `functions.R`
 This file contains utility functions used when running the simulations:

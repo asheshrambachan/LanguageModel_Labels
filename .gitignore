@@ -25,6 +25,7 @@ congressional_bills/04_simulation/lhs/bayesian/*
 
 congressional_bills/04_simulation/evaluate_*
 congressional_bills/04_simulation/evaluate_*
+congressional_bills/04_simulation/output*
 
 congressional_bills/04_simulation/rhs/bayesian_wo*
 congressional_bills/04_simulation/rhs/bayesian/*.csv

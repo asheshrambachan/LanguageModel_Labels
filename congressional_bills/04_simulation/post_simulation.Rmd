@@ -7,14 +7,16 @@ date: "Aug 12, 2024"
 ```{r, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo=TRUE)
 
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(latex2exp)
+})
+
 # Define and set the working directory
 repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 knitr::opts_knit$set(root.dir=repo_dir)
 setwd(repo_dir)
-
-require(dplyr)
-require(ggplot2)
-require(latex2exp)
 
 # Bias 
 bias = function(coef, coef.ref) return(coef - coef.ref) # Calculate bias
@@ -66,6 +68,7 @@ data %>%
 
 # Simulations we don't use
 regressions_of_intreset = c("10k_Yhuman_V", "10k_Yllm_V", "5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")
+
 data %>% 
   filter(!(regression %in% regressions_of_intreset)) %>%
   write.csv(file.path(simulation_dir, "simulations_other_lhs.csv"), row.names=FALSE)
