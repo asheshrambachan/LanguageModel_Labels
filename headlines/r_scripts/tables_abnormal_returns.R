@@ -8,9 +8,9 @@ library(modelsummary)
 # reset workspace
 rm(list = ls())
 
-question = "q2"
+question = "q1"
 return_type = "CAPM"
-model = "gpt-3.5-turbo"
+model = "gpt-4o-mini"
 
 #-------------------------------------------------------------------------------
 # helper functions
@@ -112,16 +112,17 @@ persona4 <- read.csv(paste0(path, "persona4.csv"))
 data_list <- list(base_blanks, base_json, cot1, cot2, cot3, persona1, persona2, persona3, persona4)
 data_list <- lapply(data_list, mutate_data)
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", "persona1", "persona2", "persona3", "persona4")
+
 #-------------------------------------------------------------------------------
 # returns 1 day post-headline (with magnitude)
 #-------------------------------------------------------------------------------
-# Placeholder lists for regression results 
+# Placeholder lists for regression results
 reg_list <- list()
 
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- feols(sum_exret_1 ~ increase + 
+    reg <- feols(sum_exret_1 ~ increase +
                 decrease +
                 uncertain +
                 increase.magnitude +
@@ -129,12 +130,12 @@ for (i in 1:length(data_list)) {
                 uncertain.magnitude - 1,
                 cluster = ~company_name + date,
                 data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
   else {
-    reg <- feols(sum_exret_1 ~ 
-                positive + 
+    reg <- feols(sum_exret_1 ~
+                positive +
                 negative +
                 neutral +
                 positive.magnitude +
@@ -142,14 +143,14 @@ for (i in 1:length(data_list)) {
                 neutral.magnitude - 1,
                 cluster = ~company_name + date,
                 data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
 }
 
-modelsummary(reg_list, 
+modelsummary(reg_list,
              coef_rename = magnitude_labels,
-             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",
              title = paste0(question, " Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
              stars = TRUE)
 
@@ -168,7 +169,7 @@ reg_list <- list()
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- feols(sum_exret_5 ~ increase + 
+    reg <- feols(sum_exret_5 ~ increase +
                    decrease +
                    uncertain +
                    increase.magnitude +
@@ -176,12 +177,12 @@ for (i in 1:length(data_list)) {
                    uncertain.magnitude - 1,
                  cluster = ~company_name + date,
                  data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
   else {
-    reg <- feols(sum_exret_5 ~ 
-                   positive + 
+    reg <- feols(sum_exret_5 ~
+                   positive +
                    negative +
                    neutral +
                    positive.magnitude +
@@ -189,14 +190,14 @@ for (i in 1:length(data_list)) {
                    neutral.magnitude - 1,
                  cluster = ~company_name + date,
                  data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
 }
 
-modelsummary(reg_list, 
+modelsummary(reg_list,
              coef_rename = magnitude_labels,
-             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",
              # output = "latex",
              title =  paste0(question, " Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
              stars = TRUE)
@@ -216,7 +217,7 @@ reg_list <- list()
 # Run regressions in a loop
 for (i in 1:length(data_list)) {
   if (question != "q1") {
-    reg <- feols(sum_exret_10 ~ increase + 
+    reg <- feols(sum_exret_10 ~ increase +
                    decrease +
                    uncertain +
                    increase.magnitude +
@@ -224,12 +225,12 @@ for (i in 1:length(data_list)) {
                    uncertain.magnitude - 1,
                  cluster = ~company_name + date,
                  data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
   else {
-    reg <- feols(sum_exret_10 ~ 
-                   positive + 
+    reg <- feols(sum_exret_10 ~
+                   positive +
                    negative +
                    neutral +
                    positive.magnitude +
@@ -237,162 +238,162 @@ for (i in 1:length(data_list)) {
                    neutral.magnitude - 1,
                  cluster = ~company_name + date,
                  data = data_list[[i]])
-    
+
     reg_list[[i]] <- reg
   }
 }
 
-modelsummary(reg_list, 
+modelsummary(reg_list,
              coef_rename = magnitude_labels,
-             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+             gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",
              # output = "latex",
-             title = paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
+             title = paste0(question, " Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"),
              stars = TRUE)
 
-plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"))
+plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Magnitude"))
 ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret10_magnitude.jpeg"),
        units = "in", width = 8, height = 5)
 
-#-------------------------------------------------------------------------------
-#
-# returns 1 day post-headline (with confidence)
-#
-#-------------------------------------------------------------------------------
-reg_list <- list()
-
-# Run regressions in a loop
-for (i in 1:length(data_list)) {
-  if (question != "q1") {
-    reg <- feols(sum_exret_1 ~ increase + 
-                   decrease +
-                   uncertain +
-                   increase.confidence +
-                   decrease.confidence +
-                   uncertain.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-  else {
-    reg <- feols(sum_exret_1 ~ 
-                   positive + 
-                   negative +
-                   neutral +
-                   positive.confidence +
-                   negative.confidence +
-                   neutral.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-}
-
-modelsummary(reg_list, 
-             coef_rename = confidence_labels,
-             gof_omit = "AIC|BIC",  
-             # output = "latex",
-             title = paste0("Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
-             stars = TRUE)
-
-plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
-ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret1_confidence.jpeg"),
-       units = "in", width = 8, height = 5)
-
-#-------------------------------------------------------------------------------
-#
-# returns 5 day post-headline (with confidence)
-#
-#-------------------------------------------------------------------------------
-# Placeholder lists for regression results and standard errors
-
-reg_list <- list()
-
-# Run regressions in a loop
-for (i in 1:length(data_list)) {
-  if (question != "q1") {
-    reg <- feols(sum_exret_5 ~ increase + 
-                   decrease +
-                   uncertain +
-                   increase.confidence +
-                   decrease.confidence +
-                   uncertain.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-  else {
-    reg <- feols(sum_exret_5 ~ 
-                   positive + 
-                   negative +
-                   neutral +
-                   positive.confidence +
-                   negative.confidence +
-                   neutral.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-}
-
-modelsummary(reg_list, 
-             coef_rename = confidence_labels,
-             gof_omit = "AIC|BIC",  
-             # output = "latex",
-             title = paste0("Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
-             stars = TRUE)
-
-plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
-ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret5_confidence.jpeg"),
-       units = "in", width = 8, height = 5)
-
-#-------------------------------------------------------------------------------
-#
-# returns 10 day post-headline (with confidence)
-#
-#-------------------------------------------------------------------------------
-# Placeholder lists for regression results and standard errors
-reg_list <- list()
-
-# Run regressions in a loop
-for (i in 1:length(data_list)) {
-  if (question != "q1") {
-    reg <- feols(sum_exret_10 ~ increase + 
-                   decrease +
-                   uncertain +
-                   increase.confidence +
-                   decrease.confidence +
-                   uncertain.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-  else {
-    reg <- feols(sum_exret_10 ~ 
-                   positive + 
-                   negative +
-                   neutral +
-                   positive.confidence +
-                   negative.confidence +
-                   neutral.confidence - 1,
-                 cluster = ~company_name + date,
-                 data = data_list[[i]])
-    
-    reg_list[[i]] <- reg
-  }
-}
-
-modelsummary(reg_list, 
-             coef_rename = confidence_labels,
-             gof_omit = "AIC|BIC",  
-             # output = "latex",
-             title = paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
-             stars = TRUE)
-
-plot_regression_coefficients(reg_list, file_names, paste0("Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
-ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret10_confidence.jpeg"),
-       units = "in", width = 8, height = 5)
+# #-------------------------------------------------------------------------------
+# #
+# # returns 1 day post-headline (with confidence)
+# #
+# #-------------------------------------------------------------------------------
+# reg_list <- list()
+# 
+# # Run regressions in a loop
+# for (i in 1:length(data_list)) {
+#   if (question != "q1") {
+#     reg <- feols(sum_exret_1 ~ increase + 
+#                    decrease +
+#                    uncertain +
+#                    increase.confidence +
+#                    decrease.confidence +
+#                    uncertain.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+#   else {
+#     reg <- feols(sum_exret_1 ~ 
+#                    positive + 
+#                    negative +
+#                    neutral +
+#                    positive.confidence +
+#                    negative.confidence +
+#                    neutral.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+# }
+# 
+# modelsummary(reg_list, 
+#              coef_rename = confidence_labels,
+#              gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE", 
+#              # output = "latex",
+#              title = paste0(question, " Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+#              stars = TRUE)
+# 
+# plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 1 Day Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+# ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret1_confidence.jpeg"),
+#        units = "in", width = 8, height = 5)
+# 
+# #-------------------------------------------------------------------------------
+# #
+# # returns 5 day post-headline (with confidence)
+# #
+# #-------------------------------------------------------------------------------
+# # Placeholder lists for regression results and standard errors
+# 
+# reg_list <- list()
+# 
+# # Run regressions in a loop
+# for (i in 1:length(data_list)) {
+#   if (question != "q1") {
+#     reg <- feols(sum_exret_5 ~ increase + 
+#                    decrease +
+#                    uncertain +
+#                    increase.confidence +
+#                    decrease.confidence +
+#                    uncertain.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+#   else {
+#     reg <- feols(sum_exret_5 ~ 
+#                    positive + 
+#                    negative +
+#                    neutral +
+#                    positive.confidence +
+#                    negative.confidence +
+#                    neutral.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+# }
+# 
+# modelsummary(reg_list, 
+#              coef_rename = confidence_labels,
+#              gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",  
+#              # output = "latex",
+#              title = paste0(question, " Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+#              stars = TRUE)
+# 
+# plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 5 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+# ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret5_confidence.jpeg"),
+#        units = "in", width = 8, height = 5)
+# 
+# #-------------------------------------------------------------------------------
+# #
+# # returns 10 day post-headline (with confidence)
+# #
+# #-------------------------------------------------------------------------------
+# # Placeholder lists for regression results and standard errors
+# reg_list <- list()
+# 
+# # Run regressions in a loop
+# for (i in 1:length(data_list)) {
+#   if (question != "q1") {
+#     reg <- feols(sum_exret_10 ~ increase + 
+#                    decrease +
+#                    uncertain +
+#                    increase.confidence +
+#                    decrease.confidence +
+#                    uncertain.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+#   else {
+#     reg <- feols(sum_exret_10 ~ 
+#                    positive + 
+#                    negative +
+#                    neutral +
+#                    positive.confidence +
+#                    negative.confidence +
+#                    neutral.confidence - 1,
+#                  cluster = ~company_name + date,
+#                  data = data_list[[i]])
+#     
+#     reg_list[[i]] <- reg
+#   }
+# }
+# 
+# modelsummary(reg_list, 
+#              coef_rename = confidence_labels,
+#              gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE", 
+#              # output = "latex",
+#              title = paste0(question, " Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"),
+#              stars = TRUE)
+# 
+# plot_regression_coefficients(reg_list, file_names, paste0(question, " Cumulative Abnormal Returns 10 Days Post-Headline (", return_type, ")\n Includes LLM-labeled Confidence"))
+# ggsave(filename = paste0("../temp_figs/coefficients/", model, "/", return_type, "_clustered_ses/", question, "/ret10_confidence.jpeg"),
+#        units = "in", width = 8, height = 5)
