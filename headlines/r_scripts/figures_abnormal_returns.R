@@ -7,10 +7,8 @@ library(broom)
 
 rm(list = ls())
 
-# Define the question and the list of months
+# Define the questions list
 questions <- c("q1", "q2", "q3", "q4", "q5")
-months <- c("jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec")
-year = "19"
 return_type = "CAPM"
 models = c("gpt-3.5-turbo", "gpt-4o-mini")
 
@@ -404,7 +402,7 @@ for (i in 1:n) {
   plot_results <- bind_rows(plot_results, temp)
 }
 
-current_question = "q3"
+current_question = "q5"
 
 ################################################################################
 # Plot results for Ret 1 Positive                                              #
