@@ -87,7 +87,7 @@ for (q in 1:length(questions)) {
     
     # Create a new column for text color based on Agreement value
     agreement_df <- agreement_df %>%
-      mutate(TextColor = ifelse(Agreement > 65, "white", "black"))
+      mutate(TextColor = ifelse(Agreement > 70, "white", "black"))
     
     # Plot the heatmap with percentage labels, reversed color scale, and conditional text color
     p <- ggplot(agreement_df, aes(x = Dataset1, y = Dataset2, fill = Agreement)) +
@@ -111,6 +111,4 @@ for (q in 1:length(questions)) {
 }
 
 # Display the plots one by one
-for (plot_name in names(plot_list)) {
-  print(plot_list[[plot_name]])
-}
+plot_list[[1]]

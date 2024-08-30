@@ -45,7 +45,7 @@ mutate_data <- function(df) {
 }
 
 # List of file names
-file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", 
+file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3",
                 "persona1", "persona2", "persona3", "persona4")
 
 # Placeholder lists for regression results and standard errors
@@ -55,12 +55,12 @@ meta_data <- data.frame()
 # Read, combine, and mutate data for all files
 for (q in 1:length(questions)) {
   for (m in 1:length(models)) {
-    
+
     question = questions[q]
     model = models[m]
-    
+
     path = paste0("../data/step6_common_sample/", return_type, "/", model, "/", question, "/")
-    
+
     base_blanks <- read.csv(paste0(path, "base_blanks.csv"))
     base_json <- read.csv(paste0(path, "base_json.csv"))
     cot1 <- read.csv(paste0(path, "cot1.csv"))
@@ -70,33 +70,33 @@ for (q in 1:length(questions)) {
     persona2 <- read.csv(paste0(path, "persona2.csv"))
     persona3 <- read.csv(paste0(path, "persona3.csv"))
     persona4 <- read.csv(paste0(path, "persona4.csv"))
-    
+
     data_list <- list(base_blanks, base_json, cot1, cot2, cot3, persona1, persona2, persona3, persona4)
     data_list <- lapply(data_list, mutate_data)
-    
+
     if (question != "q1") {
-      magnitude_labels <- c("Increase", "Decrease", "Uncertain", 
-                            "Increase Magnitude", "Decrease Magnitude", 
-                            "Uncertain Magnitude", "Ret LD1", 
+      magnitude_labels <- c("Increase", "Decrease", "Uncertain",
+                            "Increase Magnitude", "Decrease Magnitude",
+                            "Uncertain Magnitude", "Ret LD1",
                             "Ret LD2", "Ret LD3")
-      confidence_labels <- c("Increase", "Decrease", "Uncertain", 
-                             "Increase Confidence", "Decrease Confidence", 
-                             "Uncertain Confidence", "Ret LD1", 
-                             "Ret LD2", "Ret LD3")
-    } 
-    else {
-      magnitude_labels <- c("Positive", "Negative", "Neutral", 
-                            "Positive Magnitude", "Negative Magnitude",
-                            "Neutral Magnitude", "Ret LD1", 
-                            "Ret LD2", "Ret LD3")
-      confidence_labels <- c("Positive", "Negative", "Neutral", 
-                             "Positive Confidence", "Negative Confidence", 
-                             "Neutral Confidence", "Ret LD1", 
+      confidence_labels <- c("Increase", "Decrease", "Uncertain",
+                             "Increase Confidence", "Decrease Confidence",
+                             "Uncertain Confidence", "Ret LD1",
                              "Ret LD2", "Ret LD3")
     }
-    
+    else {
+      magnitude_labels <- c("Positive", "Negative", "Neutral",
+                            "Positive Magnitude", "Negative Magnitude",
+                            "Neutral Magnitude", "Ret LD1",
+                            "Ret LD2", "Ret LD3")
+      confidence_labels <- c("Positive", "Negative", "Neutral",
+                             "Positive Confidence", "Negative Confidence",
+                             "Neutral Confidence", "Ret LD1",
+                             "Ret LD2", "Ret LD3")
+    }
+
     temp_reg_list <- list()
-    
+
     ############################################################################
     # Run regressions in a loop for magnitude and 1-day                        #
     ############################################################################
@@ -104,7 +104,7 @@ for (q in 1:length(questions)) {
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_1 ~ increase + 
+        reg <- feols(sum_exret_1 ~ increase +
                     decrease +
                     uncertain +
                     increase.magnitude +
@@ -112,13 +112,13 @@ for (q in 1:length(questions)) {
                     uncertain.magnitude - 1,
                     cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
 
       }
       else {
-        reg <- feols(sum_exret_1 ~ 
-                    positive + 
+        reg <- feols(sum_exret_1 ~
+                    positive +
                     negative +
                     neutral +
                     positive.magnitude +
@@ -126,30 +126,30 @@ for (q in 1:length(questions)) {
                     neutral.magnitude - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "magnitude", 
+                   prompt = file_names[i],
+                   mag_v_conf = "magnitude",
                    ret = "1-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
-    
-    
+
+
     ############################################################################
     # Run regressions in a loop for magnitude and 5-day                        #
     ############################################################################
-    
+
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_5 ~ increase + 
+        reg <- feols(sum_exret_5 ~ increase +
                     decrease +
                     uncertain +
                     increase.magnitude +
@@ -157,13 +157,13 @@ for (q in 1:length(questions)) {
                     uncertain.magnitude - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
-        
+
       }
       else {
-        reg <- feols(sum_exret_5 ~ 
-                    positive + 
+        reg <- feols(sum_exret_5 ~
+                    positive +
                     negative +
                     neutral +
                     positive.magnitude +
@@ -171,29 +171,29 @@ for (q in 1:length(questions)) {
                     neutral.magnitude - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "magnitude", 
+                   prompt = file_names[i],
+                   mag_v_conf = "magnitude",
                    ret = "5-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
-    
+
     ############################################################################
     # Run regressions in a loop for magnitude and 10-day                        #
     ############################################################################
-    
+
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_10 ~ increase + 
+        reg <- feols(sum_exret_10 ~ increase +
                     decrease +
                     uncertain +
                     increase.magnitude +
@@ -201,13 +201,13 @@ for (q in 1:length(questions)) {
                     uncertain.magnitude - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
-        
+
       }
       else {
-        reg <- feols(sum_exret_10 ~ 
-                    positive + 
+        reg <- feols(sum_exret_10 ~
+                    positive +
                     negative +
                     neutral +
                     positive.magnitude +
@@ -215,29 +215,29 @@ for (q in 1:length(questions)) {
                     neutral.magnitude - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "magnitude", 
+                   prompt = file_names[i],
+                   mag_v_conf = "magnitude",
                    ret = "10-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
 
     ############################################################################
     # Run regressions in a loop for confidence and 1-day                        #
     ############################################################################
-    
+
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_1 ~ increase + 
+        reg <- feols(sum_exret_1 ~ increase +
                     decrease +
                     uncertain +
                     increase.confidence +
@@ -245,13 +245,13 @@ for (q in 1:length(questions)) {
                     uncertain.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
 
       }
       else {
-        reg <- feols(sum_exret_1 ~ 
-                    positive + 
+        reg <- feols(sum_exret_1 ~
+                    positive +
                     negative +
                     neutral +
                     positive.confidence +
@@ -259,22 +259,22 @@ for (q in 1:length(questions)) {
                     neutral.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "confidence", 
+                   prompt = file_names[i],
+                   mag_v_conf = "confidence",
                    ret = "1-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
-    
-    
+
+
     ############################################################################
     # Run regressions in a loop for confidence and 5-day                        #
     ############################################################################
@@ -282,7 +282,7 @@ for (q in 1:length(questions)) {
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_5 ~ increase + 
+        reg <- feols(sum_exret_5 ~ increase +
                     decrease +
                     uncertain +
                     increase.confidence +
@@ -290,12 +290,12 @@ for (q in 1:length(questions)) {
                     uncertain.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       else {
-        reg <- feols(sum_exret_5 ~ 
-                    positive + 
+        reg <- feols(sum_exret_5 ~
+                    positive +
                     negative +
                     neutral +
                     positive.confidence +
@@ -303,29 +303,29 @@ for (q in 1:length(questions)) {
                     neutral.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "confidence", 
+                   prompt = file_names[i],
+                   mag_v_conf = "confidence",
                    ret = "5-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
-    
+
     ############################################################################
     # Run regressions in a loop for confidence and 10-day                        #
     ############################################################################
- 
+
     # Run regressions in a loop
     for (i in 1:length(data_list)) {
       if (question != "q1") {
-        reg <- feols(sum_exret_10 ~ increase + 
+        reg <- feols(sum_exret_10 ~ increase +
                     decrease +
                     uncertain +
                     increase.confidence +
@@ -333,13 +333,13 @@ for (q in 1:length(questions)) {
                     uncertain.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
-        
+
       }
       else {
-        reg <- feols(sum_exret_10 ~ 
-                    positive + 
+        reg <- feols(sum_exret_10 ~
+                    positive +
                     negative +
                     neutral +
                     positive.confidence +
@@ -347,18 +347,18 @@ for (q in 1:length(questions)) {
                     neutral.confidence - 1,
                   cluster = ~company_name + date,
                   data = data_list[[i]])
-        
+
         temp_reg_list[[i]] <- reg
       }
       meta_data <- bind_rows(
         meta_data,
         data.frame(question = questions[q],
                    model = models[m],
-                   prompt = file_names[i], 
-                   mag_v_conf = "confidence", 
+                   prompt = file_names[i],
+                   mag_v_conf = "confidence",
                    ret = "10-day")
       )
-      
+
     }
     reg_list <- c(reg_list, temp_reg_list)
   }
@@ -366,7 +366,7 @@ for (q in 1:length(questions)) {
 
 
 ################################################################################
-#                        !!! END OF GIANT FOR LOOP !!!                         # 
+#                        !!! END OF GIANT FOR LOOP !!!                         #
 ################################################################################
 
 
@@ -381,22 +381,22 @@ for (i in 1:n) {
   if (meta_data$question[i] != "q1") {
     temp <- data.frame(question = meta_data$question[i],
                        model = meta_data$model[[i]],
-                       prompt = meta_data$prompt[i], 
+                       prompt = meta_data$prompt[i],
                        mag_v_conf = meta_data$mag_v_conf[i],
                        ret = meta_data$ret[i],
                        up.coef = reg$coefficients[names(reg$coefficients) == "increase"],
-                       down.coef = reg$coefficients[names(reg$coefficients) == "decrease"], 
-                       up.se = reg$se[names(reg$se) == "increase"], 
+                       down.coef = reg$coefficients[names(reg$coefficients) == "decrease"],
+                       up.se = reg$se[names(reg$se) == "increase"],
                        down.se = reg$se[names(reg$se) == "decrease"])
   } else {
     temp <- data.frame(question = meta_data$question[i],
                        model = meta_data$model[[i]],
-                       prompt = meta_data$prompt[i], 
+                       prompt = meta_data$prompt[i],
                        mag_v_conf = meta_data$mag_v_conf[i],
                        ret = meta_data$ret[i],
                        up.coef = reg$coefficients[names(reg$coefficients) == "positive"],
-                       down.coef = reg$coefficients[names(reg$coefficients) == "negative"], 
-                       up.se = reg$se[names(reg$se) == "positive"], 
+                       down.coef = reg$coefficients[names(reg$coefficients) == "negative"],
+                       up.se = reg$se[names(reg$se) == "positive"],
                        down.se = reg$se[names(reg$se) == "negative"])
   }
   plot_results <- bind_rows(plot_results, temp)
@@ -407,7 +407,7 @@ current_question = "q5"
 ################################################################################
 # Plot results for Ret 1 Positive                                              #
 ################################################################################
-plot_results_pos_ret1 <- plot_results %>% 
+plot_results_pos_ret1 <- plot_results %>%
   filter(
     ret == "1-day",
     question == current_question
@@ -417,19 +417,19 @@ plot_results_pos_ret1 <- plot_results %>%
   ) %>%
   arrange(up.tstat) %>%
   mutate(
-    id = 1:n() 
+    id = 1:n()
   )
 
 
-# Positive  
-pos_ret1 <- ggplot() + 
+# Positive
+pos_ret1 <- ggplot() +
   geom_point(data = plot_results_pos_ret1 %>% filter(
       model == "gpt-3.5-turbo" &
       mag_v_conf == "magnitude" &
       prompt == "base_json"),
     aes(x = id, y = up.tstat, color = "gpt-3.5-turbo, base"),
     size = 4, shape = 17) +
-  
+
   geom_point(data = plot_results_pos_ret1 %>% filter(
       model == "gpt-3.5-turbo" &
       prompt != "base_json"),
@@ -448,7 +448,7 @@ pos_ret1 <- ggplot() +
     aes(x = id, y = up.tstat, color = "gpt-4o-mini, base"), size = 2, alpha = 0.6) +
 
   labs(y = "t-statistic", color = "Model") +  # Adding a label for the legend
-  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) + 
+  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
@@ -469,7 +469,7 @@ pos_results <-
       mutate(up.tstat = up.coef/up.se) %>%
       arrange(up.tstat) %>%
       mutate(id = 1:n(),
-             ret = "5 Day"), 
+             ret = "5 Day"),
     plot_results %>% filter(
       ret == "10-day",
       question == current_question,
@@ -477,19 +477,19 @@ pos_results <-
       mutate(up.tstat = up.coef/up.se) %>%
       arrange(up.tstat) %>%
       mutate(id = 1:n(),
-             ret = "10 Day"), 
+             ret = "10 Day"),
   )
 
 pos_results <- pos_results %>%
   mutate(model = as.factor(model)) %>%
   mutate(ret = factor(ret, levels = c("1 Day", "5 Day", "10 Day")))
 
-pos_retcomp <- ggplot(data = pos_results) + 
-  geom_point(aes(x = id, y = up.tstat,  color = model), 
-             size = 2, alpha = 0.5) + 
-  geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") + 
-  geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") + 
-  facet_grid(cols = vars(ret)) + 
+pos_retcomp <- ggplot(data = pos_results) +
+  geom_point(aes(x = id, y = up.tstat,  color = model),
+             size = 2, alpha = 0.5) +
+  geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") +
+  geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") +
+  facet_grid(cols = vars(ret)) +
   scale_color_manual(values = c("gpt-4o-mini" = "#0072B2", "gpt-3.5-turbo" = "#D81B60")) +
   labs(y = "t-statistic") +
   theme_bw() + theme(axis.title.x=element_blank(),
@@ -501,7 +501,7 @@ pos_retcomp
 ################################################################################
 # Plot results for Ret 1 Negative                                              #
 ################################################################################
-plot_results_neg_ret1 <- plot_results %>% 
+plot_results_neg_ret1 <- plot_results %>%
   filter(
     ret == "1-day",
     question == current_question
@@ -511,37 +511,37 @@ plot_results_neg_ret1 <- plot_results %>%
   ) %>%
   arrange(down.tstat) %>%
   mutate(
-    id = 1:n() 
+    id = 1:n()
   )
 
 # Negative
-neg_ret1 <- ggplot() + 
+neg_ret1 <- ggplot() +
   geom_point(data = plot_results_neg_ret1 %>% filter(
       model == "gpt-3.5-turbo" &
       mag_v_conf == "magnitude" &
       prompt == "base_json"),
-    aes(x = id, y = down.tstat, color = "gpt-3.5-turbo, base"), 
+    aes(x = id, y = down.tstat, color = "gpt-3.5-turbo, base"),
     size = 4, shape = 17) +
-  
+
   geom_point(data = plot_results_neg_ret1 %>% filter(
       model == "gpt-3.5-turbo" &
       prompt != "base_json"),
     aes(x = id, y = down.tstat, color = "gpt-3.5-turbo, base"), size = 2, alpha = 0.6) +
-  
+
   geom_point(data = plot_results_neg_ret1 %>% filter(
       model == "gpt-4o-mini" &
       mag_v_conf == "magnitude" &
       prompt == "base_json"),
     aes(x = id, y = down.tstat, color = "gpt-4o-mini, base"),
     size = 4, shape = 17) +
-  
+
   geom_point(data = plot_results_neg_ret1 %>% filter(
       model == "gpt-4o-mini" &
       prompt != "base_json"),
     aes(x = id, y = down.tstat, color = "gpt-4o-mini, base"), size = 2, alpha = 0.6) +
-  
+
   labs(y = "t-statistic", color = "Model") +  # Adding a label for the legend
-  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) + 
+  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
@@ -562,7 +562,7 @@ neg_results <-
       mutate(down.tstat = down.coef/down.se) %>%
       arrange(down.tstat) %>%
       mutate(id = 1:n(),
-             ret = "5 Day"), 
+             ret = "5 Day"),
     plot_results %>% filter(
       ret == "10-day",
       question == current_question,
@@ -570,19 +570,19 @@ neg_results <-
       mutate(down.tstat = down.coef/down.se) %>%
       arrange(down.tstat) %>%
       mutate(id = 1:n(),
-             ret = "10 Day"), 
+             ret = "10 Day"),
   )
 
 neg_results <- neg_results %>%
   mutate(model = as.factor(model)) %>%
   mutate(ret = factor(ret, levels = c("1 Day", "5 Day", "10 Day")))
 
-neg_retcomp <- ggplot(data = neg_results) + 
-  geom_point(aes(x = id, y = down.tstat,  color = model), 
-             size = 2, alpha = 0.5) + 
-  geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") + 
-  geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") + 
-  facet_grid(cols = vars(ret)) + 
+neg_retcomp <- ggplot(data = neg_results) +
+  geom_point(aes(x = id, y = down.tstat,  color = model),
+             size = 2, alpha = 0.5) +
+  geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") +
+  geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") +
+  facet_grid(cols = vars(ret)) +
   scale_color_manual(values = c("gpt-4o-mini" = "#0072B2", "gpt-3.5-turbo" = "#D81B60")) +
 
   labs(y = "t-statistic") +
