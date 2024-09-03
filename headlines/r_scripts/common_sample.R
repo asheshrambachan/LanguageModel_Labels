@@ -6,8 +6,8 @@ library(gridExtra)
 
 rm(list = ls())
 
-questions <- c("q1", "q2", "q3", "q4", "q5")
-models <- c("gpt-3.5-turbo", "gpt-4o-mini")
+questions <- c("q1")
+models <- c("gpt-4o")
 
 calculate_CAR <- function(df) {
   df <- df %>%
@@ -24,7 +24,7 @@ for (q in questions) {
     # Define the question and the list of months
     question <- q
     months <- c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", 
-                "octfirst", "octsecond", "nov", "dec")
+                "octfirst", "octsecond")
     year = "19"
     return_type = "CAPM" # edit as needed, we're doing this 1 by 1 
     

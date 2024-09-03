@@ -8,9 +8,9 @@ library(broom)
 rm(list = ls())
 
 # Define the questions list
-questions <- c("q1", "q2", "q3", "q4", "q5")
+questions <- c("q1", "q2", "q3", "q4")
 return_type = "CAPM"
-models = c("gpt-3.5-turbo", "gpt-4o-mini")
+models = c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
 
 # Function to mutate the data frame with new columns
 mutate_data <- function(df) {
@@ -378,6 +378,14 @@ n = length(reg_list)
 
 for (i in 1:n) {
   reg <- reg_list[[i]]
+  
+  # Create a group_id based on the combination of metadata
+  group_id <- paste(meta_data$question[i], 
+                    meta_data$mag_v_conf[i], 
+                    meta_data$ret[i], 
+                    meta_data$prompt[i], 
+                    sep = "_")
+  
   if (meta_data$question[i] != "q1") {
     temp <- data.frame(question = meta_data$question[i],
                        model = meta_data$model[[i]],
@@ -399,56 +407,87 @@ for (i in 1:n) {
                        up.se = reg$se[names(reg$se) == "positive"],
                        down.se = reg$se[names(reg$se) == "negative"])
   }
+  temp$group_id = group_id
+  
+  # Append the temp data frame to the plot_results data frame
   plot_results <- bind_rows(plot_results, temp)
 }
 
-current_question = "q5"
+plot_results <- plot_results %>%
+  group_by(group_id) %>%
+  mutate(id = cur_group_id()) %>%
+  ungroup()
+
+current_question = "q1"
 
 ################################################################################
 # Plot results for Ret 1 Positive                                              #
 ################################################################################
-plot_results_pos_ret1 <- plot_results %>%
-  filter(
-    ret == "1-day",
-    question == current_question
-  ) %>%
-  mutate(
-    up.tstat = up.coef/up.se
-  ) %>%
+# Ensure that group_id is correctly calculated
+plot_results <- plot_results %>%
+  group_by(group_id) %>%
+  mutate(id = cur_group_id()) %>%
+  ungroup()
+
+# Arrange the gpt-3.5-turbo group by up.tstat and assign sequential IDs
+gpt3.5_arranged <- plot_results %>%
+  filter(model == "gpt-3.5-turbo" & ret == "1-day" & question == current_question) %>%
+  mutate(up.tstat = up.coef/up.se) %>%
   arrange(up.tstat) %>%
-  mutate(
-    id = 1:n()
-  )
+  mutate(new_id = row_number())  # Renaming id to new_id to avoid confusion
 
+# Join the new_id back to the entire dataset, based on the group_id
+plot_results_pos_ret1 <- plot_results %>%
+  filter(ret == "1-day", question == current_question) %>%
+  mutate(up.tstat = up.coef/up.se) %>%
+  left_join(gpt3.5_arranged %>% select(group_id, new_id), by = "group_id") %>%
+  arrange(new_id)
 
-# Positive
+# Check and remove any existing id column before renaming new_id
+if ("id" %in% colnames(plot_results_pos_ret1)) {
+  plot_results_pos_ret1 <- plot_results_pos_ret1 %>%
+    select(-id)
+}
+
+# Rename new_id back to id for plotting purposes
+plot_results_pos_ret1 <- plot_results_pos_ret1 %>%
+  rename(id = new_id)
+
 pos_ret1 <- ggplot() +
-  geom_point(data = plot_results_pos_ret1 %>% filter(
-      model == "gpt-3.5-turbo" &
-      mag_v_conf == "magnitude" &
-      prompt == "base_json"),
-    aes(x = id, y = up.tstat, color = "gpt-3.5-turbo, base"),
-    size = 4, shape = 17) +
+  geom_point(data = plot_results_pos_ret1 %>% 
+               filter(model == "gpt-3.5-turbo",
+                      prompt == "base_json",
+                      mag_v_conf == "magnitude"),
+             aes(x = id, y = up.tstat, color = "gpt-3.5-turbo, base"),
+             size = 4, shape = 17) +
+  geom_point(data = plot_results_pos_ret1 %>% 
+               filter(model == "gpt-4o-mini",
+                      prompt == "base_json",
+                      mag_v_conf == "magnitude"),
+             aes(x = id, y = up.tstat, color = "gpt-4o-mini, base"),
+             size = 4, shape = 17) +
+  geom_point(data = plot_results_pos_ret1 %>% 
+               filter(model == "gpt-4o",
+                      prompt == "base_json",
+                      mag_v_conf == "magnitude"),
+             aes(x = id, y = up.tstat, color = "gpt-4o, base"),
+             size = 4, shape = 17) +
 
-  geom_point(data = plot_results_pos_ret1 %>% filter(
-      model == "gpt-3.5-turbo" &
-      prompt != "base_json"),
-    aes(x = id, y = up.tstat, color = "gpt-3.5-turbo, base"), size = 2, alpha = 0.6) +
+  geom_point(data = plot_results_pos_ret1 %>%
+               filter(model == "gpt-3.5-turbo"),
+             aes(x = id, y = up.tstat, color = "gpt-3.5-turbo, base"),
+             size = 2, alpha = 0.5) +
+  geom_point(data = plot_results_pos_ret1 %>%
+               filter(model == "gpt-4o-mini"),
+             aes(x = id, y = up.tstat, color = "gpt-4o-mini, base"),
+             size = 2, alpha = 0.5) +
+  geom_point(data = plot_results_pos_ret1 %>%
+               filter(model == "gpt-4o"),
+             aes(x = id, y = up.tstat, color = "gpt-4o, base"),
+             size = 2, alpha = 0.5) +
+  labs(y = "t-statistic", color = "Model") +
 
-  geom_point(data = plot_results_pos_ret1 %>% filter(
-      model == "gpt-4o-mini" &
-      mag_v_conf == "magnitude" &
-      prompt == "base_json"),
-    aes(x = id, y = up.tstat, color = "gpt-4o-mini, base"),
-    size = 4, shape = 17) +
-
-  geom_point(data = plot_results_pos_ret1 %>% filter(
-      model == "gpt-4o-mini" &
-      prompt != "base_json"),
-    aes(x = id, y = up.tstat, color = "gpt-4o-mini, base"), size = 2, alpha = 0.6) +
-
-  labs(y = "t-statistic", color = "Model") +  # Adding a label for the legend
-  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) +
+  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2",  "gpt-4o, base" = "green4")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
@@ -459,135 +498,64 @@ pos_ret1
 #####################################################
 # Compare Ret 1, Ret 5, Ret 10 for positive Returns #
 #####################################################
-pos_results <-
-  bind_rows(
-    plot_results_pos_ret1 %>% mutate(ret = "1 Day"),
-    plot_results %>% filter(
-      ret == "5-day",
-      question == current_question,
-      ) %>%
-      mutate(up.tstat = up.coef/up.se) %>%
-      arrange(up.tstat) %>%
-      mutate(id = 1:n(),
-             ret = "5 Day"),
-    plot_results %>% filter(
-      ret == "10-day",
-      question == current_question,
-      ) %>%
-      mutate(up.tstat = up.coef/up.se) %>%
-      arrange(up.tstat) %>%
-      mutate(id = 1:n(),
-             ret = "10 Day"),
-  )
 
+# Arrange the gpt-3.5-turbo group separately for each time group and assign sequential IDs
+arranged_data <- list()
+
+# Loop over each time group
+for (time_group in c("1-day", "5-day", "10-day")) {
+  arranged <- plot_results %>%
+    filter(model == "gpt-3.5-turbo" & ret == time_group & question == current_question) %>%
+    mutate(up.tstat = up.coef/up.se) %>%
+    arrange(up.tstat) %>%
+    mutate(new_id = row_number(), ret = time_group)  # Assign IDs based on order
+  
+  arranged_data[[time_group]] <- arranged
+}
+
+# Combine the arranged data into one data frame
+gpt3.5_arranged <- bind_rows(arranged_data)
+
+# Apply the gpt-3.5-turbo order to each time group and ensure unique id column
+pos_results <- bind_rows(
+  plot_results %>%
+    filter(ret == "1-day", question == current_question) %>%
+    mutate(up.tstat = up.coef/up.se) %>%
+    left_join(gpt3.5_arranged %>% filter(ret == "1-day") %>% select(group_id, new_id), by = "group_id") %>%
+    mutate(ret = "1 Day"),
+  
+  plot_results %>%
+    filter(ret == "5-day", question == current_question) %>%
+    mutate(up.tstat = up.coef/up.se) %>%
+    left_join(gpt3.5_arranged %>% filter(ret == "5-day") %>% select(group_id, new_id), by = "group_id") %>%
+    mutate(ret = "5 Day"),
+  
+  plot_results %>%
+    filter(ret == "10-day", question == current_question) %>%
+    mutate(up.tstat = up.coef/up.se) %>%
+    left_join(gpt3.5_arranged %>% filter(ret == "10-day") %>% select(group_id, new_id), by = "group_id") %>%
+    mutate(ret = "10 Day")
+)
+
+# Remove all instances of 'id' before renaming 'new_id' to 'id'
 pos_results <- pos_results %>%
-  mutate(model = as.factor(model)) %>%
-  mutate(ret = factor(ret, levels = c("1 Day", "5 Day", "10 Day")))
+  select(-any_of("id")) %>%
+  rename(id = new_id) %>%
+  mutate(model = as.factor(model),
+         ret = factor(ret, levels = c("1 Day", "5 Day", "10 Day")))
 
+# Create the retcomp plot
 pos_retcomp <- ggplot(data = pos_results) +
-  geom_point(aes(x = id, y = up.tstat,  color = model),
-             size = 2, alpha = 0.5) +
+  geom_point(aes(x = id, y = up.tstat, color = model), size = 2, alpha = 0.5) +
   geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") +
   geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") +
   facet_grid(cols = vars(ret)) +
-  scale_color_manual(values = c("gpt-4o-mini" = "#0072B2", "gpt-3.5-turbo" = "#D81B60")) +
+  scale_color_manual(values = c("gpt-4o-mini" = "#0072B2", "gpt-3.5-turbo" = "#D81B60", "gpt-4o" = "green4")) +
   labs(y = "t-statistic") +
-  theme_bw() + theme(axis.title.x=element_blank(),
-                     axis.text.x=element_blank(),
-                     axis.ticks.x=element_blank())
-
-pos_retcomp
-
-################################################################################
-# Plot results for Ret 1 Negative                                              #
-################################################################################
-plot_results_neg_ret1 <- plot_results %>%
-  filter(
-    ret == "1-day",
-    question == current_question
-  ) %>%
-  mutate(
-    down.tstat = down.coef/down.se
-  ) %>%
-  arrange(down.tstat) %>%
-  mutate(
-    id = 1:n()
-  )
-
-# Negative
-neg_ret1 <- ggplot() +
-  geom_point(data = plot_results_neg_ret1 %>% filter(
-      model == "gpt-3.5-turbo" &
-      mag_v_conf == "magnitude" &
-      prompt == "base_json"),
-    aes(x = id, y = down.tstat, color = "gpt-3.5-turbo, base"),
-    size = 4, shape = 17) +
-
-  geom_point(data = plot_results_neg_ret1 %>% filter(
-      model == "gpt-3.5-turbo" &
-      prompt != "base_json"),
-    aes(x = id, y = down.tstat, color = "gpt-3.5-turbo, base"), size = 2, alpha = 0.6) +
-
-  geom_point(data = plot_results_neg_ret1 %>% filter(
-      model == "gpt-4o-mini" &
-      mag_v_conf == "magnitude" &
-      prompt == "base_json"),
-    aes(x = id, y = down.tstat, color = "gpt-4o-mini, base"),
-    size = 4, shape = 17) +
-
-  geom_point(data = plot_results_neg_ret1 %>% filter(
-      model == "gpt-4o-mini" &
-      prompt != "base_json"),
-    aes(x = id, y = down.tstat, color = "gpt-4o-mini, base"), size = 2, alpha = 0.6) +
-
-  labs(y = "t-statistic", color = "Model") +  # Adding a label for the legend
-  scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", "gpt-4o-mini, base" = "#0072B2")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
-neg_ret1
+pos_retcomp
 
-#####################################################
-# Compare Ret 1, Ret 5, Ret 10 for positive Returns #
-#####################################################
-neg_results <-
-  bind_rows(
-    plot_results_neg_ret1 %>% mutate(ret = "1 Day"),
-    plot_results %>% filter(
-      ret == "5-day",
-      question == current_question,
-      ) %>%
-      mutate(down.tstat = down.coef/down.se) %>%
-      arrange(down.tstat) %>%
-      mutate(id = 1:n(),
-             ret = "5 Day"),
-    plot_results %>% filter(
-      ret == "10-day",
-      question == current_question,
-      ) %>%
-      mutate(down.tstat = down.coef/down.se) %>%
-      arrange(down.tstat) %>%
-      mutate(id = 1:n(),
-             ret = "10 Day"),
-  )
-
-neg_results <- neg_results %>%
-  mutate(model = as.factor(model)) %>%
-  mutate(ret = factor(ret, levels = c("1 Day", "5 Day", "10 Day")))
-
-neg_retcomp <- ggplot(data = neg_results) +
-  geom_point(aes(x = id, y = down.tstat,  color = model),
-             size = 2, alpha = 0.5) +
-  geom_hline(aes(yintercept = -1.96), linetype = "dashed", color = "black") +
-  geom_hline(aes(yintercept = 1.96), linetype = "dashed", color = "black") +
-  facet_grid(cols = vars(ret)) +
-  scale_color_manual(values = c("gpt-4o-mini" = "#0072B2", "gpt-3.5-turbo" = "#D81B60")) +
-
-  labs(y = "t-statistic") +
-  theme_bw() + theme(axis.title.x=element_blank(),
-                     axis.text.x=element_blank(),
-                     axis.ticks.x=element_blank())
-
-neg_retcomp

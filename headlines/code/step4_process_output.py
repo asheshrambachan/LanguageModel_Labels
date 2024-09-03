@@ -6,8 +6,7 @@ import seaborn as sns
 from step0_constants import personas, thought_modifiers
 
 def read_jsonl(file_path, num_lines):
-    """
-    Reads the JSONL file from the given file path.
+    """Reads the JSONL file from the given file path.
     Args:
         file_path (str): The file path.
         num_lines (int): The number of lines to read from the file.
@@ -24,8 +23,7 @@ def read_jsonl(file_path, num_lines):
     return data
 
 def read_jsonl_from_line(file_path, start_line):
-    """
-    Reads the JSONL file from the given file path starting from the specified line.
+    """Reads the JSONL file from the given file path starting from the specified line.
     Args:
         file_path (str): The file path.
         start_line (int): The line number to start reading from.
@@ -46,8 +44,7 @@ def read_jsonl_from_line(file_path, start_line):
 
 
 def extract_json(json_str):
-    """
-    Extracts the JSON object from the given JSON string.
+    """Extracts the JSON object from the given JSON string.
     Args:
         json_str (str): The JSON string.
     Returns:
@@ -65,8 +62,7 @@ def extract_json(json_str):
     return None
 
 def extract_prompt_info(json_str):
-    """
-    Extracts the prompt information from the given JSON string.
+    """Extracts the prompt information from the given JSON string.
     Args:
         json_str (str): The JSON string.
     Returns:
@@ -92,8 +88,7 @@ def extract_prompt_info(json_str):
     return {'custom_id': custom_id, 'company_name': company_name, 'headline': headline, 'prompt_type': type}
 
 def construct_file_paths(question, model, month, year):
-    """
-    Constructs the input and output file paths based on the given parameters.
+    """Constructs the input and output file paths based on the given parameters.
     Args:
         question (str): The question type.
         model (str): The model name.
@@ -108,8 +103,7 @@ def construct_file_paths(question, model, month, year):
     return input_file_path, output_file_path
 
 def read_and_process_input_data(input_file_path):
-    """
-    Reads the input data from the given input file path and processes it.
+    """Reads the input data from the given input file path and processes it.
     Args:
         input_file_path (str): The input file path.
     Returns:
@@ -123,8 +117,7 @@ def read_and_process_input_data(input_file_path):
     return input_df, start_line, num_lines
 
 def read_and_process_plain_text_responses(output_file_path, num_lines):
-    """
-    Reads the plain text responses from the given output file path and processes them.
+    """Reads the plain text responses from the given output file path and processes them.
     Args:
         output_file_path (str): The output file path.
         num_lines (int): The number of lines to read from the output file.
@@ -142,9 +135,11 @@ def read_and_process_plain_text_responses(output_file_path, num_lines):
 
     outputs_plain = [output["response"]["body"]["choices"][0]["message"]["content"] for output in outputs_plain]
     outputs_plain = [item.split(', ') for item in outputs_plain]
-    outputs_plain = [item + [None] * (4 - len(item)) for item in outputs_plain]
 
+    outputs_plain = [item if len(item) <= 4 else [None] for item in outputs_plain]
+    outputs_plain = [item + [None] * (4 - len(item)) for item in outputs_plain]
     output_cols = ['headline type', 'confidence', 'magnitude', 'explanation']
+
     outputs_plain_df = pd.DataFrame(outputs_plain, columns=output_cols)
     outputs_plain_df = pd.concat([outputs_plain_ids, outputs_plain_df], axis=1)
 
@@ -153,8 +148,7 @@ def read_and_process_plain_text_responses(output_file_path, num_lines):
     return outputs_plain_df
 
 def read_and_process_json_responses(output_file_path, start_line):
-    """
-    Reads the JSON responses from the given output file path and processes them.
+    """Reads the JSON responses from the given output file path and processes them.
     Args:
         output_file_path (str): The output file path.
         start_line (int): The start line to read the JSON responses from.
@@ -183,8 +177,7 @@ def read_and_process_json_responses(output_file_path, start_line):
     return outputs_json_df
 
 def combine_responses(outputs_plain_df, outputs_json_df):
-    """
-    Combines the given plain and JSON outputs into a single DataFrame.
+    """Combines the given plain and JSON outputs into a single DataFrame.
     Args:
         outputs_plain_df (pandas.DataFrame): The DataFrame containing the plain outputs.
         outputs_json_df (pandas.DataFrame): The DataFrame containing the JSON outputs.
@@ -196,8 +189,7 @@ def combine_responses(outputs_plain_df, outputs_json_df):
     return combined_output
 
 def merge_input_with_combined_output(input_df, combined_output):
-    """
-    Merge the input dataframe with the combined output dataframe based on the 'custom_id' column.
+    """Merge the input dataframe with the combined output dataframe based on the 'custom_id' column.
     Args:
         input_df (pandas.DataFrame): The input dataframe.
         combined_output (pandas.DataFrame): The combined output dataframe.
@@ -211,8 +203,7 @@ def merge_input_with_combined_output(input_df, combined_output):
     return data
 
 def clean_and_filter_data(data, question):
-    """
-    Cleans and filters the given data based on the specified question.
+    """Cleans and filters the given data based on the specified question.
     Args:
         data (pandas.DataFrame): The input data to be cleaned and filtered.
         question (str): The question type. Should be "1" for sentiment analysis or any other value for magnitude analysis.
@@ -231,19 +222,10 @@ def clean_and_filter_data(data, question):
 
 
 def calculate_statistics(data):
-    """
-    Calculate statistics for the given data.
+    """Calculate statistics for the given data.
     Parameters:
     - data: pandas DataFrame
-        The input data containing the following columns:
-        - 'headline': str
-            The headline text.
-        - 'confidence': float
-            The confidence score.
-        - 'magnitude': float
-            The magnitude score.
-        - 'headline type num': int
-            The headline type number.
+        The input data for which statistics need to be calculated.
     Returns:
     - data_mean: pandas DataFrame
         The calculated statistics grouped by 'headline'
@@ -279,8 +261,8 @@ def main(question, model, month, year):
 if __name__ == "__main__":
     
     QUESTION = ["4"]
-    MODEL = ["gpt-3.5-turbo"]
-    MONTH = ["feb"]
+    MODEL = ["gpt-4o"]
+    MONTH = ["sep", "octfirst", "octsecond", "nov"]
     YEAR = "19"
 
     for question in QUESTION:

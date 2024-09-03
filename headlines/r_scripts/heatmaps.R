@@ -5,7 +5,7 @@ library(viridis)
 # Define the questions list
 questions <- c("q1", "q2", "q3", "q4", "q5")
 return_type <- "CAPM"
-models <- c("gpt-3.5-turbo", "gpt-4o-mini")
+models <- c("gpt-3.5-turbo")
 
 # Function to mutate the data frame with new columns
 mutate_data <- function(df, question) {
@@ -95,7 +95,7 @@ for (q in 1:length(questions)) {
       geom_text(aes(label = sprintf("%.1f", Agreement),
                     color = TextColor),  # Use TextColor column for text color
                 size = 3, show.legend = FALSE) +  # Remove text color legend
-      scale_fill_viridis_c(option = "rocket", direction = -1) +  # Reverse color scale
+      scale_fill_viridis_c(option = "rocket", direction = -1, limits = c(0, 100)) +  # Reverse color scale
       scale_color_identity() +  # Use the actual color values provided in TextColor
       labs(title = paste("Headline Type Pairwise Agreement -", question, "-", model),
            x = "Dataset",

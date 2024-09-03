@@ -126,8 +126,8 @@ def generate_prompts(month, question, year, model):
 if __name__ == "__main__":
     # Set constants here
     MODEL = "gpt-4o" # either gpt-4o-mini, gpt-4o, or gpt-3.5-turbo-0215
-    MONTH = "octfirst" # 3-letter abbreviation
-    QUESTION = "3" # question number (1, 2, 3, 4, 5)
+    MONTH = "dec" # 3-letter abbreviation
+    QUESTION = "2" # question number (1, 2, 3, 4, 5)
     YEAR = "19" # 2-digit year
 
     generate_prompts(MONTH, QUESTION, YEAR, MODEL)
