@@ -65,7 +65,7 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
 
-    QUESTION = "2"
+    QUESTION = "4"
     MODEL = "gpt-4o"
     MONTH = "dec"
     YEAR = "19"

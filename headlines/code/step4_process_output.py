@@ -260,9 +260,9 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
     
-    QUESTION = ["4"]
+    QUESTION = ["2"]
     MODEL = ["gpt-4o"]
-    MONTH = ["sep", "octfirst", "octsecond", "nov"]
+    MONTH = ["octsecond"]
     YEAR = "19"
 
     for question in QUESTION:
