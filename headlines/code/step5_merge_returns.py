@@ -54,9 +54,9 @@ def main(question, model, month, year, return_type):
 
 if __name__ == "__main__":
 
-    QUESTION = ["1"]
-    MODEL = ["gpt-3.5-turbo"]
-    MONTH = ["octsecond"]
+    QUESTION = ["1", "2", "3", "4", "5"]
+    MODEL = ["gpt-4o"]
+    MONTH = ["jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec"]
     YEAR = ["19"]
     RETURN_TYPE = ["cumulative", "CAPM", "FF3"]
 
