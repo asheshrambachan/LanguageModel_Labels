@@ -1,4 +1,5 @@
 import json
+import ast
 import pandas as pd
 import re
 import matplotlib.pyplot as plt
@@ -6,59 +7,50 @@ import seaborn as sns
 from step0_constants import personas, thought_modifiers
 
 def read_jsonl(file_path, num_lines):
-    """Reads the JSONL file from the given file path.
-    Args:
-        file_path (str): The file path.
-        num_lines (int): The number of lines to read from the file.
-    Returns:
-        list: The list of JSON objects read from the file.
-    """
-
-    data = []
+    """Reads a specified number of lines from a JSONL file."""
     with open(file_path, 'r') as file:
-        for i, line in enumerate(file):
-            if i >= num_lines:
-                break
-            data.append(json.loads(line.strip()))
-    return data
+        return [json.loads(line.strip()) for i, line in enumerate(file) if i < num_lines]
 
 def read_jsonl_from_line(file_path, start_line):
-    """Reads the JSONL file from the given file path starting from the specified line.
-    Args:
-        file_path (str): The file path.
-        start_line (int): The line number to start reading from.
-    Returns:
-        list: The list of JSON objects read from the file.
-    """
-
-    data = []
+    """Reads a JSONL file starting from a specified line."""
     with open(file_path, 'r') as file:
-        for i, line in enumerate(file):
-            if i < start_line:
-                continue
-            try:
-                data.append(json.loads(line.strip()))
-            except:
-                print(line)
-    return data
+        return [json.loads(line.strip()) for i, line in enumerate(file) if i >= start_line]
 
+import json
+import re
+
+import json
+import re
+
+import json
+import re
 
 def extract_json(json_str):
-    """Extracts the JSON object from the given JSON string.
+    """Extracts the JSON object from the given JSON string and trims anything after the 'explanation' field
+    only if there is an error in parsing.
     Args:
         json_str (str): The JSON string.
     Returns:
-        dict: The extracted JSON object
+        dict: The extracted JSON object.
     """
-
     match = re.search(r'\{.*\}', json_str, re.DOTALL)
     if match:
         json_text = match.group(0)
+
         try:
+            # Try to load the JSON as-is first
             return json.loads(json_text)  
-        except:
-            # print(f"Offending JSON string: {repr(json_text)}")
-            return None
+        except json.JSONDecodeError:
+            # If parsing fails, attempt to cut off the "explanation" field and re-parse
+            explanation_index = json_text.find('"explanation"')
+            if explanation_index != -1:
+                # Cut off everything two characters before "explanation", remove trailing comma and newline
+                json_text = json_text[:explanation_index - 2].rstrip(', \n') + "}"
+            try:
+                return json.loads(json_text)  
+            except json.JSONDecodeError:
+                # print(f"Offending JSON string: {repr(json_text)}")
+                return None
     return None
 
 def extract_prompt_info(json_str):
@@ -260,9 +252,9 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
     
-    QUESTION = ["2"]
+    QUESTION = ["1", "2", "3", "4", "5"]
     MODEL = ["gpt-4o"]
-    MONTH = ["octsecond"]
+    MONTH = ["jun", "jul", "aug", "sep", "octfirst", "octsecond", "nov", "dec"]
     YEAR = "19"
 
     for question in QUESTION:

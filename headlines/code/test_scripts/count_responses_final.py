@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 # Define the root directory where your CSV files are stored
-root_dir = "./data/step6_common_sample"
+root_dir = "./data/step5_returns_merged"
 
 # List of main directories
 main_dirs = ["cumulative", "CAPM", "FF3"]
