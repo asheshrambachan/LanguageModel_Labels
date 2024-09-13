@@ -71,7 +71,7 @@ This notebook cleans the congressional bills data for further analysis. The code
 
 #### Cleaning Remarks
 
-While our approach shares similarities with  Egami et al.'s method, we have made several key modifications:
+Our approach shares similarities with  Egami et al.'s method with few  modifications.
 
 1. We corrected inconsistencies in bill IDs. Bills with the same `BillID` are treated as duplicates and are dropped from both the CAP and CBP datasets. The coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic.
 2. Bills present in both CBP and CAP dataset but varies in any of the following variables are dropped: `Major`, `Description`, `Party`, `PassS`, `PassH`, and `Chamber`.
