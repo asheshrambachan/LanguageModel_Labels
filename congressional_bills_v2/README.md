@@ -77,7 +77,7 @@ Our approach shares similarities with  Egami et al.'s method with few  modificat
 2. Bills present in both CBP and CAP dataset but varies in any of the following variables are dropped: `Major`, `Description`, `Party`, `PassS`, `PassH`, and `Chamber`.
 3. Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. All major topic IDs are retained except for topic 99.
 4. Bills with identical `Description` values are considered duplicates and are dropped. We also ensure descriptions are case insensitive by converting them to lowercase.
-5. Egami et al. (2023) imputed missing DW1 scores by averaging over bills. In our approach, we average over the unique bill sponsor (`NameFull`) and their `DW1` score. Both the original `DW1_NA` and the imputed `DW1` columns are included in the dataset.
+5. Egami et al. (2023) imputed missing DW1 scores by averaging over bills. In our approach, we average over the unique bill sponsor (`NameFull`) and their `DW1_NA` score. Both the original `DW1_NA` and the imputed `DW1` columns are included in the dataset.
 6. Like Egami et al. (2023), we drop variables/columns with any missing values except for `DW1_NA`.
 
 ### 02_prompting.ipynb
@@ -100,3 +100,5 @@ These prompts are then used to query the LLM models via the OpenAI API. The resp
 
 - [ ] remove `_v2` from env setup
 - [ ] remove figures not used in the paper
+- [ ] complete the codebook for `./Data/02_prompting/bills_prompts_responses.csv`
+- [ ] 
