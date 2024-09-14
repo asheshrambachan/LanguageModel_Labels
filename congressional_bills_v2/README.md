@@ -86,15 +86,7 @@ This notebook generates prompts using the 10K bills dataset. We apply 12 prompt 
 
 These prompts are then used to query the LLM models via the OpenAI API. The responses are decoded and merged with the corresponding bills and prompt data, which will be used for further analysis.
 
-### 03_predict_errors
 
-```math
-\begin{align*}
-X &:= BoW(\text{Description})\\
-y &:= 1\{Y^\text{Human} \neq Y^\text{LLM}\}
-\beta_\text{ridge} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2
-\beta_\text{lasso} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
-```
 
 #### Outputs
 
@@ -110,6 +102,14 @@ y &:= 1\{Y^\text{Human} \neq Y^\text{LLM}\}
 
 The code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py 
 
+```math
+\begin{align*}
+X &:= BoW(\text{Description})\\
+y &:= 1\{Y^\text{Human} \neq Y^\text{LLM}\}\\
+\beta_\text{ridge} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
+\beta_\text{lasso} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
+\end{align*}
+```
 
 ## TODO
 
