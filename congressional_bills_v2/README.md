@@ -86,6 +86,16 @@ This notebook generates prompts using the 10K bills dataset. We apply 12 prompt 
 
 These prompts are then used to query the LLM models via the OpenAI API. The responses are decoded and merged with the corresponding bills and prompt data, which will be used for further analysis.
 
+### 03_predict_errors
+
+```math
+\begin{align*}
+X &:= BoW(\text{Description})\\
+y &:= 1\{Y^\text{Human} \neq Y^\text{LLM}\}
+\beta_\text{ridge} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2
+\beta_\text{lasso} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
+```
+
 #### Outputs
 
 - A `.jsonl` file containing all 24 prompts for the 10K bills (240K prompts total) is stored at `./Data/02_prompting/prompts.jsonl`. A batched version of this file, split into 8 files due to the old token limit, is stored at `./Data/02_prompting/prompts_batched_*.jsonl`. Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
@@ -95,6 +105,11 @@ These prompts are then used to query the LLM models via the OpenAI API. The resp
 - The details about each bill and prompt are merged with the responses, resulting in the main file used in the analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
 
 - Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`.
+
+### 03_predict_errors.ipynb
+
+The code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py 
+
 
 ## TODO
 
