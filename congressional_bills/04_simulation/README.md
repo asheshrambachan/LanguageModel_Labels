@@ -13,15 +13,6 @@ This directory contains the code to run regressions with proxy on the LHS and RH
 
 1. **Data Preparation**: Run `pre_simulation.Rmd` to generate the necessary `combinations_*.csv` files. Then, copy the repository from your local machine to the server.
 
-2. **Server Environment Setup**: Ensure that `conda` is installed on the server (see https://github.com/gentzkow/template_archive/tree/master). If not, install it. Make sure to set the default channel to `conda-forge` to use `r-base=4.4.1` rather than the default `4.3.1`, which has incompatibility issues with `dplyr`'s `slice/filter/indexing` and `furrr::future_map`. Use the following commands:
-```
-conda update conda
-conda config --set channel_priority strict
-conda env create -f setup/conda_env.yaml
-conda activate env_cb
-cd ~/Documents/LanguageModel_Labels/congressional_bills/04_simulation
-```
-
 3. **LHS Simulations**: Verify that the parameters, e.g., number of cores, and paths in `simulate_lhs_parallel.R` are correct. To check the available resources in the server, use `btop -lc` in the terminal. To run the script, run the following via the terminal:
 ```
 Rscript simulate_lhs_parallel.R 1>output_lhs.log 2>error_lhs.log &
