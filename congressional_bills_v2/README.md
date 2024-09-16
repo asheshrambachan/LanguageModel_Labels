@@ -159,3 +159,4 @@ The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Label
 - [ ] remove figures not used in the paper
 - [ ] remove dataframes not used in the paper
 - [ ] complete all codebooks at `./Data/Codebooks/`
+- [ ] merge `04_pre_simulation.r` with `04_simulate_*.r`
