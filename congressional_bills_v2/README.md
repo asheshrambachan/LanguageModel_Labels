@@ -63,7 +63,7 @@ The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageM
 
 <!-- - The bills and major topics codebooks are saved at: `./Data/Codebooks/` -->
 
-- A plot showing the distribution of the 10K bills over the years is saved in the `./Figures` directory.
+- A plot showing the distribution of the 10K bills over the years is saved in the `./FiguresTables` directory.
 
 
 <!-- 
@@ -91,7 +91,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 - The model responses are then downloaded, decoded, and combined with the corresponding bills and prompt data, creating the main dataset for further analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
 
-- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`
+- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./FiguresTables`
 
 ## Error in LLM Predictions
 
@@ -108,7 +108,7 @@ Using a 50% train-test split, we fit a regularized logistic regression model on 
 \end{align*}
 ```
 
-The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./Figures`.
+The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./FiguresTables`.
 
 ## Run LHS and RHS Simulations
 
