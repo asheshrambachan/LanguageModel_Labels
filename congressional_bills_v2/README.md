@@ -137,9 +137,10 @@ For all regressions, we report robust standard errors, except for the debiased m
 Note: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample.
 
 
+
 ### Summary of Simulation Results
 
-We summarize the simulations as follows:
+The file [04_post_simulation.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/04_post_simulation.Rmd) summarize the simulations by computing the following:
 - Sample mean: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
 - Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
 - Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$, where $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$.
@@ -147,7 +148,10 @@ We summarize the simulations as follows:
 - Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$, where $\text{mse}(\beta^{(i)}) = (\beta^{(i)} - \beta^\star)^2$
 - Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}),$ where $\text{coverage}(\beta^{(i)}) = 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} )\\}$, and $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
 
-Results are saved at `./Data/04_simulations/lhs/averaged.csv` and `./Data/04_simulations/rhs/averaged.csv`.
+<!-- Results are saved at `./Data/04_simulations/lhs/averaged.csv` and `./Data/04_simulations/rhs/averaged.csv`. -->
+
+## Results
+
 
 ## TODO
 
