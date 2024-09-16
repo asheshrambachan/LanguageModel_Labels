@@ -53,9 +53,9 @@ The primary data sources used in this project are listed below.
 
 ## Replication Files
 
-### 01_clean_bills.ipynb
+### Clean Bills
 
-This notebook generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
+The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
 
 - The notebook first cleans the raw bills data (refer to the cleaning remarks for more details).
 
@@ -85,9 +85,9 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
   - We drop bills wil `Major` topic ID of 99.
   - Bills with identical `Description` values are considered duplicates and are dropped.  -->
 
-### 02_prompting.ipynb
+### Prompt LLM
 
-- This notebook generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
+- The notebook [02_prompting.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/02_prompting.ipynb) generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
 
 - The generated prompts are used to query the GPT models via the OpenAI API in the batched mode.  Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
 
@@ -95,9 +95,9 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 - Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`
 
-### 03_predict_errors.ipynb
+### Errors in LLM Predictions
 
-This notebook analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
+The notebook [03_predict_errors.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/03_predict_errors.ipynb) analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
 - $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
 
 - $y_{m,p} = 1\\{Y_{m,p}^\text{Human} \neq Y_{m,p}^\text{LLM}\\} \in \\{0,1\\}^{10K \times 1}$ represent the error in major topic prediction between Human labels and LLM predictions for each GPT model ($m$) and prompt modification ($p$).
@@ -112,9 +112,13 @@ Using a 50% train-test split, we fit a regularized logistic regression model on 
 
 The models are evaluated using test data, and ROC curves are generated for each type of regularization and GPT model. The ROC plots are saved at: `./Figures`
 
-### 04_simulation
+### LHS and RHS Simulations
 
-Let 
+The R scripts `04_*.r` are used to run regressions with $Y$ on the LHS or RHS:
+- LHS: $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
+- RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$,
+
+where
 - $Y_\text{topic} \in \\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}, Y_\text{Other}\\}$, where $Y_\text{topic} = 1\\{Y = \text{topic}\\}$
 
 - $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where
@@ -126,40 +130,31 @@ Let
 \end{aligned}
 ```
 
-We run similations of regressions with $Y$ on the LHS and RHS:
-- $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
-- $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$
 <!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
 
-- We first use all 10K bills to fit the regressions using the true labels $Y^\text{Human}$.
-- Next, we fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$. 
-
 For $N=\\{1, \ldots, 1000\\}$ we repeat the following simulation
-1. sample 5K bills from the 10K bills, and fit a regression using $Y^\text{LLM}$, $\beta^\text{LLM}$
-2. using a given validation proportion, split the 5K sample into validation and primary set.
-3. Fit a regression using validation data and $Y^\text{Human}$, resulting in $\beta^\text{Human}$. 
-4. Use validation data, containing both $Y^\text{Human}$ and $Y^\text{LLM}$ to unbias the estimate. We then use the primary set with only $Y^\text{LLM}$ to obtain the debiased coefficent, $\beta^\text{Debiased}$.
+1. We first use all 10K bills to fit the regressions using the true labels $Y^\text{Human}$.
+2. fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$. 
+3. sample 5K bills from the 10K bills, and fit a regression using $Y^\text{LLM}$, $\beta^\text{LLM}$
+4. using a given validation proportion, split the 5K sample into validation and primary set.
+5. Fit a regression using validation data and $Y^\text{Human}$, resulting in $\beta^\text{Human}$. 
+6. Use validation data, containing both $Y^\text{Human}$ and $Y^\text{LLM}$ to unbias the estimate. We then use the primary set with only $Y^\text{LLM}$ to obtain the debiased coefficent, $\beta^\text{Debiased}$.
 
 In all regressions we report robust standard errors, except for the debiased model where we used Baysian bootstrap with $B=1000$ samples.
 
-After the simulations, we compute the following for each of the $i \in \\{1, \ldots, N = 1000\\}$ simulation runs, relative to the true coefficent over all 10K bills. These are saved at `./Data/04_simulations/lhs.csv` and `./Data/04_simulations/rhs.csv`
+After the simulations, we bias, mse, and converage for each of the $N$ simulation runs relative to the true coefficent over all 10K bills. These are saved at `./Data/04_simulations/lhs.csv` and `./Data/04_simulations/rhs.csv`
 - Bias: $\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$
 - MSE: $\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$
 - Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [{\beta_{(0.025)}^{(i)}}, {\beta_{(0.975)}^{(i)}}]$. The coverage is defined as: $ \text{coverage}(\beta^{(i)}) := 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \\}.$
  bias, mse, and coverage 
 
-We average the bias, mse, and coverage over the $N=1000$ simulation runs and reprot the results at `./Data/04_simulations/lhs_averaged.csv` and `./Data/04_simulations/rhs_averaged.csv`.
+We average the bias, mse, and coverage over the $N$ simulation runs and reprot the results at `./Data/04_simulations/lhs_averaged.csv` and `./Data/04_simulations/rhs_averaged.csv`.
 
 - The sample mean of $\beta$: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
-
 - The sample SD of $\beta$: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
-
 - The estimated bias of $\beta$: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$
-
 - The estimated normalized bias of $\beta$: $\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.$
-
 - The estimated MSE of $\beta$ is defined as: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).$
-
 - The estimated coverage probability of $\beta$: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).$
 
 
