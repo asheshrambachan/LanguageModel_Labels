@@ -3,9 +3,9 @@ Congressional Bills Experiment
 
 This file provides a description of the replication files for the congressional bills experiment.
 
-## Environment Setup
+# Environment Setup
 
-### Create Conda Environment
+## Create Conda Environment
 ```
 conda update conda
 conda config --set channel_priority strict
@@ -18,7 +18,7 @@ Navigate to the project directory:
 cd ~/Documents/LanguageModel_Labels/congressional_bills_v2
 ```
 
-### Add OPENAI_API_KEY`
+## Add OPENAI_API_KEY`
 
 1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
 2. Create a new API key.
@@ -28,7 +28,7 @@ cd ~/Documents/LanguageModel_Labels/congressional_bills_v2
    echo 'OPENAI_API_KEY="your key"' > .env
    ```
 
-## File Structure
+# File Structure
 
 The replication files are organized into the following main directories:
 
@@ -39,7 +39,7 @@ The replication files are organized into the following main directories:
 <!-- - `./Temp`: contains all intermediate dataframes that are produced in
   the empirical analyses and simulation study. -->
 
-## Data Availability
+# Data
 
 The primary data sources used in this project are listed below. 
 
@@ -51,9 +51,9 @@ The primary data sources used in this project are listed below.
 
 <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 
-## Replication Files
+# Replication Files
 
-### Clean Bills
+## Clean Bills
 
 The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
 
@@ -85,7 +85,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
   - We drop bills wil `Major` topic ID of 99.
   - Bills with identical `Description` values are considered duplicates and are dropped.  -->
 
-### Prompt LLM
+## Prompt LLM
 
 - The notebook [02_prompting.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/02_prompting.ipynb) generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
 
@@ -95,7 +95,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 - Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`
 
-### Errors in LLM Predictions
+## Error in LLM Predictions
 
 The notebook [03_predict_errors.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/03_predict_errors.ipynb) analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
 - $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
@@ -110,53 +110,46 @@ Using a 50% train-test split, we fit a regularized logistic regression model on 
 \end{align*}
 ```
 
-The models are evaluated using test data, and ROC curves are generated for each type of regularization and GPT model. The ROC plots are saved at: `./Figures`
+The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./Figures`.
 
-### LHS and RHS Simulations
+## Run LHS and RHS Simulations
 
-The R scripts `04_*.r` are used to run regressions with $Y$ on the LHS or RHS:
+The R scripts `04_utils.r`, `04_pre_simulation.r`, `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regressions with $Y$ on the LHS or RHS:
 - LHS: $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
-- RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$,
+- RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$.
 
 where
-- $Y_\text{topic} \in \\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}, Y_\text{Other}\\}$, where $Y_\text{topic} = 1\\{Y = \text{topic}\\}$
-
-- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where
-```math
-\begin{aligned}
-\text{Democrat} &= 1\{\text{Party} = \text{Democrat}\} \\
-\text{Senate} &= 1\{\text{Chamber} = \text{Senate}\} \\
-\text{DW1} &= \text{imputed DW1 score for the bill sponsor.}
-\end{aligned}
-```
+- $Y_\text{topic} \in \\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}, Y_\text{Other}\\}$, $Y_\text{topic} = 1\\{Y = \text{topic}\\}$
+- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor.
 
 <!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
 
-For $N=\\{1, \ldots, 1000\\}$ we repeat the following simulation
-1. We first use all 10K bills to fit the regressions using the true labels $Y^\text{Human}$.
-2. fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$. 
-3. sample 5K bills from the 10K bills, and fit a regression using $Y^\text{LLM}$, $\beta^\text{LLM}$
-4. using a given validation proportion, split the 5K sample into validation and primary set.
-5. Fit a regression using validation data and $Y^\text{Human}$, resulting in $\beta^\text{Human}$. 
-6. Use validation data, containing both $Y^\text{Human}$ and $Y^\text{LLM}$ to unbias the estimate. We then use the primary set with only $Y^\text{LLM}$ to obtain the debiased coefficent, $\beta^\text{Debiased}$.
+We perform $N=1000$ simulations with the following steps:
+1. Fit a regression using all 10K bills and the true labels $Y^\text{Human}$, which we denote as $\beta^\star$.
+2. Fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$.
+3. Sample 5K bills, fit a regression using $Y^\text{LLM}$ to obtain $\beta^\text{LLM}$.
+4. Split the 5K sample into validation and primary sets based on a validation proportion. 
+5. Fit a regression using validation data and $Y^\text{Human}$ to get $\beta^\text{Human}$.
+6. Use both $Y^\text{Human}$ and $Y^\text{LLM}$ from validation data to obtain a debias model, then use the primary set with $Y^\text{LLM}$ only to get the debiased coefficient $\beta^\text{Debiased}$.
 
-In all regressions we report robust standard errors, except for the debiased model where we used Baysian bootstrap with $B=1000$ samples.
+For all regressions, we report robust standard errors, except for the debiased model, where we use Bayesian bootstrap with 1000 samples.
 
-After the simulations, we bias, mse, and converage for each of the $N$ simulation runs relative to the true coefficent over all 10K bills. These are saved at `./Data/04_simulations/lhs.csv` and `./Data/04_simulations/rhs.csv`
-- Bias: $\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$
-- MSE: $\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$
-- Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [{\beta_{(0.025)}^{(i)}}, {\beta_{(0.975)}^{(i)}}]$. The coverage is defined as: $ \text{coverage}(\beta^{(i)}) := 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \\}.$
- bias, mse, and coverage 
+## Summary of Results
 
-We average the bias, mse, and coverage over the $N$ simulation runs and reprot the results at `./Data/04_simulations/lhs_averaged.csv` and `./Data/04_simulations/rhs_averaged.csv`.
+After simulations, we compute bias, mse, and coverage for each simulation run relative to the true coefficient:
+- Bias: $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$
+- MSE: $\text{mse}(\beta^{(i)}) = (\beta^{(i)} - \beta^\star)^2$
+- Coverage: $\text{coverage}(\beta^{(i)}) = 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}$, where $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
+Results are saved at `./Data/04_simulations/lhs/raw.csv` and `./Data/04_simulations/rhs/raw.csv`.
 
-- The sample mean of $\beta$: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
-- The sample SD of $\beta$: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
-- The estimated bias of $\beta$: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$
-- The estimated normalized bias of $\beta$: $\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.$
-- The estimated MSE of $\beta$ is defined as: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).$
-- The estimated coverage probability of $\beta$: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).$
-
+We then compute averages over all $N$ simulation runs:
+- Sample mean: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
+- Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
+- Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$
+- Normalized bias: $\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}$
+- Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$
+- Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).$
+Results are saved at `./Data/04_simulations/lhs/averaged.csv` and `./Data/04_simulations/rhs/averaged.csv`.
 
 ## TODO
 
