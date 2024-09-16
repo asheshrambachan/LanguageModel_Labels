@@ -125,7 +125,7 @@ where
 <!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
 
 We perform $N=1000$ simulations with the following steps:
-1. Fit a regression using all 10K bills and the true labels $Y^\text{Human}$, which we denote as $\beta^\star$.
+1. Fit a regression using all 10K bills and the true labels $Y^\text{Human}$. We denote the regression coefficient as $\beta^\star$.
 2. Fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$.
 3. Sample 5K bills, fit a regression using $Y^\text{LLM}$ to obtain $\beta^\text{LLM}$.
 4. Split the 5K sample into validation and primary sets based on a validation proportion. 
@@ -139,19 +139,14 @@ Note: We assume that the regression parameters are identifiable. Specifically, i
 
 ## Summary of Results
 
-After simulations, we compute bias, mse, and coverage for each simulation run relative to the true coefficient:
-- Bias: $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$
-- MSE: $\text{mse}(\beta^{(i)}) = (\beta^{(i)} - \beta^\star)^2$
-- Coverage: $\text{coverage}(\beta^{(i)}) = 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}$, where $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
-Results are saved at `./Data/04_simulations/lhs/raw.csv` and `./Data/04_simulations/rhs/raw.csv`.
-
-We then compute averages over all $N$ simulation runs:
+We summarize the simulations as follows:
 - Sample mean: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
 - Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
-- Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$
+- Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$, where $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$.
 - Normalized bias: $\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}$
-- Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$
-- Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).$
+- Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$, where $\text{mse}(\beta^{(i)}) = (\beta^{(i)} - \beta^\star)^2$
+- Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}),$ where $\text{coverage}(\beta^{(i)}) = 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}$, and $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
+
 Results are saved at `./Data/04_simulations/lhs/averaged.csv` and `./Data/04_simulations/rhs/averaged.csv`.
 
 ## TODO
