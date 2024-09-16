@@ -37,6 +37,7 @@ congressional_bills/05_results/results.pdf
 congressional_bills/05_results/results.log
 
 
+congressional_bills_v2/Data/01_bills/CAP.csv
+congressional_bills_v2/Data/01_bills/CBP*
+congressional_bills_v2/Temp/*.jsonl
 congressional_bills_v2/Data/02_prompts/*.jsonl
-congressional_bills_v2/Data/CAP
-congressional_bills_v2/Data/CBP

@@ -41,10 +41,13 @@ The replication files are organized into the following main directories:
 
 ## Data Availability
 
-The primary data sources are listed below. You don’t need to download the data as this is done in the notebook.
+The primary data sources used in this project are listed below. 
 
-- [Comparative Agendas Project (CAP)](https://www.comparativeagendas.net/#congressional_hearings)
-- [Congressional Bills Project (CBP)](http://congressionalbills.org/download.html)
+- [Comparative Agendas Project (CAP)](https://www.comparativeagendas.net/#congressional_hearings). Version [19.3_3_3](https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv). Accessed July 5, 2024.
+
+- [Congressional Bills Project (CBP)](http://congressionalbills.org/download.html) 
+  - [80th through 92nd Congresses](http://congressionalbills.org/billfiles/bills80-92.zip). Version 4/27/2015. Accessed July 5, 2024
+  - [93rd through 114th Congresses](http://congressionalbills.org/billfiles/bills93-114.zip). Version 8/11/2018. Accessed July 5, 2024. 
 
 <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 
@@ -52,64 +55,64 @@ The primary data sources are listed below. You don’t need to download the data
 
 ### 01_clean_bills.ipynb
 
-This notebook cleans the congressional bills data for further analysis. The code is based on the [replication code](https://osf.io/gjt87/) from [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
+This notebook generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
 
-#### Outputs
+- The notebook first cleans the raw bills data (refer to the cleaning remarks for more details).
 
-- This notebook cleans the bills data, generating a dataset of 228,372 bills. See cleaning remarks for more details. We sample 10K bills for the prompting exercises and store it at: `./Data/01_bills/bills_without_examples_10000.csv`
+- A random sample of 10K bills is taken for the prompting exercises, stored at: `./Data/01_bills/bills_10k.csv`
 
-- The notebook also creates 3 sets of 5-bill examples used in one of the prompting strategies discussed later. These are stored at:
-  - `./Data/01_bills/examples01.csv`
-  - `./Data/01_bills/examples02.csv`
-  - `./Data/01_bills/examples03.csv`
+- The notebook also generates 3 sets of examples, each containing 5 bills, to be used in later prompting strategies. These are stored at: `./Data/01_bills/bills_example*.csv`
 
-- The bills and major topics codebook are stored at: 
-  - `./Data/01_bills/codebook_bills.xlsx`
-  - `./Data/01_bills/codebook_majors.csv`.
+- The bills and major topics codebooks are saved at: `./Data/Codebooks/`
 
-- A plot of the distribution of the 10K bills over the years is stored in `./Figures`.
+- A plot showing the distribution of the 10K bills over the years is saved in the `./Figures` directory.
 
+
+<!-- 
 #### Cleaning Remarks
 
-Our approach shares similarities with  Egami et al.'s method with few  modifications.
+Our approach shares similarities with  Egami et al.'s method with few modifications. Note that the coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic.
 
-1. We corrected inconsistencies in bill IDs. Bills with the same `BillID` are treated as duplicates and are dropped from both the CAP and CBP datasets. The coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic.
-2. Bills present in both CBP and CAP dataset but varies in any of the following variables are dropped: `Major`, `Description`, `Party`, `PassS`, `PassH`, and `Chamber`.
-3. Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. All major topic IDs are retained except for topic 99.
-4. Bills with identical `Description` values are considered duplicates and are dropped. We also ensure descriptions are case insensitive by converting them to lowercase.
-5. Egami et al. (2023) imputed missing DW1 scores by averaging over bills. In our approach, we average over the unique bill sponsor (`NameFull`) and their `DW1_NA` score. Both the original `DW1_NA` and the imputed `DW1` columns are included in the dataset.
-6. Like Egami et al. (2023), we drop variables/columns with any missing values except for `DW1_NA`.
+1. Corrected the following:
+  - Fixed inconsistencies in `BillID`s in both CAP and CBP. 
+  - Corrected `Chamber` encoding in CAP for the 114th congress.
+  - Egami et al. (2023) imputed missing DW1 scores by averaging over bills instead of the bill sponsors. Both the original column, `DW1_NA`, and the imputed `DW1` column are included in the dataset
+
+2. The following bills were dropped:
+  - Bills with the same `BillID`
+  - Bills present in both CBP and CAP dataset but varies in any of the following variables are dropped: `Major`, `Description`, `Party`, `PassS`, `PassH`, and `Chamber`.
+  - Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. 
+  - We drop bills wil `Major` topic ID of 99.
+  - Bills with identical `Description` values are considered duplicates and are dropped.  -->
 
 ### 02_prompting.ipynb
 
-This notebook generates prompts using the 10K bills dataset. We apply 12 prompt modifications across 2 GPT models, specifically `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`, resulting in a total of 24 prompts per bill. Details of these 24 prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
+- This notebook generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
 
-These prompts are then used to query the LLM models via the OpenAI API. The responses are decoded and merged with the corresponding bills and prompt data, which will be used for further analysis.
+- The generated prompts are used to query the GPT models via the OpenAI API in the batched mode.  Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
 
+- The model responses are then downloaded, decoded, and combined with the corresponding bills and prompt data, creating the main dataset for further analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
 
-
-#### Outputs
-
-- A `.jsonl` file containing all 24 prompts for the 10K bills (240K prompts total) is stored at `./Data/02_prompting/prompts.jsonl`. A batched version of this file, split into 8 files due to the old token limit, is stored at `./Data/02_prompting/prompts_batched_*.jsonl`. Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
-
-- The responses from querying the LLM models are downloaded for each batch and stored in `./Data/02_prompting/responses_batched_*.jsonl`. These responses are then merged into a single file (240K responses) stored at `./Data/02_prompting/responses.jsonl`.
-
-- The details about each bill and prompt are merged with the responses, resulting in the main file used in the analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
-
-- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`.
+- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./Figures`
 
 ### 03_predict_errors.ipynb
 
-The code is based on https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py 
+This notebook analyzes prediction errors in LLM major topic predictions using a logistic regression model. The notebook is based on the [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py)
 
+Let 
+- $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
+
+- $y_{m,p} = 1\{Y_{m,p}^\text{Human} \neq Y_{m,p}^\text{LLM}\} \in \{0,1\}^{10K \times 1}$ represent the error in major topic prediction between Human labels and LLM predictions for each GPT model ($m$) and prompt modification ($p$).
+
+Using a 50% train-test split, we fit a regularized logistic regression model on the error $y$ over $X$, applying two types of regularization:
 ```math
 \begin{align*}
-X &:= BoW(\text{Description})\\
-y &:= 1\{Y^\text{Human} \neq Y^\text{LLM}\}\\
-\beta_\text{ridge} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
-\beta_\text{lasso} &= \argmin_\beta \Vert y - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
+\beta_\text{Ridge} &= \argmin_{\beta_{m,p}} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta_{m,p} \Vert_2^2\\
+\beta_\text{Lasso} &= \argmin_{\beta_{m,p}} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta_{m,p} \Vert_1
 \end{align*}
 ```
+
+The models are evaluated using test data, and ROC curves are generated for each type of regularization and GPT model. The ROC plots are saved at: `./Figures`
 
 ## TODO
 
