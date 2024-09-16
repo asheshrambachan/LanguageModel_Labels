@@ -144,7 +144,7 @@ We summarize the simulations as follows:
 - Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
 - Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$, where $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$.
 - Normalized bias: $\text{bias}_\text{norm} (\beta) = \frac{\text{bias} (\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}$
-- Normalized bias: $\frac{\text{bias} (\beta)}{\beta_\text{SD}}$
+- Normalized bias: $\frac{\text{bias} (\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}$
 - Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)})$, where $\text{mse}(\beta^{(i)}) = (\beta^{(i)} - \beta^\star)^2$
 - Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}),$ where $\text{coverage}(\beta^{(i)}) = 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} )\\}$, and $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
 
