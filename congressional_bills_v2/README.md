@@ -97,9 +97,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 ### 03_predict_errors.ipynb
 
-This notebook analyzes prediction errors in LLM major topic predictions using a logistic regression model. The notebook is based on the [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py)
-
-Let 
+This notebook analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
 - $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
 
 - $y_{m,p} = 1\{Y_{m,p}^\text{Human} \neq Y_{m,p}^\text{LLM}\} \in \{0,1\}^{10K \times 1}$ represent the error in major topic prediction between Human labels and LLM predictions for each GPT model ($m$) and prompt modification ($p$).
@@ -107,8 +105,8 @@ Let
 Using a 50% train-test split, we fit a regularized logistic regression model on the error $y$ over $X$, applying two types of regularization:
 ```math
 \begin{align*}
-\beta_\text{Ridge} &= \argmin_{\beta_{m,p}} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta_{m,p} \Vert_2^2\\
-\beta_\text{Lasso} &= \argmin_{\beta_{m,p}} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta_{m,p} \Vert_1
+\beta_{m,p}^\text{Ridge} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
+\beta_{m,p}^\text{Lasso} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
 \end{align*}
 ```
 
