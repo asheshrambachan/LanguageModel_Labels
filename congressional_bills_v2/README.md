@@ -114,7 +114,7 @@ The models are evaluated using test data, and ROC curves for each type of regula
 
 ## Run LHS and RHS Simulations
 
-The R scripts `04_utils.r`, `04_pre_simulation.r`, `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regressions with $Y$ on the LHS or RHS:
+The scripts `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regressions with $Y$ on the LHS or RHS:
 - LHS: $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
 - RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$.
 
@@ -138,9 +138,9 @@ Note: We assume that the regression parameters are identifiable. Specifically, i
 
 
 
-### Summary of Simulation Results
+## Summary of Simulation Results
 
-The file [04_post_simulation.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/04_post_simulation.Rmd) summarize the simulations by computing the following:
+The file [05_summarize_simulations.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/05_summarize_simulations.Rmd) summarize the simulations by computing the following:
 - Sample mean: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
 - Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
 - Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$, where $\text{bias}(\beta^{(i)}) = \beta^{(i)} - \beta^\star$.
