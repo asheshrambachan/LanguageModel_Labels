@@ -114,22 +114,10 @@ The models are evaluated using test data, and ROC curves are generated for each 
 
 ### 04_simulation
 
-Defines combinations where the major topic, $Y$, is on the left-hand side (LHS) as the dependent variable:
-```math
-Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon
-```
+Let 
+- $Y_\text{topic} \in \\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}, Y_\text{Other}\\}$, where $Y_\text{topic} = 1\\{Y = \text{topic}\\}$
 
-Defines combinations where the major topic, $Y$, is on the right-hand side (RHS) as an independent variable: 
-```math
-V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu
-```
-These combinations are used in subsequent simulation scripts and we ensure reproducibility by using the combination unique IDs as a seed.
-
-Note that $$Y_\text{topic} \in$$ { $$Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}$$ }, where 
-```math
-Y_\text{topic} = 1\{Y = \text{topic}\},
-``` 
-and $$V \in$$ { $$\text{Democrat}, \text{Senate}, \text{DW1}$$ }, where
+- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where
 ```math
 \begin{aligned}
 \text{Democrat} &= 1\{\text{Party} = \text{Democrat}\} \\
@@ -138,73 +126,41 @@ and $$V \in$$ { $$\text{Democrat}, \text{Senate}, \text{DW1}$$ }, where
 \end{aligned}
 ```
 
-- `04_pre_simulation.Rmd`: an R script to generates the set of combinations for both LHS and RHS simulations. The files are stored at `./Data/04_simulations`
+We run similations of regressions with $Y$ on the LHS and RHS:
+- $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
+- $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$
+<!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
 
-- `04_utils.R`: a file contains utility functions used when running the simulations. 
+- We first use all 10K bills to fit the regressions using the true labels $Y^\text{Human}$.
+- Next, we fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$. 
 
-- `04_simulate_lhs.R` and `04_simulate_rhs.R`: These scripts runs parallel simulations for combinations where $Y$ is in the LHS and the RHS. Both scripts utilizes multiple cores (default: 50).
+For $N=\\{1, \ldots, 1000\\}$ we repeat the following simulation
+1. sample 5K bills from the 10K bills, and fit a regression using $Y^\text{LLM}$, $\beta^\text{LLM}$
+2. using a given validation proportion, split the 5K sample into validation and primary set.
+3. Fit a regression using validation data and $Y^\text{Human}$, resulting in $\beta^\text{Human}$. 
+4. Use validation data, containing both $Y^\text{Human}$ and $Y^\text{LLM}$ to unbias the estimate. We then use the primary set with only $Y^\text{LLM}$ to obtain the debiased coefficent, $\beta^\text{Debiased}$.
 
-- `04_post_simulation.Rmd`: This R markdown merges the results of the simulations and generates:
-  - `10k_human_lhs.csv` and `10k_human_rhs.csv`: These files contain the regression results using `Yhuman` across all 10,000 bills.
-  - `10k_llm_lhs.csv` and `10k_llm_rhs.csv`: These files contain the regression results using `Yllm` across all 10,000 bills.
-  - `simulations_lhs.csv` and `simulations_rhs.csv`: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, mse, and coverage for each of the $i \in \\{1, \ldots, N = 1000\\}$ simulation runs, relative to the `10k_Yhuman` regressions.
+In all regressions we report robust standard errors, except for the debiased model where we used Baysian bootstrap with $B=1000$ samples.
 
-  <!-- Let $\beta^\star$ denote the variable coefficient estimated using all 10K bills, and let $\beta$ represent any of ${\hat{\beta}, \beta^\text{human}, \tilde{\beta}}$, where:
-    - $\hat{\beta}$ is the estimate using a 5K sample of LLM labels,
-    - $\beta^\text{human}$ is the estimate using human labels from the training data at a specific training proportion from the 5K bills,
-    - $\tilde{\beta}$ is the debiased coefficient, using training data that contains both human and LLM labels, and test data consisting of LLM labels.
+After the simulations, we compute the following for each of the $i \in \\{1, \ldots, N = 1000\\}$ simulation runs, relative to the true coefficent over all 10K bills. These are saved at `./Data/04_simulations/lhs.csv` and `./Data/04_simulations/rhs.csv`
+- Bias: $\text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.$
+- MSE: $\text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.$
+- Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [{\beta_{(0.025)}^{(i)}}, {\beta_{(0.975)}^{(i)}}]$. The coverage is defined as: $ \text{coverage}(\beta^{(i)}) := 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \\}.$
+ bias, mse, and coverage 
 
-  The bias for the $i^\text{th}$ simulation is defined as:
-  ```math
-  \text{bias}(\beta^{(i)}) := \beta^{(i)} - \beta^\star.
-  ```
+We average the bias, mse, and coverage over the $N=1000$ simulation runs and reprot the results at `./Data/04_simulations/lhs_averaged.csv` and `./Data/04_simulations/rhs_averaged.csv`.
 
-  The mean squared error (MSE) for the $i^\text{th}$ is defined as:
-  ```math
-  \text{mse}(\beta^{(i)}) := (\beta^{(i)} - \beta^\star)^2.
-  ```
+- The sample mean of $\beta$: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
 
-  Let the 95%CI of $\beta^{(i)}$ be $\text{CI}(\beta^{(i)}) := [{\beta_{(0.025)}^{(i)}}, {\beta_{(0.975)}^{(i)}}]$. The coverage is defined as:
-  ```math
-  \text{coverage}(\beta^{(i)}) := 1\{ \beta^\star \in \text{CI} ( \beta^{(i)} ) \}.
-  ``` -->
+- The sample SD of $\beta$: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
 
-  - 4.4. `simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
+- The estimated bias of $\beta$: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star$
 
-  The sample mean of $\beta$ is given by
-  ```math
-  \beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}
-  ```
+- The estimated normalized bias of $\beta$: $\text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.$
 
-  The sample SD of $\beta$ is given by:
-  ```math
-  \beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2
-  ```
+- The estimated MSE of $\beta$ is defined as: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).$
 
-  The estimated bias of $\beta$ is
-  ```math
-  \text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{bias}(\beta^{(i)}) =  \beta_\text{mean} - \beta^\star
-  ```
-
-  The estimated  normalized bias of $\beta$ is given by: 
-  ```math
-  \text{bias}_\text{norm}(\beta) = \frac{\text{bias}(\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}.
-  ```
-
-  The estimated MSE of $\beta$ is defined as:
-  ```math
-  \text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N \text{mse}(\beta^{(i)}).
-  ```
-
-  The estimated coverage probability of $\beta$ is given by:
-  ```math
-  \begin{aligned}
-  \text{coverage}(\beta) 
-      % &= \mathbb{P} \left( \beta^\star \in \text{CI}(\beta) \right) \\
-      % &= \mathbb{E}\left[1\{\beta^\star \in \text{CI}(\beta)\} \right] \\
-      &= \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).
-  \end{aligned}
-  ```
+- The estimated coverage probability of $\beta$: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N \text{coverage}(\beta^{(i)}).$
 
 
 ## TODO
