@@ -12,7 +12,7 @@ library(gridExtra)
 rm(list = ls())
 
 # Define lists of questions, models, and months to iterate over
-questions <- c("q1", "q2")
+questions <- c("q1", "q2", "q3", "q4", "q5")
 models <- c("gpt-4o")
 months <- c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
             "octfirst", "octsecond", "nov", "dec")
@@ -36,7 +36,7 @@ calculate_CAR <- function(df) {
 # Function to read, combine, mutate, and filter data for all files
 read_combine_filter <- function(file_name, months, question, return_type) {
   combined_df <- bind_rows(lapply(months, function(month) {
-    file_path <- paste0("../data/step5_returns_merged/", return_type, "/", 
+    file_path <- paste0("../data/step5_merged_returns/", return_type, "/", 
                         model, "/", question, "/", question, "_", 
                         month, "19/", file_name)
     read.csv(file_path)
