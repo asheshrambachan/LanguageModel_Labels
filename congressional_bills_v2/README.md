@@ -119,7 +119,7 @@ The R scripts `04_utils.r`, `04_pre_simulation.r`, `04_simulate_lhs.r`, and `04_
 - RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$.
 
 where
-- $Y_\text{topic} \in \\{Y_3, Y_{14}, Y_{15}, Y_{19}, Y_{20}, Y_\text{Other}\\}$, $Y_\text{topic} = 1\\{Y = \text{topic}\\}$
+- $Y_\text{topic} = 1\\{Y = \text{topic}\\}$ and $\text{topic}\in\\{3, 14, 15, 19, 20, \text{Other}\\}$
 - $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor.
 
 <!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
@@ -129,10 +129,13 @@ We perform $N=1000$ simulations with the following steps:
 2. Fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$.
 3. Sample 5K bills, fit a regression using $Y^\text{LLM}$ to obtain $\beta^\text{LLM}$.
 4. Split the 5K sample into validation and primary sets based on a validation proportion. 
-5. Fit a regression using validation data and $Y^\text{Human}$ to get $\beta^\text{Human}$.
+5. Fit a regression using validation data and $Y^\text{Human}$ to get $\beta^\text{Human}$. 
 6. Use both $Y^\text{Human}$ and $Y^\text{LLM}$ from validation data to obtain a debias model, then use the primary set with $Y^\text{LLM}$ only to get the debiased coefficient $\beta^\text{Debiased}$.
 
-For all regressions, we report robust standard errors, except for the debiased model, where we use Bayesian bootstrap with 1000 samples.
+For all regressions, we report robust standard errors, except for the debiased model, where we use Bayesian bootstrap with $B=1000$ samples.
+
+Note: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample.
+
 
 ## Summary of Results
 
