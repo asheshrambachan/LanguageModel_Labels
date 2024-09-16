@@ -61,7 +61,7 @@ The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageM
 
 - The notebook also generates 3 sets of examples, each containing 5 bills, to be used in later prompting strategies. These are stored at: `./Data/01_bills/bills_example*.csv`
 
-- The bills and major topics codebooks are saved at: `./Data/Codebooks/`
+<!-- - The bills and major topics codebooks are saved at: `./Data/Codebooks/` -->
 
 - A plot showing the distribution of the 10K bills over the years is saved in the `./Figures` directory.
 
@@ -158,4 +158,4 @@ The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Label
 - [ ] remove `_v2` from env setup
 - [ ] remove figures not used in the paper
 - [ ] remove dataframes not used in the paper
-- [ ] complete all codebooks
+- [ ] complete all codebooks at `./Data/Codebooks/`
