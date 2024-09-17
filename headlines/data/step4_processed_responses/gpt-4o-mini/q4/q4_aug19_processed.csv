@@ -5721,7 +5721,7 @@ custom_id,company_name,headline,prompt_type,headline type,confidence,magnitude,e
 5718,MYRIAD GENETICS INC,What Caused The Opening Gap In Myriad Genetics?,5,uncertain,0.7,0.3,,156,25,1.0
 5719,MYRIAD GENETICS INC,What Caused The Opening Gap In Myriad Genetics?,6,uncertain,0.6,0.5,"the opening gap in myriad genetics could be influenced by various factors, making it difficult to predict a clear increase or decrease in investor sentiment.",135,63,1.0
 5720,MYRIAD GENETICS INC,What Caused The Opening Gap In Myriad Genetics?,7,uncertain,0.6,0.5,"the news about the opening gap in myriad genetics could reflect mixed investor reactions depending on the underlying reasons for the gap, leading to uncertainty in sentiment.",140,61,1.0
-5721,MYRIAD GENETICS INC,What Caused The Opening Gap In Myriad Genetics?,8,,,,,142,522,
+5721,MYRIAD GENETICS INC,What Caused The Opening Gap In Myriad Genetics?,8,increase,0.8,0.7,,142,522,2.0
 5722,MYRIAD GENETICS INC,"Deutsche Bank Maintains Hold on Myriad Genetics, Lowers Price Target to $35",0,decrease,0.8,0.6,,127,30,0.0
 5723,MYRIAD GENETICS INC,"Deutsche Bank Maintains Hold on Myriad Genetics, Lowers Price Target to $35",2,decrease,0.8,0.6,,134,30,0.0
 5724,MYRIAD GENETICS INC,"Deutsche Bank Maintains Hold on Myriad Genetics, Lowers Price Target to $35",3,decrease,0.8,0.6,,139,34,0.0

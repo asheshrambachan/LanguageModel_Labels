@@ -36705,7 +36705,7 @@ custom_id,company_name,headline,prompt_type,headline type,confidence,magnitude,e
 36694,NEKTAR THERAPEUTICS,What Caused The Opening Gap In Nektar?,5,,,,,159,397,
 36695,NEKTAR THERAPEUTICS,What Caused The Opening Gap In Nektar?,6,uncertain,0.5,0.5,"the opening gap in nektar therapeutics could be influenced by various factors, making it difficult to predict a clear direction for the stock price.",138,69,1.0
 36696,NEKTAR THERAPEUTICS,What Caused The Opening Gap In Nektar?,7,uncertain,0.5,0.5,"the opening gap in nektar therapeutics could be influenced by various factors, including market sentiment and investor reactions to the news, making the impact on stock price uncertain.",143,65,1.0
-36697,NEKTAR THERAPEUTICS,What Caused The Opening Gap In Nektar?,8,,,,,145,465,
+36697,NEKTAR THERAPEUTICS,What Caused The Opening Gap In Nektar?,8,decrease,0.8,0.7,,145,465,0.0
 36698,NEKTAR THERAPEUTICS,"BMO Capital Maintains Outperform on Nektar Therapeutics, Lowers Price Target to $41",0,decrease,0.7,0.3,,133,30,0.0
 36699,NEKTAR THERAPEUTICS,"BMO Capital Maintains Outperform on Nektar Therapeutics, Lowers Price Target to $41",2,decrease,0.7,0.5,,139,30,0.0
 36700,NEKTAR THERAPEUTICS,"BMO Capital Maintains Outperform on Nektar Therapeutics, Lowers Price Target to $41",3,decrease,0.75,0.6,,145,30,0.0

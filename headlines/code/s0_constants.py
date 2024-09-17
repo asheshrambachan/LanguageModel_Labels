@@ -21,7 +21,7 @@ month_batches = ["jan", "feb", "mar", "apr", "may", "jun", "jul",
 economic_questions = ["1", "2", "3", "4", "5"]
 years = ["19"]
 return_types = ["cumulative", "CAPM", "FF3"]
-models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o-2024-08-06"]
+models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"]
 
 prompt_types = ["base_blanks", "base_json", "persona1", "persona2", "persona3", "persona4", "cot1", "cot2", "cot3"]
 

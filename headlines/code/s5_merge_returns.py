@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     QUESTION = ["3"]
     MODEL = ["gpt-4o"]
-    MONTH = ["may"]
+    MONTH = ["may", "aug"]
     YEAR = ["19"]
     RETURN_TYPE = ["cumulative", "CAPM", "FF3"]
 

@@ -21120,7 +21120,7 @@ custom_id,company_name,headline,prompt_type,headline type,confidence,magnitude,e
 21118,GAMESTOP CORP NEW,"'Limited Scope, Time To Stage A Turnaround': GameStop Analysts React To Difficult Q2",5,decrease,0.75,0.6,,168,34,0.0
 21119,GAMESTOP CORP NEW,"'Limited Scope, Time To Stage A Turnaround': GameStop Analysts React To Difficult Q2",6,decrease,0.75,0.6,"the mention of a 'difficult q2' suggests poor performance, which is likely to negatively impact investor sentiment and lead to a decrease in stock price.",147,67,0.0
 21120,GAMESTOP CORP NEW,"'Limited Scope, Time To Stage A Turnaround': GameStop Analysts React To Difficult Q2",7,decrease,0.75,0.6,"the mention of a 'difficult q2' suggests poor performance, which is likely to negatively impact investor sentiment and lead to a decrease in stock price.",152,67,0.0
-21121,GAMESTOP CORP NEW,"'Limited Scope, Time To Stage A Turnaround': GameStop Analysts React To Difficult Q2",8,,,,,154,59,
+21121,GAMESTOP CORP NEW,"'Limited Scope, Time To Stage A Turnaround': GameStop Analysts React To Difficult Q2",8,decrease,0.75,0.6,,154,59,0.0
 21122,GAMESTOP CORP NEW,"Baird Maintains Neutral, $6 Target On Gamestop As Firm Notes Co's 'Strategic update provides new focus, but headwinds remain strong' As Firm Notes 'the near-term impact of an ending console cycle is likely to more than offset any material improvements'",0,decrease,0.8,0.6,,166,30,0.0
 21123,GAMESTOP CORP NEW,"Baird Maintains Neutral, $6 Target On Gamestop As Firm Notes Co's 'Strategic update provides new focus, but headwinds remain strong' As Firm Notes 'the near-term impact of an ending console cycle is likely to more than offset any material improvements'",2,decrease,0.8,0.6,,172,34,0.0
 21124,GAMESTOP CORP NEW,"Baird Maintains Neutral, $6 Target On Gamestop As Firm Notes Co's 'Strategic update provides new focus, but headwinds remain strong' As Firm Notes 'the near-term impact of an ending console cycle is likely to more than offset any material improvements'",3,decrease,0.8,0.6,,178,34,0.0
@@ -33872,7 +33872,7 @@ custom_id,company_name,headline,prompt_type,headline type,confidence,magnitude,e
 33870,ACCENTURE PLC IRELAND,Accenture's Earnings Outlook,5,uncertain,0.6,0.3,,158,25,1.0
 33871,ACCENTURE PLC IRELAND,Accenture's Earnings Outlook,6,uncertain,0.5,0.5,"the earnings outlook can vary based on market conditions and investor sentiment, making the impact on stock price uncertain.",137,56,1.0
 33872,ACCENTURE PLC IRELAND,Accenture's Earnings Outlook,7,uncertain,0.5,0.5,"the impact on accenture's stock price is unclear without specific details on the earnings outlook, such as whether it indicates growth or decline.",142,67,1.0
-33873,ACCENTURE PLC IRELAND,Accenture's Earnings Outlook,8,,,,,144,493,
+33873,ACCENTURE PLC IRELAND,Accenture's Earnings Outlook,8,increase,0.8,0.7,,144,493,2.0
 33874,ACCENTURE PLC IRELAND,"KeyBanc Maintains Overweight on Accenture, Raises Price Target to $212",0,increase,0.8,0.6,,133,29,2.0
 33875,ACCENTURE PLC IRELAND,"KeyBanc Maintains Overweight on Accenture, Raises Price Target to $212",2,increase,0.8,0.6,,139,33,2.0
 33876,ACCENTURE PLC IRELAND,"KeyBanc Maintains Overweight on Accenture, Raises Price Target to $212",3,increase,0.8,0.6,,145,33,2.0
