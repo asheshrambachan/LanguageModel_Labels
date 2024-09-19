@@ -7,11 +7,12 @@ This repository contains the replication files for the congressional bills exper
 
 1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
 2. **Prompt Creation and LLM Querying:** Generates 24 prompts per bill using 12 strategies and 2 models, then queries LLMs to predict the major topic of each bill.
-3. **LLM Responses and Merging:** Downloads LLM responses and merges them with the corresponding bill and prompt metadata.
-4. **Error Estimation:** Estimates LLM prediction errors for each combination of prompt and model.
-5. **Simulation Runs:** Fits two regression models using major topic labels: one with the major topic on the RHS and another with it on the LHS.
-6. **Model Evaluation:** Estimates regression coefficients, bias, normalized bias, MSE, and coverage, relative to human-annotated major topics.
-7. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
+3. **Download LLM Responses:** Downloads LLM responses. 
+4. **Decode LLM Responses and Merging:** Decode LLM responses and merges them with the corresponding bill and prompt metadata.
+5. **Error Estimation:** Estimates LLM prediction errors for each combination of prompt and model.
+6. **Simulation Runs:** Fits two regression models using major topic labels: one with the major topic on the RHS and another with it on the LHS.
+7. **Model Evaluation:** Estimates regression coefficients, bias, normalized bias, MSE, and coverage, relative to human-annotated major topics.
+8. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
 
 # File Structure
 

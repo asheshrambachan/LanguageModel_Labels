@@ -1,25 +1,25 @@
-PromptingStrategyID,PromptingStrategyName,Text,TextLocation,AddExamples,ExamplesPath,ResponseFormat,InputTokensAverage,InputTokensSD,OutputTokensAverage,OutputTokensSD,AddExplanation,Model,Temperature
-1,Base Prompt,,,False,,Fill-in-the-Blanks,239.96,12.53,5.96,0.20,False,gpt-3.5-turbo-0125,0
-2,Base Prompt,,,False,,JSON,242.96,12.53,19.00,0.00,False,gpt-3.5-turbo-0125,0
-3,Persona,You are a knowledgeable political analyst. ,before,False,,JSON,249.96,12.53,19.00,0.00,False,gpt-3.5-turbo-0125,0
-4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,before,False,,JSON,261.96,12.53,19.00,0.00,False,gpt-3.5-turbo-0125,0
-5,Persona,Answer this question as if you are an expert in United States politics. ,before,False,,JSON,256.96,12.53,19.00,0.00,False,gpt-3.5-turbo-0125,0
-6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,before,False,,JSON,258.96,12.53,19.00,0.00,False,gpt-3.5-turbo-0125,0
-7,Chain-of-Thoughts,Think carefully. ,after,False,,JSON,260.96,12.53,47.56,4.41,True,gpt-3.5-turbo-0125,0
-8,Chain-of-Thoughts,Let's think step by step. Lay out each step. ,after,False,,JSON,269.96,12.53,47.47,4.72,True,gpt-3.5-turbo-0125,0
-9,Chain-of-Thoughts,Please provide an explanation for your answer. ,after,False,,JSON,265.96,12.53,48.36,5.29,True,gpt-3.5-turbo-0125,0
-10,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example1.csv,JSON,1599.96,12.53,15.00,0.00,False,gpt-3.5-turbo-0125,0
-11,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example2.csv,JSON,1562.96,12.53,15.00,0.00,False,gpt-3.5-turbo-0125,0
-12,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example3.csv,JSON,1547.96,12.53,15.00,0.00,False,gpt-3.5-turbo-0125,0
-1,Base Prompt,,,False,,Fill-in-the-Blanks,239.96,12.53,5.96,0.20,False,gpt-4o-2024-05-13,0
-2,Base Prompt,,,False,,JSON,242.96,12.53,19.00,0.00,False,gpt-4o-2024-05-13,0
-3,Persona,You are a knowledgeable political analyst. ,before,False,,JSON,249.96,12.53,19.00,0.00,False,gpt-4o-2024-05-13,0
-4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,before,False,,JSON,261.96,12.53,19.00,0.00,False,gpt-4o-2024-05-13,0
-5,Persona,Answer this question as if you are an expert in United States politics. ,before,False,,JSON,256.96,12.53,19.00,0.00,False,gpt-4o-2024-05-13,0
-6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,before,False,,JSON,258.96,12.53,19.00,0.00,False,gpt-4o-2024-05-13,0
-7,Chain-of-Thoughts,Think carefully. ,after,False,,JSON,260.96,12.53,47.56,4.41,True,gpt-4o-2024-05-13,0
-8,Chain-of-Thoughts,Let's think step by step. Lay out each step. ,after,False,,JSON,269.96,12.53,47.47,4.72,True,gpt-4o-2024-05-13,0
-9,Chain-of-Thoughts,Please provide an explanation for your answer. ,after,False,,JSON,265.96,12.53,48.36,5.29,True,gpt-4o-2024-05-13,0
-10,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example1.csv,JSON,1599.96,12.53,15.00,0.00,False,gpt-4o-2024-05-13,0
-11,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example2.csv,JSON,1562.96,12.53,15.00,0.00,False,gpt-4o-2024-05-13,0
-12,Few-Shot,,,True,/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Data/01_bills/bills_example3.csv,JSON,1547.96,12.53,15.00,0.00,False,gpt-4o-2024-05-13,0
+PromptingStrategyID,PromptingStrategyName,TextBefore,TextAfter,AddExamples,ExampleSetNum,ResponseFormat,AddExplanation,Model,Temperature
+1,Base Prompt,,,False,,Fill-in-the-Blanks,False,gpt-3.5-turbo-0125,0
+2,Base Prompt,,,False,,JSON,False,gpt-3.5-turbo-0125,0
+3,Persona,You are a knowledgeable political analyst. ,,False,,JSON,False,gpt-3.5-turbo-0125,0
+4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,,False,,JSON,False,gpt-3.5-turbo-0125,0
+5,Persona,Answer this question as if you are an expert in United States politics. ,,False,,JSON,False,gpt-3.5-turbo-0125,0
+6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,,False,,JSON,False,gpt-3.5-turbo-0125,0
+7,Chain-of-Thoughts,,Think carefully. ,False,,JSON,True,gpt-3.5-turbo-0125,0
+8,Chain-of-Thoughts,,Let's think step by step. Lay out each step. ,False,,JSON,True,gpt-3.5-turbo-0125,0
+9,Chain-of-Thoughts,,Please provide an explanation for your answer. ,False,,JSON,True,gpt-3.5-turbo-0125,0
+10,Few-Shot,,,True,1.00,JSON,False,gpt-3.5-turbo-0125,0
+11,Few-Shot,,,True,2.00,JSON,False,gpt-3.5-turbo-0125,0
+12,Few-Shot,,,True,3.00,JSON,False,gpt-3.5-turbo-0125,0
+1,Base Prompt,,,False,,Fill-in-the-Blanks,False,gpt-4o-2024-05-13,0
+2,Base Prompt,,,False,,JSON,False,gpt-4o-2024-05-13,0
+3,Persona,You are a knowledgeable political analyst. ,,False,,JSON,False,gpt-4o-2024-05-13,0
+4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,,False,,JSON,False,gpt-4o-2024-05-13,0
+5,Persona,Answer this question as if you are an expert in United States politics. ,,False,,JSON,False,gpt-4o-2024-05-13,0
+6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,,False,,JSON,False,gpt-4o-2024-05-13,0
+7,Chain-of-Thoughts,,Think carefully. ,False,,JSON,True,gpt-4o-2024-05-13,0
+8,Chain-of-Thoughts,,Let's think step by step. Lay out each step. ,False,,JSON,True,gpt-4o-2024-05-13,0
+9,Chain-of-Thoughts,,Please provide an explanation for your answer. ,False,,JSON,True,gpt-4o-2024-05-13,0
+10,Few-Shot,,,True,1.00,JSON,False,gpt-4o-2024-05-13,0
+11,Few-Shot,,,True,2.00,JSON,False,gpt-4o-2024-05-13,0
+12,Few-Shot,,,True,3.00,JSON,False,gpt-4o-2024-05-13,0
