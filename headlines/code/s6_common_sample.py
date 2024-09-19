@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from s0_constants import economic_questions, models, month_batches, return_types, prompt_types
@@ -33,7 +34,7 @@ def deduplicate_records(df):
     })
     return deduplicated
 
-def save_common_sample(question, model, return_type):
+def save_common_sample_within(question, model, return_type):
 
     # Step 1: Read, combine, and filter data for all files
     filtered_data = {file_name: read_combine_filter(model=model, 
@@ -54,20 +55,61 @@ def save_common_sample(question, model, return_type):
 
     # Save the cleaned datasets
     for file_name, final_df in final_data.items():
-        save_path = f"./data/step6_common_sample/{return_type}/{model}/q{question}/{file_name}.csv"
+        save_path = f"./data/step6_common_sample/within_model/{return_type}/{model}/q{question}/{file_name}.csv"
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
         final_df.to_csv(save_path, index=False)
 
+def save_common_sample_across(question, return_type):
+
+    # Step 1: Read, combine, and filter data for all models
+    filtered_data_across_models = {
+        model: {
+            file_name: read_combine_filter(model=model, 
+                                           months=month_batches,
+                                           file_name=f"{file_name}.csv",
+                                           question=question, 
+                                           return_type=return_type) 
+            for file_name in prompt_types
+        }
+        for model in models
+    }
+
+    # Step 2: Find the common headlines across all datasets and all models
+    # Ensure we are working with DataFrames and Series explicitly
+    common_headlines_across_models = set.intersection(
+        *[
+            set.intersection(*[
+                set(pd.DataFrame(df)["headline"])  # Explicitly convert df to DataFrame to avoid ndarray issue
+                for df in model_data.values()
+            ])
+            for model_data in filtered_data_across_models.values()
+        ]
+    )
+
+    # Step 3: Filter and deduplicate records based on common headlines across models
+    final_data_across_models = {
+        model: {
+            file_name: deduplicate_records(pd.DataFrame(df)[df["headline"].isin(common_headlines_across_models)]) 
+            for file_name, df in model_data.items()
+        }
+        for model, model_data in filtered_data_across_models.items()
+    }
+
+    # Step 4: Save the cleaned datasets for each model
+    for model, final_data in final_data_across_models.items():
+        for file_name, final_df in final_data.items():
+            save_path = f"./data/step6_common_sample/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            final_df.to_csv(save_path, index=False)
+
+
 def main(question, model, return_type):
-    save_common_sample(question, model, return_type)  
+    save_common_sample_within(question, model, return_type)
 
 if __name__ == "__main__":
 
-    QUESTION = ["3"]
-    MODEL = ["gpt-4o"]
-    RETURN_TYPE = ["CAPM"]
-
-    for return_type in RETURN_TYPE:
-        for question in QUESTION:
-            for model in MODEL:
+    for return_type in return_types:
+        for question in economic_questions:
+            for model in models:
                 main(question, model, return_type)      
 

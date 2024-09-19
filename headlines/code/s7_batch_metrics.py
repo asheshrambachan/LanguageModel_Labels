@@ -41,28 +41,27 @@ def calculate_deduplicated_clean(df, model):
 # Main function to execute the core logic
 def main():
     summary_data = []
+    return_type = "cumulative"
     
     # Main loop through directories and files
-    for return_type in return_types:  # Limiting return_type to the first item for debugging
-        for question_dir in economic_questions:  # Limiting question_dir to the first item for debugging
-            for month_dir in month_batches:
-                for file in prompt_types:
-                    model_data = {}
-                    for model_dir in models:
-                        response_file_path = os.path.join(root_dir_responses, return_type, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19", file + ".csv")
-                        prompt_file_path = os.path.join(root_dir_prompts, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19_prompts.jsonl")
-                        
-                        # Get data and print debug information
-                        model_data.update(get_model_data(model_dir, response_file_path, prompt_file_path))
+    for question_dir in economic_questions:  # Limiting question_dir to the first item for debugging
+        for month_dir in month_batches:
+            for file in prompt_types:
+                model_data = {}
+                for model_dir in models:
+                    response_file_path = os.path.join(root_dir_responses, return_type, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19", file + ".csv")
+                    prompt_file_path = os.path.join(root_dir_prompts, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19_prompts.jsonl")
                     
-                    # Append summary data for this file
-                    summary_data.append({
-                        "return type": return_type,
-                        "question": question_dir,
-                        "month": month_dir,
-                        "file": file,
-                        **model_data
-                    })
+                    # Get data and print debug information
+                    model_data.update(get_model_data(model_dir, response_file_path, prompt_file_path))
+                
+                # Append summary data for this file
+                summary_data.append({
+                    "question": question_dir,
+                    "month": month_dir,
+                    "file": file,
+                    **model_data
+                })
 
     # Convert summary data to DataFrame
     summary_df = pd.DataFrame(summary_data)
@@ -89,7 +88,7 @@ def main():
     )
 
     # Save the updated summary_df to CSV
-    summary_df.to_csv("response_counts_batch.csv", index=False)
+    summary_df.to_csv("./data/step7_batch_metrics.csv", index=False)
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
