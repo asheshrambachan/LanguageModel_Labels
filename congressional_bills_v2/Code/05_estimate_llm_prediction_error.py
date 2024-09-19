@@ -3,6 +3,12 @@
 import os
 import re
 import pandas as pd
+import nltk
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
+import matplotlib.pyplot as plt
 
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
 os.chdir(repo_dir)
@@ -10,19 +16,8 @@ os.chdir(repo_dir)
 figures_dir = os.path.join(repo_dir, "Figures and Tables")
 os.makedirs(figures_dir, exist_ok=True)
 
-bills_prompts_responses = pd.read_csv(os.path.join(repo_dir, f"Data/bills_prompts_responses.csv"))
-
-import nltk
 nltk.download('stopwords')
 nltk.download('wordnet')
-
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
-
-import matplotlib.pyplot as plt
-
 
 SEED = 123
 STOPWORDS = nltk.corpus.stopwords.words('english')
@@ -48,6 +43,7 @@ def bag_of_words(x):
     return VECTORIZER.fit_transform(x_clean)
 
 # Data Preprocessing
+bills_prompts_responses = pd.read_csv(os.path.join(repo_dir, f"Data/bills_prompts_responses.csv"))
 X = bag_of_words(bills_prompts_responses["Description"])
 y = bills_prompts_responses["Major"] !=  bills_prompts_responses["MajorLLM"]
 
@@ -108,3 +104,5 @@ for model in regressions["Model"].unique():
         plt.ylim([0,1])
         plt.xlim([0,1])
         plt.savefig(os.path.join(figures_dir, f"ROC Plot {regression['Model']} {regression['Regularizer']}.png"), bbox_inches = "tight")
+
+        
