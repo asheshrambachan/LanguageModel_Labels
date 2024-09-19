@@ -15,7 +15,7 @@ def read_combine_filter(model, months, question, file_name, return_type):
     combined_df = pd.concat([pd.read_csv(f"./data/step5_merged_returns/{return_type}/{model}/q{question}/q{question}_{month}19/{file_name}") 
                              for month in months])
 
-    if return_type == "cumulative":
+    if return_type == "realized":
         combined_df = combined_df.dropna(subset=["ret_fd1", "ret_fd5", "ret_fd10", "ret_ld1", "ret_ld2", "ret_ld3", "headline type", "confidence", "magnitude"])
     else:
         combined_df = calculate_CAR(combined_df)

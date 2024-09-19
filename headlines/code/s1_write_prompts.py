@@ -105,7 +105,7 @@ def generate_prompts(question, model, month, year):
     # Set input file paths
     current_directory = os.getcwd()
     print(f"Current working directory: {current_directory}")
-    csv_file = f"./data/step0_cumulative/{month}{year}_cumulative.csv"
+    csv_file = f"./data/step0_realized/{month}{year}_realized.csv"
     base_prompt_file = f'./data/prompt_templates/q{question}base'
 
     # Set output file path

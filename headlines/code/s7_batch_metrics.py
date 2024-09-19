@@ -41,7 +41,7 @@ def calculate_deduplicated_clean(df, model):
 # Main function to execute the core logic
 def main():
     summary_data = []
-    return_type = "cumulative"
+    return_type = "realized"
     
     # Main loop through directories and files
     for question_dir in economic_questions:  # Limiting question_dir to the first item for debugging

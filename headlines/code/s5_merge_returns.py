@@ -1,4 +1,5 @@
 import pandas as pd
+from s0_constants import economic_questions, models, month_batches, return_types, years
 import os
 
 def read_data(question, model, month, year, return_type):
@@ -54,18 +55,11 @@ def main(question, model, month, year, return_type):
 
 if __name__ == "__main__":
 
-    QUESTION = ["3"]
-    MODEL = ["gpt-4o"]
-    MONTH = ["may", "aug"]
-    YEAR = ["19"]
-    RETURN_TYPE = ["cumulative", "CAPM", "FF3"]
-
-
-    for question in QUESTION:
-        for model in MODEL:
-            for month in MONTH:
-                for year in YEAR:
-                    for return_type in RETURN_TYPE:
+    for question in economic_questions:
+        for model in models:
+            for month in month_batches:
+                for year in years:
+                    for return_type in return_types:
                         main(question=question, 
                              model=model, 
                              month=month, 
