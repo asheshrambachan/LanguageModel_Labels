@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import json
 import os
-from s0_constants import models
+from s0_constants import models, step2_path, step4_path, step7_path, step8_path
 
 def sample_index_from_step4(step4_file):
     try:
@@ -32,7 +32,7 @@ def read_line_from_step2(step2_file, line_number):
  
 
 def main():
-    batch_summary_file = pd.read_csv('./data/step7_batch_metrics.csv')
+    batch_summary_file = pd.read_csv(step7_path)
     bad_responses = []
     
     # Filter rows where any model's "empty headlines" column is greater than 5
@@ -51,13 +51,13 @@ def main():
                 month = row['month']
                 question = str(row['question'])
                 prompt_type = row['file']
-                step4_file = os.path.join('./data/step4_processed_responses', model, "q" + question, f"q{question}_{month}19_processed.csv")
+                step4_file = os.path.join(step4_path, model, "q" + question, f"q{question}_{month}19_processed.csv")
                 
                 # Sample an index where "headline type" is None in step4
                 sampled_index = sample_index_from_step4(step4_file)
                 if sampled_index is not None:
                     # Get the corresponding file from step2
-                    step2_file = os.path.join('./data/step2_batch_responses', model, "q" + question, f"q{question}_{month}19_responses.jsonl")
+                    step2_file = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}19_responses.jsonl")
                     # Read and collect the line from step2 using the sampled index
                     bad_response = read_line_from_step2(step2_file, sampled_index)
                     bad_responses.append({
@@ -70,7 +70,7 @@ def main():
                     })
                 
     bad_responses  = pd.DataFrame(bad_responses)
-    bad_responses.to_csv('./data/step8_bad_responses.csv', index=False)
+    bad_responses.to_csv(step8_path, index=False)
 
 if __name__ == "__main__":
     bad_responses = main()

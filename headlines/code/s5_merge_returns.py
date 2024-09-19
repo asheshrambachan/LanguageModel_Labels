@@ -1,10 +1,10 @@
 import pandas as pd
-from s0_constants import economic_questions, models, month_batches, return_types, years
+from s0_constants import economic_questions, models, month_batches, return_types, years, returns_path, step4_path, step5_path
 import os
 
 def read_data(question, model, month, year, return_type):
-    labels = pd.read_csv(f"./data/step4_processed_responses/{model}/q{question}/q{question}_{month}{year}_processed.csv")
-    headlines = pd.read_csv(f"./data/step0_{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
+    labels = pd.read_csv(f"{step4_path}/{model}/q{question}/q{question}_{month}{year}_processed.csv")
+    headlines = pd.read_csv(f"{returns_path}{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
     return labels, headlines
 
 def merge_data(labels, headlines):
@@ -50,16 +50,22 @@ def save_data(data, directory):
 def main(question, model, month, year, return_type):
     labels, headlines = read_data(question, model, month, year, return_type)
     merged_data = merge_data(labels, headlines)
-    directory = f"./data/step5_merged_returns/{return_type}/{model}/q{question}/q{question}_{month}{year}"
+    directory = f"{step5_path}/{return_type}/{model}/q{question}/q{question}_{month}{year}"
     save_data(merged_data, directory)
 
 if __name__ == "__main__":
 
-    for question in economic_questions:
-        for model in models:
-            for month in month_batches:
-                for year in years:
-                    for return_type in return_types:
+    QUESTIONS = ["3"]
+    MODELS = ["gpt-3.5-turbo"]
+    MONTHS = ["jan"]
+    YEARS = ["19"]
+    RETURN_TYPES = ["realized"]
+
+    for question in QUESTIONS:
+        for model in MODELS:
+            for month in MONTHS:
+                for year in YEARS:
+                    for return_type in RETURN_TYPES:
                         main(question=question, 
                              model=model, 
                              month=month, 

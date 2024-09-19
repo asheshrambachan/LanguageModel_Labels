@@ -25,6 +25,8 @@ month_batches = ["jan", "feb", "mar", "apr", "may", "jun", "jul",
 models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"]
 prompt_types = ["base_blanks", "base_json", "persona1", "persona2", "persona3", "persona4", "cot1", "cot2", "cot3"]
 
+returns_path = "./data/returns_data"
+prompts_path = "./data/prompts_templates"
 step1_path = "./data/step1_batch_prompts"
 step2_path = "./data/step2_batch_responses"
 step4_path = "./data/step4_processed_responses"

@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from s0_constants import economic_questions, models, month_batches, return_types, prompt_types
+from s0_constants import economic_questions, models, month_batches, return_types, prompt_types, step5_path, step6_path
 
 # Function to calculate cumulative abnormal returns (CAR)
 def calculate_CAR(df):
@@ -12,7 +12,7 @@ def calculate_CAR(df):
 
 # Function to read, combine, mutate, and filter data for all files
 def read_combine_filter(model, months, question, file_name, return_type):
-    combined_df = pd.concat([pd.read_csv(f"./data/step5_merged_returns/{return_type}/{model}/q{question}/q{question}_{month}19/{file_name}") 
+    combined_df = pd.concat([pd.read_csv(f"{step5_path}/{return_type}/{model}/q{question}/q{question}_{month}19/{file_name}") 
                              for month in months])
 
     if return_type == "realized":
@@ -55,7 +55,7 @@ def save_common_sample_within(question, model, return_type):
 
     # Save the cleaned datasets
     for file_name, final_df in final_data.items():
-        save_path = f"./data/step6_common_sample/within_model/{return_type}/{model}/q{question}/{file_name}.csv"
+        save_path = f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv"
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         final_df.to_csv(save_path, index=False)
 
@@ -98,7 +98,7 @@ def save_common_sample_across(question, return_type):
     # Step 4: Save the cleaned datasets for each model
     for model, final_data in final_data_across_models.items():
         for file_name, final_df in final_data.items():
-            save_path = f"./data/step6_common_sample/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
+            save_path = f"{step6_path}/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             final_df.to_csv(save_path, index=False)
 
@@ -108,8 +108,12 @@ def main(question, model, return_type):
 
 if __name__ == "__main__":
 
-    for return_type in return_types:
-        for question in economic_questions:
-            for model in models:
+    RETURN_TYPES = ["realized"]
+    QUESTIONS = ["3"]
+    MODELS = ["gpt-3.5-turbo"]
+
+    for return_type in RETURN_TYPES:
+        for question in QUESTIONS:
+            for model in MODELS:
                 main(question, model, return_type)      
 

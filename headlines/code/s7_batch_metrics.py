@@ -1,11 +1,8 @@
 import os
 import pandas as pd
-from s0_constants import return_types, month_batches, years, economic_questions, models, prompt_types
+from s0_constants import return_types, month_batches, years, economic_questions, models, prompt_types, step1_path, step5_path, step7_path
 from helpers import get_file_metrics, count_jsonl_rows
 
-# Define directories
-root_dir_responses = "./data/step5_merged_returns"
-root_dir_prompts = "./data/step1_batch_prompts"
 
 # Function to get model data
 def get_model_data(model_dir, response_file_path, prompt_file_path):
@@ -49,8 +46,8 @@ def main():
             for file in prompt_types:
                 model_data = {}
                 for model_dir in models:
-                    response_file_path = os.path.join(root_dir_responses, return_type, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19", file + ".csv")
-                    prompt_file_path = os.path.join(root_dir_prompts, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19_prompts.jsonl")
+                    response_file_path = os.path.join(step5_path, return_type, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19", file + ".csv")
+                    prompt_file_path = os.path.join(step1_path, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19_prompts.jsonl")
                     
                     # Get data and print debug information
                     model_data.update(get_model_data(model_dir, response_file_path, prompt_file_path))
@@ -88,7 +85,7 @@ def main():
     )
 
     # Save the updated summary_df to CSV
-    summary_df.to_csv("./data/step7_batch_metrics.csv", index=False)
+    summary_df.to_csv(step7_path, index=False)
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
