@@ -23,7 +23,7 @@ prompts_path = os.path.join(temp_dir, f"prompts.jsonl")
 responses_path = os.path.join(temp_dir, f"responses.jsonl")
 
 responses_batched = []
-for responses_batched_path in sorted(glob.glob(os.path.join(temp_dir, f'responses_batched_*.jsonl'))):
+for responses_batched_path in sorted(glob.glob(os.path.join(temp_dir, f'responses/responses_batched_*.jsonl'))):
     responses_batched_file = pd.read_json(responses_batched_path, lines=True)
     print(f"Loaded {responses_batched_path}, n = {len(responses_batched_file)}")
     responses_batched_file["ID"] = responses_batched_file["custom_id"].apply(lambda x: int(x[3:]))

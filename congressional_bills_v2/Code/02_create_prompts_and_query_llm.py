@@ -8,12 +8,9 @@ from dotenv import load_dotenv
 
 import tiktoken
 from copy import deepcopy
-import re
-import glob
 
 # Place API_KEY in the .env file
 load_dotenv()
-# client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY_ASHESH'))
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
@@ -24,63 +21,10 @@ data_dir = os.path.join(repo_dir, "Data")
 temp_dir = os.path.join(repo_dir, "Temp")
 os.makedirs(temp_dir, exist_ok=True)
 
+os.makedirs(os.path.join(temp_dir, "prompts"), exist_ok=True)
 
 fig_dir = os.path.join(repo_dir, "Figures")
 os.makedirs(fig_dir, exist_ok=True)
-
-# # Create `prompting_strategies.csv`
-# prompting_strategies = pd.DataFrame(data = {
-#     "PromptingStrategyID": list(range(1, 12+1)),
-
-#     "PromptingStrategyName": [
-#         "Base Prompt", "Base Prompt", 
-#         "Persona", "Persona", "Persona", "Persona", 
-#         "Chain-of-Thoughts", "Chain-of-Thoughts", "Chain-of-Thoughts", 
-#         "Few-Shot", "Few-Shot", "Few-Shot"
-#         ],
-
-#     "TextBefore": [
-#         None, None, 
-#         "You are a knowledgeable political analyst. ",
-#         "Answer this question as if you are a political scientist that studies legislation in the United States Congress. ",
-#         "Answer this question as if you are an expert in United States politics. ",
-#         "Answer this question as if you were a helpful research assistant for a political scientist. ",
-#         None, None, None,
-#         None, None, None
-#         ],
-
-#     "TextAfter": [
-#         None, None, 
-#         None, None, None, None, 
-#         "Think carefully. ", 
-#         "Let's think step by step. Lay out each step. ", 
-#         "Please provide an explanation for your answer. ",
-#         None, None, None
-#         ],
-
-#     "ExampleSetNum": [
-#         None, None, 
-#         None, None, None, None, 
-#         None, None, None, 
-#         1, 2, 3
-#     ],
-
-#     "ResponseFormat": [
-#         "Fill-in-the-Blanks", "JSON", 
-#         "JSON", "JSON", "JSON", "JSON", 
-#         "JSON", "JSON", "JSON", 
-#         "JSON", "JSON", "JSON"
-#     ]
-# })
-# prompting_strategies.insert(loc=4, column="AddExamples", value=prompting_strategies["PromptingStrategyName"] == "Few-Shot")
-# prompting_strategies["AddExplanation"] = prompting_strategies["PromptingStrategyName"] == "Chain-of-Thoughts"
-
-# n = len(prompting_strategies)
-# prompting_strategies = pd.concat([prompting_strategies, prompting_strategies], ignore_index=True)
-# prompting_strategies["Model"] = ["gpt-3.5-turbo-0125"]*n + ["gpt-4o-2024-05-13"]*n
-
-# prompting_strategies["Temperature"] = 0 
-# prompting_strategies.to_csv(os.path.join(data_dir, "prompting_strategies.csv"), index=False, float_format='%.2f')
 
 # Create `prompts.jsonl`
 MAJOR_TEXT = pd.read_csv(os.path.join(data_dir, "Codebooks/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
@@ -339,7 +283,7 @@ for model in prompts["Model"].unique():
 
         if ((i==(12e3-1)) | (len(prompts_batched)==50e3) | (i==(len(prompts_model)-1))):
             part = part + 1
-            prompts_batched_path = os.path.join(temp_dir, f"prompts_batched_{model}_part{part}.jsonl")
+            prompts_batched_path = os.path.join(temp_dir, f"prompts/prompts_batched_{model}_part{part}.jsonl")
             with open(prompts_batched_path, "w") as f:
                 for prompt_batched in prompts_batched:
                     f.write(json.dumps(prompt_batched) + "\n")
@@ -349,7 +293,7 @@ for model in prompts["Model"].unique():
 # Generate responses
 batches = {}
 
-prompts_batched_paths = glob.glob(os.path.join(temp_dir, f'prompts_batched_*.jsonl'))
+prompts_batched_paths = glob.glob(os.path.join(temp_dir, f'prompts/prompts_batched_*.jsonl'))
 
 for prompts_batched_path in prompts_batched_paths:
     batch_input_file = client.files.create(
@@ -376,13 +320,13 @@ for prompts_batched_path in prompts_batched_paths:
     }
 
 print(batches)
-# batches = {
-#     'prompts_batched_gpt-3.5-turbo-0125_part1.jsonl': {'part': 1, 'id': 'batch_tSVIpwOEqYLYIxrzneZ38Cf8'}, #12e3, this was the 1000 bill run, , prompts_batched_1000_gpt-3.5-turbo-0125.json
-#     'prompts_batched_gpt-3.5-turbo-0125_part2.jsonl': {'part': 2, 'id': 'batch_6yCzX3zUgi7xKFzWx7Y3wCih'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part1.json
-#     'prompts_batched_gpt-3.5-turbo-0125_part3.jsonl': {'part': 3, 'id': 'batch_zK9n9beqzKH84y8k45IO4Hep'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part2.json
-#     'prompts_batched_gpt-3.5-turbo-0125_part4.jsonl': {'part': 4, 'id': 'batch_pvocTdpKJAeylK6tdHxvpZmu'}, #8e3, prompts_batched_9000_gpt-3.5-turbo-0125_part3.json
-#     'prompts_batched_gpt-4o-2024-05-13_part1.jsonl':  {'part': 1, 'id': 'batch_Qi4lin1f66j96pho3ofhRxyl'}, #12e3, this was the 1000 bill run, prompts_batched_1000_gpt-4o.json
-#     'prompts_batched_gpt-4o-2024-05-13_part2.jsonl':  {'part': 2, 'id': 'batch_k0XxH5uZU78uyloLs8IYIBwh'}, #50e3, prompts_batched_9000_gpt-4o_part1.json
-#     'prompts_batched_gpt-4o-2024-05-13_part3.jsonl':  {'part': 3, 'id': 'batch_0IR9IRoYYJb6TYYvvN8XqXk2'}, #50e3, prompts_batched_9000_gpt-4o_part2.json
-#     'prompts_batched_gpt-4o-2024-05-13_part4.jsonl':  {'part': 4, 'id': 'batch_8EFmBWRWBFJuStCPbO26rhQ3'}, #8e3, prompts_batched_9000_gpt-4o_part3.json
-# }
+batches = {
+    'prompts_batched_gpt-3.5-turbo-0125_part1.jsonl': {'part': 1, 'id': 'batch_tSVIpwOEqYLYIxrzneZ38Cf8'}, #12e3, this was the 1000 bill run, , prompts_batched_1000_gpt-3.5-turbo-0125.json
+    'prompts_batched_gpt-3.5-turbo-0125_part2.jsonl': {'part': 2, 'id': 'batch_6yCzX3zUgi7xKFzWx7Y3wCih'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part1.json
+    'prompts_batched_gpt-3.5-turbo-0125_part3.jsonl': {'part': 3, 'id': 'batch_zK9n9beqzKH84y8k45IO4Hep'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part2.json
+    'prompts_batched_gpt-3.5-turbo-0125_part4.jsonl': {'part': 4, 'id': 'batch_pvocTdpKJAeylK6tdHxvpZmu'}, #8e3, prompts_batched_9000_gpt-3.5-turbo-0125_part3.json
+    'prompts_batched_gpt-4o-2024-05-13_part1.jsonl':  {'part': 1, 'id': 'batch_Qi4lin1f66j96pho3ofhRxyl'}, #12e3, this was the 1000 bill run, prompts_batched_1000_gpt-4o.json
+    'prompts_batched_gpt-4o-2024-05-13_part2.jsonl':  {'part': 2, 'id': 'batch_k0XxH5uZU78uyloLs8IYIBwh'}, #50e3, prompts_batched_9000_gpt-4o_part1.json
+    'prompts_batched_gpt-4o-2024-05-13_part3.jsonl':  {'part': 3, 'id': 'batch_0IR9IRoYYJb6TYYvvN8XqXk2'}, #50e3, prompts_batched_9000_gpt-4o_part2.json
+    'prompts_batched_gpt-4o-2024-05-13_part4.jsonl':  {'part': 4, 'id': 'batch_8EFmBWRWBFJuStCPbO26rhQ3'}, #8e3, prompts_batched_9000_gpt-4o_part3.json
+}

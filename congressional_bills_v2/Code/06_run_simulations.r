@@ -11,7 +11,7 @@
 
 # --- User Configurable Parameters ----------------------------------
 n_cores <- 50
-N <- 4 # 1000 # Number of simulations per a single combination
+N <- 1000 # Number of simulations per a single combination
 B <- 1000 # Number of bootstrap samples
 n_samples <- 5000 # Number of samples drawn from 10K bill in each of the N simulations
 type_boot <- "bayesian" # "nonparametric"

@@ -3,7 +3,9 @@ import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 
-temp_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Temp"
+temp_responses_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2/Temp/responses"
+os.makedirs(os.path.join(temp_responses_dir, "prompts"), exist_ok=True)
+
 
 # Place API_KEY in the .env file
 load_dotenv()
@@ -38,7 +40,7 @@ for file in batches:
     output_file_id = batch_status.output_file_id
     responses_batched = client.files.content(output_file_id)
 
-    responses_batched_path = os.path.join(temp_dir, file.replace("prompts", "responses"))
+    responses_batched_path = os.path.join(temp_responses_dir, file.replace("prompts", "responses"))
     responses_batched.write_to_file(responses_batched_path)
 
     # if not part 1, we correct the ID as it shouldn't start from 1
