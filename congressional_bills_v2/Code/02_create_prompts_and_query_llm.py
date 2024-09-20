@@ -1,33 +1,40 @@
 import os
 import pandas as pd
 from openai import OpenAI
-
 import numpy as np
 import json
 from dotenv import load_dotenv
-
+import re
 import tiktoken
 from copy import deepcopy
 
 # Place API_KEY in the .env file
 load_dotenv()
-client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
 
-repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
-os.chdir(repo_dir)
-
-data_dir = os.path.join(repo_dir, "Data")
-
-temp_dir = os.path.join(repo_dir, "Temp")
-os.makedirs(temp_dir, exist_ok=True)
-
-os.makedirs(os.path.join(temp_dir, "prompts"), exist_ok=True)
-
-fig_dir = os.path.join(repo_dir, "Figures")
-os.makedirs(fig_dir, exist_ok=True)
-
-# Create `prompts.jsonl`
-MAJOR_TEXT = pd.read_csv(os.path.join(data_dir, "Codebooks/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
+MAJOR_TEXT = {
+    1: "Macroeconomics",
+    2: "Civil Rights, Minority Issues, and Civil Liberties",
+    3: "Health",
+    4: "Agriculture",
+    5: "Labor and Employment",
+    6: "Education",
+    7: "Environment",
+    8: "Energy",
+    9: "Immigration",
+    10: "Transportation",
+    11: "Law, Crime, and Family Issues",
+    12: "Social Welfare",
+    13: "Community Development and Housing Issues",
+    14: "Banking, Finance, and Domestic Commerce",
+    15: "Defense",
+    16: "Space, Science, Technology, and Communications",
+    17: "Foreign Trade",
+    18: "International Affairs and Foreign Aid",
+    19: "Government Operations",
+    20: "Public Lands and Water Management"
+}
 
 CATEGORIES = "\n".join([f"{int(major)}. {text}" for major, text in MAJOR_TEXT.items()])
 
@@ -144,84 +151,52 @@ def create_messages(strategy, bills_examples, min_confidence=0.9, max_confidence
     return messages
 
 
-prompting_strategies = pd.read_csv(os.path.join(data_dir, "prompting_strategies.csv"))
-bills = pd.read_csv(os.path.join(data_dir, f"bills_10k.csv"))
-bills_examples = pd.read_csv(os.path.join(data_dir, "bills_examples.csv"))
-prompts_path = os.path.join(temp_dir, f"prompts.jsonl")
 
-prompting_strategies_json = []
-for _, strategy in prompting_strategies.iterrows():
-    strategy_json = {
-        "PromptingStrategyID": strategy["PromptingStrategyID"],
-        "PromptingStrategyName": strategy["PromptingStrategyName"],
-        "ResponseFormat": strategy["ResponseFormat"],
-        "AddExplanation": strategy["AddExplanation"],
-        "AddExamples": strategy["AddExamples"],
-        "Model": strategy["Model"], 
-        "Temperature": strategy["Temperature"],
-        "Messages": create_messages(strategy, bills_examples, min_confidence=0.9, max_confidence=1, examples_via_system=True)
-    }
-    prompting_strategies_json.append(strategy_json)
-    
-prompting_strategies_json = pd.json_normalize(prompting_strategies_json)
-
-id = 0
-prompts = []
-for _, bill in bills.iterrows():
-    for _, strategy in prompting_strategies_json.iterrows():
-        
-        # add bill to last used message
-        bill_messages = deepcopy(strategy["Messages"])
-        bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill["Description"])
-        
-        id = id + 1
-        prompt = {
-            "ID": id,
-            "BillID": bill["BillID"],
+def create_prompts(prompting_strategies, bills, bills_examples):
+    prompting_strategies_json = []
+    for _, strategy in prompting_strategies.iterrows():
+        strategy_json = {
             "PromptingStrategyID": strategy["PromptingStrategyID"],
-            "Description": bill["Description"],
             "PromptingStrategyName": strategy["PromptingStrategyName"],
             "ResponseFormat": strategy["ResponseFormat"],
             "AddExplanation": strategy["AddExplanation"],
             "AddExamples": strategy["AddExamples"],
-            "Model": strategy["Model"],
+            "Model": strategy["Model"], 
             "Temperature": strategy["Temperature"],
-            "Major": bill["Major"],
-            "MajorText": bill["MajorText"],
-            "Messages": bill_messages
+            "Messages": create_messages(strategy, bills_examples, min_confidence=0.9, max_confidence=1, examples_via_system=True)
         }
-        prompts.append(prompt)
+        prompting_strategies_json.append(strategy_json)
+        
+    prompting_strategies_json = pd.json_normalize(prompting_strategies_json)
 
-with open(prompts_path, "w") as f:
-    for prompt in prompts:
-        f.write(json.dumps(prompt) + "\n")
-print(f"Saved {prompts_path}")
+    id = 0
+    prompts = []
+    for _, bill in bills.iterrows():
+        for _, strategy in prompting_strategies_json.iterrows():
+            
+            # add bill to last used message
+            bill_messages = deepcopy(strategy["Messages"])
+            bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill["Description"])
+            
+            id = id + 1
+            prompt = {
+                "ID": id,
+                "BillID": bill["BillID"],
+                "PromptingStrategyID": strategy["PromptingStrategyID"],
+                # "Description": bill["Description"],
+                "PromptingStrategyName": strategy["PromptingStrategyName"],
+                "ResponseFormat": strategy["ResponseFormat"],
+                "AddExplanation": strategy["AddExplanation"],
+                "AddExamples": strategy["AddExamples"],
+                "Model": strategy["Model"],
+                "Temperature": strategy["Temperature"],
+                # "Major": bill["Major"],
+                # "MajorText": bill["MajorText"],
+                "Messages": bill_messages
+            }
+            prompts.append(prompt)
 
-# Estimate Cost using Batch API
-INPUT_TOKEN_COST = {
-    'gpt-3.5-turbo-0125': 0.25/1e6,
-    'gpt-4o-2024-05-13': 2.5/1e6
-}
-
-OUTPUT_TOKEN_COST = {
-    'gpt-3.5-turbo-0125': 0.75/1e6,
-    'gpt-4o-2024-05-13': 7.5/1e6
-}
-
-PROMPT2OUTPUT_TOKEN = {
-    1: 5.96, 
-    2: 19, 
-    3: 19, 
-    4: 19, 
-    5: 19, 
-    6: 19, 
-    7: 47.56, 
-    8: 47.47, 
-    9: 48.36, 
-    10: 15, 
-    11: 15, 
-    12: 15
-} 
+    return(prompts)
 
 def count_tokens(messages, model):
     encoding = tiktoken.encoding_for_model(model)
@@ -237,17 +212,42 @@ def count_tokens(messages, model):
     num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
     return num_tokens
 
-def estimate_cost(prompts):
+def estimate_cost(prompts, batched=True):
     prompts = prompts[['PromptingStrategyID', 'Model', 'Messages']]
 
     input_tokens = []
     for _, prompt in prompts.iterrows():
         num_tokens = count_tokens(prompt['Messages'], prompt['Model'])
         input_tokens = np.append(input_tokens, num_tokens)
-    avg_output_tokens = prompts['PromptingStrategyID'].apply(lambda x: PROMPT2OUTPUT_TOKEN[x])
 
-    input_token_cost  = prompts['Model'].apply(lambda x: INPUT_TOKEN_COST[x])
-    output_token_cost = prompts['Model'].apply(lambda x: OUTPUT_TOKEN_COST[x])
+    prompt2OutputTokens = {
+        1: 5.96, 
+        2: 19, 
+        3: 19, 
+        4: 19, 
+        5: 19, 
+        6: 19, 
+        7: 47.56, 
+        8: 47.47, 
+        9: 48.36, 
+        10: 15, 
+        11: 15, 
+        12: 15
+    } 
+    avg_output_tokens = prompts['PromptingStrategyID'].apply(lambda x: prompt2OutputTokens[x])
+
+    # Cost using Batch API
+    in_token_cost = {
+        'gpt-3.5-turbo-0125': 0.25/1e6,
+        'gpt-4o-2024-05-13': 2.5/1e6
+    }
+    out_token_cost = {
+        'gpt-3.5-turbo-0125': 0.75/1e6,
+        'gpt-4o-2024-05-13': 7.5/1e6
+    }
+
+    input_token_cost  = prompts['Model'].apply(lambda x: in_token_cost[x] if batched else in_token_cost[x]*2)
+    output_token_cost = prompts['Model'].apply(lambda x: out_token_cost[x] if batched else out_token_cost[x]*2)
 
     input_tokens_cost = input_tokens * input_token_cost
     output_tokens_cost = avg_output_tokens * output_token_cost
@@ -255,78 +255,97 @@ def estimate_cost(prompts):
     total_cost = (input_tokens_cost + output_tokens_cost).sum()
     return total_cost
 
-prompts = pd.read_json(os.path.join(temp_dir, f'prompts.jsonl'), lines=True)
-print(f"Estimated cost of running {os.path.basename(prompts_path)} is ${estimate_cost(prompts):.2f}")
+def create_batched_prompts(prompts, batched_prompts_dir):
+    batches = []
+    for model in prompts["Model"].unique(): 
+        prompts_model = prompts[prompts["Model"]==model].reset_index()
 
-# Create `prompts_batched.jsonl`
-prompts_path = os.path.join(temp_dir, f"prompts.jsonl")
-prompts = pd.read_json(prompts_path, lines=True)
-
-for model in prompts["Model"].unique(): 
-    prompts_model = prompts[prompts["Model"]==model].reset_index()
-
-    prompts_batched = []
-    part = 0
-    for i, prompt in prompts_model.iterrows():
-        prompt_batched = {
-                "custom_id": "ID_" + str(prompt["ID"]),
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": {
-                    "model": prompt["Model"],
-                    "temperature": prompt["Temperature"],
-                    "response_format": {"type": "json_object"} if (prompt["ResponseFormat"]=="JSON") else None,
-                    "messages": prompt["Messages"],
+        prompts_batched = []
+        part = 0
+        for i, prompt in prompts_model.iterrows():
+            prompt_batched = {
+                    "custom_id": "ID_" + str(prompt["ID"]),
+                    "method": "POST",
+                    "url": "/v1/chat/completions",
+                    "body": {
+                        "model": prompt["Model"],
+                        "temperature": prompt["Temperature"],
+                        "response_format": {"type": "json_object"} if (prompt["ResponseFormat"]=="JSON") else None,
+                        "messages": prompt["Messages"],
+                    }
                 }
-            }
-        prompts_batched.append(prompt_batched)
+            prompts_batched.append(prompt_batched)
 
-        if ((i==(12e3-1)) | (len(prompts_batched)==50e3) | (i==(len(prompts_model)-1))):
-            part = part + 1
-            prompts_batched_path = os.path.join(temp_dir, f"prompts/prompts_batched_{model}_part{part}.jsonl")
-            with open(prompts_batched_path, "w") as f:
-                for prompt_batched in prompts_batched:
-                    f.write(json.dumps(prompt_batched) + "\n")
-                print(f"Saved {prompts_batched_path}")
-            prompts_batched = []
+            if ((i==(12e3-1)) | (len(prompts_batched)==50e3) | (i==(len(prompts_model)-1))):
+                part = part + 1
+                prompts_batched_path = os.path.join(batched_prompts_dir, f"prompts_batched_{model}_part{part}.jsonl")
 
-# Generate responses
-batches = {}
+                with open(prompts_batched_path, "w") as f:
+                    for prompt_batched in prompts_batched:
+                        f.write(json.dumps(prompt_batched) + "\n")
+                    print(f"Saved {os.path.basename(prompts_batched_path)}, n = {len(prompts_batched)}, at {os.path.dirname(prompts_batched_path)}")
+                prompts_batched = []
 
-prompts_batched_paths = glob.glob(os.path.join(temp_dir, f'prompts/prompts_batched_*.jsonl'))
+                batch = {
+                    'file': prompts_batched_path,
+                    'part': part
+                }
+                batches.append(batch)
 
-for prompts_batched_path in prompts_batched_paths:
-    batch_input_file = client.files.create(
-        file = open(prompts_batched_path, "rb"),
-        purpose = "batch"
-    )
-    batch_input_file_id = batch_input_file.id
-    batch = client.batches.create(
-            input_file_id = batch_input_file_id,
+    return(pd.json_normalize(batches))
+
+def query_llm(batches):
+    client = OpenAI(api_key=OPENAI_API_KEY)
+    
+    batches_id = []
+    for _, batch in batches.iterrows():
+        batch_input_file = client.files.create(
+            file = open(batch['file'], "rb"),
+            purpose = "batch"
+        )
+
+        new_batch = client.batches.create(
+            input_file_id = batch_input_file.id,
             endpoint = "/v1/chat/completions",
             completion_window = "24h",
-            metadata = {"description": f"{os.path.basename(prompts_batched_path)}"}
+            metadata = {"description": f"{os.path.basename(batch['file'])}"}
         )
+
+        batches_id.append(new_batch.id)
     
-    # Regex pattern to match the part number
-    pattern = r'_part(\d+)'
+    batches['id'] = batches_id
+    return(batches)
 
-    # Extract the part numbers
-    part = int(re.search(pattern, prompts_batched_path).group(1))
+def main():
+    data_dir = os.path.join(REPO_DIR, "Data")
+    temp_dir = os.path.join(REPO_DIR, "Temp")
+    batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
+    os.makedirs(temp_dir, exist_ok=True)
+    os.makedirs(batched_prompts_dir, exist_ok=True)
 
-    batches[os.path.basename(prompts_batched_path)] = {
-        'part': part,
-        'id': batch.id
-    }
+    prompting_strategies = pd.read_csv(os.path.join(data_dir, "prompting_strategies.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, "bills_10k.csv"))
+    bills_examples = pd.read_csv(os.path.join(data_dir, "bills_examples.csv"))
 
-print(batches)
-batches = {
-    'prompts_batched_gpt-3.5-turbo-0125_part1.jsonl': {'part': 1, 'id': 'batch_tSVIpwOEqYLYIxrzneZ38Cf8'}, #12e3, this was the 1000 bill run, , prompts_batched_1000_gpt-3.5-turbo-0125.json
-    'prompts_batched_gpt-3.5-turbo-0125_part2.jsonl': {'part': 2, 'id': 'batch_6yCzX3zUgi7xKFzWx7Y3wCih'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part1.json
-    'prompts_batched_gpt-3.5-turbo-0125_part3.jsonl': {'part': 3, 'id': 'batch_zK9n9beqzKH84y8k45IO4Hep'}, #50e3, prompts_batched_9000_gpt-3.5-turbo-0125_part2.json
-    'prompts_batched_gpt-3.5-turbo-0125_part4.jsonl': {'part': 4, 'id': 'batch_pvocTdpKJAeylK6tdHxvpZmu'}, #8e3, prompts_batched_9000_gpt-3.5-turbo-0125_part3.json
-    'prompts_batched_gpt-4o-2024-05-13_part1.jsonl':  {'part': 1, 'id': 'batch_Qi4lin1f66j96pho3ofhRxyl'}, #12e3, this was the 1000 bill run, prompts_batched_1000_gpt-4o.json
-    'prompts_batched_gpt-4o-2024-05-13_part2.jsonl':  {'part': 2, 'id': 'batch_k0XxH5uZU78uyloLs8IYIBwh'}, #50e3, prompts_batched_9000_gpt-4o_part1.json
-    'prompts_batched_gpt-4o-2024-05-13_part3.jsonl':  {'part': 3, 'id': 'batch_0IR9IRoYYJb6TYYvvN8XqXk2'}, #50e3, prompts_batched_9000_gpt-4o_part2.json
-    'prompts_batched_gpt-4o-2024-05-13_part4.jsonl':  {'part': 4, 'id': 'batch_8EFmBWRWBFJuStCPbO26rhQ3'}, #8e3, prompts_batched_9000_gpt-4o_part3.json
-}
+    # Create `prompts.jsonl`
+    prompts_json = create_prompts(prompting_strategies, bills, bills_examples)
+    with open(os.path.join(temp_dir, "prompts.jsonl"), "w") as f:
+        for prompt in prompts_json:
+            f.write(json.dumps(prompt) + "\n")
+    print(f"Saved prompts.jsonl, n = {len(prompts_json)}, at {temp_dir}")
+    prompts = pd.json_normalize(prompts_json)
+
+    # Estimate cost using Batch API
+    cost = estimate_cost(prompts, batched=True)
+    print(f"Estimated cost using Batch API is ${cost:.2f}")
+
+    # Create `prompts_batched.jsonl`
+    batches = create_batched_prompts(prompts, batched_prompts_dir)
+
+    # Query LLM and store batches id 
+    batches = query_llm(batches)
+    batches.to_csv(os.path.join(data_dir, "batches.csv"), index=False)
+    print(f"Saved batches.csv, n = {len(batches)}, at {data_dir}")
+
+if __name__ == "__main__":
+    main()

@@ -6,11 +6,10 @@ from copy import deepcopy
 
 REPO_DIR = '/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2'
 
-def load_cap(path_cap):
+def get_cap(path_cap):
+    # Load CAP data from path
     cap = pd.read_csv(path_cap, low_memory=False)
-    return(cap)
 
-def clean_cap(cap):
     # Correct BillID
     cap['BillID'] = cap['cong'].astype(str) + '-' + cap['bill_type'].apply(lambda x: x.upper()) + '-' + cap['bill_no'].astype(str) 
 
@@ -54,7 +53,7 @@ def clean_cap(cap):
     # cap['Description'] = cap['Description'].str.replace(r'\s+', ' ', regex=True)
     return(cap)
 
-def load_cbp(path_cbp_80_92, path_cbp_93_114):  
+def get_cbp(path_cbp_80_92, path_cbp_93_114):
     # Load CBP data, 80th through 92nd congress
     cbp_80_92 = pd.read_csv(path_cbp_80_92, sep='\t', encoding='latin-1', low_memory=False)
     cbp_80_92.rename(columns={' ': 'Minor'}, inplace=True)
@@ -66,9 +65,7 @@ def load_cbp(path_cbp_80_92, path_cbp_93_114):
 
     # Merge CBP datasets
     cbp = pd.concat([cbp_80_92, cbp_93_114], join='inner').reset_index(drop=True)
-    return(cbp)
 
-def clean_cbp(cbp):
     # Rename columns
     cbp.rename(columns={'Title': 'Description'}, inplace=True)
 
@@ -130,6 +127,21 @@ def description_mismatch(d1, d2):
     return condition
 
 def merge_cap_cbp(cap, cbp):
+    # Merge CAP and CBP
+    bills = cap.merge(cbp, on=['BillID', 'Major', 'Party', 'PassS', 'PassH', 'Chamber'], suffixes=('', '_CBP'))
+
+    # Drop bills with mismatching Description in CAP and CBP
+    condition = description_mismatch(bills['Description'], bills['Description_CBP'])
+    bills = bills[~condition] 
+
+    # Remove bills with Major=99 (~80,000)
+    bills = bills[bills['Major']!=99]
+
+    # Remove duplicates based on Description (lower cased)
+    bills['Description_lower'] = bills['Description'].apply(lambda x: x.lower())
+    bills.drop_duplicates(subset='Description_lower', inplace=True)
+    
+    # Map PAP/CAP major topic IDs to our IDs 
     major_PAP2Ours = {
         1:  1,
         2:  2,
@@ -152,17 +164,19 @@ def merge_cap_cbp(cap, cbp):
         20: 19,
         21: 20
     }
-        
+    bills['Major'] = bills['Major'].apply(lambda x: major_PAP2Ours[x])
+
+    # Add MajorText column 
     major_code = {
-         1: "Macroeconomics",
-         2: "Civil Rights, Minority Issues, and Civil Liberties",
-         3: "Health",
-         4: "Agriculture",
-         5: "Labor and Employment",
-         6: "Education",
-         7: "Environment",
-         8: "Energy",
-         9: "Immigration",
+        1: "Macroeconomics",
+        2: "Civil Rights, Minority Issues, and Civil Liberties",
+        3: "Health",
+        4: "Agriculture",
+        5: "Labor and Employment",
+        6: "Education",
+        7: "Environment",
+        8: "Energy",
+        9: "Immigration",
         10: "Transportation",
         11: "Law, Crime, and Family Issues",
         12: "Social Welfare",
@@ -175,53 +189,32 @@ def merge_cap_cbp(cap, cbp):
         19: "Government Operations",
         20: "Public Lands and Water Management"
     }
+    bills['MajorText'] = bills['Major'].apply(lambda x: major_code[x])
 
+    # Add Chamber codes
     chamber_code = {
         0: 'House', 
         1: 'Senate'
     }
+    bills['Chamber'] = bills['Chamber'].apply(lambda x: chamber_code[x])
 
+    # Add Party codes
     party_code = {
         100: 'Democrat', 
         112: 'Conservative',
         200: 'Republican',
         328: 'Independent'
     }
-
-    bills = cap.merge(cbp, on=['BillID', 'Major', 'Party', 'PassS', 'PassH', 'Chamber'], suffixes=('', '_CBP'))
-
-    # Drop bills with mismatching Description in CAP and CBP
-    condition = description_mismatch(bills['Description'], bills['Description_CBP'])
-    bills = bills[~condition] 
-
-    # Remove bills with Major=99 (~80,000)
-    bills = bills[bills['Major']!=99]
-
-    # Remove duplicates based on Description (lower cased)
-    bills['Description_lower'] = bills['Description'].apply(lambda x: x.lower())
-    bills.drop_duplicates(subset='Description_lower', inplace=True)
-
-    # Map PAP/CAP major topic IDs to our IDs 
-    bills['Major'] = bills['Major'].apply(lambda x: major_PAP2Ours[x])
-
-    # Add MajorText column 
-    bills['MajorText'] = bills['Major'].apply(lambda x: major_code[x])
-
-    # Add Chamber codes
-    bills['Chamber'] = bills['Chamber'].apply(lambda x: chamber_code[x])
-
-    # Add Party codes
     bills['Party'] = bills['Party'].apply(lambda x: party_code[x])
 
     # Rearrange columns
     bills = bills[['BillID', 'Year', 'Major', 'MajorText', 'Party', 'PassH', 'PassS', 'Description', 'DW1', 'Chamber', 'Postal']]
     bills.reset_index(drop=True)
-    print(len(bills)) # n = 228387
-    return()
+    return(bills)
 
-def sample_bills(bills, n_examples = 5, seed = 123):
+def sample_bills(bills, n_examples = 15, seed = 123):
     # Bills used for few-shot prompting
-    examples = bills.groupby('Major').sample(n=1, random_state=seed).reset_index(drop=True)[:(n_examples*3)] 
+    examples = bills.groupby('Major').sample(n=1, random_state=seed).reset_index(drop=True)[:n_examples] 
 
     condition = bills['BillID'].apply(lambda x: x not in examples['BillID'].to_list())
     bills = bills[condition]
@@ -246,32 +239,31 @@ def main():
     # path_cbp_93_114 = os.path.join(data_dir, 'CBP93-114.csv')
     
     # Load and clean CAP
-    cap = load_cap(path_cap)
-    cap = clean_cap(cap)
+    cap = get_cap(path_cap)
     cap.to_csv(os.path.join(data_dir, "cap.csv"), index=False)
     print(f'Saved cap.csv, n = {len(cap)}, at {data_dir}')
 
     # Load and clean CBP
-    cbp = load_cbp(path_cbp_80_92, path_cbp_93_114)
-    cbp.to_csv(os.path.join(data_dir, "cbp2.csv"), index=False)
-    cbp = clean_cbp(cbp)
+    cbp = get_cbp(path_cbp_80_92, path_cbp_93_114)
     cbp.to_csv(os.path.join(data_dir, "cbp.csv"), index=False)
     print(f'Saved cbp.csv, n = {len(cbp)}, at {data_dir}')
 
     # Merge CAP and CBP data
     bills = merge_cap_cbp(cap, cbp)
     bills.to_csv(os.path.join(data_dir, "bills.csv"), index=False)
-    print(f'Saved bills.csv, n = {len(bills)}, at {data_dir}')
+    print(f'Saved bills.csv, n = {len(bills)}, at {data_dir}') # n = 228,387
 
     # Draw 10k bills and 5*3=15 bill examples used for few-shot prompts.
     bills_10k, bills_examples = sample_bills(bills, n_examples = 15, seed = 123)
-    bills_10k.to_csv(os.path.join(data_dir, 'bills_10k.csv'), index=False)
-    print(f'Saved bills_10k.csv, n = {len(bills_10k)}, at {data_dir}')
 
     # Split the 15 examples into 3 sets for the 3 few-shot prompts
     bills_examples['ExampleSetNum'] = np.repeat([1, 2, 3], repeats=15/3)
     bills_examples.to_csv(os.path.join(data_dir, 'bills_examples.csv'), index=False)
     print(f'Saved bills_examples.csv, n = {len(bills_examples)}, at {data_dir}')
+
+    # Save 10K bills data
+    bills_10k.to_csv(os.path.join(data_dir, 'bills_10k.csv'), index=False)
+    print(f'Saved bills_10k.csv, n = {len(bills_10k)}, at {data_dir}')
 
     # Plot the frequency of the 10K bills over years
     plt.figure(figsize=(10, 6))
@@ -283,6 +275,5 @@ def main():
     plt.savefig(os.path.join(fig_dir, 'A histogram of the frequency of the 10K bills over years.png'))
     print(f'Saved figures at {fig_dir}')
 
-# Run the main function when the script is executed
 if __name__ == "__main__":
     main()
