@@ -16,9 +16,8 @@ thought_modifiers = [
 explanation = '\n____ fill in with explanation (less than 25 words)'
 explanation_json = ',\n"explanation": one sentence explanation for your headline type answer}'
 
-
 economic_questions = ["1", "2", "3", "4", "5"]
-return_types = ["realized", "CAPM", "FF3"]
+return_types = ["realized", "abnormal_CAPM", "abnormal_FF3"]
 years = ["19"]
 month_batches = ["jan", "feb", "mar", "apr", "may", "jun", "jul", 
                  "aug", "sep", "octfirst", "octsecond", "nov", "dec"]
