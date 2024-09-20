@@ -11,8 +11,8 @@ rm(list = ls())
 
 # Define the questions list
 questions <- c("q1", "q2", "q3", "q4", "q5")
-return_type <- "CAPM"
-models <- c("gpt-3.5-turbo")
+return_type <- "realized"
+models <- c("gpt-4o")
 
 # List of file names
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", 
@@ -34,7 +34,7 @@ for (q in questions) {
     question <- q
     model <- m
     
-    path <- paste0("../../data/step6_common_sample/", 
+    path <- paste0("../../data/step6_common_sample/across_models/", 
                    return_type, 
                    "/", 
                    model, 
@@ -81,7 +81,7 @@ for (q in questions) {
                     color = TextColor),  
                 size = 3, show.legend = FALSE) +  
       scale_fill_viridis_c(option = "rocket", direction = -1, 
-                           limits = c(0, 100)) + 
+                           limits = c(60, 100)) + 
       scale_color_identity() + 
       labs(title = paste("Headline Type Pairwise Agreement -", 
                          question, "-", model),
@@ -98,4 +98,4 @@ for (q in questions) {
 }
 
 # Change index as needed to display/save plot of interest
-plot_list[[1]]
+plot_list[[5]]

@@ -61,9 +61,9 @@ plot_lists <- list(freq = list(), conf = list(),
                    mag_split = list())
 
 # Define questions and models to iterate over
-questions <- c("q1", "q2", "q3", "q4")
+questions <- c("q1", "q2", "q3", "q4", "q5")
 models <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
-return_type <- "CAPM"
+return_type <- "abnormal_CAPM"
 
 # Loop over each combination of question and model
 for (question in questions) {
@@ -75,11 +75,12 @@ for (question in questions) {
     
     # Print the current model and question being processed
     cat(model, question, "\n")
-    
+  
     # Define the file path based on the current model and question
-    path <- paste0("../../data/step6_common_sample/", return_type, "/", 
+    path <- paste0("../data/step6_common_sample/across_models/", return_type, "/", 
                    model, "/", question, "/")
     
+
     # Read in data sets for various prompting strategies
     datasets <- lapply(c("base_blanks", "base_json", "cot1", "cot2", 
                          "cot3", "persona1", "persona2", "persona3", 

@@ -58,7 +58,7 @@ file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3",
 
 # Define the questions list, return type, and list of models we are comparing
 questions <- c("q1", "q2", "q3", "q4", "q5")
-return_type = "FF3"
+return_type = "abnormal_FF3"
 models = c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
 
 # Placeholder lists for regression results and standard errors
@@ -80,7 +80,7 @@ for (q in 1:length(questions)) {
     cat(model, question, "\n")
     
     # Define the file path based on the current model and question
-    path <- glue("../../data/step6_common_sample/{return_type}/{model}/{question}/")
+    path <- glue("../../data/step6_common_sample/across_models/{return_type}/{model}/{question}/")
     
     # Read in data sets for various prompting strategies
     data_list <- lapply(c("base_blanks", "base_json", "cot1", "cot2", 
@@ -541,7 +541,8 @@ ggplot() +
                filter(model == "gpt-4o"),
              aes(x = id, y = up.tstat, color = "gpt-4o, base"),
              size = 2) +
-  labs(y = "t-statistic", color = "Model") +
+  labs(y = "t-statistic", color = "Model",
+       title = glue("Positive/Up T-Statistic by Prompt Strategy for {return_type} Returns")) +
   
   scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", 
                                 "gpt-4o-mini, base" = "#0072B2",  
@@ -620,8 +621,8 @@ pos_retcomp <- ggplot() +
                                 "gpt-3.5-turbo" = "#D81B60", 
                                 "gpt-4o" = "green4")) +
   labs(y = "t-statistic",
-       title = glue("`Up` T-statistic Comparison by Returns Horizon for 
-                    Abnormal Returns Under {return_type}")) +
+       title = glue("Postive/Up T-statistic Comparison by Returns Horizon for 
+                    {return_type} Returns")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),
@@ -691,7 +692,8 @@ ggplot() +
                filter(model == "gpt-4o"),
              aes(x = id, y = down.tstat, color = "gpt-4o, base"),
              size = 2) +
-  labs(y = "t-statistic", color = "Model") +
+  labs(y = "t-statistic", color = "Model",
+       title = glue("Negative/Down T-Statistic by Prompt Strategy for {return_type} Returns")) +
   
   scale_color_manual(values = c("gpt-3.5-turbo, base" = "#D81B60", 
                                 "gpt-4o-mini, base" = "#0072B2",  
@@ -770,8 +772,8 @@ neg_retcomp <- ggplot() +
                                 "gpt-3.5-turbo" = "#D81B60", 
                                 "gpt-4o" = "green4")) +
   labs(y = "t-statistic",
-       title = glue("`Down` T-statistic Comparison by Returns Horizon for 
-                    Abnormal Returns Under {return_type}")) +
+       title = glue("Negative/Down T-statistic Comparison by Returns Horizon for 
+                    {return_type} Returns")) +
   theme_bw() +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_blank(),

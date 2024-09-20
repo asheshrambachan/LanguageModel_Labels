@@ -12,14 +12,13 @@ library(gridExtra)
 rm(list = ls())
 
 # Define lists of questions, models, and months to iterate over
-questions <- c("q1", "q2", "q3", "q4", "q5")
-models <- c("gpt-4o")
+questions <- c("q1")
+models <- c("gpt-3.5-turbo")
 months <- c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
             "octfirst", "octsecond", "nov", "dec")
 
-# Define return type: "FF3" for abnormal returns or "cumulative" 
-# for cumulative returns
-return_type <- "CAPM"
+# Define return type: "abnormal_FF3" or "abnormal_CAPM" for abnormal returns or "realized" 
+return_type <- "abnormal_CAPM"
 
 # Function to calculate cumulative abnormal returns (CAR)
 calculate_CAR <- function(df) {
@@ -42,7 +41,7 @@ read_combine_filter <- function(file_name, months, question, return_type) {
     read.csv(file_path)
   }))
   
-  if (return_type == "cumulative") {
+  if (return_type == "realized") {
     combined_df %>%
       filter(!is.na(ret_fd1) & !is.na(ret_fd5) & !is.na(ret_fd10)) %>%
       filter(!is.na(ret_ld1) & !is.na(ret_ld2) & !is.na(ret_ld3)) %>%
@@ -113,7 +112,7 @@ for (question in questions) {
     
     # Save the cleaned data sets
     lapply(file_names, function(file_name) {
-      write.csv(get(file_name), paste0("../data/step6_common_sample/", 
+      write.csv(get(file_name), paste0("../data/step6_common_sample/within_model/", 
                                        return_type, "/", model, "/", 
                                        question, "/", file_name, ".csv"))
     })
