@@ -55,7 +55,7 @@ require(lemon)
 # names(pdfFonts()) # uncomment to get list of fonts
 loadfonts(quiet=T)
 
-my_palette <- c("red"="#F85427", "blue"="#277BB6", "green"="#97BD59", "yellow"="#FFD166", "black"="#262626", "gray"="#605856")
+my_palette <- c("red"="#F85427", "blue"="#277BB6", "green"="#97BD59", "yellow"="#FFD166", "black"="#262626", "gray"="#605856", "lightgray"="#EBEBEB")
 my_colors <- c(
   "star" = my_palette[["red"]], 
   "gpt-3.5" =  my_palette[["green"]],
@@ -136,7 +136,7 @@ accuracy <- bills_prompts_responses %>%
   theme.bar
 
 accuracy
-ggsave(file.path(fig_dir,"results fig01 Accuracy of Topic Predictions vs. Prompt.png"), height=3.5, width=4)
+ggsave(file.path(fig_dir,"results fig01, Accuracy of Topic Predictions vs. Prompt.png"), height=3.5, width=4)
 ```
 
 \clearpage
@@ -265,7 +265,7 @@ bias1 <- regressions.averaged %>%
   geom_vline(xintercept=0, color=my_palette[["black"]], linewidth=0.2) +
   geom_histogram(bins=30, color="white") +
   
-  geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
+  geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
   facet_grid(. ~ proportion, labeller=facet.labeller) +
   
   xlab("Bias") +
@@ -292,7 +292,7 @@ bias1_norm <- regressions.averaged %>%
              group=regression, fill=regression)) +
   geom_vline(xintercept=0, color=my_palette[["black"]], linewidth=0.2) +
   geom_histogram(bins=30, color="white") +
-  geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
+  geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
   facet_grid(. ~ proportion, labeller=facet.labeller) +
   
   xlab("Normalized Bias") +
