@@ -138,15 +138,15 @@ stat.pivot(index='UniqueMajorLLM', columns='Model', values='Share').plot(
 
 plt.savefig(os.path.join(fig_dir, 'A histogram of unique LLM labels in few-shot prompts only.png'))
 
-bills_prompts_responses = pd.read_csv(bills_prompts_responses_path)
-bills_prompts_responses["CorrectMajorLLM"] = bills_prompts_responses["Major"] == bills_prompts_responses["MajorLLM"]
-stat = bills_prompts_responses.groupby(["PromptingStrategyID", "PromptingStrategyName", "Model"]).agg(
-    ShareCorrectMajorLLM = ("CorrectMajorLLM", "mean")
-).reset_index().pivot(index='PromptingStrategyID', columns='Model', values='ShareCorrectMajorLLM').plot(
-    kind="bar", 
-    title=f'Accuracy of LLM major topic labels',
-    xlabel='Prompt Modification',
-    ylabel='Share of bills with correct LLM major topic label',
-    ylim=(0,1)) 
+# bills_prompts_responses = pd.read_csv(bills_prompts_responses_path)
+# bills_prompts_responses["CorrectMajorLLM"] = bills_prompts_responses["Major"] == bills_prompts_responses["MajorLLM"]
+# stat = bills_prompts_responses.groupby(["PromptingStrategyID", "PromptingStrategyName", "Model"]).agg(
+#     ShareCorrectMajorLLM = ("CorrectMajorLLM", "mean")
+# ).reset_index().pivot(index='PromptingStrategyID', columns='Model', values='ShareCorrectMajorLLM').plot(
+#     kind="bar", 
+#     title=f'Accuracy of LLM major topic labels',
+#     xlabel='Prompt Modification',
+#     ylabel='Share of bills with correct LLM major topic label',
+#     ylim=(0,1)) 
 
-plt.savefig(os.path.join(fig_dir, 'Accuracy of LLM major topic labels.png'))
+# plt.savefig(os.path.join(fig_dir, 'Accuracy of LLM major topic labels.png'))

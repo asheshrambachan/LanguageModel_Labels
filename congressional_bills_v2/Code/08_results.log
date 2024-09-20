@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.19)  20 SEP 2024 12:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.8.19)  20 SEP 2024 13:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -724,11 +724,11 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 91.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig1_fig_accuracy-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/fig1_fig_accuracy-1.pdf, id=4, 289.08pt x 252.945pt>
-File: 08_results_files/figure-latex/fig1_fig_accuracy-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/fig1_fig_accuracy-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/fig1_fig_accuracy-1.pdf  used on input line 94.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig01_accuracy-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig01_accuracy-1.pdf, id=4, 289.08pt x 252.945pt>
+File: 08_results_files/figure-latex/fig01_accuracy-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig01_accuracy-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig01_accuracy-1.pdf  used on input line 94.
 (pdftex.def)             Requested size: 289.0837pt x 252.94823pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 99.
@@ -736,13 +736,13 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 
 [1
 
-{/Users/haya1/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc} <./08_results_files/figure-latex/fig1_fig_accuracy-1.pdf>]
+{/Users/haya1/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/Users/haya1/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc} <./08_results_files/figure-latex/fig01_accuracy-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf, id=30, 650.43pt x 397.485pt>
-File: 08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf  used on input line 107.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig02_lhs_coef-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig02_lhs_coef-1.pdf, id=30, 650.43pt x 397.485pt>
+File: 08_results_files/figure-latex/fig02_lhs_coef-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig02_lhs_coef-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig02_lhs_coef-1.pdf  used on input line 107.
 (pdftex.def)             Requested size: 469.76817pt x 287.08055pt.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <10> on input line 111.
@@ -750,85 +750,85 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <7> on input line 111.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf, id=31, 650.43pt x 397.485pt>
-File: 08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf  used on input line 116.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig03_lhs_tscore-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig03_lhs_tscore-1.pdf, id=31, 650.43pt x 397.485pt>
+File: 08_results_files/figure-latex/fig03_lhs_tscore-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig03_lhs_tscore-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig03_lhs_tscore-1.pdf  used on input line 116.
 (pdftex.def)             Requested size: 469.76817pt x 287.08055pt.
 
 
 [2
 
- <./08_results_files/figure-latex/fig2_lhs_fig_coef-1.pdf>]
+ <./08_results_files/figure-latex/fig02_lhs_coef-1.pdf>]
 
-[3 <./08_results_files/figure-latex/fig3_lhs_fig_tscore-1.pdf>]
+[3 <./08_results_files/figure-latex/fig03_lhs_tscore-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf, id=69, 578.16pt x 216.81pt>
-File: 08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf  used on input line 127.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig04_lhs_bias1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig04_lhs_bias1-1.pdf, id=69, 578.16pt x 216.81pt>
+File: 08_results_files/figure-latex/fig04_lhs_bias1-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig04_lhs_bias1-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig04_lhs_bias1-1.pdf  used on input line 127.
 (pdftex.def)             Requested size: 469.75385pt x 176.15768pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf, id=70, 578.16pt x 216.81pt>
-File: 08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf  used on input line 136.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf, id=70, 578.16pt x 216.81pt>
+File: 08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf  used on input line 136.
 (pdftex.def)             Requested size: 469.75385pt x 176.15768pt.
 
 
 [4
 
- <./08_results_files/figure-latex/fig4_lhs_fig_bias1-1.pdf>]
+ <./08_results_files/figure-latex/fig04_lhs_bias1-1.pdf>]
 
-[5 <./08_results_files/figure-latex/fig5_lhs_fig_bias1_norm-1.pdf>]
+[5 <./08_results_files/figure-latex/fig05_lhs_bias1_norm-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/lhs_fig_bias2-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/lhs_fig_bias2-1.pdf, id=98, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/lhs_fig_bias2-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/lhs_fig_bias2-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/lhs_fig_bias2-1.pdf  used on input line 147.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig06_lhs_bias2-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig06_lhs_bias2-1.pdf, id=98, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/fig06_lhs_bias2-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig06_lhs_bias2-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig06_lhs_bias2-1.pdf  used on input line 147.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf, id=99, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf  used on input line 156.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf, id=99, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf  used on input line 156.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
 [6
 
- <./08_results_files/figure-latex/lhs_fig_bias2-1.pdf>]
+ <./08_results_files/figure-latex/fig06_lhs_bias2-1.pdf>]
 
-[7 <./08_results_files/figure-latex/lhs_fig_bias2_norm-1.pdf>]
+[7 <./08_results_files/figure-latex/fig07_lhs_bias2_norm-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/lhs_fig_mse1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/lhs_fig_mse1-1.pdf, id=127, 578.16pt x 216.81pt>
-File: 08_results_files/figure-latex/lhs_fig_mse1-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/lhs_fig_mse1-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/lhs_fig_mse1-1.pdf  used on input line 167.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig08_lhs_mse1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig08_lhs_mse1-1.pdf, id=127, 578.16pt x 216.81pt>
+File: 08_results_files/figure-latex/fig08_lhs_mse1-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig08_lhs_mse1-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig08_lhs_mse1-1.pdf  used on input line 167.
 (pdftex.def)             Requested size: 469.75385pt x 176.15768pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/lhs_fig_mse2-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/lhs_fig_mse2-1.pdf, id=128, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/lhs_fig_mse2-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/lhs_fig_mse2-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/lhs_fig_mse2-1.pdf  used on input line 176.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/fig09_lhs_mse2-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/fig09_lhs_mse2-1.pdf, id=128, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/fig09_lhs_mse2-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/fig09_lhs_mse2-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/fig09_lhs_mse2-1.pdf  used on input line 176.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
 [8
 
- <./08_results_files/figure-latex/lhs_fig_mse1-1.pdf>]
+ <./08_results_files/figure-latex/fig08_lhs_mse1-1.pdf>]
 
-[9 <./08_results_files/figure-latex/lhs_fig_mse2-1.pdf>]
+[9 <./08_results_files/figure-latex/fig09_lhs_mse2-1.pdf>]
 
 [10]
 
@@ -840,255 +840,255 @@ Package pdftex.def Info: 08_results_files/figure-latex/lhs_fig_mse2-1.pdf  used 
 
 [14]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_coef-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_coef-1.pdf, id=186, 650.43pt x 397.485pt>
-File: 08_results_files/figure-latex/rhs_fig_coef-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_coef-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_coef-1.pdf  used on input line 431.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_coef-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_coef-1.pdf, id=186, 650.43pt x 397.485pt>
+File: 08_results_files/figure-latex/rhs_coef-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_coef-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_coef-1.pdf  used on input line 431.
 (pdftex.def)             Requested size: 469.76817pt x 287.08055pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_tscore-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_tscore-1.pdf, id=187, 650.43pt x 397.485pt>
-File: 08_results_files/figure-latex/rhs_fig_tscore-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_tscore-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_tscore-1.pdf  used on input line 440.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_tscore-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_tscore-1.pdf, id=187, 650.43pt x 397.485pt>
+File: 08_results_files/figure-latex/rhs_tscore-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_tscore-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_tscore-1.pdf  used on input line 440.
 (pdftex.def)             Requested size: 469.76817pt x 287.08055pt.
 
 
 [15
 
 
- <./08_results_files/figure-latex/rhs_fig_coef-1.pdf>]
+ <./08_results_files/figure-latex/rhs_coef-1.pdf>]
 
-[16 <./08_results_files/figure-latex/rhs_fig_tscore-1.pdf>]
+[16 <./08_results_files/figure-latex/rhs_tscore-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias1-1.pdf, id=223, 578.16pt x 650.43pt>
-File: 08_results_files/figure-latex/rhs_fig_bias1-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias1-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias1-1.pdf  used on input line 451.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias1-1.pdf, id=223, 578.16pt x 650.43pt>
+File: 08_results_files/figure-latex/rhs_bias1-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias1-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias1-1.pdf  used on input line 451.
 (pdftex.def)             Requested size: 469.75385pt x 528.47307pt.
 
 LaTeX Warning: Float too large for page by 19.84885pt on input line 456.
 
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf, id=224, 578.16pt x 650.43pt>
-File: 08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf  used on input line 460.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias1_norm-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias1_norm-1.pdf, id=224, 578.16pt x 650.43pt>
+File: 08_results_files/figure-latex/rhs_bias1_norm-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias1_norm-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias1_norm-1.pdf  used on input line 460.
 (pdftex.def)             Requested size: 469.75385pt x 528.47307pt.
 
 
-[17 <./08_results_files/figure-latex/rhs_fig_bias1-1.pdf>]
+[17 <./08_results_files/figure-latex/rhs_bias1-1.pdf>]
 
-[18 <./08_results_files/figure-latex/rhs_fig_bias1_norm-1.pdf>]
+[18 <./08_results_files/figure-latex/rhs_bias1_norm-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf, id=251, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf  used on input line 471.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_3-1.pdf, id=251, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_3-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_3-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_3-1.pdf  used on input line 471.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf, id=252, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf  used on input line 480.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_14-1.pdf, id=252, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_14-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_14-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_14-1.pdf  used on input line 480.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf, id=253, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf  used on input line 489.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_15-1.pdf, id=253, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_15-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_15-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_15-1.pdf  used on input line 489.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf, id=254, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf  used on input line 498.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_19-1.pdf, id=254, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_19-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_19-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_19-1.pdf  used on input line 498.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf, id=255, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf  used on input line 507.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_20-1.pdf, id=255, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_20-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_20-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_20-1.pdf  used on input line 507.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf, id=256, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf  used on input line 516.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_Other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_Other-1.pdf, id=256, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_Other-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_Other-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_Other-1.pdf  used on input line 516.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
 [19
 
 
- <./08_results_files/figure-latex/rhs_fig_bias2_3-1.pdf>]
+ <./08_results_files/figure-latex/rhs_bias2_3-1.pdf>]
 
-[20 <./08_results_files/figure-latex/rhs_fig_bias2_14-1.pdf> <./08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf
+[20 <./08_results_files/figure-latex/rhs_bias2_14-1.pdf> <./08_results_files/figure-latex/rhs_bias2_15-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_15-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_15-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[21 <./08_results_files/figure-latex/rhs_fig_bias2_19-1.pdf> <./08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf
+[21 <./08_results_files/figure-latex/rhs_bias2_19-1.pdf> <./08_results_files/figure-latex/rhs_bias2_20-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_20-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_20-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[22 <./08_results_files/figure-latex/rhs_fig_bias2_Other-1.pdf>]
+[22 <./08_results_files/figure-latex/rhs_bias2_Other-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf, id=327, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf  used on input line 527.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf, id=327, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf  used on input line 527.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf, id=328, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf  used on input line 536.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf, id=328, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf  used on input line 536.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf, id=329, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf  used on input line 545.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf, id=329, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf  used on input line 545.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf, id=330, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf  used on input line 554.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf, id=330, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf  used on input line 554.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf, id=331, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf  used on input line 563.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf, id=331, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf  used on input line 563.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf, id=332, 578.16pt x 325.215pt>
-File: 08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf  used on input line 572.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf, id=332, 578.16pt x 325.215pt>
+File: 08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf  used on input line 572.
 (pdftex.def)             Requested size: 469.75385pt x 264.23653pt.
 
 
 [23
 
- <./08_results_files/figure-latex/rhs_fig_bias2_norm_3-1.pdf>]
+ <./08_results_files/figure-latex/rhs_bias2_norm_3-1.pdf>]
 
-[24 <./08_results_files/figure-latex/rhs_fig_bias2_norm_14-1.pdf> <./08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf
+[24 <./08_results_files/figure-latex/rhs_bias2_norm_14-1.pdf> <./08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_15-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_15-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[25 <./08_results_files/figure-latex/rhs_fig_bias2_norm_19-1.pdf> <./08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf
+[25 <./08_results_files/figure-latex/rhs_bias2_norm_19-1.pdf> <./08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_bias2_norm_20-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_bias2_norm_20-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[26 <./08_results_files/figure-latex/rhs_fig_bias2_norm_Other-1.pdf>]
+[26 <./08_results_files/figure-latex/rhs_bias2_norm_Other-1.pdf>]
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse1-1.pdf, id=402, 578.16pt x 794.97pt>
-File: 08_results_files/figure-latex/rhs_fig_mse1-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse1-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse1-1.pdf  used on input line 583.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse1-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse1-1.pdf, id=402, 578.16pt x 794.97pt>
+File: 08_results_files/figure-latex/rhs_mse1-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse1-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse1-1.pdf  used on input line 583.
 (pdftex.def)             Requested size: 469.75385pt x 645.91154pt.
 
 LaTeX Warning: Float too large for page by 17.48154pt on input line 588.
 
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf, id=403, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf  used on input line 592.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_3-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_3-1.pdf, id=403, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_3-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_3-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_3-1.pdf  used on input line 592.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf, id=404, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf  used on input line 601.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_14-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_14-1.pdf, id=404, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_14-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_14-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_14-1.pdf  used on input line 601.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf, id=405, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf  used on input line 610.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_15-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_15-1.pdf, id=405, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_15-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_15-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_15-1.pdf  used on input line 610.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf, id=406, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf  used on input line 619.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_19-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_19-1.pdf, id=406, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_19-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_19-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_19-1.pdf  used on input line 619.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf, id=407, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf  used on input line 628.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_20-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_20-1.pdf, id=407, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_20-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_20-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_20-1.pdf  used on input line 628.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
-<08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf, id=408, 578.16pt x 289.08pt>
-File: 08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf Graphic file (type pdf)
-<use 08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf>
-Package pdftex.def Info: 08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf  used on input line 637.
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_other-1.pdf): PDF inclusion: found PDF version <1.7>, but at most version <1.5> allowed
+<08_results_files/figure-latex/rhs_mse2_other-1.pdf, id=408, 578.16pt x 289.08pt>
+File: 08_results_files/figure-latex/rhs_mse2_other-1.pdf Graphic file (type pdf)
+<use 08_results_files/figure-latex/rhs_mse2_other-1.pdf>
+Package pdftex.def Info: 08_results_files/figure-latex/rhs_mse2_other-1.pdf  used on input line 637.
 (pdftex.def)             Requested size: 469.75385pt x 234.8769pt.
 
 
-[27 <./08_results_files/figure-latex/rhs_fig_mse1-1.pdf>]
+[27 <./08_results_files/figure-latex/rhs_mse1-1.pdf>]
 
-[28 <./08_results_files/figure-latex/rhs_fig_mse2_3-1.pdf> <./08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf
+[28 <./08_results_files/figure-latex/rhs_mse2_3-1.pdf> <./08_results_files/figure-latex/rhs_mse2_14-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_14-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_14-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[29 <./08_results_files/figure-latex/rhs_fig_mse2_15-1.pdf> <./08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf
+[29 <./08_results_files/figure-latex/rhs_mse2_15-1.pdf> <./08_results_files/figure-latex/rhs_mse2_19-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_19-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_19-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
-[30 <./08_results_files/figure-latex/rhs_fig_mse2_20-1.pdf> <./08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf
+[30 <./08_results_files/figure-latex/rhs_mse2_20-1.pdf> <./08_results_files/figure-latex/rhs_mse2_other-1.pdf
 
-pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_fig_mse2_other-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ./08_results_files/figure-latex/rhs_mse2_other-1.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
 
 [31]
@@ -1164,14 +1164,14 @@ LaTeX Warning: There were multiply-defined labels.
  ) 
 Here is how much of TeX's memory you used:
  15048 strings out of 475539
- 250799 string characters out of 5776751
+ 249809 string characters out of 5776751
  2453957 words of memory out of 5000000
  37297 multiletter control sequences out of 15000+600000
  610183 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  89i,13n,93p,1631b,520s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Users/haya1/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on 08_results.pdf (62 pages, 856511 bytes).
+Output written on 08_results.pdf (62 pages, 856461 bytes).
 PDF statistics:
  785 PDF objects out of 1000 (max. 8388607)
  583 compressed objects within 6 object streams
