@@ -4,7 +4,6 @@ from openai import OpenAI
 import numpy as np
 import json
 from dotenv import load_dotenv
-import re
 import tiktoken
 from copy import deepcopy
 
@@ -12,31 +11,8 @@ from copy import deepcopy
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
-
-MAJOR_TEXT = {
-    1: "Macroeconomics",
-    2: "Civil Rights, Minority Issues, and Civil Liberties",
-    3: "Health",
-    4: "Agriculture",
-    5: "Labor and Employment",
-    6: "Education",
-    7: "Environment",
-    8: "Energy",
-    9: "Immigration",
-    10: "Transportation",
-    11: "Law, Crime, and Family Issues",
-    12: "Social Welfare",
-    13: "Community Development and Housing Issues",
-    14: "Banking, Finance, and Domestic Commerce",
-    15: "Defense",
-    16: "Space, Science, Technology, and Communications",
-    17: "Foreign Trade",
-    18: "International Affairs and Foreign Aid",
-    19: "Government Operations",
-    20: "Public Lands and Water Management"
-}
-
-CATEGORIES = "\n".join([f"{int(major)}. {text}" for major, text in MAJOR_TEXT.items()])
+MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/Codebooks/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
+CATEGORIES = "\n".join([f"{int(major)}. {text}" for major, text in MAJOR_CODE.items()])
 
 QUESTION =f"""Here is a description of a bill introduced in the U.S. Congress:
 "{{0}}"
@@ -46,25 +22,25 @@ Please classify this description into one of the following categories:
 """
 
 ANSWER_JSON = f"""Output a JSON object structured like: {{{{
-    "Category": an integer from {min(MAJOR_TEXT.keys())} to {max(MAJOR_TEXT.keys())} that best represents the bill category,
+    "Category": an integer from {min(MAJOR_CODE.keys())} to {max(MAJOR_CODE.keys())} that best represents the bill category,
     "Confidence": confidence level in the bill classification as a number between 0 to 1 with 2 decimal places
 }}}}
 """
 
 ANSWER_JSON_EXPLANATION = f"""Output a JSON object structured like: {{{{
-    "Category": an integer from {min(MAJOR_TEXT.keys())} to {max(MAJOR_TEXT.keys())} that best represents the bill category,
+    "Category": an integer from {min(MAJOR_CODE.keys())} to {max(MAJOR_CODE.keys())} that best represents the bill category,
     "Confidence": confidence level in the bill classification as a number between 0 to 1 with 2 decimal places,
     "Explanation": a one-sentence explanation for your chosen bill category
 }}}}
 """
 
 ANSWER_BLANKS = f"""Write your answer as:
-____ (fill in with an integer from {min(MAJOR_TEXT.keys())} to {max(MAJOR_TEXT.keys())} that best represents the bill category),
+____ (fill in with an integer from {min(MAJOR_CODE.keys())} to {max(MAJOR_CODE.keys())} that best represents the bill category),
 ____ (fill in with confidence level in the bill classification as a number between 0 to 1 with 2 decimal places)
 """
 
 ANSWER_BLANKS_EXPLANATION = f"""Write your answer as:
-____ (fill in with an integer from {min(MAJOR_TEXT.keys())} to {max(MAJOR_TEXT.keys())} that best represents the bill category),
+____ (fill in with an integer from {min(MAJOR_CODE.keys())} to {max(MAJOR_CODE.keys())} that best represents the bill category),
 ____ (fill in with confidence level in the bill classification as a number between 0 to 1 with 2 decimal places),
 ____ (fill in with a one-sentence explanation for your chosen bill category)
 """
@@ -149,8 +125,6 @@ def create_messages(strategy, bills_examples, min_confidence=0.9, max_confidence
     message_user = {"role": "user", "content": message_user_content}
     messages.append(message_user)
     return messages
-
-
 
 def create_prompts(prompting_strategies, bills, bills_examples):
     prompting_strategies_json = []

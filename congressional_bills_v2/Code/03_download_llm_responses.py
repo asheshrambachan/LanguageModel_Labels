@@ -25,7 +25,6 @@ def download_batched_responses(batches, out_dir):
     for _, batch in batches.iterrows():
         file = batch['file']
         batch_id = batch['id']
-        part = batch['part']
         batch_status = client.batches.retrieve(batch_id)
         
         if batch_status.status != "completed":
@@ -38,11 +37,11 @@ def download_batched_responses(batches, out_dir):
         responses_batched_path = os.path.join(out_dir, file.replace("prompts", "responses"))
         responses_batched.write_to_file(responses_batched_path)
 
-        # if not part 1, we correct the ID as it shouldn't start from 1
-        if (part!=1):
-            responses_batched = pd.read_json(responses_batched_path, lines=True)
-            responses_batched["custom_id"] = responses_batched["custom_id"].apply(lambda x: "ID_" + str(int(x[3:]) + int(1000*24))) 
-            responses_batched.to_json(responses_batched_path, orient='records', lines=True)
+        # # if not part 1, we correct the ID as it shouldn't start from 1
+        # if (batch['part']!=1):
+        #     responses_batched = pd.read_json(responses_batched_path, lines=True)
+        #     responses_batched["custom_id"] = responses_batched["custom_id"].apply(lambda x: "ID_" + str(int(x[3:]) + int(1000*24))) 
+        #     responses_batched.to_json(responses_batched_path, orient='records', lines=True)
 
         print(f"Saved {os.path.basename(responses_batched_path)}, n = {len(responses_batched)}, at {os.path.dirname(responses_batched_path)}")
         responses_batched_paths.append(responses_batched_path)

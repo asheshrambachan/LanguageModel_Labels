@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from copy import deepcopy
 
 REPO_DIR = '/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2'
+MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/Codebooks/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):
     # Load CAP data from path
@@ -26,6 +27,9 @@ def get_cap(path_cap):
         'name_full': 'NameFull'
         }, inplace=True)
 
+    # Remove duplicates based on bill ID
+    cap.drop_duplicates(subset='BillID', inplace=True)
+
     # Correct chamber encoding for the 114th congress
     if ~((cap.loc[cap['Cong']==114, 'Chamber'].unique()) == [1,2]).all():
         cap.loc[cap['Cong']==114, 'Chamber'] = cap.loc[cap['Cong']==114, 'Chamber'] + 1
@@ -40,13 +44,10 @@ def get_cap(path_cap):
     # Drop bills with missing data
     cap.dropna(inplace=True)
 
-    # Remove duplicates based on bill ID
-    cap.drop_duplicates(subset='BillID', inplace=True)
-
     # Make Major, PassH and PassS integers
-    cap['Major']  = cap['Major'].apply(lambda x: int(x))
-    cap['PassH']  = cap['PassH'].apply(lambda x: int(x))
-    cap['PassS']  = cap['PassS'].apply(lambda x: int(x))
+    cap['Major'] = cap['Major'].apply(lambda x: int(x))
+    cap['PassH'] = cap['PassH'].apply(lambda x: int(x))
+    cap['PassS'] = cap['PassS'].apply(lambda x: int(x))
 
     # # Correct Description
     # cap['Description'] = cap['Description'].str.replace(r'[_]|[?"]{2,}|[`]|[\']', '', regex=True)
@@ -74,19 +75,18 @@ def get_cbp(path_cbp_80_92, path_cbp_93_114):
     cbp['BillID'] = cbp['Cong'].astype(str) + '-' + cbp['BillType'] + '-' + cbp['BillNum'].astype(str) 
 
     # Remove duplicates in CBP based on BillID, keeping the bill with Major code similar to that in CAP
-    cbp.drop_duplicates(subset=['BillID', 'Major'], inplace=True)
     condition = (
         ((cbp['BillID']=="107-HR-5715") & (cbp['Major']!=12)) |
         ((cbp['BillID']=="107-S-3051") & (cbp['Major']!=9)) |
         ((cbp['BillID']=="107-S-3160") & (cbp['Major']!=15))
     ) # These are bills with Major_CBP != Major_CAP
     cbp = cbp[~condition]
-        
+    cbp.drop_duplicates(subset=['BillID'], inplace=True)
+     
     # Impute missing DW1 scores
     cbp['DW1_NA'] = cbp['DW1']
     dw1 = cbp.groupby(['NameFull', 'DW1'], group_keys=True).first()['DW1_NA'] 
     dw1_mean = dw1.mean()
-    # print(dw1_mean)
     cbp.fillna(value={'DW1': dw1_mean}, inplace=True)
 
     # Keep columns we need
@@ -111,18 +111,29 @@ def description_mismatch(d1, d2):
     description_cbp = description_cbp.apply(lambda x: x.lower())
     description_cap = description_cap.apply(lambda x: x.lower())
 
-    description_cbp = description_cbp.str.replace("'s", "s") 
-    description_cbp = description_cbp.str.replace(r'[?"]{2,}|[`]', '', regex=True)
-    description_cap = description_cap.str.replace("'s", "s") 
-    description_cap = description_cap.str.replace(r'_\?\?|["]{2,}|[`]', '', regex=True) # 1 to 8 times in the 10K sample
+    # description_cbp = description_cbp.str.replace("'s", "s") 
+    # description_cbp = description_cbp.str.replace(r'[?"]{2,}|[`]', '', regex=True)
+    # description_cap = description_cap.str.replace("'s", "s") 
+    # description_cap = description_cap.str.replace(r'_\?\?|["]{2,}|[`]', '', regex=True) # 1 to 8 times in the 10K sample
     
+    description_cbp = description_cbp.str.replace('??????', '')
+    description_cbp = description_cbp.str.replace('???', '')
+    description_cbp = description_cbp.str.replace('""""', '')
+    description_cbp = description_cbp.str.replace('`', '')
+    description_cbp = description_cbp.str.replace("'s", "s") 
+
+    description_cap = description_cap.str.replace('_??', '')
+    description_cap = description_cap.str.replace('""""', '')
+    description_cap = description_cap.str.replace('`', '')
+    description_cap = description_cap.str.replace("'s", "s") 
+
     condition = description_cap!=description_cbp
     description_cbp[condition] = description_cbp[condition].str.replace('\' ', ' ')
     description_cbp[condition] = description_cbp[condition].str.replace(' \'', ' ')
     description_cap[condition] = description_cap[condition].str.replace('\' ', ' ')
-    description_cap[condition] = description_cap[condition].str.replace(' \'', ' ')
+    description_cap[condition] = description_cap[condition] .str.replace(' \'', ' ')
     description_cap[condition] = description_cap[condition].str.replace("'", "")
-
+    
     condition = description_cap!=description_cbp
     return condition
 
@@ -165,31 +176,7 @@ def merge_cap_cbp(cap, cbp):
         21: 20
     }
     bills['Major'] = bills['Major'].apply(lambda x: major_PAP2Ours[x])
-
-    # Add MajorText column 
-    major_code = {
-        1: "Macroeconomics",
-        2: "Civil Rights, Minority Issues, and Civil Liberties",
-        3: "Health",
-        4: "Agriculture",
-        5: "Labor and Employment",
-        6: "Education",
-        7: "Environment",
-        8: "Energy",
-        9: "Immigration",
-        10: "Transportation",
-        11: "Law, Crime, and Family Issues",
-        12: "Social Welfare",
-        13: "Community Development and Housing Issues",
-        14: "Banking, Finance, and Domestic Commerce",
-        15: "Defense",
-        16: "Space, Science, Technology, and Communications",
-        17: "Foreign Trade",
-        18: "International Affairs and Foreign Aid",
-        19: "Government Operations",
-        20: "Public Lands and Water Management"
-    }
-    bills['MajorText'] = bills['Major'].apply(lambda x: major_code[x])
+    bills['MajorText'] = bills['Major'].apply(lambda x: MAJOR_CODE[x])
 
     # Add Chamber codes
     chamber_code = {
@@ -231,12 +218,12 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
 
     # CAP and CBP data paths
-    path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
-    path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
-    path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
-    # path_cap = os.path.join(data_dir, 'CAP.csv')
-    # path_cbp_80_92 = os.path.join(data_dir, 'CBP80-92.txt')
-    # path_cbp_93_114 = os.path.join(data_dir, 'CBP93-114.csv')
+    # path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
+    # path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
+    # path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
+    path_cap = os.path.join(data_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
+    path_cbp_80_92 = os.path.join(data_dir, 'bills80-92.txt')
+    path_cbp_93_114 = os.path.join(data_dir, 'bills93-114.csv')
     
     # Load and clean CAP
     cap = get_cap(path_cap)
