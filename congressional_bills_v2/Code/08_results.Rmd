@@ -263,8 +263,7 @@ bias1 <- regressions.averaged %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
   geom_vline(xintercept=0, color=my_palette[["black"]], linewidth=0.2) +
-  geom_histogram(bins=30, color="white") +
-  
+  geom_histogram(bins=30, color="white") +  
   geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
   facet_grid(. ~ proportion, labeller=facet.labeller) +
   

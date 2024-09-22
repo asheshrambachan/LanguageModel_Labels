@@ -111,11 +111,6 @@ def description_mismatch(d1, d2):
     description_cbp = description_cbp.apply(lambda x: x.lower())
     description_cap = description_cap.apply(lambda x: x.lower())
 
-    # description_cbp = description_cbp.str.replace("'s", "s") 
-    # description_cbp = description_cbp.str.replace(r'[?"]{2,}|[`]', '', regex=True)
-    # description_cap = description_cap.str.replace("'s", "s") 
-    # description_cap = description_cap.str.replace(r'_\?\?|["]{2,}|[`]', '', regex=True) # 1 to 8 times in the 10K sample
-    
     description_cbp = description_cbp.str.replace('??????', '')
     description_cbp = description_cbp.str.replace('???', '')
     description_cbp = description_cbp.str.replace('""""', '')
@@ -218,12 +213,12 @@ def main():
     os.makedirs(fig_dir, exist_ok=True)
 
     # CAP and CBP data paths
-    # path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
-    # path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
-    # path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
-    path_cap = os.path.join(data_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
-    path_cbp_80_92 = os.path.join(data_dir, 'bills80-92.txt')
-    path_cbp_93_114 = os.path.join(data_dir, 'bills93-114.csv')
+    path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
+    path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
+    path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
+    # path_cap = os.path.join(data_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
+    # path_cbp_80_92 = os.path.join(data_dir, 'bills80-92.txt')
+    # path_cbp_93_114 = os.path.join(data_dir, 'bills93-114.csv')
     
     # Load and clean CAP
     cap = get_cap(path_cap)

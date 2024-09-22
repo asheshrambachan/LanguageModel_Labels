@@ -1,11 +1,16 @@
----
-title: "Post-Simulation"
-output: html_document
-date: "Aug 12, 2024"
----
+# Aug 12, 2024
 
-```{r, warning=FALSE, message=FALSE}
-knitr::opts_chunk$set(echo=TRUE)
+# <!-- This R markdown merges the results of the simulations and generating the following outputs: -->
+# 
+# <!-- - **`10k_human_lhs.csv` and `10k_human_rhs.csv`**: These files contain the regression results using `Yhuman` across all 10,000 bills. -->
+# 
+# <!-- - **`10k_llm_lhs.csv` and `10k_llm_rhs.csv`**: These files contain the regression results using `Yllm` across all 10,000 bills. -->
+# 
+# <!-- - **`simulations_lhs.csv` and `simulations_rhs.csv`**: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions. -->
+# 
+# <!-- - **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs. -->
+# 
+# <!-- - **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**: These files contain intermediate regression results that we don't use in our analysis -->
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -15,69 +20,31 @@ suppressPackageStartupMessages({
 
 # Define and set the working directory
 repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
-knitr::opts_knit$set(root.dir=repo_dir)
-setwd(repo_dir)
+data_dir <- file.path(repo_dir, "Data")
+temp_dir <- file.path(repo_dir, "Temp")
 
-# Bias 
+# Functions 
 bias = function(coef, coef.ref) return(coef - coef.ref) # Calculate bias
 mse = function(coef, coef.ref) return((coef - coef.ref)^2)  # Calculate Mean Squared Error (MSE)
 coverage = function(coef.ref, lci, uci) return(as.integer((lci <= coef.ref) & (coef.ref <= uci))) # Check if the confidence interval covers the reference coefficient
-```
-
-# Overview
-
-This R markdown merges the results of the simulations and generating the following outputs:
-
-- **`10k_human_lhs.csv` and `10k_human_rhs.csv`**: These files contain the regression results using `Yhuman` across all 10,000 bills.
-
-- **`10k_llm_lhs.csv` and `10k_llm_rhs.csv`**: These files contain the regression results using `Yllm` across all 10,000 bills.
-
-- **`simulations_lhs.csv` and `simulations_rhs.csv`**: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
-
-- **`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs.
-
-- **`simulations_other_lhs.csv`** and **`simulations_other_rhs.csv`**: These files contain intermediate regression results that we don't use in our analysis
 
 # Proxy on the LHS
-
-```{r}
-data_dir <- file.path(repo_dir, "Data")
-
-temp_dir <- file.path(repo_dir, "Temp")
 
 # Define the directory containing the RDS files
 rds_dir <- file.path(temp_dir, "lhs_rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+regressions_of_intreset <- c("10k_Yhuman_V", "10k_Yllm_V", "5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")
+
 data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
   rename(c(t=t_stat, Y=major_topic, V=variable)) %>% 
   mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", "gpt-4o"),
-         coef_name = as.factor(if_else(coef_name=="V1", "V", coef_name)))
-
-# # Check NaNs
-# data %>% 
-#   group_by(regression, coef_name) %>% 
-#   summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
-#             .groups="drop") %>%
-#   filter(share.nan_t>0) %>%
-#   as.data.frame(.) %>%
-#   print(.)
-
-# data %>% 
-#   .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ] %>%
-#   write.csv(file.path(temp_dir, "simulations_nan.csv"), row.names=FALSE)
-
-# Simulations we don't use
-regressions_of_intreset = c("10k_Yhuman_V", "10k_Yllm_V", "5k_Yllm_V", "train_Yhuman_V", "test_Ytilde_V")
-
-# data %>% 
-#   filter(!(regression %in% regressions_of_intreset)) %>%
-#   write.csv(file.path(temp_dir, "simulations_other_lhs.csv"), row.names=FALSE)
-
-# Simulations we do use
-data <- data %>% 
+         coef_name = as.factor(if_else(coef_name=="V1", "V", coef_name))) %>% 
   filter(regression %in% regressions_of_intreset)
+
+# Define the output path and write the combined results to a CSV file
+write.csv(data, file.path(temp_dir, "lhs.csv"), row.names=FALSE)
 
 # Extract reference regression results (10k_Yhuman_V)
 regression.ref <- data %>% 
@@ -92,8 +59,6 @@ data %>%
   filter(regression=="10k_Yllm_V") %>%
   select(c("prompt", "model", "V", "Y", "regression", "coef_name", "coef", "se", "t", "lci", "uci")) %>%
   distinct() %>%
-  # merge(x=., y=regression.ref, by=c("V", "Y", "coef_name"), suffixes=c("",".ref")) %>%
-  # relocate(coef_name, .before=coef) %>%
   write.csv(file.path(data_dir, "lhs_10k_llm.csv"), row.names=FALSE)
 
 # Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
@@ -109,8 +74,6 @@ regressions <- data %>%
   relocate(coef_name, .before=coef) %>%
   relocate(sim_number, .before=regression) 
 
-# Define the output path and write the combined results to a CSV file
-write.csv(regressions, file.path(temp_dir, "lhs.csv"), row.names=FALSE)
 
 # For all other regressions, calculate the average of bias, MSE, and coverage for each combination, and save the averaged results to a new CSV file
 regressions %>% 
@@ -125,42 +88,24 @@ regressions %>%
     .groups = "drop") %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(data_dir, "lhs_averaged.csv"), row.names=FALSE)
-```
+
 
 # Proxy on the RHS
 
-```{r}
 # Define the directory containing the RDS files
 rds_dir <- file.path(temp_dir, "rhs_rds")
 
 # Read all RDS files and combine them into a single data frame
 rds_paths <- list.files(rds_dir, pattern="*.rds", full.names=TRUE)
+regressions_of_intreset <- c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde")
+
 data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
   rename(c(t=t_stat, V=variable)) %>% 
-  mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", "gpt-4o"))
-
-# # Check NANs
-# data %>% 
-#   group_by(regression, coef_name) %>% 
-#   summarise(share.nan_t = sprintf("%.2f%%",  sum(is.nan(t))/n()*100),
-#             .groups="drop") %>%
-#   filter(share.nan_t>0) %>%
-#   as.data.frame(.) %>%
-#   print(.)
-
-# data %>% 
-#   .[!complete.cases(.[, c("coef", "se", "t", "lci", "uci")]), ] %>%
-#   write.csv(file.path(temp_dir, "simulations_nan.csv"), row.names=FALSE)
-
-# Regressions we don't use
-regressions_of_intreset = c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "test_Vtilde_Ytilde")
-# data %>% 
-#   filter(!(regression %in% regressions_of_intreset)) %>%
-#   write.csv(file.path(temp_dir, "simulations_other_rhs.csv"), row.names=FALSE)
-
-# Regressions we do use
-data <- data %>% 
+  mutate(model = if_else(model=="gpt-3.5-turbo-0125", "gpt-3.5", "gpt-4o")) %>% 
   filter(regression %in% regressions_of_intreset)
+
+# Define the output path and write the combined results to a CSV file
+write.csv(data, file.path(temp_dir, "rhs.csv"), row.names=FALSE)
 
 # Extract reference regression results (10k_V_Yhuman)
 regression.ref <- data %>% 
@@ -192,9 +137,6 @@ regressions <- data %>%
   relocate(coef_name, .before=coef) %>%
   relocate(sim_number, .before=regression) 
 
-# Define the output path and write the combined results to a CSV file
-write.csv(regressions, file.path(temp_dir, "rhs.csv"), row.names=FALSE)
-
 # For all other regressions, calculate the average of bias, MSE, and coverage for each combination, and save the averaged results to a new CSV file
 regressions %>% 
   group_by(combination_id, train_proportion, model, prompt, V, regression, coef_name) %>% 
@@ -208,5 +150,4 @@ regressions %>%
     .groups = "drop") %>%
   select(!contains(".ref")) %>%
   write.csv(file.path(data_dir, "rhs_averaged.csv"), row.names=FALSE)
-```
 

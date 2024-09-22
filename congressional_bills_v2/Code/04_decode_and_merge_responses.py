@@ -103,6 +103,7 @@ def main():
         xlabel="Number of unique LLM major topic labels",
         ylabel="Share of Bills")
     plt.savefig(os.path.join(fig_dir, 'A histogram of unique LLM labels in few-shot prompts only.png'))
-
+    print(f'Saved figures at {fig_dir}')
+    
 if __name__ == "__main__":
     main()
