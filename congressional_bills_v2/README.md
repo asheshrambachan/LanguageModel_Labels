@@ -214,3 +214,4 @@ In step 4.1, we estimate the error in LLM predications using a logistic regressi
 
 - [ ] remove `_v2` from env setup
 - [ ] complete all codebooks at `./Data/Codebooks/`
+- [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills_v2#additional-notes-and-remarks)
