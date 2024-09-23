@@ -70,17 +70,18 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
 python ./Code/1_clean_bills.py
 ```
 
-**Replicating Prompt Creation, Querying and Decoding LLM Responses:** If you are only interested in generating prompts, querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
+**Replicating Prompt Creation, Querying and Decoding LLM Responses:** If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
 ```bash
 python ./Code/2.1_create_prompts.py
 python ./Code/2.2_query_llm.py
 python ./Code/2.3_download_responses.py
 python ./Code/2.4_decode_responses.py
 ```
+[^1]: Note that the token limit for the models varies by user, so you may need to split the prompts into more smaller batches.
 
 **Replicating Simulation Runs & Model Evaluation:** If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
-- `./Data/lhs_10k_human.csv`, `./Data/lhs_10k_llm.csv`, `./Data/lhs_5k_llm_human_debiased_averaged.csv`
-- `./Data/rhs_10k_human.csv`, `./Data/rhs_10k_llm.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`
+- `./Data/lhs_10k_human.csv`[^2], `./Data/lhs_10k_llm.csv`[^3], `./Data/lhs_5k_llm_human_debiased_averaged.csv`[^4]
+- `./Data/rhs_10k_human.csv`[^2], `./Data/rhs_10k_llm.csv`[^3], `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
 ```bash
 Rscript ./Code/3.1_run_lhs_simulations.r
@@ -88,6 +89,9 @@ Rscript ./Code/3.2_run_rhs_simulations.r
 Rscript ./Code/3.3_summarize_lhs_simulations.r
 Rscript ./Code/3.4_summarize_rhs_simulations.r
 ```
+[^2]: These files contain the regression results using `Yhuman` across all 10,000 bills. 
+[^3]: These files contain the regression results using `Yllm` across all 10,000 bills. 
+[^4]: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage averaged over $N = 1000$ simulation runs, relative to the `10k_Yhuman` regressions.
 
 **Replicating Figures & Tables:** If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
 ```bash
@@ -108,17 +112,22 @@ Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figu
 
 - WJones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
 
-# Additional Notes and Remarks
 
-<!-- ## Data Cleaning -->
 
-## LLM Models & Prompt Modifications
+<!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
+
+<!-- The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746). -->
+
+
+## Additional Notes and Remarks
+
+### LLM Models & Prompt Modifications
 
 We use 2 GPT models:
 - `gpt-3.5-turbo-0125`
 - `gpt-4o-2024-05-13`
 
-Each model is paired with **12** prompt modifications, resulting in **24 prompts per bill**. The table below provides an overview of each of the 12 prompts and links to the templates used in this experiment.
+Each model is paired with **12** prompt modifications, resulting in **24 prompts per bill**. The table below outlines each of the prompts and links to their templates:
 
 | #	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
@@ -136,27 +145,9 @@ Each model is paired with **12** prompt modifications, resulting in **24 prompts
 12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](./Data/prompt_templates/12.json) |
 
 
+### Data Cleaning Remarks
 
-<!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
-
-<!-- 
-## Clean Bills
-
-The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746).
-
-- The notebook first cleans the raw bills data (refer to the cleaning remarks for more details).
-
-- A random sample of 10K bills is taken for the prompting exercises, stored at: `./Data/01_bills/bills_10k.csv`
-
-- The notebook also generates 3 sets of examples, each containing 5 bills, to be used in later prompting strategies. These are stored at: `./Data/01_bills/bills_example*.csv`
-
-<!-- - The bills and major topics codebooks are saved at: `./Data/Codebooks/` -->
-
-<!-- - A plot showing the distribution of the 10K bills over the years is saved in the `./FiguresTables` directory. -->
-
-#### Cleaning Remarks
-
-Our approach shares similarities with Egami et al. (2023)'s method, with a few modifications. [^1]
+Our approach is based on Egami et al. (2023) with a few modifications:
 
 1. **Corrections**:
    - Fixed inconsistencies in `BillID`s in both the CAP and CBP datasets.
@@ -170,96 +161,53 @@ Our approach shares similarities with Egami et al. (2023)'s method, with a few m
    - Bills with a major topic ID of `99`.
    - Bills with identical `Descriptions` were considered duplicates and dropped.
 
-[^1]: test
 
-#### Cleaning Remarks
 
-Our approach shares similarities with  Egami et al.'s method with few modifications. 
-<!-- Note that the coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic. -->
+### LHS and RHS Simulations
 
-1. Corrected the following:
-  - Fixed inconsistencies in `BillID`s in both CAP and CBP. 
-  - Corrected `Chamber` encoding in CAP for the 114th congress.
-  - Corrected imputation of DW1 scores by averaging over  bill sponsors and not bills. 
+Steps 3.1 and 3.2 perform regressions with $Y$ on the LHS or RHS:
 
-2. Similar to Egami et al. (2023), we drop the following bills:
-  - Duplicate bills based on `BillID`
-  - Bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. 
-  - Bills not present in both CBP and CAP dataset, or varies in the columns listed above
-  - Bills wil major topic ID of 99.
-  - Bills with identical `Description` are considered duplicates and are dropped.
-
-<!-- ## Prompt LLM
-
-- The generated prompts are used to query the GPT models via the OpenAI API in the batched mode.  Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
-
-<!-- ## Error in LLM Predictions
-
-The notebook [03_predict_errors.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/03_predict_errors.ipynb) analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
-- $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
-
-- $y_{m,p} = 1\\{Y_{m,p}^\text{Human} \neq Y_{m,p}^\text{LLM}\\} \in \\{0,1\\}^{10K \times 1}$ represent the error in major topic prediction between Human labels and LLM predictions for each GPT model ($m$) and prompt modification ($p$).
-
-Using a 50% train-test split, we fit a regularized logistic regression model on the error $y$ over $X$, applying two types of regularization:
-```math
-\begin{align*}
-\beta_{m,p}^\text{Ridge} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
-\beta_{m,p}^\text{Lasso} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
-\end{align*}
-``` -->
-
-<!-- The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./FiguresTables`. -->
-
-<!-- ## Run LHS and RHS Simulations
-
-The scripts `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regressions with $Y$ on the LHS or RHS:
 - LHS: $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
-- RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$.
+- RHS: $V = Y_3 \beta_3 + Y_{14} \beta_{14} +  Y_{15} \beta_{15} + Y_{19} \beta_{19} +  Y_{20} \beta_{20} + Y_\text{Other} \beta_\text{Other} + \nu$,
 
-where
+where:
 - $Y_\text{topic} = 1\\{Y = \text{topic}\\}$ and $\text{topic}\in\\{3, 14, 15, 19, 20, \text{Other}\\}$
-- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor. -->
+- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor.
 
-<!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
+We perform $N=1000$ simulations with the following steps[^5]:
 
-<!-- We perform $N=1000$ simulations with the following steps:
-1. Fit a regression using all 10K bills and the true labels $Y^\text{Human}$. We denote the regression coefficient as $\beta^\star$.
-2. Fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$.
-3. Sample 5K bills, fit a regression using $Y^\text{LLM}$ to obtain $\beta^\text{LLM}$.
-4. Split the 5K sample into validation and primary sets based on a validation proportion. 
-5. Fit a regression using validation data and $Y^\text{Human}$ to get $\beta^\text{Human}$. 
-6. Use both $Y^\text{Human}$ and $Y^\text{LLM}$ from validation data to obtain a debias model, then use the primary set with $Y^\text{LLM}$ only to get the debiased coefficient $\beta^\text{Debiased}$.
+1. Fit a regression using 10K bills and true labels $Y^{\text{Human}}$, yielding $\beta^\star$.
+2. Fit a regression using 10K bills and LLM predictions $Y^{\text{LLM}}$.
+3. Sample 5K bills, fit a regression with $Y^{\text{LLM}}$ to obtain $\beta^{\text{LLM}}$[^6].
+4. Split the 5K sample into validation and primary sets. 
+5. Fit a regression using validation data and $Y^{\text{Human}}$ to get $\beta^{\text{Human}}$. 
+6. Use both $Y^{\text{Human}}$ and $Y^{\text{LLM}}$ from the validation set to obtain a debiased model, and use the primary set with $Y^{\text{LLM}}$ only to get $\beta^{\text{Debiased}}$.
 
-For all regressions, we report robust standard errors, except for the debiased model, where we use Bayesian bootstrap with $B=1000$ samples.
+For all regressions, robust standard errors are reported, except for the debiased model, where Bayesian bootstrap with $B=1000$ samples is used.
 
-Note: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample.  -->
+[^5]: To ensure reproducibility of the simulations, combination unique IDs as a seed.
+[^6]: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample.
 
+### Summary of Simulation Results
 
-<!-- # merges the results of the simulations and generating the following outputs: -->
-<!-- `10k_human_lhs.csv` and `10k_human_rhs.csv`**: These files contain the regression results using `Yhuman` across all 10,000 bills. 
-`10k_llm_lhs.csv` and `10k_llm_rhs.csv`**: These files contain the regression results using `Yllm` across all 10,000 bills.
-`simulations_lhs.csv` and `simulations_rhs.csv`**: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage for each of the $i \in \{1, \ldots, N = 1000\}$ simulation runs, relative to the `10k_Yhuman` regressions.
-`simulations_averaged_lhs.csv` and `simulations_averaged_rhs.csv`**: These files contain the averaged results for the regressions in `simulations_lhs.csv` and `simulations_rhs.csv` across the $N = 1000$ simulation runs. -->
+Steps 3.3 and 3.4 summarize the simulations by computing:
 
-<!-- 
-
-## Summary of Simulation Results
-
-The file [05_summarize_simulations.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/05_summarize_simulations.Rmd) summarize the simulations by computing the following:
 - Sample mean: $\beta_\text{mean} = \frac{1}{N} \sum_{i=1}^N \beta^{(i)}$
 - Sample SD: $\beta_\text{SD} = \frac{1}{N-1} \sum_{i=1}^{N} (\beta^{(i)} - \beta_\text{mean})^2$
 - Estimated bias: $\text{bias}(\beta) = \frac{1}{N} \sum_{i=1}^N (\beta^{(i)} - \beta^\star) =  \beta_\text{mean} - \beta^\star$$
 - Normalized bias: $\frac{\text{bias} (\beta)}{\beta_\text{SD}} = \frac{\beta_\text{mean} - \beta^\star}{\beta_\text{SD}}$
 - Estimated MSE: $\text{mse}(\beta) =\frac{1}{N} \sum_{i=1}^N (\beta^{(i)} - \beta^\star)^2$
-- Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} )\\},$ where $\text{CI}(\beta^{(i)})$ is the 95% confidence interval. -->
+- Coverage probability: $\text{coverage}(\beta) = \frac{1}{N} \sum_{i=1}^N 1\\{ \beta^\star \in \text{CI} ( \beta^{(i)} )\\},$ where $\text{CI}(\beta^{(i)})$ is the 95% confidence interval.
 
-<!-- Results are saved at `./Data/04_simulations/lhs/averaged.csv` and `./Data/04_simulations/rhs/averaged.csv`. -->
+### Estimating Error in LLM Predictions
 
-<!-- ## Results
-
-The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/06_results.Rmd) generates the figures and tables found in `./FiguresTables/06_results.pdf`.
- -->
-
+In step 4.1, we estimate the error in LLM predications using a logistic regression model. Let $X\in \mathbb{Z}^{10K \times 9698}$ represent the bag-of-words matrix of token frequencies from the 10K bill descriptions, and $y_{m,p} = 1\\{Y_{m,p}^\text{Human} \neq Y_{m,p}^\text{LLM}\\} \in \\{0,1\\}^{10K \times 1}$ represent the error in topic prediction between human labels and LLM predictions for each model $m$ and prompt $p$. Using a 50% train-test split, we fit regularized logistic regressions on $y$:
+```math
+\begin{align*}
+\beta_{m,p}^\text{Ridge} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
+\beta_{m,p}^\text{Lasso} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
+\end{align*}
+```
 
 ## TODO
 
