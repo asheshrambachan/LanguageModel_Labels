@@ -76,7 +76,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
         python ./Code/2.3_download_responses.py
         python ./Code/2.4_decode_responses.py
         ```
-        [^1]: Note that the token limit for the models varies by user, so you may need to split the prompts into more smaller batches.
+        [^1]: The token limit varies by user and you may need to split the prompts into more smaller batches.
 
     3. **Replicating Simulation Runs & Model Evaluation:** 
         If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
