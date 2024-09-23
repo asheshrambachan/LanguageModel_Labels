@@ -45,10 +45,9 @@ The replication files are organized into the following main directories:
   2. Create a new API key.
   3. Copy the generated key.
   4. Replace `your key` in the command below with your actual API key, then run it o create a `.env` file and add your OpenAI API key.
-    
-    ```sh
-    echo 'OPENAI_API_KEY="your key"' > .env
-    ```
+      ```sh
+      echo 'OPENAI_API_KEY="your key"' > .env
+      ```
 
 ## Replication Levels
 
