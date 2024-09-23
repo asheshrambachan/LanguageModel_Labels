@@ -23,6 +23,8 @@ This repository contains the replication files for the congressional bills exper
 
 # Experiment Replication 
 
+There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
+
 ## Environment Setup
 
 ### Create Conda Environment
@@ -45,8 +47,6 @@ cd [path/to/congressional_bills_v2]
    ```
 
 ## Replication Levels
-
-There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
 
 ### Full Replication
 If you want to run the entire pipeline from data cleaning to figure generation, run:
