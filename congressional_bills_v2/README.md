@@ -49,14 +49,14 @@ cd [path/to/congressional_bills_v2]
 ## Replication Levels
 
 ### Full Replication
-If you want to run the entire pipeline from data cleaning to figure generation, run:
+If you want to run the entire pipeline from data cleaning to figure and table generation, run:
 ```bash
 chmod +x ./Code/run_all.sh
 ./Code/run_all.sh
 ```
 
 ### Partial Replication 
-The repo contain all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
+The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
 1. **Replicating Data Cleaning:**
   If you are only interested in replicating the data cleaning step, run the following:
@@ -83,9 +83,7 @@ The repo contain all the necessary data for you to run a specific steps (e.g., m
   Rscript ./Code/3.3_summarize_lhs_simulations.r
   Rscript ./Code/3.4_summarize_rhs_simulations.r
   ```
-  This will create the files: 
-  - `./Data/lhs_10k_human.csv`, `./Data/lhs_10k_llm.csv`, `./Data/lhs_5k_llm_human_debiased_averaged.csv`
-  - `./Data/rhs_10k_human.csv`, `./Data/rhs_10k_llm.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`
+  This will create the following files under `./Data` directory: `lhs_10k_human.csv`, `lhs_10k_llm.csv`, `lhs_5k_llm_human_debiased_averaged.csv`, `rhs_10k_human.csv`, `rhs_10k_llm.csv`, and `rhs_5k_llm_human_debiased_averaged.csv`.
 
 4. **Replicating Figures & Tables:**
   If you are only interested in generating the figures and tables, run the following:
