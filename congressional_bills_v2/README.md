@@ -80,8 +80,9 @@ python ./Code/2.4_decode_responses.py
 [^1]: Note that the token limit for the models varies by user, so you may need to split the prompts into more smaller batches.
 
 **Replicating Simulation Runs & Model Evaluation:** If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
-- `./Data/lhs_10k_human.csv`[^2], `./Data/lhs_10k_llm.csv`[^3], `./Data/lhs_5k_llm_human_debiased_averaged.csv`[^4]
-- `./Data/rhs_10k_human.csv`[^2], `./Data/rhs_10k_llm.csv`[^3], `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
+- `./Data/lhs_10k_human.csv`, ./Data/rhs_10k_human.csv`[^2]
+- `./Data/lhs_10k_llm.csv`,  `./Data/rhs_10k_llm.csv`[^3]
+- `./Data/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
 ```bash
 Rscript ./Code/3.1_run_lhs_simulations.r
