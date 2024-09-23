@@ -106,7 +106,7 @@ Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figu
 
 - WJones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
 
-# Notes and Remarks
+# Additional Notes and Remarks
 
 <!-- ## Data Cleaning -->
 
@@ -152,23 +152,40 @@ The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageM
 
 <!-- - A plot showing the distribution of the 10K bills over the years is saved in the `./FiguresTables` directory. -->
 
-
-<!-- 
 #### Cleaning Remarks
 
-Our approach shares similarities with  Egami et al.'s method with few modifications. Note that the coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic.
+Our approach shares similarities with Egami et al. (2023)'s method, with a few modifications. [^1]
+
+1. **Corrections**:
+   - Fixed inconsistencies in `BillID`s in both the CAP and CBP datasets.
+   - Corrected the `Chamber` encoding in CAP for the 114th Congress.
+   - Corrected the imputation of DW1 scores by averaging over **bill sponsors** instead of **bills**.
+
+2. **Dropped Bills**: Similar to Egami et al. (2023), we excluded the following bills from the dataset:
+   - Duplicate bills based on `BillID`.
+   - Bills with missing values in key fields: `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber`.
+   - Bills that were not present in both the CBP and CAP datasets or had discrepancies in the columns listed above.
+   - Bills with a major topic ID of `99`.
+   - Bills with identical `Descriptions` were considered duplicates and dropped.
+
+[^1]: test
+
+#### Cleaning Remarks
+
+Our approach shares similarities with  Egami et al.'s method with few modifications. 
+<!-- Note that the coding system for `Major` topic ID is mutually exclusive: each `BillID` is mapped to only one `Major` topic. -->
 
 1. Corrected the following:
   - Fixed inconsistencies in `BillID`s in both CAP and CBP. 
   - Corrected `Chamber` encoding in CAP for the 114th congress.
-  - Egami et al. (2023) imputed missing DW1 scores by averaging over bills instead of the bill sponsors. Both the original column, `DW1_NA`, and the imputed `DW1` column are included in the dataset
+  - Corrected imputation of DW1 scores by averaging over  bill sponsors and not bills. 
 
-2. The following bills were dropped:
-  - Bills with the same `BillID`
-  - Bills present in both CBP and CAP dataset but varies in any of the following variables are dropped: `Major`, `Description`, `Party`, `PassS`, `PassH`, and `Chamber`.
-  - Similar to Egami et al. (2023), we drop bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. 
-  - We drop bills wil `Major` topic ID of 99.
-  - Bills with identical `Description` values are considered duplicates and are dropped.  -->
+2. Similar to Egami et al. (2023), we drop the following bills:
+  - Duplicate bills based on `BillID`
+  - Bills with missing `Major`, `Description`, `Party`, `PassS`, `PassH`, `Year`, or `Chamber` values. 
+  - Bills not present in both CBP and CAP dataset, or varies in the columns listed above
+  - Bills wil major topic ID of 99.
+  - Bills with identical `Description` are considered duplicates and are dropped.
 
 <!-- ## Prompt LLM
 
@@ -242,7 +259,6 @@ The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Label
  -->
 
 
-# Additional Notes and remarks
 ## TODO
 
 - [ ] remove `_v2` from env setup
