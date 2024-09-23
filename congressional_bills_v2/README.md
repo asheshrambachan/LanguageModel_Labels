@@ -33,7 +33,7 @@ The replication files are organized into the following main directories:
 ## Environment Setup
 
 - **Create Conda Environment**
-  ```sh
+  ```bash
   conda update conda
   conda config --set channel_priority strict
   conda env create -f conda_env.yaml
@@ -45,7 +45,7 @@ The replication files are organized into the following main directories:
   2. Create a new API key.
   3. Copy the generated key.
   4. Replace `your key` in the command below with your actual API key, then run it o create a `.env` file and add your OpenAI API key.
-      ```sh
+      ```bash
       echo 'OPENAI_API_KEY="your key"' > .env
       ```
 
@@ -54,7 +54,7 @@ The replication files are organized into the following main directories:
 There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
 
 1. **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
-    ```sh
+    ```bash
     chmod +x ./Code/run_all.sh
     ./Code/run_all.sh
     ```
@@ -64,13 +64,13 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
   1. **Replicating Data Cleaning:** 
       If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
-      ```sh
+      ```bash
       python ./Code/1_clean_bills.py
       ```
 
   2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:** 
       If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
-      ```sh
+      ```bash
       python ./Code/2.1_create_prompts.py
       python ./Code/2.2_query_llm.py
       python ./Code/2.3_download_responses.py
@@ -84,7 +84,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
       - `./Data/lhs_10k_llm.csv`,  `./Data/rhs_10k_llm.csv`[^3]
       - `./Data/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
-      ```sh
+      ```bash
       Rscript ./Code/3.1_run_lhs_simulations.r
       Rscript ./Code/3.2_run_rhs_simulations.r
       Rscript ./Code/3.3_summarize_lhs_simulations.r
@@ -96,7 +96,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
   4. **Replicating Figures & Tables:** 
       If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
-      ```sh
+      ```bash
       python ./Code/4.1_est_llm_pred_error.py
       Rscript ./Code/4.2_bills_llm_plots.r
       Rscript -e "rmarkdown::render('./Code/4.3_lhs_results.rmd', output_dir = './Figures and Tables')"
