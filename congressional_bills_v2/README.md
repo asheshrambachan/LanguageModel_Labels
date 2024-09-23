@@ -112,11 +112,11 @@ The replication files are organized into the following main directories:
 
 ## Prompt Modifications & LLM Models
 
-A total of 12 prompt modifications are applied across 2 GPT models: 
-- `gpt-3.5-turbo-0125` 
+We use 2 GPT models:
+- `gpt-3.5-turbo-0125`
 - `gpt-4o-2024-05-13`
 
-This results in 24 prompts per bill. 
+Each model is paired with **12** prompt modifications, resulting in **24 prompts per bill**. The table below provides an overview of each of the 12 prompts and links to the templates used in this experiment.
 
 | #	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
