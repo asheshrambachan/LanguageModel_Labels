@@ -65,41 +65,37 @@ chmod +x ./Code/run_all.sh
 ### Partial Replication 
 The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
-1. **Replicating Data Cleaning:** If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
-  ```bash
-  python ./Code/1_clean_bills.py
-  ```
+**Replicating Data Cleaning:** If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
+```bash
+python ./Code/1_clean_bills.py
+```
 
-2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:** If you are only interested in generating prompts, querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
-  ```bash
-  python ./Code/2.1_create_prompts.py
-  python ./Code/2.2_query_llm.py
-  python ./Code/2.3_download_responses.py
-  python ./Code/2.4_decode_responses.py
-  ```
+**Replicating Prompt Creation, Querying and Decoding LLM Responses:** If you are only interested in generating prompts, querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
+```bash
+python ./Code/2.1_create_prompts.py
+python ./Code/2.2_query_llm.py
+python ./Code/2.3_download_responses.py
+python ./Code/2.4_decode_responses.py
+```
 
-3. **Replicating Simulation Runs & Model Evaluation:** If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
-  - `./Data/lhs_10k_human.csv`
-  - `./Data/lhs_10k_llm.csv`
-  - `./Data/lhs_5k_llm_human_debiased_averaged.csv`
-  - `./Data/rhs_10k_human.csv`
-  - `./Data/rhs_10k_llm.csv`
-  - `./Data/rhs_5k_llm_human_debiased_averaged.csv`
+**Replicating Simulation Runs & Model Evaluation:** If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
+- `./Data/lhs_10k_human.csv`, `./Data/lhs_10k_llm.csv`, `./Data/lhs_5k_llm_human_debiased_averaged.csv`
+- `./Data/rhs_10k_human.csv`, `./Data/rhs_10k_llm.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`
 
-  ```bash
-  Rscript ./Code/3.1_run_lhs_simulations.r
-  Rscript ./Code/3.2_run_rhs_simulations.r
-  Rscript ./Code/3.3_summarize_lhs_simulations.r
-  Rscript ./Code/3.4_summarize_rhs_simulations.r
-  ```
+```bash
+Rscript ./Code/3.1_run_lhs_simulations.r
+Rscript ./Code/3.2_run_rhs_simulations.r
+Rscript ./Code/3.3_summarize_lhs_simulations.r
+Rscript ./Code/3.4_summarize_rhs_simulations.r
+```
 
-4. **Replicating Figures & Tables:** If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
-  ```bash
-  python ./Code/4.1_est_llm_pred_error.py
-  Rscript ./Code/4.2_bills_llm_plots.r
-  Rscript -e "rmarkdown::render('./Code/4.3_lhs_results.rmd', output_dir = './Figures and Tables')"
-  Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figures and Tables')"
-  ```
+**Replicating Figures & Tables:** If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
+```bash
+python ./Code/4.1_est_llm_pred_error.py
+Rscript ./Code/4.2_bills_llm_plots.r
+Rscript -e "rmarkdown::render('./Code/4.3_lhs_results.rmd', output_dir = './Figures and Tables')"
+Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figures and Tables')"
+```
  
 
 # References
