@@ -108,7 +108,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 - Adler, E Scott and John Wilkerson, _"Congressional Bills Project: 1947-2016,"_ NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
 
-- Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei, _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models,"_ in Advances in Neural Information Processing Systems, Vol. 36, 2023.
+- Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei, _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models,"_ in Advances in Neural Information Processing Systems, Vol. 36, 2023. Replication code available at: [`https://osf.io/gjt87/`]( https://osf.io/gjt87/)
 
 - Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, _``Policy Agendas Project: Congressional Bills,''_ 2023. Accessed July 5, 2024. [`https://www.comparativeagendas.net/#congressional_hearings`](https://www.comparativeagendas.net/#congressional_hearings).
 
@@ -116,14 +116,10 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 
 
-<!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
-
-<!-- The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746). -->
-
 ## TODO
 
 - [ ] remove `_v2` from env setup
-- [ ] complete all codebooks at `./Data/Codebooks/`
+- [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 - [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills_v2#additional-notes-and-remarks)
 
 ## Additional Notes and Remarks
