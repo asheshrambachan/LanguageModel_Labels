@@ -119,6 +119,11 @@ Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figu
 
 <!-- The notebook [01_clean_bills.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/01_clean_bills.ipynb) generates the 10K congressional bills dataset for further analysis. The code is adapted from the [replication code](https://osf.io/gjt87/) of [Egami et al. (2023)](https://arxiv.org/abs/2306.04746). -->
 
+## TODO
+
+- [ ] remove `_v2` from env setup
+- [ ] complete all codebooks at `./Data/Codebooks/`
+- [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills_v2#additional-notes-and-remarks)
 
 ## Additional Notes and Remarks
 
@@ -210,8 +215,3 @@ In step 4.1, we estimate the error in LLM predications using a logistic regressi
 \end{align*}
 ```
 
-## TODO
-
-- [ ] remove `_v2` from env setup
-- [ ] complete all codebooks at `./Data/Codebooks/`
-- [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills_v2#additional-notes-and-remarks)
