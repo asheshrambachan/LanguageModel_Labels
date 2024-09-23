@@ -33,7 +33,7 @@ The replication files are organized into the following main directories:
 ## Environment Setup
 
 ### Create Conda Environment
-```
+```sh
 conda update conda
 conda config --set channel_priority strict
 conda env create -f conda_env.yaml
@@ -57,7 +57,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 ### Full Replication
 If you want to run the entire pipeline from data cleaning to figure and table generation, run:
-```bash
+```sh
 chmod +x ./Code/run_all.sh
 ./Code/run_all.sh
 ```
@@ -67,13 +67,13 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
 
 1. **Replicating Data Cleaning:** 
     If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
-    ```bash
+    ```sh
     python ./Code/1_clean_bills.py
     ```
 
 2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:** 
     If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
-    ```bash
+    ```sh
     python ./Code/2.1_create_prompts.py
     python ./Code/2.2_query_llm.py
     python ./Code/2.3_download_responses.py
@@ -87,7 +87,7 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
     - `./Data/lhs_10k_llm.csv`,  `./Data/rhs_10k_llm.csv`[^3]
     - `./Data/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
-    ```bash
+    ```sh
     Rscript ./Code/3.1_run_lhs_simulations.r
     Rscript ./Code/3.2_run_rhs_simulations.r
     Rscript ./Code/3.3_summarize_lhs_simulations.r
@@ -99,7 +99,7 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
 
 4. **Replicating Figures & Tables:** 
     If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
-    ```bash
+    ```sh
     python ./Code/4.1_est_llm_pred_error.py
     Rscript ./Code/4.2_bills_llm_plots.r
     Rscript -e "rmarkdown::render('./Code/4.3_lhs_results.rmd', output_dir = './Figures and Tables')"
