@@ -58,15 +58,13 @@ chmod +x ./Code/run_all.sh
 ### Partial Replication 
 The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
-1. **Replicating Data Cleaning:**
-  If you are only interested in replicating the data cleaning step, run the following:
+1. **Replicating Data Cleaning:** If you are only interested in replicating the data cleaning step, run the following:
   ```bash
   python ./Code/1_clean_bills.py
   ```
   This will create: `./Data/bills.csv`
 
-2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:**
-  If you are only interested in generating prompts, querying and decoding of LLM responses, run the following:
+2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:** If you are only interested in generating prompts, querying and decoding of LLM responses, run the following:
   ```bash
   python ./Code/2.1_create_prompts.py
   python ./Code/2.2_query_llm.py
@@ -75,18 +73,17 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
   ```
   This will create the file `./Data/bills_llm.csv`
 
-3. **Replicating Simulation Runs & Model Evaluation:**
-  If you are only interested in running the simulation and model evaluation part of the experiment, run the following:
+3. **Replicating Simulation Runs & Model Evaluation:** If you are only interested in running the simulation and model evaluation part of the experiment, run the following:
   ```bash
   Rscript ./Code/3.1_run_lhs_simulations.r
   Rscript ./Code/3.2_run_rhs_simulations.r
   Rscript ./Code/3.3_summarize_lhs_simulations.r
   Rscript ./Code/3.4_summarize_rhs_simulations.r
   ```
+  [!NOTE]
   This will create the following files under `./Data` directory: `lhs_10k_human.csv`, `lhs_10k_llm.csv`, `lhs_5k_llm_human_debiased_averaged.csv`, `rhs_10k_human.csv`, `rhs_10k_llm.csv`, and `rhs_5k_llm_human_debiased_averaged.csv`.
 
-4. **Replicating Figures & Tables:**
-  If you are only interested in generating the figures and tables, run the following:
+4. **Replicating Figures & Tables:** If you are only interested in generating the figures and tables, run the following:
   ```bash
   python ./Code/4.1_est_llm_pred_error.py
   Rscript ./Code/4.2_bills_llm_plots.r
