@@ -11,8 +11,8 @@
 
 # --- User Configurable Parameters ----------------------------------
 n_cores <- 50
-N <- 2 # Number of simulations per a single combination
-B <- 3 # Number of bootstrap samples
+N <- 1000 # Number of simulations per a single combination
+B <- 1000 # Number of bootstrap samples
 n_samples <- 5000 # Number of samples drawn from 10K bill in each of the N simulations
 type_boot <- "bayesian" # "nonparametric"
 sel_topics <- c(3, 14, 15, 19, 20) # This list represents the most common major topics based on the Major/Yhuman column.

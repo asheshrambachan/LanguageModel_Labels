@@ -52,7 +52,7 @@ If you want to run the entire pipeline from data cleaning to figure generation, 
 chmod +x ./Code/run_all.sh
 ./Code/run_all.sh
 ```
-
+Note that this will used 
 ## Partial Replication 
 The repo contain all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
