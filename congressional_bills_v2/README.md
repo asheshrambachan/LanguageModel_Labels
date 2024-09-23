@@ -110,9 +110,15 @@ The replication files are organized into the following main directories:
 
 <!-- ## Data Cleaning -->
 
-## Prompting Strategies
+## Prompt Modifications & LLM Models
 
-| \#	| Name	| Examples	| Explanation	| Response Format	| Template | 
+A total of 12 prompt modifications are applied across 2 GPT models: 
+- `gpt-3.5-turbo-0125` 
+- `gpt-4o-2024-05-13`
+
+This results in 24 prompts per bill. 
+
+| #	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
 1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/01.json](./Data/prompt_templates/01.json) | 
 2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/02.json](./Data/prompt_templates/02.json) | 
@@ -166,13 +172,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 <!-- ## Prompt LLM
 
-- The notebook [02_prompting.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/02_prompting.ipynb) generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
-
 - The generated prompts are used to query the GPT models via the OpenAI API in the batched mode.  Note that the token limit for the models used has decreased recently, so you may need to split the prompts into more parts.
-
-- The model responses are then downloaded, decoded, and combined with the corresponding bills and prompt data, creating the main dataset for further analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
-
-- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./FiguresTables` -->
 
 <!-- ## Error in LLM Predictions
 
