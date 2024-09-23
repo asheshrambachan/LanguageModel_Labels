@@ -21,9 +21,11 @@ This repository contains the replication files for the congressional bills exper
    - **5.4** Generate figures and tables for regressions with proxy on the RHS.
 
 
-# Environment Setup
+# Experiment Replication 
 
-## Create Conda Environment
+## Environment Setup
+
+### Create Conda Environment
 ```
 conda update conda
 conda config --set channel_priority strict
@@ -32,7 +34,7 @@ conda activate env_cb_v2
 cd [path/to/congressional_bills_v2]
 ```
 
-## Add OPENAI_API_KEY`
+### Add OPENAI_API_KEY`
 
 1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
 2. Create a new API key.
@@ -42,18 +44,18 @@ cd [path/to/congressional_bills_v2]
    echo 'OPENAI_API_KEY="your key"' > .env
    ```
 
-# Replication Levels
+## Replication Levels
 
 There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
 
-## Full Replication
+### Full Replication
 If you want to run the entire pipeline from data cleaning to figure generation, run:
 ```bash
 chmod +x ./Code/run_all.sh
 ./Code/run_all.sh
 ```
-Note that this will used 
-## Partial Replication 
+
+### Partial Replication 
 The repo contain all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
 1. **Replicating Data Cleaning:**
@@ -96,7 +98,7 @@ The repo contain all the necessary data for you to run a specific steps (e.g., m
   This will generate folder `./Figures and Tables` containing the resulting figures and tables
 
 
-# File Structure
+## File Structure
 
 The replication files are organized into the following main directories:
 
@@ -105,6 +107,13 @@ The replication files are organized into the following main directories:
 - `./Figures and Tables`
 - `./Temp`: contains all intermediate files.
 
+# References
+
+- Adler, E Scott and John Wilkerson, ``Congressional Bills Project: 1947-2016,'' NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
+
+- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, _``Policy Agendas Project: Congressional Bills,''_ 2023. Accessed July 5, 2024. [`https://www.comparativeagendas.net/#congressional_hearings`](https://www.comparativeagendas.net/#congressional_hearings).
+
+- WJones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
 
 # Notes and Remarks
 
@@ -241,13 +250,6 @@ The file [05_summarize_simulations.Rmd](https://github.com/asheshrambachan/Langu
 The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/06_results.Rmd) generates the figures and tables found in `./FiguresTables/06_results.pdf`.
  -->
 
-# References
-
-- Adler, E Scott and John Wilkerson, ``Congressional Bills Project: 1947-2016,'' NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
-
-- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, _``Policy Agendas Project: Congressional Bills,''_ 2023. Accessed July 5, 2024. [`https://www.comparativeagendas.net/#congressional_hearings`](https://www.comparativeagendas.net/#congressional_hearings).
-
-- WJones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
 
 # Additional Notes and remarks
 ## TODO
