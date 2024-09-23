@@ -34,7 +34,7 @@ conda activate env_cb_v2
 cd [path/to/congressional_bills_v2]
 ```
 
-### Add OPENAI_API_KEY`
+### Add your `OPENAI_API_KEY`
 
 1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
 2. Create a new API key.
