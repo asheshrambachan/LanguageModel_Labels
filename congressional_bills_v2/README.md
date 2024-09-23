@@ -112,20 +112,20 @@ The replication files are organized into the following main directories:
 
 ## Prompting Strategies
 
-| \#	| Name	| Text	| Examples	| Response Format	| Explanation	| Template | 
-| -------- | ------- | -------- | ------- | -------- | ------- | -------- | 
-1	 | Base Prompt	|	None | None	|	Fill-in-the-Blanks	| None	| [1.json](congressional_bills_v2/Data/prompt_templates/1.json) | 
-2	 | Base Prompt	|	None | None	|	JSON	              | None	| [2.json](congressional_bills_v2/Data/prompt_templates/2.json) | 
-3	 | Persona	    | <sub>You are a knowledgeable political analyst.<sub> 	| None	|	JSON	| FALSE |	[3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
-4	 | Persona	    | <sub>Answer this question as if you are a political scientist that studies legislation in the United States Congress.<sub>	| None	|	JSON	| FALSE	| [4.json](congressional_bills_v2/Data/prompt_templates/4.json) |
-5	 | Persona	    | <sub>Answer this question as if you are an expert in United States politics.<sub> | None	|	JSON |	FALSE	| [5.json](congressional_bills_v2/Data/prompt_templates/5.json) |
-6	 | Persona	    | <sub>Answer this question as if you were a helpful research assistant for a political scientist.<sub> |	None	|	JSON |	FALSE	| [6.json](congressional_bills_v2/Data/prompt_templates/6.json) |
-7	 | Chain-of-Thoughts	| <sub>Think carefully.<sub> 	                              | None	|	JSON	| TRUE	| [7.json](congressional_bills_v2/Data/prompt_templates/7.json) |
-8	 | Chain-of-Thoughts	| <sub>Let's think step by step. Lay out each step.<sub> 	  | None	|	JSON  | TRUE	| [8.json](congressional_bills_v2/Data/prompt_templates/8.json) |
-9	 | Chain-of-Thoughts	| <sub>Please provide an explanation for your answer.<sub> 	| None	|	JSON  | TRUE	| [9.json](congressional_bills_v2/Data/prompt_templates/9.json) |
-10 | Few-Shot		        | None | Example Set 1	| JSON | FALSE	| [10.json](congressional_bills_v2/Data/prompt_templates/10.json) |
-11 | Few-Shot		        | None | Example Set 2	| JSON | FALSE	| [11.json](congressional_bills_v2/Data/prompt_templates/11.json) |
-12 | Few-Shot		        | None | Example Set 3	| JSON | FALSE	| [12.json](congressional_bills_v2/Data/prompt_templates/12.json) |
+| \#	| Name	| Examples	| Explanation	| Response Format	| Template | 
+| -------- | -------- | ------- | -------- | ------- | -------- | 
+1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/1.json](congressional_bills_v2/Data/prompt_templates/1.json) | 
+2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/2.json](congressional_bills_v2/Data/prompt_templates/2.json) | 
+3	 | Persona | ❌ | ❌ | JSON	|	[./Data/prompt_templates/3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
+4	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/4.json](congressional_bills_v2/Data/prompt_templates/4.json) |
+5	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/5.json](congressional_bills_v2/Data/prompt_templates/5.json) |
+6	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/6.json](congressional_bills_v2/Data/prompt_templates/6.json) |
+7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/prompt_templates/7.json](congressional_bills_v2/Data/prompt_templates/7.json) |
+8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/8.json](congressional_bills_v2/Data/prompt_templates/8.json) |
+9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/9.json](congressional_bills_v2/Data/prompt_templates/9.json) |
+10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/prompt_templates/10.json](congressional_bills_v2/Data/prompt_templates/10.json) |
+11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/prompt_templates/11.json](congressional_bills_v2/Data/prompt_templates/11.json) |
+12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](congressional_bills_v2/Data/prompt_templates/12.json) |
 
 
 
