@@ -33,19 +33,20 @@ The replication files are organized into the following main directories:
 ## Environment Setup
 
 - **Create Conda Environment**
-```sh
-conda update conda
-conda config --set channel_priority strict
-conda env create -f conda_env.yaml
-conda activate env_cb_v2
-cd [path/to/congressional_bills_v2]
-```
+  ```sh
+  conda update conda
+  conda config --set channel_priority strict
+  conda env create -f conda_env.yaml
+  conda activate env_cb_v2
+  cd [path/to/congressional_bills_v2]
+  ```
 - **Add your `OPENAI_API_KEY`**
     1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
     2. Create a new API key.
     3. Copy the generated key.
     4. Replace `your key` in the command below with your actual API key, then run it o create a `.env` file and add your OpenAI API key.
-      ```bash
+      
+      ```sh
       echo 'OPENAI_API_KEY="your key"' > .env
       ```
 
