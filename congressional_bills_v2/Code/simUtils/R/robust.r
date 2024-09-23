@@ -1,10 +1,10 @@
 #' Create a Robust Data Object
 #'
-#' This function creates a robust data object from a linear model.
-#' @param model A linear model object.
-#' @param regression_name A name for the regression model.
-#' @param suppressWarnings A logical value to suppress warnings.
-#' @return A robust object.
+#' This function creates a robust data object from a linear model
+#' @param model A linear model object
+#' @param regression_name A name for the regression model
+#' @param suppressWarnings A logical value to suppress warnings
+#' @return A robust object
 #' @export
 robust <- function(model, regression_name, suppressWarnings=F){ 
   if(any(se(model)==0)){
@@ -34,7 +34,7 @@ robust <- function(model, regression_name, suppressWarnings=F){
       coef_name = rownames(model_robust),
       coef_vec = model_robust[, "Estimate"], #model$coef,
       se = model_robust[, "Std. Error"],
-      t_stat = model_robust[, "t value"]
+      t = model_robust[, "t value"]
     ),
     class = "robust"
   ))

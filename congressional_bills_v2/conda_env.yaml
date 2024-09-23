@@ -25,3 +25,8 @@ dependencies:
   - r-furrr 
   - r-Matrix
   - r-logger
+  - r-latex2exp
+  - r-lemon
+  - r-kableExtra
+  # - r-extrafont
+

@@ -1,15 +1,16 @@
 #' Create a Bootstrap Data Object
 #'
-#' This function creates a bootstrap data object from a model-fitting function, using either nonparametric or Bayesian bootstrap methods.
-#' @param fun A function that fits a model to training data and returns coefficients.
-#' @param B The number of bootstrap samples to generate.
-#' @param type_boot The type of bootstrap to perform ("bayesian" or "nonparametric").
+#' This function creates a bootstrap data object from a model-fitting function, using either nonparametric or Bayesian bootstrap methods
+#' @param fun A function that fits a model to training data and returns coefficients
+#' @param B The number of bootstrap samples to generate
+#' @param type_boot The type of bootstrap to perform ("bayesian" or "nonparametric")
 #' @param fun_out_boot A vector of names indicating which elements of the function output to bootstrap.
-#' @param train The training dataset.
-#' @param test The test dataset.
-#' @return A bootstrap object with the bootstrapped coefficient estimates.
+#' @param regression_name A vector of names for the regression model
+#' @param train The training dataset
+#' @param test The test dataset
+#' @return A bootstrap object with the bootstrapped coefficient estimates
 #' @export
-boot <- function(fun, train, test, B, type_boot=c("bayesian", "nonparametric"), fun_out_boot){
+boot <- function(fun, train, test, B, type_boot=c("bayesian", "nonparametric"), fun_out_boot, regression_name=NA){
   type_boot <- match.arg(type_boot)
   out <- list()
   
@@ -18,7 +19,8 @@ boot <- function(fun, train, test, B, type_boot=c("bayesian", "nonparametric"), 
     stop("Listed coefficents to bootstrap are not among the output of the function")
   
   # setup output template
-  for (var in fun_out_boot){
+  for (i in 1:length(fun_out_boot)){
+    var <- fun_out_boot[i]
     var_coef <- fun_out[[var]]
     out <- append(out, list(
       structure(
@@ -26,7 +28,8 @@ boot <- function(fun, train, test, B, type_boot=c("bayesian", "nonparametric"), 
           coef = var_coef, 
           boot = matrix(NA, nrow=B, ncol=length(var_coef), dimnames=list(NULL, names(var_coef))), 
           coef_name = names(var_coef), 
-          regression_name = sub("coef_", "", var)),
+          regression_name = ifelse(is.na(regression_name[i]), sub("coef_", "", var), regression_name[i])
+        ),
         class="boot"
       )
     ))

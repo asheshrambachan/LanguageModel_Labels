@@ -10,25 +10,28 @@ boot(
   test,
   B,
   type_boot = c("bayesian", "nonparametric"),
-  fun_out_boot
+  fun_out_boot,
+  regression_name = NA
 )
 }
 \arguments{
-\item{fun}{A function that fits a model to training data and returns coefficients.}
+\item{fun}{A function that fits a model to training data and returns coefficients}
 
-\item{train}{The training dataset.}
+\item{train}{The training dataset}
 
-\item{test}{The test dataset.}
+\item{test}{The test dataset}
 
-\item{B}{The number of bootstrap samples to generate.}
+\item{B}{The number of bootstrap samples to generate}
 
-\item{type_boot}{The type of bootstrap to perform ("bayesian" or "nonparametric").}
+\item{type_boot}{The type of bootstrap to perform ("bayesian" or "nonparametric")}
 
 \item{fun_out_boot}{A vector of names indicating which elements of the function output to bootstrap.}
+
+\item{regression_name}{A vector of names for the regression model}
 }
 \value{
-A bootstrap object with the bootstrapped coefficient estimates.
+A bootstrap object with the bootstrapped coefficient estimates
 }
 \description{
-This function creates a bootstrap data object from a model-fitting function, using either nonparametric or Bayesian bootstrap methods.
+This function creates a bootstrap data object from a model-fitting function, using either nonparametric or Bayesian bootstrap methods
 }

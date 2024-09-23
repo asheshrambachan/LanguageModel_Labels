@@ -7,15 +7,15 @@
 robust(model, regression_name, suppressWarnings = F)
 }
 \arguments{
-\item{model}{A linear model object.}
+\item{model}{A linear model object}
 
-\item{regression_name}{A name for the regression model.}
+\item{regression_name}{A name for the regression model}
 
-\item{suppressWarnings}{A logical value to suppress warnings.}
+\item{suppressWarnings}{A logical value to suppress warnings}
 }
 \value{
-A robust object.
+A robust object
 }
 \description{
-This function creates a robust data object from a linear model.
+This function creates a robust data object from a linear model
 }

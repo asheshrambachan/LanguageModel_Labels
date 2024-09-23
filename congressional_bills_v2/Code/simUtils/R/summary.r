@@ -14,7 +14,7 @@ summary.robust <- function(object, alpha=0.05, z_score=TRUE, ...){
     coef_name = object$coef_name,
     coef = object$coef_vec,
     se = object$se, 
-    t_stat = object$t_stat, 
+    t = object$t, 
     lci = ci_value[, 1], 
     uci = ci_value[, 2], 
     class = attr(object, "class"),
@@ -35,18 +35,18 @@ summary.boot <- function(object, alpha=0.05, z_score=TRUE, ...){
   # Calculate standard errors from bootstrap samples
   se_value <- se(object)
   ci_value <- ci(object, alpha=alpha, z_score=z_score)
-  t_value <- coef_value/se_value
+  t <- coef_value/se_value
   
   # Simplify coefficient names
   coef_name <- gsub("Yhuman|Yllm|Ytilde", "",  names(coef_value))
   coef_name <- gsub("V1", "V",  coef_name)
   
   return(data.frame(
-    regression=object$regression, 
+    regression=object$regression_name, 
     coef_name=coef_name,  
     coef=coef_value, 
     se=se_value, 
-    t_stat=t_value, 
+    t=t, 
     lci=ci_value[,1], 
     uci=ci_value[,2], 
     class=attr(object, "class"),

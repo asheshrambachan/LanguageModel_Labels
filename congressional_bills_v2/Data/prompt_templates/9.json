@@ -1,0 +1,6 @@
+[
+    {
+        "role": "user",
+        "content": "Here is a description of a bill introduced in the U.S. Congress:\n\"{}\"\n\nPlease classify this description into one of the following categories:\n1. Macroeconomics\n2. Civil Rights, Minority Issues, and Civil Liberties\n3. Health\n4. Agriculture\n5. Labor and Employment\n6. Education\n7. Environment\n8. Energy\n9. Immigration\n10. Transportation\n11. Law, Crime, and Family Issues\n12. Social Welfare\n13. Community Development and Housing Issues\n14. Banking, Finance, and Domestic Commerce\n15. Defense\n16. Space, Science, Technology, and Communications\n17. Foreign Trade\n18. International Affairs and Foreign Aid\n19. Government Operations\n20. Public Lands and Water Management\n\nPlease provide an explanation for your answer. Output a JSON object structured like: {{\n    \"Category\": an integer from 1 to 20 that best represents the bill category,\n    \"Confidence\": confidence level in the bill classification as a number between 0 to 1 with 2 decimal places,\n    \"Explanation\": a one-sentence explanation for your chosen bill category\n}}\n"
+    }
+]
