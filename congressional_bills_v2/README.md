@@ -95,7 +95,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
       [^4]: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage averaged over $N = 1000$ simulation runs, relative to the `10k_Yhuman` regressions.
 
   4. **Replicating Figures & Tables:** 
-      If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory containing the resulting figures and tables, organized in subdirectories:
+      If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory and its content:
       ```bash
       python ./Code/4.1_est_llm_pred_error.py
       Rscript ./Code/4.2_bills_llm_plots.r
