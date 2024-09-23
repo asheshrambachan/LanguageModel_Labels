@@ -111,11 +111,13 @@ The replication files are organized into the following main directories:
 <!-- ## Data Cleaning -->
 
 ## Prompts
+
+<sub>
 | PromptingStrategyID	| PromptingStrategyName	| AddText	| Add Examples?	| ResponseFormat	| AddExplanation	| TemplatePath | 
 | -------- | ------- | -------- | ------- | -------- | ------- | -------- | ------- |
 1	 | Base Prompt	|	None | None	|	Fill-in-the-Blanks	| None	| [Data/prompt_templates/1.json](congressional_bills_v2/Data/prompt_templates/1.json) | 
 2	 | Base Prompt	|	None | None	|	JSON	              | None	| [Data/prompt_templates/2.json](congressional_bills_v2/Data/prompt_templates/2.json) | 
-3	 | Persona	    | <sub>You are a knowledgeable political analyst.<sub> 	| None	|	JSON	| FALSE |	[Data/prompt_templates/3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
+3	 | Persona	    | You are a knowledgeable political analyst. 	| None	|	JSON	| FALSE |	[Data/prompt_templates/3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
 4	 | Persona	    | Answer this question as if you are a political scientist that studies legislation in the United States Congress. 	| FALSE	|	JSON	| FALSE	| [Data/prompt_templates/4.json](congressional_bills_v2/Data/prompt_templates/4.json) |
 5	 | Persona	    | Answer this question as if you are an expert in United States politics. | None	|	JSON |	FALSE	| [Data/prompt_templates/5.json](congressional_bills_v2/Data/prompt_templates/5.json) |
 6	 | Persona	    | Answer this question as if you were a helpful research assistant for a political scientist. |	FALSE	|	JSON |	FALSE	| [Data/prompt_templates/6.json](congressional_bills_v2/Data/prompt_templates/6.json) |
@@ -125,7 +127,7 @@ The replication files are organized into the following main directories:
 10 | Few-Shot		        | None | Example Set 1	| JSON | FALSE	| [Data/prompt_templates/10.json](congressional_bills_v2/Data/prompt_templates/10.json) |
 11 | Few-Shot		        | None | Example Set 2	| JSON | FALSE	| [Data/prompt_templates/11.json](congressional_bills_v2/Data/prompt_templates/11.json) |
 12 | Few-Shot		        | None | Example Set 3	| JSON | FALSE	| [Data/prompt_templates/12.json](congressional_bills_v2/Data/prompt_templates/12.json) |
-
+<sub>
 <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 
 <!-- 
