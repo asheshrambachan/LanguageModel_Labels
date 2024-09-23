@@ -38,6 +38,7 @@ congressional_bills/05_results/results.log
 
 congressional_bills_v2/Temp/*
 congressional_bills_v2/Log/*
+congressional_bills_v2/Papers and bib/*
 congressional_bills_v2/Code/*.log
 congressional_bills_v2/Data/US-*.csv
 congressional_bills_v2/Data/bills80*.txt

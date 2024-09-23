@@ -105,12 +105,12 @@ The replication files are organized into the following main directories:
 - `./Figures and Tables`
 - `./Temp`: contains all intermediate files.
 
-<!-- 
+
 # Notes and Remarks
 
 ## Data Cleaning Remarks
 
-##  -->
+## 
 <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 
 <!-- 
