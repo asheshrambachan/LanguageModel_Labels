@@ -114,18 +114,18 @@ The replication files are organized into the following main directories:
 
 | \#	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
-1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/1.json](congressional_bills_v2/Data/prompt_templates/1.json) | 
-2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/2.json](congressional_bills_v2/Data/prompt_templates/2.json) | 
-3	 | Persona | ❌ | ❌ | JSON	|	[./Data/prompt_templates/3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
-4	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/4.json](congressional_bills_v2/Data/prompt_templates/4.json) |
-5	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/5.json](congressional_bills_v2/Data/prompt_templates/5.json) |
-6	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/6.json](congressional_bills_v2/Data/prompt_templates/6.json) |
-7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/prompt_templates/7.json](congressional_bills_v2/Data/prompt_templates/7.json) |
-8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/8.json](congressional_bills_v2/Data/prompt_templates/8.json) |
-9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/9.json](congressional_bills_v2/Data/prompt_templates/9.json) |
-10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/prompt_templates/10.json](congressional_bills_v2/Data/prompt_templates/10.json) |
-11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/prompt_templates/11.json](congressional_bills_v2/Data/prompt_templates/11.json) |
-12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](congressional_bills_v2/Data/prompt_templates/12.json) |
+1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/1.json](./Data/prompt_templates/1.json) | 
+2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/2.json](./Data/prompt_templates/2.json) | 
+3	 | Persona | ❌ | ❌ | JSON	|	[./Data/prompt_templates/3.json](./Data/prompt_templates/3.json) |
+4	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/4.json](./Data/prompt_templates/4.json) |
+5	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/5.json](./Data/prompt_templates/5.json) |
+6	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/6.json](./Data/prompt_templates/6.json) |
+7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/prompt_templates/7.json](./Data/prompt_templates/7.json) |
+8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/8.json](./Data/prompt_templates/8.json) |
+9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/9.json](./Data/prompt_templates/9.json) |
+10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/prompt_templates/10.json](./Data/prompt_templates/10.json) |
+11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/prompt_templates/11.json](./Data/prompt_templates/11.json) |
+12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](./Data/prompt_templates/12.json) |
 
 
 
