@@ -53,13 +53,13 @@ The replication files are organized into the following main directories:
 
 There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
 
-- **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
+1. **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
     ```sh
     chmod +x ./Code/run_all.sh
     ./Code/run_all.sh
     ```
 
-- **Partial Replication:** 
+2. **Partial Replication:** 
   The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
   1. **Replicating Data Cleaning:** 
