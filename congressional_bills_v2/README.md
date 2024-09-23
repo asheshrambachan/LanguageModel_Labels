@@ -12,13 +12,12 @@ This repository contains the replication files for the congressional bills exper
    - **3.2** Downloads LLM responses.
    - **3.3** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
 4. **Simulation Runs & Model Evaluation:**
-   - **4.1** & **4.2** Fit regression models using major topic labels, with the major topic on the LHS and another with it on the RHS.
-   - **4.3** & **4.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for both LHS and RHS.
+   - **4.1 and 4.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
+   - **4.3 and 4.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and  RHS.
 5. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
    - **5.1** Estimates LLM prediction errors for each combination of prompt and model.
    - **5.2** Plots: Distribution of bills over years, unique LLM major topics vs. prompt.
-   - **5.3** Generate figures and tables for regressions with proxy on the LHS.
-   - **5.4** Generate figures and tables for regressions with proxy on the RHS.
+   - **5.3 and 5.4** Generate figures and tables for regressions with proxy on the LHS and  RHS.
 
 
 # Experiment Replication 
