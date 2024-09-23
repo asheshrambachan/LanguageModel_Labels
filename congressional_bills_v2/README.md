@@ -113,7 +113,7 @@ The replication files are organized into the following main directories:
 ## Prompts
 
 | PromptingStrategyID	| PromptingStrategyName	| AddText	| Add Examples?	| ResponseFormat	| AddExplanation	| TemplatePath | 
-| -------- | ------- | -------- | ------- | -------- | ------- | -------- | ------- |
+| -------- | ------- | -------- | ------- | -------- | ------- | -------- | 
 1	 | Base Prompt	|	None | None	|	Fill-in-the-Blanks	| None	| [Data/prompt_templates/1.json](congressional_bills_v2/Data/prompt_templates/1.json) | 
 2	 | Base Prompt	|	None | None	|	JSON	              | None	| [Data/prompt_templates/2.json](congressional_bills_v2/Data/prompt_templates/2.json) | 
 3	 | Persona	    | You are a knowledgeable political analyst. 	| None	|	JSON	| FALSE |	[Data/prompt_templates/3.json](congressional_bills_v2/Data/prompt_templates/3.json) |
