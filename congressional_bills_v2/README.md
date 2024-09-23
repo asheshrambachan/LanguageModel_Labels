@@ -110,7 +110,7 @@ The replication files are organized into the following main directories:
 
 <!-- ## Data Cleaning -->
 
-## Prompt Modifications & LLM Models
+## LLM Models & Prompt Modifications
 
 We use 2 GPT models:
 - `gpt-3.5-turbo-0125`
