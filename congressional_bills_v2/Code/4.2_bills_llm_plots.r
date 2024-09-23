@@ -14,11 +14,11 @@ suppressPackageStartupMessages({
 })
 source(file.path(repo_dir, "Code/ggplot_theme.r"))
 
-bills_10k <- read.csv(file.path(data_dir, "bills_10k.csv"))
+bills <- read.csv(file.path(data_dir, "bills.csv"))
 
 # Fig 1
 year_bins <- seq(1947, 2016, by=2)+1
-bills_over_years <- ggplot(bills_10k, aes(x = Year)) +
+bills_over_years <- ggplot(bills, aes(x = Year)) +
   geom_histogram(breaks = year_bins, color = "white", fill = my_palette[["green"]]) +
   geom_hline(yintercept = 0, color = my_palette[["lightgray"]]) +
   xlab("Year") +

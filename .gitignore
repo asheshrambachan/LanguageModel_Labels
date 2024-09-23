@@ -43,3 +43,4 @@ congressional_bills_v2/Code/*.log
 congressional_bills_v2/Data/US-*.csv
 congressional_bills_v2/Data/bills80*.txt
 congressional_bills_v2/Data/bills93*.csv
+congressional_bills_v2/Rplots.pdf
