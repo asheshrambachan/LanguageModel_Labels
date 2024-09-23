@@ -100,7 +100,9 @@ Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figu
 
 # References
 
-- Adler, E Scott and John Wilkerson, ``Congressional Bills Project: 1947-2016,'' NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
+- Adler, E Scott and John Wilkerson, _"Congressional Bills Project: 1947-2016,"_ NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
+
+- Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei, _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models,"_ in Advances in Neural Information Processing Systems, Vol. 36, 2023.
 
 - Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, _``Policy Agendas Project: Congressional Bills,''_ 2023. Accessed July 5, 2024. [`https://www.comparativeagendas.net/#congressional_hearings`](https://www.comparativeagendas.net/#congressional_hearings).
 
@@ -158,8 +160,8 @@ Our approach shares similarities with Egami et al. (2023)'s method, with a few m
 
 1. **Corrections**:
    - Fixed inconsistencies in `BillID`s in both the CAP and CBP datasets.
-   - Corrected the `Chamber` encoding in CAP for the 114th Congress.
-   - Corrected the imputation of DW1 scores by averaging over **bill sponsors** instead of **bills**.
+   - Corrected the `Chamber` encoding in CAP for the 114th Congress and one `Party` affiliation.
+   - Corrected the imputation of `DW1` scores by averaging over **bill sponsors** instead of `BillID`s.
 
 2. **Dropped Bills**: Similar to Egami et al. (2023), we excluded the following bills from the dataset:
    - Duplicate bills based on `BillID`.
