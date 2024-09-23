@@ -64,11 +64,7 @@ The repo contain all the necessary data for you to run a specific steps (e.g., m
   This will create: `./Data/bills.csv`
 
 2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:**
-  If you are only interested in generating prompts, querying and decoding of LLM responses, you can use the given files:
-  - `./Data/bills.csv` 
-  - `./Data/prompting_strategies.csv`
-  - `./Data/prompt_templates/*.json`,
-  and run the following:
+  If you are only interested in generating prompts, querying and decoding of LLM responses, run the following:
   ```bash
   python ./Code/2.1_create_prompts.py
   python ./Code/2.2_query_llm.py
@@ -110,7 +106,11 @@ The replication files are organized into the following main directories:
 - `./Temp`: contains all intermediate files.
 
 
+# Notes and Remarks
 
+## Data Cleaning Remarks
+
+## 
 <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 
 <!-- 
@@ -146,7 +146,7 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
   - We drop bills wil `Major` topic ID of 99.
   - Bills with identical `Description` values are considered duplicates and are dropped.  -->
 
-## Prompt LLM
+<!-- ## Prompt LLM
 
 - The notebook [02_prompting.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/02_prompting.ipynb) generates prompts based on the 10K bills dataset. A total of 12 prompt modifications are applied across 2 GPT models: `gpt-3.5-turbo-0125` and `gpt-4o-2024-05-13`. This results in 24 prompts per bill. Detailed information about these prompts can be found in `./Data/02_prompting/prompting_strategies.csv`.
 
@@ -154,9 +154,9 @@ Our approach shares similarities with  Egami et al.'s method with few modificati
 
 - The model responses are then downloaded, decoded, and combined with the corresponding bills and prompt data, creating the main dataset for further analysis: `./Data/02_prompting/bills_prompts_responses.csv`.
 
-- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./FiguresTables`
+- Figures showing the variability of LLM-generated labels across prompt modifications and the accuracy of these labels relative to the true labels are stored in `./FiguresTables` -->
 
-## Error in LLM Predictions
+<!-- ## Error in LLM Predictions
 
 The notebook [03_predict_errors.ipynb](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/03_predict_errors.ipynb) analyzes prediction errors in LLM major topic predictions using a logistic regression model based on [this code](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/predict_errors.py). Let 
 - $X \in \mathbb{Z}^{10K \times 9698}$ be the bag-of-words representation of the 10K bill description, i.e., a matrix of token frequencies.
@@ -169,11 +169,11 @@ Using a 50% train-test split, we fit a regularized logistic regression model on 
 \beta_{m,p}^\text{Ridge} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_2^2\\
 \beta_{m,p}^\text{Lasso} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
 \end{align*}
-```
+``` -->
 
-The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./FiguresTables`.
+<!-- The models are evaluated using test data, and ROC curves for each type of regularization and GPT model are saved at: `./FiguresTables`. -->
 
-## Run LHS and RHS Simulations
+<!-- ## Run LHS and RHS Simulations
 
 The scripts `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regressions with $Y$ on the LHS or RHS:
 - LHS: $Y_\text{topic} = \beta_0 + \beta_1 V + \epsilon$
@@ -181,11 +181,11 @@ The scripts `04_simulate_lhs.r`, and `04_simulate_rhs.r` are used to run regress
 
 where
 - $Y_\text{topic} = 1\\{Y = \text{topic}\\}$ and $\text{topic}\in\\{3, 14, 15, 19, 20, \text{Other}\\}$
-- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor.
+- $V \in \\{\text{Democrat}, \text{Senate}, \text{DW1}\\}$, where $\text{Democrat} = 1\\{\text{Party} = \text{Democrat}\\}$, $\text{Senate} = 1\\{\text{Chamber} = \text{Senate}\\}$, and $\text{DW1}$ is the imputed DW1 score for the bill sponsor. -->
 
 <!-- To ensure reproducibility of the simulations, combination unique IDs as a seed. -->
 
-We perform $N=1000$ simulations with the following steps:
+<!-- We perform $N=1000$ simulations with the following steps:
 1. Fit a regression using all 10K bills and the true labels $Y^\text{Human}$. We denote the regression coefficient as $\beta^\star$.
 2. Fit a model using 10K bills and LLM predictions, $Y^\text{LLM}$.
 3. Sample 5K bills, fit a regression using $Y^\text{LLM}$ to obtain $\beta^\text{LLM}$.
@@ -195,7 +195,7 @@ We perform $N=1000$ simulations with the following steps:
 
 For all regressions, we report robust standard errors, except for the debiased model, where we use Bayesian bootstrap with $B=1000$ samples.
 
-Note: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample. -->
+Note: We assume that the regression parameters are identifiable. Specifically, in the RHS regressions, we require that the ranks of $\text{Rank}(Y^\text{Human}) = \text{Rank}(Y^\text{LLM}) = 6$ in the validation set. If this condition is not met, we redraw the sample.  -->
 
 
 <!-- # merges the results of the simulations and generating the following outputs: -->
@@ -223,15 +223,7 @@ The file [05_summarize_simulations.Rmd](https://github.com/asheshrambachan/Langu
 The file [06_results.Rmd](https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/congressional_bills_v2/Code/06_results.Rmd) generates the figures and tables found in `./FiguresTables/06_results.pdf`.
  -->
 
-# Data References
-
-The primary data sources used in this project are listed below. 
-
-- [Comparative Agendas Project (CAP)](https://www.comparativeagendas.net/#congressional_hearings). Version [19.3_3_3](https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv). Accessed July 5, 2024.
-
-- [Congressional Bills Project (CBP)](http://congressionalbills.org/download.html) 
-  - [80th through 92nd Congresses](http://congressionalbills.org/billfiles/bills80-92.zip). Version 4/27/2015. Accessed July 5, 2024
-  - [93rd through 114th Congresses](http://congressionalbills.org/billfiles/bills93-114.zip). Version 8/11/2018. Accessed July 5, 2024. 
+# References
 
 - Adler, E Scott and John Wilkerson, ``Congressional Bills Project: 1947-2016,'' NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
 
