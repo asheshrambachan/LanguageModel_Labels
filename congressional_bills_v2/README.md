@@ -3,21 +3,21 @@ Congressional Bills Experiment
 
 # Overview 
 
-This repository contains the replication files for the congressional bills experiment. The code is a combination of Python and R scripts, organized by workflow step. Each step serves a specific function in the data preparation, modeling, and evaluation processes:
+This repository contains the replication files for the congressional bills experiment. The code is a combination of Python and R scripts, labeled by their order in the workflow. 
 
 1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
-2. **Prompt Creation:** Generates 24 prompts per bill using 12 prompt strategies and 2 models.
-3. **Querying and Decoding LLM Responses:**
-   - **3.1** Queries LLMs to predict the major topic of each bill.
-   - **3.2** Downloads LLM responses.
-   - **3.3** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
+2. **Prompt Creation, LLM Querying, and Response Decoding:**
+   - **2.1** Generates 24 prompts per bill using 12 prompt templates and 2 models.
+   - **2.2** Queries LLMs to predict the major topic of each bill.
+   - **2.3** Downloads LLM responses.
+   - **2.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
 4. **Simulation Runs & Model Evaluation:**
-   - **4.1 and 4.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
-   - **4.3 and 4.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and  RHS.
+   - **3.1 and 3.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
+   - **3.3 and 3.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and  RHS.
 5. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
-   - **5.1** Estimates LLM prediction errors for each combination of prompt and model.
-   - **5.2** Plots: Distribution of bills over years, unique LLM major topics vs. prompt.
-   - **5.3 and 5.4** Generate figures and tables for regressions with proxy on the LHS and  RHS.
+   - **4.1** Estimates LLM prediction errors for each combination of prompt and model.
+   - **4.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
+   - **4.3 and 4.4** Generate figures and tables for regressions with proxy on the LHS and  RHS.
 
 
 # Experiment Replication 
@@ -68,7 +68,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
         python ./Code/1_clean_bills.py
         ```
 
-    2. **Replicating Prompt Creation, Querying and Decoding LLM Responses:** 
+    2. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
         If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, run the following commands. This will create the file `./Data/bills_llm.csv`:
         ```bash
         python ./Code/2.1_create_prompts.py
