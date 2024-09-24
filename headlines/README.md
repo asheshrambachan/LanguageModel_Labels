@@ -14,7 +14,12 @@ Our data generation and processing pipeline for this exercise is this the follow
   All 3 versions of this merged data can be found in the `./data/returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
 
 
-2. For each headline in the data, generate 5 sets of prompts for 3 LLMs (GPT-3.5-turbo, GPT-4o, and GPT-4o-mini). Each set of prompts asks a different economic question that tells the LLM to infer something about the company or its returns based on the headline.
+2. For each headline in the data, generate 5 sets of prompts for 3 OpenAI LLMs (further model details found [here](https://platform.openai.com/docs/models/gpt-4o)):
+ * GPT-3.5-turbo (default points to GPT-3.5-turbo-0125 trained up to Sep 2021)
+ * GPT-4o-mini (default points to gpt-4o-mini-2024-07-18 trained up to Oct 2023)
+ * GPT-4o (default pointed to gpt-4o-2024-05-13 in the version of the data here, but the data generating code has been updated to point to the newer gpt-4o-2024-08-06 trained up to Oct 2023). 
+ 
+ 	Each set of prompts asks a different economic question that tells the LLM to infer something about the company or its returns based on the headline.
 	
 	The question text can be found in `./data/prompt_templates.` In this directory, there are 2 `.txt` files for each question. One file has a version of the question that asks the LLM to respond by filling in a blank. The other version of the question asks the LLM to respond with a structured JSON object.
 	

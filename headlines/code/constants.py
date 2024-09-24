@@ -1,4 +1,4 @@
-API_KEY = "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"
+API_KEY = "insert API key here"
 
 personas = [
     "You are a knowledgeable economic agent. ",

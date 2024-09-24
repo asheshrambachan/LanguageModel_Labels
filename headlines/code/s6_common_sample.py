@@ -44,22 +44,21 @@ def save_common_sample_within(question, model, return_type):
                                                     return_type=return_type) 
                     for file_name in prompt_types}
     
-    print([len(df) for df in filtered_data.values()])
+    print("Step 1 - valid respopnses by prompting strategy: ", [len(df) for df in filtered_data.values()])
 
-    # Step 2: Find the common headlines across all datasets using set intersection
+    # Step 2: Find and filter the common headlines across all datasets using set intersection
     common_headlines = set.intersection(*[set(df["headline"]) for df in filtered_data.values()])
-    
-    # Step 3: Filter and deduplicate records based on common headlines
     final_data = {
         file_name: deduplicate_records(df[df["headline"].isin(common_headlines)]) 
         for file_name, df in filtered_data.items()
     }
+    print("Step 2 - common headlines: ", len(common_headlines))
 
     # Save the cleaned datasets
     for file_name, final_df in final_data.items():
         save_path = f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv"
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
         final_df.to_csv(save_path, index=False)
+    print("Step 3 - saved files")
 
 def save_common_sample_across(question, return_type):
 
@@ -97,7 +96,6 @@ def save_common_sample_across(question, return_type):
     for model, model_data in final_data_across_models.items():
         for file_name, file_df in model_data.items():
             save_path = f"{step6_path}/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
             file_df.to_csv(save_path, index=False)
 
 def main(question, model, return_type):
@@ -112,5 +110,6 @@ if __name__ == "__main__":
     for return_type in RETURN_TYPES:
         for question in QUESTIONS:
             for model in MODELS:
+                print(f"Processing {model} for question {question} and return type {return_type}")
                 main(question, model, return_type)      
 
