@@ -1,10 +1,10 @@
 import pandas as pd
-from s0_constants import economic_questions, models, month_batches, return_types, years, returns_path, step4_path, step5_path
+from constants import economic_questions, models, month_batches, return_types, years, returns_path, step4_path, step5_path
 import os
 
 def read_data(question, model, month, year, return_type):
     labels = pd.read_csv(f"{step4_path}/{model}/q{question}/q{question}_{month}{year}_processed.csv")
-    headlines = pd.read_csv(f"{returns_path}{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
+    headlines = pd.read_csv(f"{returns_path}/{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
     return labels, headlines
 
 def merge_data(labels, headlines):
@@ -55,11 +55,11 @@ def main(question, model, month, year, return_type):
 
 if __name__ == "__main__":
 
-    QUESTIONS = ["3"]
-    MODELS = ["gpt-3.5-turbo"]
-    MONTHS = ["jan"]
+    QUESTIONS = ["1", "2", "3", "4", "5"]
+    MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
+    MONTHS = ["oct"]
     YEARS = ["19"]
-    RETURN_TYPES = ["realized"]
+    RETURN_TYPES = ["realized", "abnormal_CAPM", "abnormal_FF3"]
 
     for question in QUESTIONS:
         for model in MODELS:

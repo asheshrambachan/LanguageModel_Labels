@@ -10,9 +10,9 @@ library(viridis)
 rm(list = ls())
 
 # Define the questions list
-questions <- c("q1", "q2", "q3", "q4", "q5")
+questions <- c("q2")#, "q2", "q3", "q4", "q5")
 return_type <- "realized"
-models <- c("gpt-4o")
+models <- c("gpt-3.5-turbo")
 
 # List of file names
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", 
@@ -34,7 +34,7 @@ for (q in questions) {
     question <- q
     model <- m
     
-    path <- paste0("../../data/step6_common_sample/across_models/", 
+    path <- paste0("../../data/step6_common_sample/within_model/", 
                    return_type, 
                    "/", 
                    model, 

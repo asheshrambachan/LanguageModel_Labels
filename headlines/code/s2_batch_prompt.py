@@ -1,6 +1,6 @@
 from openai import OpenAI
 import os
-from s0_constants import API_KEY, step1_path
+from constants import API_KEY, step1_path
 
 def initialize_client(api_key):
     """Initializes and returns the OpenAI client using the provided API key."""
@@ -29,14 +29,35 @@ def create_batch(client, batch_input_file_id, description):
 def main(question, model, month, year):
     """Main function to create a batch on OpenAI's servers."""
     description = f"{model} {question} {month} {year}"
-    file_path = os.path.join(step1_path, model, f'q{question}', f'q{question}_{month}{year}_prompts.jsonl')
-
-    # Initialize the client and create the batch
+    model_path = os.path.join(step1_path, model, f'q{question}')
+    
+    # Initialize the client
     client = initialize_client(API_KEY)
-    batch_input_file_id = create_batch_input_file(client, file_path)
-    batch = create_batch(client, batch_input_file_id, description=description)
+    
+    if month == "oct":
+        # File paths for both halves of October data
+        file_path1 = os.path.join(model_path, f'q{question}_{month}first{year}_prompts.jsonl')
+        file_path2 = os.path.join(model_path, f'q{question}_{month}second{year}_prompts.jsonl')
 
-    print(batch)
+        # Create batches for both files
+        batch_input_file_id1 = create_batch_input_file(client, file_path1)
+        batch1 = create_batch(client, batch_input_file_id1, description=f"{description} first")
+
+        batch_input_file_id2 = create_batch_input_file(client, file_path2)
+        batch2 = create_batch(client, batch_input_file_id2, description=f"{description} second")
+
+        print(batch1)
+        print(batch2)
+
+    else:
+        # Normal case for non-October months
+        file_path = os.path.join(model_path, f'q{question}_{month}{year}_prompts.jsonl')
+
+        # Create batch
+        batch_input_file_id = create_batch_input_file(client, file_path)
+        batch = create_batch(client, batch_input_file_id, description=description)
+
+        print(batch)
 
 if __name__ == "__main__":
 

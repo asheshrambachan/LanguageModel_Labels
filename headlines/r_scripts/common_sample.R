@@ -14,8 +14,8 @@ rm(list = ls())
 # Define lists of questions, models, and months to iterate over
 questions <- c("q1")
 models <- c("gpt-3.5-turbo")
-months <- c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
-            "octfirst", "octsecond", "nov", "dec")
+months <- c("jan", "feb", "mar", "apr", "may", "jun", 
+            "jul", "aug", "sep", "oct", "nov", "dec")
 
 # Define return type: "abnormal_FF3" or "abnormal_CAPM" for abnormal returns or "realized" 
 return_type <- "abnormal_CAPM"

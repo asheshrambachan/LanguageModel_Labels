@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import json
 import os
-from s0_constants import models, step2_path, step4_path, step7_path, step8_path
+from constants import models, step2_path, step4_path, step7_path, step8_path
 
 def sample_index_from_step4(step4_file):
     try:

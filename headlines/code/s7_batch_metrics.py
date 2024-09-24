@@ -1,92 +1,77 @@
 import os
 import pandas as pd
-from s0_constants import return_types, month_batches, years, economic_questions, models, prompt_types, step1_path, step5_path, step7_path
-from helpers import get_file_metrics, count_jsonl_rows
-
+from constants import (
+    return_types, month_batches, years, economic_questions, models, 
+    prompt_types, step1_path, step5_path, step6_path, step7_path
+)
+from helpers import get_batch_file_metrics, count_overlap, count_jsonl_rows
 
 # Function to get model data
-def get_model_data(model_dir, response_file_path, prompt_file_path):
+def get_batch_info(response_file_path, prompt_file_path):
+    row_count, empty_count, dup_count = (0, 0, 0)
+    prompt_row_count = 0
 
     if os.path.exists(response_file_path):
-        row_count, empty_count, dup_count = get_file_metrics(response_file_path)
-    else:
-        print(f"Response file for {model_dir} does not exist at {response_file_path}")
-        row_count, empty_count, dup_count = 0, 0, 0
+        row_count, empty_count, dup_count = get_batch_file_metrics(response_file_path)
 
     if os.path.exists(prompt_file_path):
         prompt_row_count = count_jsonl_rows(prompt_file_path) / 9
-    else:
-        print(f"Prompt file for {model_dir} does not exist at {prompt_file_path}")
-        prompt_row_count = 0
+    elif "oct" in prompt_file_path:
+        first = prompt_file_path[:-16] + "first" + prompt_file_path[-16:]
+        second = prompt_file_path[:-16] + "second" + prompt_file_path[-16:]
+        if os.path.exists(first) and os.path.exists(second):
+            prompt_row_count = count_jsonl_rows(first) / 9 + count_jsonl_rows(second) / 9
 
     return {
-        f"{model_dir} response rows": row_count,
-        f"{model_dir} prompt rows": prompt_row_count,
-        f"{model_dir} empty headlines": empty_count,
-        f"{model_dir} duplicate headlines": dup_count
+        "response rows": row_count,
+        "prompt rows": prompt_row_count,
+        "empty headlines": empty_count,
+        "duplicate headlines": dup_count
     }
 
-# Function to calculate deduplicated and clean rows
-def calculate_deduplicated_clean(df, model):
-    if f"{model} response rows" in df and f"{model} duplicate headlines" in df:
-        df[f"{model} deduplicated"] = df[f"{model} response rows"] - df[f"{model} duplicate headlines"]
-        df[f"{model} clean"] = df[f"{model} deduplicated"] - df[f"{model} empty headlines"]
-        print(f"Calculated deduplicated/clean for {model}")
-    else:
-        print(f"Missing columns for {model}, skipping deduplicated/clean calculation.")
+def get_combined_info(response_file_path, model_common_file_path, all_common_file_path):
+    model_sample_count = count_overlap(response_file_path, model_common_file_path) if os.path.exists(model_common_file_path) else 0
+    model_sample_count1 = count_overlap(model_common_file_path, response_file_path) if os.path.exists(model_common_file_path) else 0
+    all_sample_count = count_overlap(response_file_path, all_common_file_path) if os.path.exists(all_common_file_path) else 0
+    all_sample_count1 = count_overlap(all_common_file_path, response_file_path) if os.path.exists(all_common_file_path) else 0
+
+    return {
+        "rows in model sample": model_sample_count,
+        "rows in all sample": all_sample_count,
+        "model sample rows in batch": model_sample_count1,
+        "all sample rows in batch": all_sample_count1
+    }
 
 # Main function to execute the core logic
-def main():
-    summary_data = []
-    return_type = "realized"
+def main(questions, models, months, return_types, prompt_types):
+    monthly_batch_info = []
     
-    # Main loop through directories and files
-    for question_dir in economic_questions:  # Limiting question_dir to the first item for debugging
-        for month_dir in month_batches:
-            for file in prompt_types:
-                model_data = {}
-                for model_dir in models:
-                    response_file_path = os.path.join(step5_path, return_type, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19", file + ".csv")
-                    prompt_file_path = os.path.join(step1_path, model_dir, "q" + question_dir, f"q{question_dir}_{month_dir}19_prompts.jsonl")
-                    
-                    # Get data and print debug information
-                    model_data.update(get_model_data(model_dir, response_file_path, prompt_file_path))
-                
-                # Append summary data for this file
-                summary_data.append({
-                    "question": question_dir,
-                    "month": month_dir,
-                    "file": file,
-                    **model_data
-                })
+    for question_dir, model_dir, return_type, file, month_dir in [(q, m, rt, p, mn) 
+        for q in questions for m in models for rt in return_types for p in prompt_types for mn in months]:
+        
+        print(f"Processing: q{question_dir}, {model_dir}, {return_type}, {file}, {month_dir}")
 
-    # Convert summary data to DataFrame
-    summary_df = pd.DataFrame(summary_data)
+        model_common_file_path = os.path.join(step6_path, "within_model", return_type, model_dir, f"q{question_dir}", f"{file}.csv")
+        all_common_file_path = os.path.join(step6_path, "across_models", return_type, model_dir, f"q{question_dir}", f"{file}.csv")
+        response_file_path = os.path.join(step5_path, return_type, model_dir, f"q{question_dir}", f"q{question_dir}_{month_dir}19", f"{file}.csv")
+        prompt_file_path = os.path.join(step1_path, model_dir, f"q{question_dir}", f"q{question_dir}_{month_dir}19_prompts.jsonl")
 
-    # Check if DataFrame has been populated
-    if summary_df.empty:
-        print("No data found. Please check your file paths or input data.")
-        return
+        model_data = get_batch_info(response_file_path, prompt_file_path)
+        combined_info = get_combined_info(response_file_path, model_common_file_path, all_common_file_path)
 
-    # Apply deduplicated and clean row calculations to all models
-    for model in models:
-        calculate_deduplicated_clean(summary_df, model)
+        monthly_batch_info.append({
+            "question": question_dir,
+            "month": month_dir,
+            "model": model_dir,
+            "file": file,
+            "return_type": return_type,
+            **model_data,
+            **combined_info
+        })
 
-    # Check if deduplicated columns were successfully created
-    missing_cols = [col for col in ["gpt-3.5-turbo deduplicated", "gpt-4o deduplicated", "gpt-4o-mini deduplicated"] if col not in summary_df.columns]
-    if missing_cols:
-        print(f"Error: Missing columns: {missing_cols}")
-        return
-
-    # Check if deduplicated rows are equal across models
-    summary_df["deduplicated equal for all models?"] = (
-        (summary_df["gpt-3.5-turbo deduplicated"] == summary_df["gpt-4o deduplicated"]) &
-        (summary_df["gpt-3.5-turbo deduplicated"] == summary_df["gpt-4o-mini deduplicated"])
-    )
-
-    # Save the updated summary_df to CSV
-    summary_df.to_csv(step7_path, index=False)
+    # Convert summary data to DataFrame and save
+    pd.DataFrame(monthly_batch_info).to_csv(step7_path, index=False)
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
-    main()
+    main(economic_questions, models, month_batches, return_types[:1], prompt_types[:1])

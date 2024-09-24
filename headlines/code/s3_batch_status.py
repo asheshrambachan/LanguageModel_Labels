@@ -1,5 +1,5 @@
 import os
-from s0_constants import API_KEY, step2_path
+from constants import API_KEY, step2_path
 from s2_batch_prompt import initialize_client
 
 def retrieve_batch_status(client, batch_id):
@@ -8,12 +8,16 @@ def retrieve_batch_status(client, batch_id):
 
 def get_batch_description(client, batch):
     """Retrieves the description of a batch."""
-
     description = batch.metadata["description"].split(" ")
     model = description[0]
     question = description[1]
-    month = description[2]
     year = description[3]
+
+    if len(description) == 4:
+        part = description[4]
+        month = description[2] + part
+    else:
+        month = description[2]
     
     return model, question, month, year
 

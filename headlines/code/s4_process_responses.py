@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 import re
-from s0_constants import personas, thought_modifiers, step1_path, step2_path, step4_path
+from constants import personas, thought_modifiers, step1_path, step2_path, step4_path
 
 def read_jsonl(file_path, num_lines):
     """Reads a specified number of lines from a JSONL file."""
@@ -138,6 +138,18 @@ def clean_and_filter_data(data, question):
     data.loc[~data['magnitude'].between(0, 1), 'magnitude'] = None
     return data
 
+def process(question, model, month, year):
+    input_file_path, output_file_path = construct_file_paths(question, model, month, year)
+    input_df, start_line, num_lines = read_and_process_input_data(input_file_path)
+    outputs_plain_df = read_and_process_plain_text_responses(output_file_path, num_lines)
+    outputs_json_df = read_and_process_json_responses(output_file_path, start_line)
+    combined_output = combine_responses(outputs_plain_df, outputs_json_df)
+    if len(input_df) != len(combined_output):
+        print(f"Length mismatch: input_df: {len(input_df)}, combined_output: {len(combined_output)}")
+        print(question, model, month)
+    data = merge_input_with_combined_output(input_df, combined_output)
+    data = clean_and_filter_data(data, question)
+    return data
 
 def calculate_statistics(data):
     """Calculate statistics for the given data."""
@@ -151,25 +163,20 @@ def calculate_statistics(data):
     return data_mean
 
 def main(question, model, month, year):
-
-    input_file_path, output_file_path = construct_file_paths(question, model, month, year)
-    input_df, start_line, num_lines = read_and_process_input_data(input_file_path)
-    outputs_plain_df = read_and_process_plain_text_responses(output_file_path, num_lines)
-    outputs_json_df = read_and_process_json_responses(output_file_path, start_line)
-    combined_output = combine_responses(outputs_plain_df, outputs_json_df)
-    if len(input_df) != len(combined_output):
-        print(f"Length mismatch: input_df: {len(input_df)}, combined_output: {len(combined_output)}")
-        print(question, model, month)
-    data = merge_input_with_combined_output(input_df, combined_output)
-    data = clean_and_filter_data(data, question)
-
+    if month == "oct":
+        data_first = process(question, model, f"{month}first", year)
+        data_second = process(question, model, f"{month}second", year)
+        data = pd.concat([data_first, data_second], ignore_index=True)
+    else:    
+        data = process(question, model, month, year)
+    
     data.to_csv(f"{step4_path}/{model}/q{question}/q{question}_{month}{year}_processed.csv", index=False)
 
 if __name__ == "__main__":
     
-    QUESTION = ["3"]
-    MODEL = ["gpt-4o"]
-    MONTH = ["aug"]
+    QUESTION = ["1", "2", "3", "4", "5"]
+    MODEL = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
+    MONTH = ["oct"]
     YEAR = "19"
 
     for question in QUESTION:

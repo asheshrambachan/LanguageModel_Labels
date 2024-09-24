@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
-from s0_constants import economic_questions, models, month_batches, return_types, prompt_types, step5_path, step6_path
+from constants import models, month_batches, prompt_types, step5_path, step6_path
 
 # Function to calculate cumulative abnormal returns (CAR)
 def calculate_CAR(df):
@@ -23,7 +23,7 @@ def read_combine_filter(model, months, question, file_name, return_type):
         
     return combined_df
 
-# Function to deduplicate records based on common headlines
+# Function to deduplicate records (take the average magnitude and confidence if multiple)
 def deduplicate_records(df):
     # Group by headline and handle character and numeric variables
     deduplicated = df.groupby("headline", as_index=False).agg({
@@ -44,6 +44,8 @@ def save_common_sample_within(question, model, return_type):
                                                     return_type=return_type) 
                     for file_name in prompt_types}
     
+    print([len(df) for df in filtered_data.values()])
+
     # Step 2: Find the common headlines across all datasets using set intersection
     common_headlines = set.intersection(*[set(df["headline"]) for df in filtered_data.values()])
     
@@ -64,11 +66,7 @@ def save_common_sample_across(question, return_type):
     # Step 1: Read, combine, and filter data for all models
     filtered_data_across_models = {
         model: {
-            file_name: read_combine_filter(model=model, 
-                                           months=month_batches,
-                                           file_name=f"{file_name}.csv",
-                                           question=question, 
-                                           return_type=return_type) 
+            file_name: pd.read_csv(f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv")
             for file_name in prompt_types
         }
         for model in models
@@ -79,38 +77,37 @@ def save_common_sample_across(question, return_type):
     common_headlines_across_models = set.intersection(
         *[
             set.intersection(*[
-                set(pd.DataFrame(df)["headline"])  # Explicitly convert df to DataFrame to avoid ndarray issue
+                set(df["headline"])
                 for df in model_data.values()
             ])
             for model_data in filtered_data_across_models.values()
         ]
     )
 
-    # Step 3: Filter and deduplicate records based on common headlines across models
+    # Step 3: Filter records based on common headlines across models
     final_data_across_models = {
         model: {
-            file_name: deduplicate_records(pd.DataFrame(df)[df["headline"].isin(common_headlines_across_models)]) 
+            file_name: pd.DataFrame(df)[df["headline"].isin(common_headlines_across_models)] 
             for file_name, df in model_data.items()
         }
         for model, model_data in filtered_data_across_models.items()
     }
 
     # Step 4: Save the cleaned datasets for each model
-    for model, final_data in final_data_across_models.items():
-        for file_name, final_df in final_data.items():
+    for model, model_data in final_data_across_models.items():
+        for file_name, file_df in model_data.items():
             save_path = f"{step6_path}/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            final_df.to_csv(save_path, index=False)
-
+            file_df.to_csv(save_path, index=False)
 
 def main(question, model, return_type):
     save_common_sample_within(question, model, return_type)
 
 if __name__ == "__main__":
 
-    RETURN_TYPES = ["realized"]
-    QUESTIONS = ["3"]
-    MODELS = ["gpt-3.5-turbo"]
+    RETURN_TYPES = ["abnormal_CAPM", "abnormal_FF3", "realized"]
+    QUESTIONS = ["1", "2", "3", "4", "5"]
+    MODELS = ["gpt-4o-mini", "gpt-3.5-turbo", "gpt-4o"]
 
     for return_type in RETURN_TYPES:
         for question in QUESTIONS:
