@@ -59,8 +59,8 @@ source(file.path(repo_dir, "Code/ggplot_theme.r"))
 # Note: prompts were sorted based on the coefficients values of GPT3.5 model.
 V.levels <- c("Democrat", "Senate", "DW1")
 
-model.levels <- c("star", "gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
-model.labels <- c("Human", "GPT-3.5", "GPT-4o")
+model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
+model.labels <- c("GPT-3.5", "GPT-4o", "Human")
 
 # Y.labeller <- function(Y) TeX(sprintf("$Y_{%s}$", Y)) 
 Y.levels <- c(3, 14, 15, 19, 20, "Other")
@@ -89,7 +89,7 @@ regressions.llm <- read.csv(file.path(data_dir, "rhs_10k_llm.csv")) %>%
 
 regressions.human <- read.csv(file.path(data_dir, "rhs_10k_human.csv")) %>%
   mutate(
-    model = "star",
+    model = "Human",
     model = factor(model, levels=model.levels, labels=model.labels),
     Y = sub("Y","", coef_name), 
     V = factor(V, levels=V.levels),
@@ -104,19 +104,17 @@ regressions.human <- read.csv(file.path(data_dir, "rhs_10k_human.csv")) %>%
 
 coefs <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_coef, color=model, shape=model)) +
-
-
   geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width=0.5, linewidth=0.3) +
   geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
   geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
   
   facet_grid(V ~ Y, labeller=label_wrap_gen(width=30), scales="free_y") +
   
-  xlab("Prompt-Model Index") +
+  xlab("Prompt-Model Index (Sorted)") +
   ylab("Coefficients") +
   
   scale_color_manual(name=NULL, values=my_colors, labels=model.labels) +
-  guides(color = guide_legend(override.aes = list(shape = c(NA, 16, 17))), 
+  guides(color = guide_legend(override.aes = list(shape = c(16, 17, NA))),
          shape = "none") +  # merge color and shape legends
   theme.point
 
@@ -130,13 +128,12 @@ tscores <- regressions.llm %>%
   
   facet_grid(V ~ Y, labeller=label_wrap_gen(width=30), scales="free_y") +
   
-  xlab("Prompt-Model Index") +
+  xlab("Prompt-Model Index (Sorted)") +
   ylab("t-scores") +
 
-  scale_color_manual(name=NULL, values=my_colors, labels=model.labels[2:3]) +
-  guides(color = guide_legend(override.aes = list(shape = c(NA, 16, 17)[2:3])), 
+  scale_color_manual(name=NULL, values=my_colors) +
+  guides(color = guide_legend(override.aes = list(shape = c(16, 17))),
          shape = "none") +  # merge color and shape legends
-  
   theme.point
 
 tscores

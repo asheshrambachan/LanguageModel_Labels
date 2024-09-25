@@ -7,9 +7,9 @@ loadfonts(quiet=T)
 
 my_palette <- c("red"="#F85427", "blue"="#277BB6", "green"="#97BD59", "yellow"="#FFD166", "black"="#262626", "gray"="#605856", "lightgray"="#EBEBEB")
 my_colors <- c(
-  "Human" = my_palette[["red"]], 
   "GPT-3.5" =  my_palette[["green"]],
   "GPT-4o" = my_palette[["blue"]],
+  "Human" = my_palette[["red"]], 
   
   "LLM" = my_palette[["green"]], 
   "Human Validation" = my_palette[["red"]],
