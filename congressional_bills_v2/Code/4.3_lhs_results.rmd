@@ -60,12 +60,15 @@ V.levels <- c("Democrat", "Senate", "DW1")
 model.levels <- c("star", "gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
 model.labels <- c("Human", "GPT-3.5", "GPT-4o")
 
-Y.labeller <- function(Y) TeX(sprintf("$Y_{%s}$", Y)) 
+Y.levels <- c(3, 14, 15, 19, 20)
+Y.labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
 
 prompt_index <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
   group_by(V, Y, coef_name) %>%
-  arrange(V, Y, coef_name, coef) %>% mutate(prompt.ordered_coef = row_number()) %>% # create prompt index ordered by coef
-  arrange(V, Y, coef_name, t) %>% mutate(prompt.ordered_t = row_number()) %>% # create prompt index ordered by t scores
+  arrange(V, Y, coef_name, coef) %>% 
+  mutate(prompt.ordered_coef = row_number()) %>% # create prompt index ordered by coef
+  arrange(V, Y, coef_name, t) %>% 
+  mutate(prompt.ordered_t = row_number()) %>% # create prompt index ordered by t scores
   ungroup() %>%
   select(V, Y, model, coef_name, prompt, prompt.ordered_coef, prompt.ordered_t) %>%
   distinct()
@@ -76,7 +79,8 @@ regressions.llm <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
     prompt.ordered_coef = as.factor(prompt.ordered_coef),
     prompt.ordered_t = as.factor(prompt.ordered_t),
     model = factor(model, levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels)
+    V = factor(V, levels=V.levels),
+    Y = factor(Y, levels=Y.levels, labels=Y.labels)
     ) %>%
   filter(coef_name!="(Intercept)")
 
@@ -84,12 +88,13 @@ regressions.human <- read.csv(file.path(data_dir, "lhs_10k_human.csv")) %>%
   mutate(
     model = "star",
     model = factor(model, levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels)
+    V = factor(V, levels=V.levels),
+    Y = factor(Y, levels=Y.levels, labels=Y.labels)
     ) %>%
   filter(coef_name!="(Intercept)")
 ```
 
-```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 
 coefs <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_coef, color=model, shape=model)) +
@@ -99,7 +104,7 @@ coefs <- regressions.llm %>%
   geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
   geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
 
-  facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed)) +
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
   
   xlab("Prompt-Model Index") +
   ylab("Coefficients") +
@@ -112,7 +117,7 @@ coefs <- regressions.llm %>%
 coefs
 ```
 
-```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 
 tscores <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_t, color=model, shape=model)) +
@@ -121,7 +126,7 @@ tscores <- regressions.llm %>%
   # geom_hline(aes(yintercept=t, color=model), linewidth=0.5, data=regressions.human) +
   geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
 
-  facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed)) +
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
   
   xlab("Prompt-Model Index") +
   ylab("t-scores") +
@@ -159,7 +164,7 @@ n_bins <- 30
 
 
 
-```{r fig03_bias1_llm, fig.height=3.5, fig.width=4, fig.cap="Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, using a regression of the form $Y_t = \\alpha + \\beta V$, where $t \\in \\{3, 14, 15, 19, 20\\}$ represents major topics and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. For $\\beta^\\star$, $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for $\\beta^\\text{LLM}$, $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
+```{r fig03_bias1_llm, fig.height=3.5, fig.width=4, fig.cap="Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, using a regression of the form $Y_t = \\alpha + \\beta V$, where $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} represents major topics and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. For $\\beta^\\star$, $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for $\\beta^\\text{LLM}$, $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
 bias1 <- regressions.averaged %>%
   filter(
     proportion==0.05, 

@@ -62,7 +62,10 @@ V.levels <- c("Democrat", "Senate", "DW1")
 model.levels <- c("star", "gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
 model.labels <- c("Human", "GPT-3.5", "GPT-4o")
 
-Y.labeller <- function(Y) TeX(sprintf("$Y_{%s}$", Y)) 
+# Y.labeller <- function(Y) TeX(sprintf("$Y_{%s}$", Y)) 
+Y.levels <- c(3, 14, 15, 19, 20, "Other")
+Y.labels <- c("Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management", "Other")
+
 
 prompt_index <- read.csv(file.path(data_dir, "rhs_10k_llm.csv")) %>%
   group_by(V, coef_name) %>%
@@ -79,35 +82,35 @@ regressions.llm <- read.csv(file.path(data_dir, "rhs_10k_llm.csv")) %>%
     prompt.ordered_t = as.factor(prompt.ordered_t),
     model = factor(model, levels=model.levels, labels=model.labels),
     Y = sub("Y","", coef_name), 
-    V = factor(V, levels=V.levels)
-    ) # %>%
-  # filter(coef_name!="Other")
+    V = factor(V, levels=V.levels),
+    Y = factor(Y, levels=Y.levels, labels=Y.labels)
+    ) %>%
+ filter(Y!="Other")
 
 regressions.human <- read.csv(file.path(data_dir, "rhs_10k_human.csv")) %>%
   mutate(
     model = "star",
     model = factor(model, levels=model.levels, labels=model.labels),
     Y = sub("Y","", coef_name), 
-    V = factor(V, levels=V.levels)
-    ) # %>%
-  # filter(coef_name!="Other")
+    V = factor(V, levels=V.levels),
+    Y = factor(Y, levels=Y.levels, labels=Y.labels)
+    ) %>%
+ filter(Y!="Other")
 ```
 
 
 
-```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta_t$  vs. Prompt for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $V = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19} \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20, Other\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta_t$  vs. Prompt for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $V = Y^\\top\\beta = \\sum_{t} Y_t \\beta_t$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here,  $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ and $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\}. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 
 coefs <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_coef, color=model, shape=model)) +
 
-  # geom_hline(aes(yintercept=lci, color=model), linetype="dashed", linewidth=0.3, data=regressions.human) +
-  # geom_hline(aes(yintercept=uci, color=model), linetype="dashed", linewidth=0.3, data=regressions.human) +
-  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
 
   geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width=0.5, linewidth=0.3) +
   geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
   
-  facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed), scales="free_y") +
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30), scales="free_y") +
   
   xlab("Prompt-Model Index") +
   ylab("Coefficients") +
@@ -120,14 +123,12 @@ coefs <- regressions.llm %>%
 coefs
 ```
 
-```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of each $\\beta_t$ vs. Prompt for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $V = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19} \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20, Other\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of each $\\beta_t$ vs. Prompt for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $V = Y^\\top\\beta = \\sum_{t} Y_t \\beta_t$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ and $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\}. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 tscores <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_t, color=model, shape=model)) +
-
-  # geom_hline(aes(yintercept=t, color=model), linewidth=0.5, data=regressions.human) +
   geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
-
-  facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed), scales="free_y") +
+  
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30), scales="free_y") +
   
   xlab("Prompt-Model Index") +
   ylab("t-scores") +
@@ -151,29 +152,29 @@ regression.labels <- c("LLM", "Human Validation", "Debiased")
 model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
 model.labels <- c("GPT3.5", "GPT4o")
 
-Y.levels <- c("3", "14", "15", "19", "20", "Other")
+Y.levels <- c(3, 14, 15, 19, 20, "Other")
+Y.labels <- c("Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management", "Other")
 
 regressions.averaged <- read.csv(file.path(data_dir, "rhs_5k_llm_human_debiased_averaged.csv")) %>%
    mutate(
      bias_norm = bias_mean/coef_sd, 
-     Y = factor(sub("Y","", coef_name), levels=Y.levels), 
+     Y = factor(sub("Y","", coef_name), levels=Y.levels, labels=Y.labels), 
      V = factor(V, levels=V.levels),
      model = factor(model, levels=model.levels, labels=model.labels),
      regression = factor(regression, levels=regression.levels, labels=regression.labels)
      ) %>%
-  rename(proportion=train_proportion) # %>%
-  # filter(Y!="Other")
+  rename(proportion=train_proportion) %>%
+  filter(Y!="Other")
 
 facet.labeller <- labeller(
-  Y = function(Y) TeX(sprintf("$Y_{%s}$", Y)),
-  proportion = function(proportion) paste("'", sprintf("Validation Proportion=%s%%", as.numeric(proportion)*100),"'"),
-  .default = label_parsed
+  Y = function(Y) Y,
+  proportion = function(proportion) sprintf("Validation Proportion=%s%%", as.numeric(proportion)*100)
   )
 
 n_bins <- 30
 ```
 
-```{r fig03_bias1_llm, fig.height=2, fig.width=8, fig.cap="Bias Density of $\\beta_t^\\text{LLM}$ for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta_t^\\text{LLM}$ and the human-based coefficient $\\beta_t^\\star$, using a regression of the form $V = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19} \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$, where $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ and $t \\in \\{3, 14, 15, 19, 20\\}$. For human-based coefficients, the covariates are $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for LLM-based coefficients, the covariates are $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta_t^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta_t^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. The bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
+```{r fig03_bias1_llm, fig.height=2, fig.width=8, fig.cap="Bias Density of $\\beta_t^\\text{LLM}$ for all $t$. Proxy on the RHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta_t^\\text{LLM}$ and the human-based coefficient $\\beta_t^\\star$, using a regression of the form $V = Y^\\top\\beta = \\sum_{t} Y_t \\beta_t$, where $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ and $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\}. For human-based coefficients, the covariates are $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for LLM-based coefficients, the covariates are $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta_t^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta_t^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. The bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
 
 bias1 <- regressions.averaged %>%
   filter(
@@ -182,7 +183,7 @@ bias1 <- regressions.averaged %>%
   ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(count/tapply(count, PANEL, FUN=sum)[PANEL]), fill=regression)) +
   geom_histogram(bins=n_bins, position=position_dodge()) +
-  facet_grid( ~ Y, labeller=facet.labeller, scales="free_x") +
+  facet_grid( ~ Y, labeller=label_wrap_gen(width=30), scales="free_x") +
   
   xlab("Bias") +
   ylab("Probability Densities") +
@@ -207,7 +208,7 @@ bias1_norm <- regressions.averaged %>%
   ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(count/tapply(count, PANEL, FUN=sum)[PANEL]), fill=regression)) +
   geom_histogram(bins=n_bins, position=position_dodge()) +
-  facet_grid( ~ Y, labeller=facet.labeller, scales="free_x") +
+  facet_grid( ~ Y, labeller=label_wrap_gen(width=30), scales="free_x") +
   
   xlab("Normalized Bias") +
   ylab("Probability Densities") +
@@ -224,11 +225,11 @@ bias1_norm
 
 \clearpage
 
-```{r fig05_bias2_3, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{3}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig05_bias2_3, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{t}$, for $t=$Health, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 bias2 <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="3",
+    Y==Y.labels[1],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
@@ -247,12 +248,12 @@ bias2 <- regressions.averaged %>%
 bias2
 ```
 
-```{r fig06_bias2_14, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{14}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig06_bias2_14, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2 <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="14",
+    Y==Y.labels[2],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
@@ -272,12 +273,12 @@ bias2
 ```
 
 
-```{r fig07_bias2_15, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{15}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig07_bias2_15, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2 <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="15",
+    Y==Y.labels[3],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
@@ -296,12 +297,12 @@ bias2 <- regressions.averaged %>%
 bias2
 ```
 
-```{r fig08_bias2_19, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{19}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig08_bias2_19, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2 <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="19",
+    Y==Y.labels[4],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
@@ -320,36 +321,12 @@ bias2 <- regressions.averaged %>%
 bias2
 ```
 
-```{r fig09_bias2_20, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{20}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig09_bias2_20, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2 <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="20",
-    regression!="Human Validation"
-    ) %>%
-  ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
-             group=regression, fill=regression)) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
-  facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
-  
-  xlab("Bias") +
-  ylab("Probability Densities") +
-  
-  scale_fill_manual(name=NULL, values=my_colors) +
-  scale_x_symmetric(mid=0) +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  theme.bar
-
-bias2
-```
-
-```{r fig10_bias2_Other, fig.height=3*1.5, fig.width=8, fig.cap="Bias Density of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
-
-bias2 <- regressions.averaged %>%
-  filter(
-    # proportion!=0.25,
-    Y=="Other",
+    Y==Y.labels[5],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
@@ -370,12 +347,12 @@ bias2
 
 \clearpage 
 
-```{r fig11_bias2_norm_3, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{3}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig10_bias2_norm_3, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{t}$, $t=$Health, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="3",
+    Y==Y.labels[1],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -394,12 +371,12 @@ bias2_norm <- regressions.averaged %>%
 bias2_norm
 ```
 
-```{r fig12_bias2_norm_14, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{14}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig11_bias2_norm_14, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="14",
+    Y==Y.labels[2],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -418,12 +395,12 @@ bias2_norm <- regressions.averaged %>%
 bias2_norm
 ```
 
-```{r fig13_bias2_norm_15, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{15}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig12_bias2_norm_15, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="15",
+    Y==Y.labels[3],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -442,12 +419,12 @@ bias2_norm <- regressions.averaged %>%
 bias2_norm
 ```
 
-```{r fig14_bias2_norm_19, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{19}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig13_bias2_norm_19, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="19",
+    Y==Y.labels[4],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -466,36 +443,12 @@ bias2_norm <- regressions.averaged %>%
 bias2_norm
 ```
 
-```{r fig15_bias2_norm_20, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{20}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig14_bias2_norm_20, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
   filter(
     # proportion!=0.25,
-    Y=="20",
-    regression!="Human Validation"
-    ) %>%
-  ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
-             group=regression, fill=regression)) +
-  geom_histogram(binwidth=0.09, position=position_dodge()) +
-  facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
-  
-  xlab("Normalized Bias") +
-  ylab("Probability Densities") +
-  
-  scale_fill_manual(name=NULL, values=my_colors) +
-  scale_x_symmetric(mid=0) +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  theme.bar
-
-bias2_norm
-```
-
-```{r fig16_bias2_norm_Other, fig.height=3*1.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
-
-bias2_norm <- regressions.averaged %>%
-  filter(
-    # proportion!=0.25,
-    Y=="Other",
+    Y==Y.labels[5],
     regression!="Human Validation"
     ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -517,7 +470,7 @@ bias2_norm
 
 \clearpage
 
-```{r fig17_mse1, fig.height=11, fig.width=8, fig.cap="MSE Empirical CDF for all $\\beta$s by Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig15_mse1, fig.height=11, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_t$ for all $t$ by Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse1 <- regressions.averaged %>%
   filter(
@@ -540,13 +493,13 @@ mse1 <- regressions.averaged %>%
 mse1
 ```
 
-```{r fig18_mse2_3, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_3$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig16_mse2_3, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{t}$, $t=$Health,  by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
     # proportion != 0.25,
     regression != "LLM",
-    Y == "3"
+    Y == Y.labels[1]
     ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   
@@ -564,13 +517,13 @@ mse2 <- regressions.averaged %>%
 mse2
 ```
 
-```{r fig19_mse2_14, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{14}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig17_mse2_14, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
     # proportion != 0.25,
     regression != "LLM",
-    Y == "14"
+    Y == Y.labels[2]
     ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   
@@ -589,13 +542,13 @@ mse2
 ```
 
 
-```{r fig20_mse2_15, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{15}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig18_mse2_15, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
     # proportion != 0.25,
     regression != "LLM",
-    Y == "15"
+    Y == Y.labels[3]
     ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   
@@ -614,13 +567,13 @@ mse2
 ```
 
 
-```{r fig21_mse2_19, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{19}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig19_mse2_19, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
     # proportion != 0.25,
     regression != "LLM",
-    Y == "19"
+    Y == Y.labels[4]
     ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   
@@ -639,13 +592,13 @@ mse2
 ```
 
 
-```{r fig22_mse2_20, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{20}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
+```{r fig20_mse2_20, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
     # proportion != 0.25,
     regression != "LLM",
-    Y == "20"
+    Y == Y.labels[5]
     ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   
@@ -664,29 +617,6 @@ mse2
 ```
 
 
-```{r fig23_mse2_other, fig.height=4, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples. Proxy on the RHS.", fig.align="center"}
-
-mse2 <- regressions.averaged %>%
-  filter(
-    # proportion != 0.25,
-    regression != "LLM",
-    Y == "Other"
-    ) %>%
-  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
-  
-  stat_ecdf(linewidth=0.5) +
-  facet_grid(model ~ proportion, labeller=facet.labeller, scales="free_x") +
-  
-  xlab("MSE") +
-  ylab("Empirical CDF") +
-  
-  coord_cartesian(xlim=c(0,0.008)) +
-  scale_color_manual(name="", values=my_colors) +
-  scale_linetype_manual(name="", values=c("dashed", "solid")) +
-  theme.mse
-
-mse2
-```
 
 \clearpage
 
@@ -694,14 +624,11 @@ mse2
 regression.levels <- c("5k_V_Yllm", "train_V_Yhuman", "Vtilde_Ytilde")
 regression.labels <- c("LLM", "Human Validation", "Debiased")
 
-model.levels <- c("gpt-3.5", "gpt-4o")
+model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
 model.labels <- c("GPT-3.5", "GPT-4o")
 
 proportion.levels <- c(0.05, 0.10, 0.25, 0.50)
 proportion.labels <- sprintf("%s\\%%", proportion.levels*100)
-
-Y.levels <- c("3", "14", "15", "19", "20", "Other")
-Y.labels <- sprintf("$Y_{%s}$", Y.levels)
 
 regressions.averaged <- read.csv(file.path(data_dir, "rhs_5k_llm_human_debiased_averaged.csv")) %>%
   rename(proportion=train_proportion) %>%
@@ -712,8 +639,8 @@ regressions.averaged <- read.csv(file.path(data_dir, "rhs_5k_llm_human_debiased_
      model = factor(model, levels=model.levels, labels=model.labels),
      regression = factor(regression, levels=regression.levels, labels=regression.labels),
      proportion = factor(proportion, levels=proportion.levels, labels=proportion.labels),
-     ) # %>%
-  # filter(Y!="Other")
+     ) %>%
+  filter(Y!="Other")
 
 alpha <- 0.10
 probs <- c(alpha/2, 1-alpha/2)
@@ -748,8 +675,8 @@ bias1 <- regressions.averaged %>%
 bias1 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_{3}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Health, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -758,8 +685,8 @@ bias1 %>%
 bias1 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_{14}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -768,8 +695,8 @@ bias1 %>%
 bias1 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_{15}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Defense, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -778,8 +705,8 @@ bias1 %>%
 bias1 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_{19}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -788,8 +715,8 @@ bias1 %>%
 bias1 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_{20}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 
@@ -800,7 +727,7 @@ bias1 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
       caption="Bias Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
       digits=3, booktabs=T, linesep = "", escape=F) %>%
     kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -827,8 +754,8 @@ bias1_norm <- regressions.averaged %>%
 bias1_norm %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{3}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Health, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -837,8 +764,8 @@ bias1_norm %>%
 bias1_norm %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{14}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -847,8 +774,8 @@ bias1_norm %>%
 bias1_norm %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{15}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Defense, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -857,8 +784,8 @@ bias1_norm %>%
 bias1_norm %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{19}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -867,8 +794,8 @@ bias1_norm %>%
 bias1_norm %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{20}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -878,7 +805,7 @@ bias1_norm %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
     caption="Normalized Bias Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -907,8 +834,8 @@ bias2 <- regressions.averaged %>%
 bias2 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_{3}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Health, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -917,8 +844,8 @@ bias2 %>%
 bias2 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_{14}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -927,8 +854,8 @@ bias2 %>%
 bias2 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_{15}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -937,8 +864,8 @@ bias2 %>%
 bias2 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_{19}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -947,8 +874,8 @@ bias2 %>%
 bias2 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_{20}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -958,7 +885,7 @@ bias2 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
     caption="Bias Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples for.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -987,8 +914,8 @@ bias2_norm <- regressions.averaged %>%
 bias2_norm %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary of $\\beta_{3}$ Statistics by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary of $\\beta_{t}$, $t=$Health, Statistics by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -997,8 +924,8 @@ bias2_norm %>%
 bias2_norm %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{14}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1007,8 +934,8 @@ bias2_norm %>%
 bias2_norm %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{15}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1017,8 +944,8 @@ bias2_norm %>%
 bias2_norm %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{19}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1027,8 +954,8 @@ bias2_norm %>%
 bias2_norm %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_{20}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Normalized Bias Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1038,7 +965,7 @@ bias2_norm %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
     caption="Normalized Bias Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1064,8 +991,8 @@ mse1 <- regressions.averaged %>%
 mse1 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{3}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Health, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1074,8 +1001,8 @@ mse1 %>%
 mse1 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{14}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1084,8 +1011,8 @@ mse1 %>%
 mse1 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{15}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Defense, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1094,8 +1021,8 @@ mse1 %>%
 mse1 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{19}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1104,8 +1031,8 @@ mse1 %>%
 mse1 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{20}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1115,7 +1042,7 @@ mse1 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
     caption="MSE Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1143,8 +1070,8 @@ mse2 <- regressions.averaged %>%
 mse2 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{3}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Health, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1153,8 +1080,8 @@ mse2 %>%
 mse2 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{14}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1163,8 +1090,8 @@ mse2 %>%
 mse2 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{15}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1173,8 +1100,8 @@ mse2 %>%
 mse2 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{19}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1183,8 +1110,8 @@ mse2 %>%
 mse2 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_{20}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1194,7 +1121,7 @@ mse2 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
     caption="MSE Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1222,8 +1149,8 @@ coverage1 <- regressions.averaged %>%
 coverage1 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{3}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Health, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1233,8 +1160,8 @@ coverage1 %>%
 coverage1 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{14}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1244,8 +1171,8 @@ coverage1 %>%
 coverage1 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{15}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Defense, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1255,8 +1182,8 @@ coverage1 %>%
 coverage1 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{19}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1266,8 +1193,8 @@ coverage1 %>%
 coverage1 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{20}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1278,7 +1205,7 @@ coverage1 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="rllrrrrr",
     caption="Coverage Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1305,8 +1232,8 @@ coverage2 <- regressions.averaged %>%
 coverage2 %>% 
   filter(Y=="3") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{3}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Health, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1315,8 +1242,8 @@ coverage2 %>%
 coverage2 %>% 
   filter(Y=="14") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{14}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1325,8 +1252,8 @@ coverage2 %>%
 coverage2 %>% 
   filter(Y=="15") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{15}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Defense, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1335,8 +1262,8 @@ coverage2 %>%
 coverage2 %>% 
   filter(Y=="19") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{19}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Government Operations, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1345,8 +1272,8 @@ coverage2 %>%
 coverage2 %>% 
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_{20}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+    caption="Coverage Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -1356,7 +1283,7 @@ coverage2 %>%
   filter(Y=="Other") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
     caption="Coverage Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = Y_3 \\beta_3 + Y_{14} \\beta_{14} + Y_{15} \\beta_{15} + Y_{19}  \\beta_{19}+ Y_{20} \\beta_{20} + Y_\\text{Other} \\beta_\\text{Other}$",
+      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
