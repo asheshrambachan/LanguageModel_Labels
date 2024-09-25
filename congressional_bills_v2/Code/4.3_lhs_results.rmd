@@ -1,5 +1,5 @@
 ---
-title: "Results LHS"
+title: "Results for Regressions with LHS Proxy"
 header-includes:
   - \usepackage{amsmath}
   - \usepackage[capposition=top]{floatrow}
@@ -8,7 +8,7 @@ output:
   pdf_document: 
     fig_caption: true
     fig_crop: false
-date: "Aug 12, 2024"
+date: "Sep 24, 2024"
 editor_options: 
   chunk_output_type: console
 ---
@@ -52,7 +52,6 @@ require(lemon)
 source(file.path(repo_dir, "Code/ggplot_theme.r"))
 ```
 
-# Proxy on the LHS
 
 ```{r data_10k}
 # Note: prompts were sorted based on the coefficients values of GPT3.5 model.
@@ -64,12 +63,11 @@ model.labels <- c("Human", "GPT-3.5", "GPT-4o")
 Y.labeller <- function(Y) TeX(sprintf("$Y_{%s}$", Y)) 
 
 prompt_index <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
-  filter(tolower(model)=="gpt-3.5-turbo-0125") %>%
   group_by(V, Y, coef_name) %>%
   arrange(V, Y, coef_name, coef) %>% mutate(prompt.ordered_coef = row_number()) %>% # create prompt index ordered by coef
   arrange(V, Y, coef_name, t) %>% mutate(prompt.ordered_t = row_number()) %>% # create prompt index ordered by t scores
   ungroup() %>%
-  select(V, Y, coef_name, prompt, prompt.ordered_coef, prompt.ordered_t) %>%
+  select(V, Y, model, coef_name, prompt, prompt.ordered_coef, prompt.ordered_t) %>%
   distinct()
 
 regressions.llm <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
@@ -91,21 +89,19 @@ regressions.human <- read.csv(file.path(data_dir, "lhs_10k_human.csv")) %>%
   filter(coef_name!="(Intercept)")
 ```
 
-```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta_1$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $Y_t = \\beta_{0} + \\beta_{1} V$ over 10,000 bills, with 95\\% confidence intervals computed using robust standard errors. Here, $Y_t$ denotes the indicator for topic $t$, where $Y_t = 1\\{Y = t\\}$ for $t \\in \\mathcal{T}$ and $Y_\\text{Other} = 1\\{Y \\notin \\mathcal{T}\\}$, with $\\mathcal{T} = \\{3, 14, 15, 19, 20\\}$ is the 5 most-common human-labeled topics in the bills data. The variable $V$ takes one of the following bills variables: Democrat, Senate, or DW1, where $\text{Democrat} = 1\\{\\text{Party} = \\text{Democrat}\\}$, $\\text{Senate} = 1\\{\\text{Chamber} = \\text{Senate}\\}$, and DW1 is the imputed DW1 score for the bill sponsor. The regressions based on human-labeled topics (red) were estimated with $Y_{t}^\\text{Human} = 1\\{Y^\\text{Human} = t\\}$, while the LLM-based regressions (GPT-3.5 in green, circles; and GPT-4o in blue, triangles) were estimated with $Y_{t,m,p}^\\text{LLM} = 1\\{Y_{m,p}^\\text{LLM} = t\\}$, where $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denotes the LLM model and $p \\in \\{1, \\ldots, 12\\}$ denotes the prompt modifications. In each subplot, the indices for the prompts reflect the order chosen based on sorting the estimated values of the GPT-3.5 model in ascending order. The corresponding estimates for GPT-4o are aligned according to this order."}
+```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+
 coefs <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_coef, color=model, shape=model)) +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
-
-  geom_hline(aes(yintercept=lci, color=model), linetype="dashed", linewidth=0.3, data=regressions.human) +
-  geom_hline(aes(yintercept=uci, color=model), linetype="dashed", linewidth=0.3, data=regressions.human) +
-  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
-
+  
   geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width=0.5, linewidth=0.3) +
   geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
-  
+  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
+
   facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed)) +
   
-  xlab("Prompt Index") +
+  xlab("Prompt-Model Index") +
   ylab("Coefficients") +
   
   scale_color_manual(name=NULL, values=my_colors, labels=model.labels) +
@@ -116,7 +112,7 @@ coefs <- regressions.llm %>%
 coefs
 ```
 
-```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta_1$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\beta_{0} + \\beta_{1} V$ over 10,000 bills, with 95\\% confidence intervals computed using robust standard errors. Here, $Y_t$ denotes the indicator for topic $t$, where $Y_t = 1\\{Y = t\\}$ for $t \\in \\mathcal{T}$ and $Y_\\text{Other} = 1\\{Y \\notin \\mathcal{T}\\}$, with $\\mathcal{T} = \\{3, 14, 15, 19, 20\\}$ is the 5 most-common human-labeled topics in the bills data. The variable $V$ takes one of the following bills variables: Democrat, Senate, or DW1, where $\text{Democrat} = 1\\{\\text{Party} = \\text{Democrat}\\}$, $\\text{Senate} = 1\\{\\text{Chamber} = \\text{Senate}\\}$, and DW1 is the imputed DW1 score for the bill sponsor. The regressions based on human-labeled topics (red) were estimated with $Y_{t}^\\text{Human} = 1\\{Y^\\text{Human} = t\\}$, while the LLM-based regressions (GPT-3.5 in green, circles; and GPT-4o in blue, triangles) were estimated with $Y_{t,m,p}^\\text{LLM} = 1\\{Y_{m,p}^\\text{LLM} = t\\}$, where $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denotes the LLM model and $p \\in \\{1, \\ldots, 12\\}$ denotes the prompt modifications. In each subplot, the indices for the prompts reflect the order chosen based on sorting the estimated values of the GPT-3.5 model in ascending order. The corresponding estimates for GPT-4o are aligned according to this order."}
+```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in \\{3, 14, 15, 19, 20\\}$ and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 
 tscores <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_t, color=model, shape=model)) +
@@ -127,7 +123,7 @@ tscores <- regressions.llm %>%
 
   facet_grid(V ~ Y, labeller=labeller(Y=Y.labeller, .default = label_parsed)) +
   
-  xlab("Prompt Index") +
+  xlab("Prompt-Model Index") +
   ylab("t-scores") +
 
   scale_color_manual(name=NULL, values=my_colors, labels=model.labels[2:3]) +
@@ -161,24 +157,27 @@ facet.labeller <- labeller(proportion = function(proportion) sprintf("Validation
 n_bins <- 30
 ```
 
-```{r fig03_bias1, fig.height=3, fig.width=8, fig.cap="Bias Density of $\\beta_1^\\text{LLM}$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center", fig.note="The bias estimates were computed as the difference between the coefficient estimates from $N = 1000$ simulation runs, $\\bar{\\beta}_{t, V, \\eta, m,p} = \\sum_{i=1}^N \\beta_{t, V, \\eta, m,p}^{(i)} / N$, and the human-based coefficient from the entire set of 10,000 bills,  $\\beta_{t,V}^\\star$, using a regression model of the form $Y_t = \\beta_{0} + \\beta_{1} V$, for topic $t\\in\\{3, 14, 15, 19, 20, \\text{Other}\\}$, variable $V\\in\\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$, validation proportion $\\eta\\in\\{5\\%, 10\\%, 25\\%, 50\\%\\}$, LLM model $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$, and prompt $p \\in \\{1, \\ldots, 12\\}$. A random sample of 5,000 bills drawn from the original 10,000 was used, with LLM-based labels, $Y_{t,m,p}^\\text{LLM} = 1\\{Y_{m,p}^\\text{LLM} = t\\}$."}
 
+
+```{r fig03_bias1_llm, fig.height=3.5, fig.width=4, fig.cap="Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, using a regression of the form $Y_t = \\alpha + \\beta V$, where $t \\in \\{3, 14, 15, 19, 20\\}$ represents major topics and $V \\in \\{\\text{Democrat}, \\text{Senate}, \\text{DW1}\\}$ are the covariates. For $\\beta^\\star$, $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for $\\beta^\\text{LLM}$, $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
 bias1 <- regressions.averaged %>%
-  filter(proportion!=0.25) %>%
-  filter(regression=="LLM") %>%
-  ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
-             group=regression, fill=regression)) +
+  filter(
+    proportion==0.05, 
+    regression=="LLM"
+  ) %>%
+  ggplot(aes(x=bias_mean, y=after_stat(count/sum(count)), fill=regression)) +
   geom_vline(xintercept=0, color=my_palette[["black"]], linewidth=0.2) +
   geom_histogram(bins=n_bins, color="white") +  
   geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
-  facet_grid(. ~ proportion, labeller=facet.labeller) +
   
   xlab("Bias") +
   ylab("Probability Densities") +
   
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,0.25)) +
+  scale_y_continuous(
+    minor_breaks=seq(0, 1, by=0.01), limits=c(0,0.25)
+    ) +
   theme.bar + 
   guides(fill="none")
 
@@ -186,25 +185,26 @@ bias1 <- regressions.averaged %>%
 bias1
 ```
 
-```{r fig04_bias1_norm, fig.height=3, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_1^\\text{LLM}$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center", fig.note="The normalized bias estimates were computed as the normalized difference between the coefficient estimates from $N = 1000$ simulation runs, $\\bar{\\beta}_{t, V, \\eta, m,p}$, and the human-based coefficient from the entire set of 10,000 bills,  $\\beta_{t,V}^\\star$, divided by the sample standard deviation, $s_{t,V,\\eta, m,p}$, where $s^2_{t,V,\\eta, m,p} = \\sum_{i=1}^N (\\beta_{t,V, \\eta, m,p}^{(i)} - \\bar{\\beta}_{t,V, \\eta, m,p})^2/(N-1)$ and all variables are as defined previously."}
+
+
+```{r fig04_bias1_norm_llm, fig.height=3.5, fig.width=4, fig.cap="Normalized Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The normalized bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, divided by the sample standard deviation computed across $N=1000$ samples. All other variables are as defined in the previous figure. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$"}
 
 bias1_norm <- regressions.averaged %>%
-  filter(proportion!=0.25) %>%
-  filter(regression=="LLM") %>%
-  ggplot(aes(x=bias_norm, 
-             y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
-             group=regression, fill=regression)) +
+  filter(
+    proportion==0.05,
+    regression=="LLM"
+  ) %>%
+  ggplot(aes(x=bias_norm, y=after_stat(count/sum(count)), fill=regression)) +
   geom_vline(xintercept=0, color=my_palette[["black"]], linewidth=0.2) +
   geom_histogram(bins=n_bins, color="white") +
   geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
-  facet_grid(. ~ proportion, labeller=facet.labeller) +
   
   xlab("Normalized Bias") +
   ylab("Probability Densities") + 
   
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,0.25)) +
+  scale_y_continuous(minor_breaks=seq(0,1,by=0.01), limits=c(0,0.25)) +
   theme.bar + 
   guides(fill="none")
 
@@ -214,10 +214,13 @@ bias1_norm
 
 \clearpage
 
-```{r fig05_bias2, fig.height=4.5, fig.width=8, fig.cap="Bias Density of $\\beta_1$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r fig05_bias2, fig.height=4.5, fig.width=8, fig.cap="Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
 bias2 <- regressions.averaged %>%
-  filter(proportion!=0.25) %>%
+  filter(
+    proportion!=0.25,
+    regression!="Human Validation"
+  ) %>%
   ggplot(aes(x=bias_mean, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
              group=regression, fill=regression)) +
   geom_histogram(bins=n_bins, position=position_dodge()) +
@@ -234,10 +237,13 @@ bias2 <- regressions.averaged %>%
 bias2
 ```
 
-```{r fig06_bias2_norm, fig.height=4.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta_1$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r fig06_bias2_norm, fig.height=4.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
 bias2_norm <- regressions.averaged %>%
-  filter(proportion!=0.25) %>%
+  filter(
+    proportion!=0.25,
+    regression!="Human Validation"
+  ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
              group=regression, fill=regression)) +
   geom_histogram(binwidth=0.09, position=position_dodge()) +
@@ -256,7 +262,7 @@ bias2_norm
 
 \clearpage
 
-```{r fig07_mse1, fig.height=3, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_1$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r fig07_mse1, fig.height=3, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
 mse1 <- regressions.averaged %>%
   filter(
@@ -280,7 +286,7 @@ mse1
 # ggsave(file.path(fig_dir,"results fig08 LHS, MSE Empirical CDF by Proportion of Validation Samples.png"), height=3, width=8)
 ```
 
-```{r fig08_mse2, fig.height=4.5, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta_1$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r fig08_mse2, fig.height=4.5, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
 mse2 <- regressions.averaged %>%
   filter(
@@ -339,7 +345,7 @@ bias1 <- regressions.averaged %>%
     )
 
 kbl(bias1, align="rlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_1$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Bias Summary Statistics of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -362,7 +368,7 @@ bias1_norm <- regressions.averaged %>%
     )
 
 kbl(bias1_norm, align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_1$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Normalized Bias Summary Statistics of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -387,7 +393,7 @@ bias2 <- regressions.averaged %>%
     ))
 
 kbl(bias2, align="lrlrrrrr",
-    caption="Bias Summary Statistics by Model and Proportion of Validation Samples for $\\beta_1$. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Bias Summary Statistics by Model and Proportion of Validation Samples for $\\beta$. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -412,7 +418,7 @@ bias2_norm <- regressions.averaged %>%
     ))
 
 kbl(bias2_norm, align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics by Model and Proportion of Validation Samples for $\\beta_1$. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Normalized Bias Summary Statistics by Model and Proportion of Validation Samples for $\\beta$. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -434,7 +440,7 @@ mse1 <- regressions.averaged %>%
     )
 
 kbl(mse1, align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_1$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="MSE Summary Statistics of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -458,7 +464,7 @@ mse2 <- regressions.averaged %>%
     ))
 
 kbl(mse2, align="lrlrrrrr",
-    caption="MSE Summary Statistics by Model and Proportion of Validation Samples for $\\beta_1$. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="MSE Summary Statistics by Model and Proportion of Validation Samples for $\\beta$. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -481,7 +487,7 @@ coverage1 <- regressions.averaged %>%
     )
 
 kbl(coverage1, align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_1$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Coverage Summary Statistics of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
@@ -505,7 +511,7 @@ coverage2 <- regressions.averaged %>%
     ))
   
 kbl(coverage2, align="lrlrrrrr",
-    caption="Coverage Summary Statistics by Model and Proportion of Validation Samples for $\\beta_1$. Proxy on the LHS: $Y = \\beta_{0} + \\beta_{1} V$.",
+    caption="Coverage Summary Statistics by Model and Proportion of Validation Samples for $\\beta$. Proxy on the LHS: $Y = \\alpha + \\beta V$.",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```

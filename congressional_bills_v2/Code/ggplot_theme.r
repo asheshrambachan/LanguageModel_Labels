@@ -29,6 +29,8 @@ theme.point <- theme_bw() +
     # legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
     # plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
     # plot.subtitle=element_text(size=12, family="CMU Sans Serif")
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
   ) 
 
 theme.bar <- theme_bw() + 
