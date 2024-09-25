@@ -722,15 +722,6 @@ bias1 %>%
 
 ```
 
-```{r tab_bias1_Other, results='asis'}
-bias1 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="rlrrrrr",
-      caption="Bias Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-      digits=3, booktabs=T, linesep = "", escape=F) %>%
-    kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
 
 ```{r tab_bias1_norm, results='asis'}
 bias1_norm <- regressions.averaged %>%
@@ -800,15 +791,6 @@ bias1_norm %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
 
-```{r tab_bias1_norm_Other, results='asis'}
-bias1_norm %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="rlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
 
 
 ```{r tab_bias2, results='asis'}
@@ -875,16 +857,6 @@ bias2 %>%
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="lrlrrrrr",
     caption="Bias Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
-
-```{r tab_bias2_Other, results='asis'}
-bias2 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="lrlrrrrr",
-    caption="Bias Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples for.
       Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
@@ -960,16 +932,6 @@ bias2_norm %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
 
-```{r tab_bias2_norm_Other, results='asis'}
-bias2_norm %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="lrlrrrrr",
-    caption="Normalized Bias Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
-
 ```{r tab_mse1, results='asis'}
 mse1 <- regressions.averaged %>%
   mutate(statistic=mse_mean) %>%
@@ -1032,16 +994,6 @@ mse1 %>%
   filter(Y=="20") %>% select(!Y) %>%
   kbl(., align="rlrrrrr",
     caption="MSE Summary Statistics of $\\beta_{t}$, $t=$Public Lands and Water Management, by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
-
-```{r tab_mse1_Other, results='asis'}
-mse1 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="rlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
       Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
@@ -1116,17 +1068,6 @@ mse2 %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
 
-```{r tab_mse2_Other, results='asis'}
-mse2 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="lrlrrrrr",
-    caption="MSE Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
-
-
 ```{r tab_coverage1, results='asis'}
 coverage1 <- regressions.averaged %>%
   mutate(statistic=coverage_mean) %>%
@@ -1200,15 +1141,6 @@ coverage1 %>%
 ```
 
 
-```{r tab_coverage1_Other, results='asis'}
-coverage1 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="rllrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_\\text{Other}$ by Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
 
 ```{r tab_coverage2, results='asis'}
 coverage2 <- regressions.averaged %>%
@@ -1277,14 +1209,3 @@ coverage2 %>%
     digits=3, booktabs=T, linesep = "", escape=F) %>%
   kable_styling(latex_options = "striped", stripe_index = stripe(3))
 ```
-
-```{r tab_coverage2_Other, results='asis'}
-coverage2 %>% 
-  filter(Y=="Other") %>% select(!Y) %>%
-  kbl(., align="lrlrrrrr",
-    caption="Coverage Summary Statistics of $\\beta_\\text{Other}$ by Model and Proportion of Validation Samples.
-      Proxy on the RHS: $V = Y^\\top \\beta = \\sum_{t} Y_t \\beta_t$",
-    digits=3, booktabs=T, linesep = "", escape=F) %>%
-  kable_styling(latex_options = "striped", stripe_index = stripe(3))
-```
-
