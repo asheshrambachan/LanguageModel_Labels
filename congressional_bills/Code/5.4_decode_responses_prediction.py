@@ -53,7 +53,7 @@ def main():
     temp_dir = os.path.join(REPO_DIR, "Temp")
     os.makedirs(temp_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, f"bills_prediction.csv"))
     prompts = pd.read_json(os.path.join(temp_dir, f"prompts_prediction.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
@@ -62,7 +62,7 @@ def main():
     responses = merge_batched_responses(responses_batched_paths)
     
     print(f"Appended all responses, n = {len(responses)}")
-    responses = responses.merge(prompts[["ID",  "PromptingStrategyID", "PromptingStrategyName", "BillID", "TrimText", "AddIntrYear"]], on="ID")
+    responses = responses.merge(prompts[["ID",  "PromptingStrategyID", "PromptingStrategyName", "BillID", "TrimText", "AddIntrDate"]], on="ID")
     responses.set_index("ID", inplace=True, drop=False)
     responses.sort_index(inplace=True)
 
@@ -96,10 +96,10 @@ def main():
 
     # Print mean and max input and output tokens
     print("bills_llm_passage")
-    print(bills_llm_passage[["AddIntrYear", "InputTokens", "OutputTokens"]].groupby("AddIntrYear").agg(['mean']))
+    print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     print("bills_llm_completion")
-    print(bills_llm_completion[["AddIntrYear", "InputTokens", "OutputTokens"]].groupby("AddIntrYear").agg(['mean']))
+    print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     # Save
     bills_llm_passage_path = os.path.join(data_dir, f"bills_llm_passage.csv")

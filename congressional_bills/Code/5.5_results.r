@@ -1,9 +1,9 @@
 # Results Bills and LLM
 # Sep 23, 2024
 
-repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+repo_dir = "."
 data_dir = file.path(repo_dir, "Data") 
-fig_dir = file.path(repo_dir, "Figures and Tables/4.2_bills_llm_plots/")
+fig_dir = file.path(repo_dir, "Figures and Tables/5.5/")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Load required packages quietly and custom functions
@@ -14,7 +14,7 @@ suppressPackageStartupMessages({
 })
 source(file.path(repo_dir, "Code/ggplot_theme.r"))
 
-bills <- read.csv(file.path(data_dir, "bills.csv"))
+bills <- read.csv(file.path(data_dir, "bills_prediction.csv"))
 
 # Fig 1
 year_bins <- seq(1947, 2016, by=2)+1
@@ -29,28 +29,40 @@ bills_over_years
 ggsave(file.path(fig_dir, "fig01_bills A histogram of the frequency of the 10K bills over years.jpeg"), height = 2.5, width = 4)
 
 # Fig 2
-bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
-  rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
-  select(c(prompt, model, Yhuman, Yllm)) %>%
+bills_llm_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
+  rename(c(
+    prompt=PromptingStrategyID, 
+    model=Model,
+    AddIntrDate=AddIntrYear # TODO: remove
+  )) %>%
+  select(c(prompt, model, AddIntrDate, PassS, PassSLLM, PassH, PassHLLM)) %>%
   mutate(model = factor(
     model, 
     levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
     labels=c("GPT-3.5", "GPT-4o")
   )) %>%
-  group_by(model, prompt) %>%
-  summarise(accuracy = mean(Yhuman==Yllm), .groups="drop")
+  group_by(model, AddIntrDate) %>%
+  summarise(
+    accuracyS = mean(PassS==PassSLLM), 
+    accuracyH = mean(PassH==PassHLLM), 
+    .groups="drop"
+  ) %>% 
+  tidyr::pivot_longer(cols = c(accuracyS, accuracyH), names_to = "chamber", values_to = "accuracy") %>%
+  mutate(chamber = ifelse(chamber == "accuracyS", "Pass Senate", "Pass House"))
 
-accuracy <- bills_llm %>%
-  ggplot(aes(x=as.factor(prompt), y=accuracy, fill=model)) +
+
+bills_llm_passage %>%
+  ggplot(aes(x=as.factor(AddIntrDate), y=accuracy, fill=model)) +
   geom_col(position=position_dodge()) +
-  xlab("Prompt Index") +
+  facet_grid(model ~ chamber) +
+  xlab("Information Up to Intro Date Restriction in Prompt") +
   ylab("Accuracy") +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
   scale_fill_manual(name="", values=my_colors) +
-  theme.bar
+  theme.bar +
+  guides(fill="none")
 
-accuracy
-ggsave(file.path(fig_dir, "fig02_accuracy Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 3.5, width = 4)
+ggsave(file.path(fig_dir, "fig02_accuracy Accuracy of Bill Pass Predictions vs. Intro Date.jpeg"), height = 3.5, width = 4)
 
 # Fig 3 & 4
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%

@@ -35,7 +35,7 @@ def create_prompts(prompting_strategies, bills):
                 bill_description = trim(bill_description, strategy["TrimProp"])
 
             # add bill description 
-            if (strategy["AddIntrYear"]):
+            if (strategy["AddIntrDate"]):
                 bill_date = datetime.strptime(bill['IntrDate'], "%Y-%m-%d").strftime('%-m/%-d/%Y')
                 bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill_id, bill_description, bill_date)
             else:
@@ -49,10 +49,11 @@ def create_prompts(prompting_strategies, bills):
                 "PromptingStrategyName": strategy["PromptingStrategyName"],
                 "ResponseFormat": strategy["ResponseFormat"],
                 "TrimText": strategy["TrimText"],
-                "AddIntrYear": strategy["AddIntrYear"],
+                "AddIntrDate": strategy["AddIntrDate"],
                 "Model": strategy["Model"],
                 "Temperature": strategy["Temperature"],
                 "MaxTokens": strategy["MaxTokens"],
+                "DescriptionTrim": bill_description,
                 "Messages": bill_messages
             }
             prompts.append(prompt)
