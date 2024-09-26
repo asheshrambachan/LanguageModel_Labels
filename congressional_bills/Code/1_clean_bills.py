@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-REPO_DIR = '/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2'
+REPO_DIR = '/Users/haya1/Documents/LanguageModel_Labels/congressional_bills'
 MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/Codebooks/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):

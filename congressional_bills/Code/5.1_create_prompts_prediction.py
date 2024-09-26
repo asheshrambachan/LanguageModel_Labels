@@ -4,7 +4,7 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
+REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 DEBUG = False

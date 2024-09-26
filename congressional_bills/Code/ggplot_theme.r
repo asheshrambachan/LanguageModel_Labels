@@ -2,8 +2,8 @@
 # # 2. install on mac 
 # # 3. Run once in R: 
 # extrafont::font_import(paths="~/Library/Fonts/", pattern="cmun*")
-names(pdfFonts()) # uncomment to get list of fonts
-extrafont::loadfonts(quiet=T)
+# names(pdfFonts()) # uncomment to get list of fonts
+# extrafont::loadfonts(quiet=T)
 
 my_palette <- c("red"="#F85427", "blue"="#277BB6", "green"="#97BD59", "yellow"="#FFD166", "black"="#262626", "gray"="#605856", "lightgray"="#EBEBEB")
 my_colors <- c(
@@ -27,10 +27,10 @@ theme.point <- theme_bw() +
     axis.ticks=element_line(linewidth=0.3),
     axis.text.x=element_blank(),
     axis.ticks.x=element_blank(),
-    text=element_text(size=12, family="CMU Sans Serif"),
-    legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
-    plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
-    plot.subtitle=element_text(size=12, family="CMU Sans Serif")
+    # text=element_text(size=12, family="CMU Sans Serif"),
+    # legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
+    # plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
+    # plot.subtitle=element_text(size=12, family="CMU Sans Serif")
   ) 
 
 theme.bar <- theme_bw() + 
@@ -42,10 +42,10 @@ theme.bar <- theme_bw() +
     legend.position="top", 
     axis.text=element_text(size=7),
     axis.ticks=element_line(linewidth=0.3),
-    text=element_text(size=12, family="CMU Sans Serif"),
-    legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
-    plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
-    plot.subtitle=element_text(size=12, family="CMU Sans Serif")
+    # text=element_text(size=12, family="CMU Sans Serif"),
+    # legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
+    # plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
+    # plot.subtitle=element_text(size=12, family="CMU Sans Serif")
   )
 
 theme.mse <- theme_bw() + 
@@ -57,8 +57,8 @@ theme.mse <- theme_bw() +
     legend.position="top", 
     axis.text=element_text(size=7),
     axis.ticks=element_line(linewidth=0.3),
-    text=element_text(size=12, family="CMU Sans Serif"),
-    legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
-    plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
-    plot.subtitle=element_text(size=12, family="CMU Sans Serif")
+    # text=element_text(size=12, family="CMU Sans Serif"),
+    # legend.title=element_text(size=10, family="CMU Sans Serif Bold"),
+    # plot.title=element_text(size=14, family="CMU Sans Serif Bold"),
+    # plot.subtitle=element_text(size=12, family="CMU Sans Serif")
   )

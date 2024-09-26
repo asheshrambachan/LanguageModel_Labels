@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Place API_KEY in the .env file
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
+REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 
 def query_llm(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)

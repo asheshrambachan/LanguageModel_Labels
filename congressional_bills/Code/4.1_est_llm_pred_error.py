@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 import matplotlib.pyplot as plt
 
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
+REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
 STOPWORDS = nltk.corpus.stopwords.words('english')

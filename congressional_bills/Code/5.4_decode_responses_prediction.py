@@ -4,7 +4,7 @@ import pandas as pd
 import json
 import re
 
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills_v2"
+REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 
 def merge_batched_responses(responses_batched_paths):
     responses = []

@@ -1,4 +1,4 @@
-name: env_cb_v2
+name: env_cb
 
 channels:
   - conda-forge

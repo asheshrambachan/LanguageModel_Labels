@@ -37,9 +37,10 @@ The replication files are organized into the following main directories:
   conda update conda
   conda config --set channel_priority strict
   conda env create -f conda_env.yaml
-  conda activate env_cb_v2
-  cd [path/to/congressional_bills_v2]
+  conda activate env_cb
+  cd [path/to/congressional_bills]
   ```
+  
 - **Add your `OPENAI_API_KEY`**
   1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
   2. Create a new API key.
@@ -118,9 +119,8 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 ## TODO
 
-- [ ] remove `_v2` from env setup
 - [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
-- [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills_v2#additional-notes-and-remarks)
+- [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills#additional-notes-and-remarks)
 
 ## Additional Notes and Remarks
 

@@ -21,7 +21,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 
 # Set directories
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills_v2"
+repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 data_path <- file.path(repo_dir, "Data/bills_llm.csv")
 lhs_rds_dir <- file.path(repo_dir, "Temp/lhs")
 

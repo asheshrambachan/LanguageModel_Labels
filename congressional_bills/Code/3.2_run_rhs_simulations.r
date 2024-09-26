@@ -20,7 +20,7 @@ train_proportion <- c(0.05, 0.1, 0.25, 0.5) # Proportions for training data: 5%,
 variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 # Set directories
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills_v2"
+repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 data_path <- file.path(repo_dir, "Data/bills_llm.csv")
 rhs_rds_dir <- file.path(repo_dir, "Temp/rhs")
 
