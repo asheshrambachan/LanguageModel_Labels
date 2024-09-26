@@ -6,43 +6,16 @@ settings.json
 .rds
 *.rds
 
-congressional_bills/01_bills/CAP
-congressional_bills/01_bills/CBP
-congressional_bills/01_bills/ICPSR 
-congressional_bills/01_bills/*.csv 
-
-congressional_bills/02_llm/archive
-congressional_bills/02_llm/*.csv 
-congressional_bills/02_llm/*.jsonl 
-
-congressional_bills/04_simulation/rds*
 *.Rhistory
 *.RData
 
-congressional_bills/04_simulation/lhs/nonparametric/*
-congressional_bills/04_simulation/lhs/bayesian_*
-congressional_bills/04_simulation/lhs/bayesian/*
-
-congressional_bills/04_simulation/evaluate_*
-congressional_bills/04_simulation/evaluate_*
-congressional_bills/04_simulation/output*
-
-congressional_bills/04_simulation/rhs/bayesian_wo*
-congressional_bills/04_simulation/rhs/bayesian/*.csv
-congressional_bills/04_simulation/rhs/bayesian/figures*
-
-congressional_bills/05_results/fig*
-congressional_bills/05_results/tables*
-congressional_bills/05_results/results.pdf
-congressional_bills/05_results/results.log
-
-congressional_bills_v2/Temp/*
-congressional_bills_v2/Log/*
-congressional_bills_v2/Papers and bib/*
-congressional_bills_v2/Code/*.log
-congressional_bills_v2/Data/US-*.csv
-congressional_bills_v2/Data/bills80*.txt
-congressional_bills_v2/Data/bills93*.csv
-congressional_bills_v2/Rplots.pdf
+congressional_bills/Temp/*
+congressional_bills/Log/*
+congressional_bills/Papers and bib/*
+congressional_bills/Code/*.log
+congressional_bills/Data/US-*.csv
+congressional_bills/Data/bills80*.txt
+congressional_bills/Data/bills93*.csv
+congressional_bills/Rplots.pdf
 
 congressional_bills_v1
