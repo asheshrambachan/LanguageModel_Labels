@@ -30,11 +30,7 @@ ggsave(file.path(fig_dir, "fig01_bills A histogram of the frequency of the 10K b
 
 # Fig 2
 bills_llm_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
-  rename(c(
-    prompt=PromptingStrategyID, 
-    model=Model,
-    AddIntrDate=AddIntrYear # TODO: remove
-  )) %>%
+  rename(c(prompt=PromptingStrategyID, model=Model)) %>%
   select(c(prompt, model, AddIntrDate, PassS, PassSLLM, PassH, PassHLLM)) %>%
   mutate(model = factor(
     model, 
@@ -50,7 +46,6 @@ bills_llm_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
   tidyr::pivot_longer(cols = c(accuracyS, accuracyH), names_to = "chamber", values_to = "accuracy") %>%
   mutate(chamber = ifelse(chamber == "accuracyS", "Pass Senate", "Pass House"))
 
-
 bills_llm_passage %>%
   ggplot(aes(x=as.factor(AddIntrDate), y=accuracy, fill=model)) +
   geom_col(position=position_dodge()) +
@@ -63,6 +58,19 @@ bills_llm_passage %>%
   guides(fill="none")
 
 ggsave(file.path(fig_dir, "fig02_accuracy Accuracy of Bill Pass Predictions vs. Intro Date.jpeg"), height = 3.5, width = 4)
+
+# Figure 3
+bills_llm_completion <- read.csv(file.path(data_dir, "bills_llm_completion.csv")) %>%
+  rename(c(prompt=PromptingStrategyID, model=Model)) %>%
+  select(c(prompt, model, AddIntrDate, Description, DescriptionTrim, DescriptionLLM)) %>%
+  mutate(model = factor(
+    model, 
+    levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
+    labels=c("GPT-3.5", "GPT-4o")
+  )) %>%
+  group_by(model, AddIntrDate) %>%
+  
+
 
 # Fig 3 & 4
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
