@@ -90,13 +90,21 @@ def get_cbp(path_cbp_80_92, path_cbp_93_114):
     cbp.fillna(value={'DW1': dw1_mean}, inplace=True)
 
     # Keep columns we need
-    cbp = cbp[['BillID', 'Major', 'Description', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal']]
+    cbp = cbp[['BillID', 'Major', 'Description', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal', 'IntrDate']]
 
     # Drop bills with missing data
-    cbp.dropna(inplace=True)
+    cbp.dropna(inplace=True, subset=['BillID', 'Major', 'Description', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal'])
 
     # Make Majors an integer
     cbp['Major'] = cbp['Major'].apply(lambda x: int(x))
+
+    # Correct date data:
+    # First try parsing as MM/DD/YYYY
+    intr_date = cbp['IntrDate']
+    cbp['IntrDate'] = pd.to_datetime(intr_date, format='%m/%d/%Y', errors='coerce')
+
+    # For rows where this failed (NaT), try parsing as YYYY-MM-DD
+    cbp['IntrDate'] = cbp['IntrDate'].fillna(pd.to_datetime(intr_date, format='%Y-%m-%d', errors='coerce'))
 
     # # Correct Description
     # cbp['Description'] = cbp['Description'].str.replace(r'[_]|[?"]{2,}|[`]|[\']', '', regex=True)
@@ -190,20 +198,25 @@ def merge_cap_cbp(cap, cbp):
     bills['Party'] = bills['Party'].apply(lambda x: party_code[x])
 
     # Rearrange columns
-    bills = bills[['BillID', 'Year', 'Major', 'MajorText', 'Party', 'PassH', 'PassS', 'Description', 'DW1', 'Chamber', 'Postal']]
+    bills = bills[['BillID', 'Year', 'Major', 'MajorText', 'Party', 'PassH', 'PassS', 'Description', 'DW1', 'Chamber', 'Postal', 'IntrDate']]
     bills.reset_index(drop=True)
     return(bills)
 
-def sample_bills(bills, n_examples = 15, seed = 123):
+def sample_bills(bills, n_bills = 10e3, n_examples = 15, seed = 123):
     # Bills used for few-shot prompting
     examples = bills.groupby('Major').sample(n=1, random_state=seed).reset_index(drop=True)[:n_examples] 
 
     condition = bills['BillID'].apply(lambda x: x not in examples['BillID'].to_list())
     bills = bills[condition]
     print(f'Removed {len(examples)} examples from bills data.')
+    bills_10k_estimation = bills.sample(n=int(n_bills), random_state=seed)
 
-    bills_10k = bills.sample(n=10_000, random_state=seed)
-    return(bills_10k, examples)
+    # Drop bills with missing IntrDate data
+    bills.dropna(inplace=True)
+    print(f'Removed bills with missing IntrDate from bills data, n = {len(bills)}.')
+    bills_10k_prediction = bills.sample(n=int(n_bills), random_state=seed)
+
+    return(bills_10k_estimation, bills_10k_prediction, examples)
 
 def main():
     # Define directories
@@ -236,16 +249,23 @@ def main():
     print(f'Saved bills_228387.csv, n = {len(bills)}, at {temp_dir}') # n = 228,387
 
     # Draw 10k bills and 5*3=15 bill examples used for few-shot prompts.
-    bills, bills_examples = sample_bills(bills, n_examples = 15, seed = 123)
+    bills_estimation, bills_prediction, bills_examples = sample_bills(bills, n_bills=10e3, n_examples = 15, seed = 123)
 
     # Split the 15 examples into 3 sets for the 3 few-shot prompts
     bills_examples['ExampleSetNum'] = np.repeat([1, 2, 3], repeats=15/3)
-    bills_examples.to_csv(os.path.join(temp_dir, 'bills_examples.csv'), index=False)
-    print(f'Saved bills_examples.csv, n = {len(bills_examples)}, at {temp_dir}')
+    bills_examples_path = os.path.join(temp_dir, 'bills_examples.csv')
+    bills_examples.to_csv(bills_examples_path, index=False)
+    print(f'Saved {os.path.basename(bills_examples_path)}, n = {len(bills_examples)}, at {os.path.dirname(bills_examples_path)}')
+
+    # Save 10K bills data for the estimation exercise 
+    bills_estimation_path = os.path.join(data_dir, 'bills.csv')
+    bills_estimation.to_csv(bills_estimation_path, index=False)
+    print(f'Saved {os.path.basename(bills_estimation_path)}, n = {len(bills_estimation)}, at {os.path.dirname(bills_estimation_path)}')
 
     # Save 10K bills data
-    bills.to_csv(os.path.join(data_dir, 'bills.csv'), index=False)
-    print(f'Saved bills.csv, n = {len(bills)}, at {data_dir}')
+    bills_prediction_path = os.path.join(data_dir, 'bills_prediction.csv')
+    bills_prediction.to_csv(bills_prediction_path, index=False)
+    print(f'Saved {os.path.basename(bills_prediction_path)}, n = {len(bills_prediction)}, at {os.path.dirname(bills_prediction_path)}')
 
 if __name__ == "__main__":
     main()

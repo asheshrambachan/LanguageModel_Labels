@@ -3,21 +3,19 @@ import pandas as pd
 import numpy as np
 import json
 import tiktoken
+from datetime import datetime
 
 REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
-DEBUG = False
+DEBUG = True
 if (DEBUG):
     PER_BATCH_LIMIT = 40
 
-# a function to trim the description 
-def trim(description, trimprop, min_words):
+# a function to trim a string 
+def trim(text, trimprop):
     keepprop = min(1-trimprop, 1)
-    words = description.split() # Split the description into words
-    word_count = len(words) # Total number of words
-    limit = max(min_words, int(word_count * keepprop))  # Calculate proportion of the words, at least max_words
-    return ' '.join(words[:limit])
+    return text[:int(len(text) * keepprop)]
 
 def create_prompts(prompting_strategies, bills):
     id = 0
@@ -29,16 +27,19 @@ def create_prompts(prompting_strategies, bills):
             with open(template_path, 'r') as template:
                 bill_messages = json.load(template)
 
-            # trim bill description
+            bill_id = bill["BillID"]
             bill_description = bill["Description"]
+
+            # trim bill description
             if (strategy["TrimText"]):
-                bill_description = trim(bill_description, trimprop=strategy["TrimProp"], min_words=3)
+                bill_description = trim(bill_description, strategy["TrimProp"])
 
             # add bill description 
             if (strategy["AddIntrYear"]):
-                bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill_description, bill["Year"])
+                bill_date = datetime.strptime(bill['IntrDate'], "%Y-%m-%d").strftime('%-m/%-d/%Y')
+                bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill_id, bill_description, bill_date)
             else:
-                bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill_description)
+                bill_messages[-1]["content"] = bill_messages[-1]["content"].format(bill_id, bill_description)
 
             id = id + 1
             prompt = {
@@ -51,9 +52,13 @@ def create_prompts(prompting_strategies, bills):
                 "AddIntrYear": strategy["AddIntrYear"],
                 "Model": strategy["Model"],
                 "Temperature": strategy["Temperature"],
+                "MaxTokens": strategy["MaxTokens"],
                 "Messages": bill_messages
             }
             prompts.append(prompt)
+
+            # print(bill_messages[-1]["content"])
+
     return(prompts)
 
 def count_tokens(messages, model):
@@ -67,7 +72,7 @@ def count_tokens(messages, model):
             num_tokens += len(encoding.encode(value))
             if key == "name":
                 num_tokens += tokens_per_name
-    num_tokens += 3  # every reply is primed with <|start|>assistant<|message|>
+    num_tokens += 3 
     return num_tokens
 
 def estimate_cost(prompts, batched=True):
@@ -80,10 +85,10 @@ def estimate_cost(prompts, batched=True):
 
     # TODO: correct based on test run
     prompt2OutputTokens = {
-        1: 19, 
-        2: 19, 
-        3: 67, 
-        4: 66
+        1: 22, 
+        2: 22, 
+        3: 75.5, 
+        4: 47.0
     } 
     avg_output_tokens = prompts['PromptingStrategyID'].apply(lambda x: prompt2OutputTokens[x])
 
@@ -123,6 +128,7 @@ def create_batched_prompts(prompts, batched_prompts_dir):
                         "temperature": prompt["Temperature"],
                         "response_format": {"type": "json_object"} if (prompt["ResponseFormat"]=="JSON") else None,
                         "messages": prompt["Messages"],
+                        "max_tokens": prompt["MaxTokens"] if (prompt["PromptingStrategyName"]=="Complete Bill Summary") else None
                     }
                 }
             prompts_batched.append(prompt_batched)
@@ -156,7 +162,7 @@ def main():
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, "bills.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, "bills_prediction.csv"))
     prompting_strategies = pd.read_csv(os.path.join(data_dir, "prompt_templates_prediction.csv"))
     
     # Create `prompts.jsonl`

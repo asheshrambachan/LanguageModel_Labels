@@ -44,10 +44,10 @@ def decode_responses_completion(responses):
         })
     return(responses_decoded)
 
-def count_words(description):
-    words = description.split() # Split the description into words
-    word_count = len(words) # Total number of words
-    return word_count
+# def count_words(description):
+#     words = description.split() # Split the description into words
+#     word_count = len(words) # Total number of words
+#     return word_count
 
 def main():
     data_dir = os.path.join(REPO_DIR, "Data")
@@ -97,11 +97,10 @@ def main():
 
     # Print mean and max input and output tokens
     print("bills_llm_passage")
-    print(bills_llm_passage[["AddIntrYear", "InputTokens", "OutputTokens"]].groupby("AddIntrYear").agg(['mean', 'max']))
+    print(bills_llm_passage[["AddIntrYear", "InputTokens", "OutputTokens"]].groupby("AddIntrYear").agg(['mean']))
 
     print("bills_llm_completion")
-    bills_llm_completion["OutputWords"] = bills_llm_completion["DescriptionLLM"].apply(count_words)
-    print(bills_llm_completion[["AddIntrYear", "InputTokens", "OutputTokens", "OutputWords"]].groupby("AddIntrYear").agg(['mean', 'max']))
+    print(bills_llm_completion[["AddIntrYear", "InputTokens", "OutputTokens"]].groupby("AddIntrYear").agg(['mean']))
 
     # Save
     bills_llm_passage_path = os.path.join(data_dir, f"bills_llm_passage.csv")
