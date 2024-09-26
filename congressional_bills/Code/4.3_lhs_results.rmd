@@ -54,7 +54,6 @@ source(file.path(repo_dir, "Code/ggplot_theme.r"))
 
 
 ```{r data_10k}
-# Note: prompts were sorted based on the coefficients values of GPT3.5 model.
 V.levels <- c("Democrat", "Senate", "DW1")
 
 model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
@@ -117,7 +116,7 @@ coefs <- regressions.llm %>%
 coefs
 ```
 
-```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
+```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the t-score estimates were sorted in ascending order for clarity."}
 
 tscores <- regressions.llm %>%
   ggplot(aes(x=prompt.ordered_t, color=model, shape=model)) +
