@@ -105,11 +105,11 @@ There are **2 possible levels of replication** that this code base allows for. Y
         ```
 
     5. **Replicating Figure 2 only from `4.3_lhs_results`:**
-      ```bash
-      cd path/to/congressional_bills
-      Rscript ./Code/4.3_lhs_results_fig02.r
-      ```
-      
+        ```bash
+        cd path/to/congressional_bills
+        Rscript ./Code/4.3_lhs_results_fig02.r
+        ```
+
 # References
 
 - Adler, E Scott and John Wilkerson, _"Congressional Bills Project: 1947-2016,"_ NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
