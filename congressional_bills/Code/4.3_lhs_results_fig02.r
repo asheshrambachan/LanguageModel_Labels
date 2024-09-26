@@ -1,47 +1,45 @@
 # Setup directories
-repo_dir = "."
-data_dir = file.path(repo_dir, "Data")
-fig_dir = file.path(repo_dir, "Figures and Tables/4.3_lhs_results")
+repo_dir <- "."
+data_dir <- file.path(repo_dir, "Data")
+fig_dir <- file.path(repo_dir, "Figures and Tables/4.3_lhs_results")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
-# Load packages
+path_data_llm <- file.path(data_dir, "lhs_10k_llm.csv")
+path_data_human <- file.path(data_dir, "lhs_10k_human.csv")
+
+# Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
-require(latex2exp, warn.conflicts = FALSE)
-require(kableExtra, warn.conflicts = FALSE)
-require(lemon, warn.conflicts = FALSE)
-
-# Load ggplot themes
 source(file.path("./Code/ggplot_theme.r"))
 
 # Factor labels and levels
-V.levels <- c("Democrat", "Senate", "DW1")
-model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
+V_levels <- c("Democrat", "Senate", "DW1")
+model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
 model.labels <- c("GPT-3.5", "GPT-4o", "Human")
-Y.levels <- c(3, 14, 15, 19, 20)
-Y.labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
+Y_levels <- c(3, 14, 15, 19, 20)
+Y_labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
 
 # Load LLM Data
-data.llm <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
+data_llm <- read.csv(path_data_llm) %>%
   mutate(
-    model = factor(model, levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
+    model = factor(model, levels=model_levels, labels=model.labels),
+    V = factor(V, levels=V_levels),
+    Y = factor(Y, levels=Y_levels, labels=Y_labels)
   ) %>%
   filter(coef_name!="(Intercept)")
 
 # Load Human Data
-data.human <- read.csv(file.path(data_dir, "lhs_10k_human.csv")) %>%
+data_human <- read.csv(path_data_human) %>%
   mutate(
-    model = factor("Human", levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
+    model = factor("Human", levels=model_levels, labels=model.labels),
+    V = factor(V, levels=V_levels),
+    Y = factor(Y, levels=Y_levels, labels=Y_labels)
   ) %>%
   filter(coef_name!="(Intercept)")
 
 # Figure 2: t-score vs Prompt-Model (Sorted)
 # sort prompts by t-score
-data.fig02 <- data.llm %>%
+data.fig02 <- data_llm %>%
   group_by(V, Y, coef_name) %>%
   arrange(V, Y, coef_name, t) %>% 
   mutate(prompt.sorted = row_number()) %>% 
