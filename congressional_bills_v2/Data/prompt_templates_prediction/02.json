@@ -1,0 +1,6 @@
+[
+    {
+        "role": "user",
+        "content": "Here is a summary of a bill introduced in the U.S. Congress:\n\"{}\"\n\nUsing information available up until {}, please answer the following:\n1. Will this bill pass the Senate?\n2. Will this bill pass the House of Representatives?\n\nReturn the answers in the following JSON format:\n{{\n    \"PassSLLM\": 1 if the bill will pass the Senate, otherwise 0,\n    \"PassHLLM\": 1 if the bill will pass the House of Representatives, otherwise 0\n}}\n"
+    }
+]

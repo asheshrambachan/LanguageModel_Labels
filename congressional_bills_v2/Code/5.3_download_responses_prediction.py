@@ -39,10 +39,10 @@ def download_batched_responses(batches, out_dir):
 
 def main():
     temp_dir = os.path.join(REPO_DIR, "Temp")
-    batched_responses_dir = os.path.join(temp_dir, "responses_batched")
+    batched_responses_dir = os.path.join(temp_dir, "responses_batched_prediction")
     os.makedirs(batched_responses_dir, exist_ok=True)
 
-    batches = pd.read_csv(os.path.join(temp_dir, "batches.csv"))
+    batches = pd.read_csv(os.path.join(temp_dir, "batches_prediction.csv"))
     check_batches_status(batches)
     download_batched_responses(batches, batched_responses_dir)
 

@@ -1,9 +1,9 @@
 # # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
 # # 2. install on mac 
 # # 3. Run once in R: 
-# font_import(paths="~/Library/Fonts/", pattern="cmun*")
-# # names(pdfFonts()) # uncomment to get list of fonts
-loadfonts(quiet=T)
+# extrafont::font_import(paths="~/Library/Fonts/", pattern="cmun*")
+names(pdfFonts()) # uncomment to get list of fonts
+extrafont::loadfonts(quiet=T)
 
 my_palette <- c("red"="#F85427", "blue"="#277BB6", "green"="#97BD59", "yellow"="#FFD166", "black"="#262626", "gray"="#605856", "lightgray"="#EBEBEB")
 my_colors <- c(

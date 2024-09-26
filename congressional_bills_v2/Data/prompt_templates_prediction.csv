@@ -1,0 +1,9 @@
+PromptingStrategyID,PromptingStrategyName,AddIntrYear,TrimText,TrimProp,ResponseFormat,Model,Temperature,TemplatePath
+1,Predict Bill Passage,FALSE,FALSE,,JSON,gpt-3.5-turbo-0125,0,Data/prompt_templates_prediction/01.json
+2,Predict Bill Passage,TRUE,FALSE,,JSON,gpt-3.5-turbo-0125,0,Data/prompt_templates_prediction/02.json
+3,Complete Bill Summary,FALSE,TRUE,0.7,JSON,gpt-3.5-turbo-0125,0,Data/prompt_templates_prediction/03.json
+4,Complete Bill Summary,TRUE,TRUE,0.7,JSON,gpt-3.5-turbo-0125,0,Data/prompt_templates_prediction/04.json
+1,Predict Bill Passage,FALSE,FALSE,,JSON,gpt-4o-2024-05-13,0,Data/prompt_templates_prediction/01.json
+2,Predict Bill Passage,TRUE,FALSE,,JSON,gpt-4o-2024-05-13,0,Data/prompt_templates_prediction/02.json
+3,Complete Bill Summary,FALSE,TRUE,0.7,JSON,gpt-4o-2024-05-13,0,Data/prompt_templates_prediction/03.json
+4,Complete Bill Summary,TRUE,TRUE,0.7,JSON,gpt-4o-2024-05-13,0,Data/prompt_templates_prediction/04.json

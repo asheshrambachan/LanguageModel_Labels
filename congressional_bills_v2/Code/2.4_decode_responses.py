@@ -73,8 +73,9 @@ def main():
     # Merge prompts and bills metadata with llm responses
     responses = pd.read_json(os.path.join(temp_dir, f"responses.jsonl"), lines=True)
     bills_llm = prompts.merge(responses, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm.to_csv(os.path.join(data_dir, f"bills_llm.csv"), index=False)
-    print(f"Saved bills_llm.csv, n = {len(bills_llm)}, at {data_dir}")
+    bills_llm_path = os.path.join(data_dir, f"bills_llm.csv")
+    bills_llm.to_csv(bills_llm_path, index=False)
+    print(f"Saved {os.path.basename(bills_llm_path)}, n = {len(bills_llm)}, at {os.path.dirname(bills_llm_path)}")
 
 if __name__ == "__main__":
     main()
