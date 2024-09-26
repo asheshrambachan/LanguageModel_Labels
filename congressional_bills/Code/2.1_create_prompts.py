@@ -4,7 +4,7 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+REPO_DIR = "."
 
 def create_prompts(prompting_strategies, bills, min_confidence=0.9, max_confidence=1):
     id = 0

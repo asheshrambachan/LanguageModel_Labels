@@ -1,9 +1,9 @@
 # Results Bills and LLM
 # Sep 23, 2024
 
-repo_dir = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
-data_dir = file.path(repo_dir, "Data") 
-fig_dir = file.path(repo_dir, "Figures and Tables/4.2_bills_llm_plots/")
+repo_dir <- "."
+data_dir <- file.path(repo_dir, "Data") 
+fig_dir <- file.path(repo_dir, "Figures and Tables/4.2_bills_llm_plots/")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Load required packages quietly and custom functions

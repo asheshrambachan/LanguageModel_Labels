@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Place API_KEY in the .env file or replace os.environ.get('OPENAI_API_KEY') with the key
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+REPO_DIR = "."
 
 # Check status of all batches
 def check_batches_status(batches):

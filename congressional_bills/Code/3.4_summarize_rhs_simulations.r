@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
 })
 
 # Define and set the working directory
-repo_dir <- "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+repo_dir <- "."
 data_dir <- file.path(repo_dir, "Data")
 temp_dir <- file.path(repo_dir, "Temp")
 rhs_dir <- file.path(temp_dir, "rhs")

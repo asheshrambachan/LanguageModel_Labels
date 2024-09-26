@@ -5,7 +5,7 @@ import json
 import tiktoken
 from datetime import datetime
 
-REPO_DIR = "/Users/haya1/Documents/LanguageModel_Labels/congressional_bills"
+REPO_DIR = "."
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 DEBUG = True
