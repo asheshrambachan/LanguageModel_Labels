@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
 })
 
 # Define and set the working directory
+# setwd("~/Documents/LanguageModel_Labels/congressional_bills/")
 repo_dir <- "."
 data_dir <- file.path(repo_dir, "Data")
 temp_dir <- file.path(repo_dir, "Temp")

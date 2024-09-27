@@ -20,6 +20,8 @@ train_proportion <- c(0.05, 0.1, 0.25, 0.5) # Proportions for training data: 5%,
 variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 # Set directories
+
+# setwd("~/Documents/LanguageModel_Labels/congressional_bills/")
 repo_dir <- "."
 data_path <- file.path(repo_dir, "Data/bills_llm.csv")
 rhs_rds_dir <- file.path(repo_dir, "Temp/rhs")
@@ -254,12 +256,12 @@ log_info("Proxy on the RHS")
 
 # RHS combinations
 rhs_combinations <- expand.grid(
-  train_proportion = train_proportion,
-  prompt = sort(unique(data$Prompt)),
-  model = unique(data$Model),
-  variable = variable, 
-  stringsAsFactors = FALSE
-) %>%
+    train_proportion = train_proportion,
+    prompt = sort(unique(data$Prompt)),
+    model = unique(data$Model),
+    variable = variable, 
+    stringsAsFactors = FALSE
+  ) %>%
   mutate(combination_id=1:n(), .before=1) # Assign a unique ID to each combination; used as seed for reproducibility
 
 # Filter out completed combinations

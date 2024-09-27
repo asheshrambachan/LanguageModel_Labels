@@ -54,61 +54,55 @@ source(file.path(repo_dir, "Code/ggplot_theme.r"))
 
 
 ```{r data_10k}
-V.levels <- c("Democrat", "Senate", "DW1")
+V_levels <- c("Democrat", "Senate", "DW1")
 
-model.levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
-model.labels <- c("GPT-3.5", "GPT-4o", "Human")
+model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
+model_labels <- c("GPT-3.5", "GPT-4o", "Human")
 
-Y.levels <- c(3, 14, 15, 19, 20)
-Y.labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
+Y_levels <- c(3, 14, 15, 19, 20)
+Y_labels <- c("Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
 
-prompt_index <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
-  group_by(V, Y, coef_name) %>%
-  arrange(V, Y, coef_name, coef) %>% 
-  mutate(prompt.ordered_coef = row_number()) %>% # create prompt index ordered by coef
-  arrange(V, Y, coef_name, t) %>% 
-  mutate(prompt.ordered_t = row_number()) %>% # create prompt index ordered by t scores
-  ungroup() %>%
-  select(V, Y, model, coef_name, prompt, prompt.ordered_coef, prompt.ordered_t) %>%
-  distinct()
-
-regressions.llm <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
-  merge(x=., y=prompt_index, all=TRUE, sort=FALSE) %>%
+# Load LLM Data
+data_llm <- read.csv(file.path(data_dir, "lhs_10k_llm.csv")) %>%
   mutate(
-    prompt.ordered_coef = as.factor(prompt.ordered_coef),
-    prompt.ordered_t = as.factor(prompt.ordered_t),
-    model = factor(model, levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
-    ) %>%
+    model = factor(model, levels=model_levels, labels=model_labels),
+    V = factor(V, levels=V_levels),
+    Y = factor(Y, levels=Y_levels, labels=Y_labels)
+  ) %>%
   filter(coef_name!="(Intercept)")
 
-regressions.human <- read.csv(file.path(data_dir, "lhs_10k_human.csv")) %>%
+# Load Human Data
+data_human <- read.csv(file.path(data_dir, "lhs_10k_human.csv")) %>%
   mutate(
-    model = "Human",
-    model = factor(model, levels=model.levels, labels=model.labels),
-    V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
-    ) %>%
+    model = factor("Human", levels=model_levels, labels=model_labels),
+    V = factor(V, levels=V_levels),
+    Y = factor(Y, levels=Y_levels, labels=Y_labels)
+  ) %>%
   filter(coef_name!="(Intercept)")
 ```
 
 ```{r fig01_coef, fig.height=5.5, fig.width=9, fig.cap="$\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The coefficients were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the bias estimates were sorted in ascending order for clarity."}
 
-coefs <- regressions.llm %>%
-  ggplot(aes(x=prompt.ordered_coef, color=model, shape=model)) +
+# sort prompts by coef estimate
+data <- data_llm %>%
+  group_by(V, Y, coef_name) %>%
+  arrange(V, Y, coef_name, coef) %>% 
+  mutate(prompt.sorted = row_number()) %>% 
+  ungroup() %>%
+  mutate(prompt.sorted = as.factor(prompt.sorted))
+
+coefs <- data %>%
+  ggplot(aes(x=prompt.sorted, color=model, shape=model)) +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
-  
   geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width=0.5, linewidth=0.3) +
   geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
-  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=regressions.human) +
-
-  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
+  geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=data_human) +
   
+  # theme and aesthetics
   xlab("Prompt-Model Index (Sorted)") +
   ylab("Coefficients") +
-  
-  scale_color_manual(name=NULL, values=my_colors, labels=model.labels) +
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
+  scale_color_manual(name=NULL, values=my_colors, labels=model_labels) +
   guides(color = guide_legend(override.aes = list(shape = c(16, 17, NA))),
          shape = "none") +  # merge color and shape legends
   theme.point
@@ -118,20 +112,26 @@ coefs
 
 ```{r fig02_tscore, fig.height=5.5, fig.width=9, fig.cap="t-scores of $\\beta$ vs. Prompt. Proxy on the LHS.", fig.align="center", fig.note="The t-scores were obtained by fitting the model $Y_t = \\alpha + \\beta V$ using 10,000 bills, with 95\\% confidence intervals computed via robust standard errors. Here, $Y_t$ are indicator for topic $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. The human-based coefficients $\\beta^\\star$ (red) were estimated using $Y_{t}^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while LLM-based coefficients $\\beta^\\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. In each subplot, the t-score estimates were sorted in ascending order for clarity."}
 
-tscores <- regressions.llm %>%
-  ggplot(aes(x=prompt.ordered_t, color=model, shape=model)) +
+# sort prompts by t-score
+data_fig02 <- data_llm %>%
+  group_by(V, Y, coef_name) %>%
+  arrange(V, Y, coef_name, t) %>% 
+  mutate(prompt.sorted = row_number()) %>% 
+  ungroup() %>%
+  mutate(prompt.sorted = as.factor(prompt.sorted))
+
+tscores <- data_fig02 %>%
+  ggplot(aes(x=prompt.sorted, color=model, shape=model)) +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
   geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
-
-  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
   
+  # theme and aesthetics
   xlab("Prompt-Model Index (Sorted)") +
   ylab("t-scores") +
-
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=30)) +
   scale_color_manual(name=NULL, values=my_colors) +
   guides(color = guide_legend(override.aes = list(shape = c(16, 17))),
          shape = "none") +  # merge color and shape legends
-  
   theme.point
 
 tscores
@@ -140,17 +140,17 @@ tscores
 \clearpage
 
 ```{r data_regressions.averaged}
-regression.levels <- c("5k_Yllm_V", "train_Yhuman_V", "Ytilde_V")
-regression.labels <- c("LLM", "Human Validation", "Debiased")
+regression_levels <- c("5k_Yllm_V", "train_Yhuman_V", "Ytilde_V")
+regression_labels <- c("LLM", "Human Validation", "Debiased")
 
-regressions.averaged <- read.csv(file.path(data_dir, "lhs_5k_llm_human_debiased_averaged.csv")) %>%
+regressions_averaged <- read.csv(file.path(data_dir, "lhs_5k_llm_human_debiased_averaged.csv")) %>%
   filter(coef_name!="(Intercept)") %>% # Plot only beta_1
   # filter(regressions=="5k_Yllm_V") %>%
    mutate(
      bias_norm = bias_mean/coef_sd, 
-     V = factor(V, levels=V.levels),
-     model = factor(model, levels=model.levels, labels=model.labels),
-     regression = factor(regression, levels=regression.levels, labels=regression.labels)
+     V = factor(V, levels=V_levels),
+     model = factor(model, levels=model_levels, labels=model_labels),
+     regression = factor(regression, levels=regression_levels, labels=regression_labels)
      ) %>%
   rename(proportion=train_proportion) 
 
@@ -162,7 +162,7 @@ n_bins <- 30
 
 
 ```{r fig03_bias1_llm, fig.height=3.5, fig.width=4, fig.cap="Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, using a regression of the form $Y_t = \\alpha + \\beta V$, where $t \\in$ \\{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\\} represents major topics and $V \\in \\{\\text{Democrat}; \\text{Senate}; \\text{DW1}\\}$ are the covariates. For $\\beta^\\star$, $Y_t^\\text{Human} := 1\\{Y^\\text{Human} = t\\}$, while for $\\beta^\\text{LLM}$, $Y_{t,m,p}^\\text{LLM} := 1\\{Y_{m,p}^\\text{LLM} = t\\}$, with $m \\in \\{\\text{GPT-3.5}, \\text{GPT-4o}\\}$ denoting the LLM model and $p \\in \\{1, \\ldots, 12\\}$ representing the prompt. The human-based coefficient $\\beta^\\star$ was computed using the full 10,000 bills, whereas the LLM-based coefficient $\\beta^\\text{LLM}$ was calculated as the average of $N = 1,000$ simulation runs, with each run’s estimate based on a sample of 5,000 bills. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$."}
-bias1 <- regressions.averaged %>%
+bias1 <- regressions_averaged %>%
   filter(
     proportion==0.05, 
     regression=="LLM"
@@ -191,7 +191,7 @@ bias1
 
 ```{r fig04_bias1_norm_llm, fig.height=3.5, fig.width=4, fig.cap="Normalized Bias Density of $\\beta^\\text{LLM}$. Proxy on the LHS.", fig.align="center", fig.note="The normalized bias estimates were calculated as the difference between the LLM-based coefficient $\\beta^\\text{LLM}$ and the human-based coefficient $\\beta^\\star$, divided by the sample standard deviation computed across $N=1000$ samples. All other variables are as defined in the previous figure. These bias estimates are independent of the validation proportion $\\eta$, though they were generated in the experiment run with $\\eta = 5\\%$"}
 
-bias1_norm <- regressions.averaged %>%
+bias1_norm <- regressions_averaged %>%
   filter(
     proportion==0.05,
     regression=="LLM"
@@ -218,7 +218,7 @@ bias1_norm
 
 ```{r fig05_bias2, fig.height=4.5, fig.width=8, fig.cap="Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
-bias2 <- regressions.averaged %>%
+bias2 <- regressions_averaged %>%
   filter(
     proportion!=0.25,
     regression!="Human Validation"
@@ -241,7 +241,7 @@ bias2
 
 ```{r fig06_bias2_norm, fig.height=4.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
-bias2_norm <- regressions.averaged %>%
+bias2_norm <- regressions_averaged %>%
   filter(
     proportion!=0.25,
     regression!="Human Validation"
@@ -266,7 +266,7 @@ bias2_norm
 
 ```{r fig07_mse1, fig.height=3, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
-mse1 <- regressions.averaged %>%
+mse1 <- regressions_averaged %>%
   filter(
     proportion != 0.25,
     regression != "LLM"
@@ -290,7 +290,7 @@ mse1
 
 ```{r fig08_mse2, fig.height=4.5, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 
-mse2 <- regressions.averaged %>%
+mse2 <- regressions_averaged %>%
   filter(
     proportion != 0.25,
     regression != "LLM"
@@ -315,10 +315,12 @@ mse2
 
 ```{r tab_data}
 proportion.levels <- c(0.05, 0.10, 0.25, 0.50)
-regressions.averaged$proportion <- factor(
-  regressions.averaged$proportion, 
+
+regressions_averaged$proportion <- factor(
+  regressions_averaged$proportion, 
   levels=proportion.levels, 
-  labels=sprintf("%s\\%%", proportion.levels*100))
+  labels=sprintf("%s\\%%", proportion.levels*100)
+  )
 
 alpha <- 0.10
 probs <- c(alpha/2, 1-alpha/2)
@@ -330,7 +332,7 @@ stripe <- function(nstriped=3, nrow=50){
 ```
 
 ```{r tab_bias1, results='asis'}
-bias1 <- regressions.averaged %>%
+bias1 <- regressions_averaged %>%
   mutate(statistic=bias_mean) %>%
   group_by(proportion, regression) %>%
   summarise(
@@ -353,7 +355,7 @@ kbl(bias1, align="rlrrrrr",
 ```
 
 ```{r tab_bias1_norm, results='asis'}
-bias1_norm <- regressions.averaged %>%
+bias1_norm <- regressions_averaged %>%
   mutate(statistic=bias_norm) %>%
   group_by(proportion, regression) %>%
   summarise(
@@ -377,7 +379,7 @@ kbl(bias1_norm, align="rlrrrrr",
 
 
 ```{r tab_bias2, results='asis'}
-bias2 <- regressions.averaged %>%
+bias2 <- regressions_averaged %>%
   mutate(statistic=bias_mean) %>%
   group_by(model, proportion, regression) %>%
   summarise(
@@ -402,7 +404,7 @@ kbl(bias2, align="lrlrrrrr",
 
 
 ```{r tab_bias2_norm, results='asis'}
-bias2_norm <- regressions.averaged %>%
+bias2_norm <- regressions_averaged %>%
   mutate(statistic=bias_norm) %>%
   group_by(model, proportion, regression) %>%
   summarise(
@@ -426,7 +428,7 @@ kbl(bias2_norm, align="lrlrrrrr",
 ```
 
 ```{r tab_mse1, results='asis'}
-mse1 <- regressions.averaged %>%
+mse1 <- regressions_averaged %>%
   mutate(statistic=mse_mean) %>%
   group_by(proportion, regression) %>%
   summarise(
@@ -449,7 +451,7 @@ kbl(mse1, align="rlrrrrr",
 
 
 ```{r tab_mse2, results='asis'}
-mse2 <- regressions.averaged %>%
+mse2 <- regressions_averaged %>%
   mutate(statistic=mse_mean) %>%
   group_by(model, proportion, regression) %>%
   summarise(
@@ -473,7 +475,7 @@ kbl(mse2, align="lrlrrrrr",
 
 
 ```{r tab_coverage1, results='asis'}
-coverage1 <- regressions.averaged %>%
+coverage1 <- regressions_averaged %>%
   mutate(statistic=coverage_mean) %>%
   group_by(proportion, regression) %>%
   summarise(
@@ -496,7 +498,7 @@ kbl(coverage1, align="rllrrrrr",
 
 
 ```{r tab_coverage2, results='asis'}
-coverage2 <- regressions.averaged %>%
+coverage2 <- regressions_averaged %>%
   mutate(statistic=coverage_mean) %>%
   group_by(model, proportion, regression) %>%
   summarise(

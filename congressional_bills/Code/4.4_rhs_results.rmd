@@ -78,21 +78,19 @@ regressions.llm <- read.csv(file.path(data_dir, "rhs_10k_llm.csv")) %>%
     prompt.ordered_coef = as.factor(prompt.ordered_coef),
     prompt.ordered_t = as.factor(prompt.ordered_t),
     model = factor(model, levels=model.levels, labels=model.labels),
-    Y = sub("Y","", coef_name), 
     V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
-    ) %>%
- filter(Y!="Other")
+    Y = factor(coef_name, levels=Y.levels, labels=Y.labels)
+  ) %>%
+  filter(Y!="Other")
 
 regressions.human <- read.csv(file.path(data_dir, "rhs_10k_human.csv")) %>%
   mutate(
     model = "Human",
     model = factor(model, levels=model.levels, labels=model.labels),
-    Y = sub("Y","", coef_name), 
     V = factor(V, levels=V.levels),
-    Y = factor(Y, levels=Y.levels, labels=Y.labels)
-    ) %>%
- filter(Y!="Other")
+    Y = factor(coef_name, levels=Y.levels, labels=Y.labels)
+  ) %>%
+  filter(Y!="Other")
 ```
 
 
@@ -152,11 +150,11 @@ Y.labels <- c("Health", "Banking, Finance, and Domestic Commerce", "Defense", "G
 regressions.averaged <- read.csv(file.path(data_dir, "rhs_5k_llm_human_debiased_averaged.csv")) %>%
    mutate(
      bias_norm = bias_mean/coef_sd, 
-     Y = factor(sub("Y","", coef_name), levels=Y.levels, labels=Y.labels), 
+     Y = factor(coef_name, levels=Y.levels, labels=Y.labels), 
      V = factor(V, levels=V.levels),
      model = factor(model, levels=model.levels, labels=model.labels),
      regression = factor(regression, levels=regression.levels, labels=regression.labels)
-     ) %>%
+  ) %>%
   rename(proportion=train_proportion) %>%
   filter(Y!="Other")
 
@@ -628,7 +626,7 @@ regressions.averaged <- read.csv(file.path(data_dir, "rhs_5k_llm_human_debiased_
   rename(proportion=train_proportion) %>%
    mutate(
      bias_norm = bias_mean/coef_sd, 
-     Y = sub("Y","", coef_name),
+     Y = coef_name,
      V = factor(V, levels=V.levels),
      model = factor(model, levels=model.levels, labels=model.labels),
      regression = factor(regression, levels=regression.levels, labels=regression.labels),
