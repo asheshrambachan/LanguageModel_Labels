@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import json
 import os
-from constants import models, step2_path, step4_path, step7_path, step8_path
+from constants import step2_path, step4_path, step7_path, step8_path
 
 def sample_index_from_step4(step4_file):
     try:
@@ -36,26 +36,45 @@ def main():
     bad_responses = []
     
     # Filter rows where any model's "empty headlines" column is greater than 5
-    filtered_rows = batch_summary_file[
-        (batch_summary_file["gpt-3.5-turbo empty headlines"] > 5) |
-        (batch_summary_file["gpt-4o empty headlines"] > 5) |
-        (batch_summary_file["gpt-4o-mini empty headlines"] > 5)
-    ]
+    filtered_rows = batch_summary_file[batch_summary_file["empty headlines"] > 5]
     
     # Now iterate over only the filtered rows
     for index, row in filtered_rows.iterrows():
-        for model in models:
-            empty_col = f"{model} empty headlines"
-            if row[empty_col] > 5:
-                # Get the corresponding file from step4
-                month = row['month']
-                question = str(row['question'])
-                prompt_type = row['file']
-                step4_file = os.path.join(step4_path, model, "q" + question, f"q{question}_{month}19_processed.csv")
-                
-                # Sample an index where "headline type" is None in step4
-                sampled_index = sample_index_from_step4(step4_file)
-                if sampled_index is not None:
+        empty_col = "empty headlines"
+        if row[empty_col] > 5:
+            # Get the corresponding file from step4
+            month = row['month']
+            model = row["model"]
+            question = str(row['question'])
+            prompt_type = row['file']
+            step4_file = os.path.join(step4_path, model, "q" + question, f"q{question}_{month}19_processed.csv")
+            
+            # Sample an index where "headline type" is None in step4
+            sampled_index = sample_index_from_step4(step4_file)
+            if sampled_index is not None:
+                if month == "oct":
+                    # Get the corresponding file from step2
+                    step2_file1 = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}first19_responses.jsonl")
+                    step2_file2 = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}second19_responses.jsonl")
+                    bad_response1 = read_line_from_step2(step2_file1, sampled_index)
+                    bad_response2 = read_line_from_step2(step2_file2, sampled_index)
+                    bad_responses.append({
+                        "custom id": sampled_index,
+                        "model": model,
+                        "month": month,
+                        "prompt type": prompt_type,
+                        "question": question,
+                        "bad_response": bad_response1,
+                    })
+                    bad_responses.append({
+                        "custom id": sampled_index,
+                        "model": model,
+                        "month": month,
+                        "prompt type": prompt_type,
+                        "question": question,
+                        "bad_response": bad_response2
+                    })
+                else:    
                     # Get the corresponding file from step2
                     step2_file = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}19_responses.jsonl")
                     # Read and collect the line from step2 using the sampled index
@@ -68,9 +87,10 @@ def main():
                         "question": question,
                         "bad_response": bad_response
                     })
-                
+                    
     bad_responses  = pd.DataFrame(bad_responses)
-    bad_responses.to_csv(step8_path, index=False)
+    os.makedirs(step8_path, exist_ok=True)
+    bad_responses.to_csv(step8_path + "bad_responses.csv", index=False)
 
 if __name__ == "__main__":
     bad_responses = main()

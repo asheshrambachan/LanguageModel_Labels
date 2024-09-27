@@ -2,7 +2,8 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import json
-from constants import personas, thought_modifiers, explanation, explanation_json, returns_path, step1_path, prompts_path
+from constants import personas, thought_modifiers, explanation, explanation_json, step0_path, step1_path, prompts_path 
+from constants import month_batches, economic_questions, years, models
 from helpers import confirm_overwrite
 
 def format_content(content, JSON=False, chain_of_thought=False):
@@ -20,7 +21,6 @@ def read_base_prompt(base_prompt_file, suffix):
 
 def write_prompt(companies, content, JSON, file, id_num, model):
     """Generates prompts for each company in the dataframe."""
-
     model = "gpt-4o-08-26" if model == "gpt-4o" else model
     all_prompts = []
 
@@ -68,12 +68,12 @@ def write_prompt(companies, content, JSON, file, id_num, model):
     return id_num
 
 def generate_prompts(question, model, month, year):
-    """Main function to generate prompts and write them to a file."""   
-
+    """Main function to generate prompts and write them to a file."""  
+    print(f"Writing prompts for {question}, {model},{month}, and {year}") 
     if not confirm_overwrite():
         return
 
-    csv_file = os.path.join(returns_path, "realized", f"{month}{year}_realized.csv")
+    csv_file = os.path.join(step0_path, "realized", f"{month}{year}_realized.csv")
     base_prompt_file = os.path.join(prompts_path, f'q{question}base')
 
     # Check if the model needs modification
@@ -117,10 +117,10 @@ def generate_prompts(question, model, month, year):
 
 if __name__ == "__main__":
 
-    MONTHS = ["jan"]
-    YEARS = ["19"]
-    QUESTIONS = ["1"]
-    MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
+    MONTHS = month_batches
+    YEARS = years
+    QUESTIONS = economic_questions
+    MODELS = models
 
     # Set constants here
     for month in MONTHS:

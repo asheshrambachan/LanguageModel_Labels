@@ -1,10 +1,10 @@
 import pandas as pd
-from constants import economic_questions, models, month_batches, return_types, years, returns_path, step4_path, step5_path
+from constants import economic_questions, models, month_batches, return_types, years, step0_path, step4_path, step5_path
 import os
 
 def read_data(question, model, month, year, return_type):
     labels = pd.read_csv(f"{step4_path}/{model}/q{question}/q{question}_{month}{year}_processed.csv")
-    headlines = pd.read_csv(f"{returns_path}/{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
+    headlines = pd.read_csv(f"{step0_path}/{return_type}/{month}{year}_{return_type}.csv").drop_duplicates(subset=['headline', 'company_name'])
     return labels, headlines
 
 def merge_data(labels, headlines):
@@ -66,8 +66,5 @@ if __name__ == "__main__":
             for month in MONTHS:
                 for year in YEARS:
                     for return_type in RETURN_TYPES:
-                        main(question=question, 
-                             model=model, 
-                             month=month, 
-                             year=year, 
-                             return_type=return_type)
+                        main(question=question, model=model, month=month, year=year, return_type=return_type)
+                        print(f"Merged returns data for {question}, {model}, {month}, {year}, {return_type}")

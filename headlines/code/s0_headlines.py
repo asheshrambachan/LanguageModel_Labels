@@ -1,9 +1,10 @@
 import pandas as pd
 import datetime as dt
+import os
 import numpy as np
 import pandas_market_calendars as pmc
 from helpers import try_float
-from constants import month_batches, returns_path
+from constants import month_batches, step0_path
 
 headlines_file_path = "./data/raw/headlines2019.csv"
 factors_file_path = "./data/raw/F-F_Research_Data_Factors_daily.csv"
@@ -57,14 +58,15 @@ def main(months):
         decimal_cols = ["ret", "ret_fd1", "ret_fd5", "ret_fd10", "ret_ld1", "ret_ld2", "ret_ld3"]
         monthly_data.loc[:, decimal_cols] = monthly_data[decimal_cols].apply(lambda x: x * 100)
         monthly_data.drop_duplicates(inplace=True)
-        monthly_data.to_csv(f"{returns_path}/realized/{month}19_realized.csv", index=False)
+
+        os.makedirs(f"{step0_path}/realized", exist_ok=True)
+        monthly_data.to_csv(f"{step0_path}/realized/{month}19_realized.csv", index=False)
         print(f"Saved realized returns for {month}")
 
         # Precompute trading days for all dates in the monthly data
         trading_days = {d: get_trading_days(d) for d in monthly_data['date'].unique()}
         for i in range(1, 11):
             monthly_data[f'date_{i}'] = monthly_data['date'].map(lambda d: trading_days[d][i] if d in trading_days else pd.NaT)
-        print("Computed trading days")
 
         # Process WRDS returns for CAPM and FF3
         returns_data = {'CAPM': process_returns(WRDS_CAPM, factors), 'FF3': process_returns(WRDS_FF3, factors)}
@@ -78,7 +80,9 @@ def main(months):
                                       right_on=["date", "permno"],
                                       how='left', suffixes=('', f'_{i}'))
             merged.drop(columns=[f'date_{i}' for i in range(1, 11)], inplace=True)
-            merged.to_csv(f"{returns_path}/abnormal_{key}/{month}19_abnormal_{key}.csv", index=False)
+
+            os.makedirs(f"{step0_path}/abnormal_{key}", exist_ok=True)
+            merged.to_csv(f"{step0_path}/abnormal_{key}/{month}19_abnormal_{key}.csv", index=False)
             print(f"Saved abnormal returns for {month} using {key}")
 
 

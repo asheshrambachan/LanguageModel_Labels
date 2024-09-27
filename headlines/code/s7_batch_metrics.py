@@ -70,8 +70,9 @@ def main(questions, models, months, return_types, prompt_types):
         })
 
     # Convert summary data to DataFrame and save
-    pd.DataFrame(monthly_batch_info).to_csv(step7_path, index=False)
+    os.makedirs(step7_path, exist_ok=True)
+    pd.DataFrame(monthly_batch_info).to_csv(step7_path + "batch_metrics.csv", index=False)
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
-    main(economic_questions, models, month_batches, return_types[:1], prompt_types[:1])
+    main(economic_questions, models, month_batches, return_types, prompt_types)

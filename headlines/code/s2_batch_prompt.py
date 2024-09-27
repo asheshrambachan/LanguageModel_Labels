@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
 from constants import API_KEY, step1_path
+from constants import economic_questions, models, month_batches, years
 
 def initialize_client(api_key):
     """Initializes and returns the OpenAI client using the provided API key."""
@@ -46,8 +47,8 @@ def main(question, model, month, year):
         batch_input_file_id2 = create_batch_input_file(client, file_path2)
         batch2 = create_batch(client, batch_input_file_id2, description=f"{description} second")
 
-        print(batch1)
-        print(batch2)
+        print("oct first half batch id:", batch1)
+        print("oct second half batch id:", batch2)
 
     else:
         # Normal case for non-October months
@@ -57,18 +58,19 @@ def main(question, model, month, year):
         batch_input_file_id = create_batch_input_file(client, file_path)
         batch = create_batch(client, batch_input_file_id, description=description)
 
-        print(batch)
+        print(f"{month} batch id:", batch)
 
 if __name__ == "__main__":
 
-    QUESTIONS = ["1"]
-    MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
-    MONTHS = ["jan"]
-    YEARS = ["19"]
+    QUESTIONS = economic_questions
+    MODELS = models
+    MONTHS = month_batches
+    YEARS = years
 
     for question in QUESTIONS:
         for model in MODELS:
             for month in MONTHS:
                 for year in YEARS:
                     main(question, model, month, year)
+                    print(f"Submitted batch for {question}, {model}, {month}, {year}")
 

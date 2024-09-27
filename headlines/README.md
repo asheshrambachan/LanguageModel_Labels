@@ -79,20 +79,20 @@ The repository structure is the following:
 		*  `realized_returns_robust.R` regresses realized returns under both models on LLM labels. Heteroskedasticity robust SEs are reported. 
 
 ## Using this Code Base
-There are four possible levels of replication that this code base allows for described in decreasing complexity. 
-1. Creating the dataset of headlines and returns followed by items 2-4 below.
-2. Rerunning the prompting exercise by writing prompts and prompting each LLM followed by items 3 and 4 below. 
-3.   Analyzing each LLMs responses to the prompting exercise and generating the regression figures and tables.
-4. Generating the regression tables and figures
+There are three possible levels of replication that this code base allows: 
+1. Creating the dataset of headlines and rerunning the prompting exercise followed by steps 2 and 3 below.
+2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
+3. Generating the regression tables and figures. 
 
-### Recreating the Headlines Dataset:
+For running any of the code, set the working directory to `./headlines`.
 
- - Navigate to the `./returns_data` directory. Unzip all the `.zip` files. Set the working directory to `./headlines`. Then, run `s0_headlines.py`. 
- 
- ### Prompting Exercise
- - Run `s0_headlines.py`
+### Recreating the Headlines Dataset and Prompting Exercise:
+
+ - Navigate to the `./returns_data` directory. Unzip all the `.zip` files. Then, run `./run_prompting.sh`. This will run a bash script that populates the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
+ - The bash script will then write the prompts based on the headlines data that was just generated. If a set of prompts already exists and you try to overwrite them by running this script, you will have to type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
+ - You can run any of the individual scripts called by the bash script from the `./code` directory, and also modify the call to `main()` if you only want to run the prompting on a subset of the data. 
 
 ### Analysis
-- Run `./code/run_all.py` 
+- `./code/run_all.py` will run steps 4-8. To individually run any of these steps, the individual scripts can be used. Make sure to pass into the main function the appropriate parameters (whichever subset of models, months, return types etc. that need to be analyzed)
 
 ### Figures and Tables
