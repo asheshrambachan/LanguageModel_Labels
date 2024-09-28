@@ -60,19 +60,16 @@ def main():
     # Load and merge batched responses
     responses_batched_paths = glob.glob(os.path.join(temp_dir, f'responses_batched_prediction/*.jsonl'))
     responses = merge_batched_responses(responses_batched_paths)
-    
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["ID",  "PromptingStrategyID", "PromptingStrategyName", "BillID", "TrimText", "AddIntrDate"]], on="ID")
     responses.set_index("ID", inplace=True, drop=False)
     responses.sort_index(inplace=True)
 
+    # Pass 
     responses_passage = responses.loc[responses["PromptingStrategyName"]=="Predict Bill Passage"]
-    responses_completion = responses.loc[responses["PromptingStrategyName"]=="Complete Bill Summary"]
-    # print(len(responses_passage))
 
     # Decoded responses
     responses_passage = decode_responses_passage(responses_passage)
-    responses_completion = decode_responses_completion(responses_completion)
 
     # save as jsonl file
     responses_passage_path = os.path.join(temp_dir, f"responses_prediction_passage.jsonl")
@@ -81,31 +78,44 @@ def main():
             f.write(json.dumps(response) + "\n")
     print(f"Saved {os.path.basename(responses_passage_path)}, at {os.path.dirname(responses_passage_path)}")
 
+    # merge prompts and bills metadata with llm responses
+    responses_passage = pd.read_json(responses_passage_path, lines=True)
+    bills_llm_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
+    bills_llm_passage.drop(columns="ID", inplace=True)
+    bills_llm_passage.reset_index(drop=False, names="ID", inplace=True)
+
+    # print mean input and output tokens
+    print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
+
+    # save
+    bills_llm_passage_path = os.path.join(data_dir, f"bills_llm_passage.csv")
+    bills_llm_passage.to_csv(bills_llm_passage_path, index=False)
+    print(f"Saved {os.path.basename(bills_llm_passage_path)}, n = {len(bills_llm_passage)}, at {os.path.dirname(bills_llm_passage_path)}")
+
+    # Completion
+    responses_completion = responses.loc[responses["PromptingStrategyName"]=="Complete Bill Summary"]
+
+    # decoded responses
+    responses_completion = decode_responses_completion(responses_completion)
+
+    # save as jsonl file
     responses_completion_path = os.path.join(temp_dir, f"responses_prediction_completion.jsonl")
     with open(responses_completion_path, "w") as f:
         for response in responses_completion:
             f.write(json.dumps(response) + "\n")
     print(f"Saved {os.path.basename(responses_completion_path)}, at {os.path.dirname(responses_completion_path)}")
 
-    # Merge prompts and bills metadata with llm responses
-    responses_passage = pd.read_json(responses_passage_path, lines=True)
-    bills_llm_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-
+    # merge prompts and bills metadata with llm responses
     responses_completion = pd.read_json(responses_completion_path, lines=True)
     bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
+    bills_llm_completion.drop(columns="ID", inplace=True)
+    bills_llm_completion.reset_index(drop=False, names="ID", inplace=True)
 
-    # Print mean and max input and output tokens
-    print("bills_llm_passage")
-    print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
-    print("bills_llm_completion")
+    # print mean input and output tokens
     print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
-    # Save
-    bills_llm_passage_path = os.path.join(data_dir, f"bills_llm_passage.csv")
-    bills_llm_passage.to_csv(bills_llm_passage_path, index=False)
-    print(f"Saved {os.path.basename(bills_llm_passage_path)}, n = {len(bills_llm_passage)}, at {os.path.dirname(bills_llm_passage_path)}")
-
+    # save
     bills_llm_completion_path = os.path.join(data_dir, f"bills_llm_completion.csv")
     bills_llm_completion.to_csv(bills_llm_completion_path, index=False)
     print(f"Saved {os.path.basename(bills_llm_completion_path)}, n = {len(bills_llm_completion)}, at {os.path.dirname(bills_llm_completion_path)}")

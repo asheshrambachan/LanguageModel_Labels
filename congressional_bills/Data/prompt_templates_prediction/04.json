@@ -1,6 +1,6 @@
 [
     {
         "role": "user",
-        "content": "Here is the beginning of the summary for U.S. Congress bill {}:\n\"{}\"\n\nUsing information available up until {}, please complete the summary of this bill to the best of your knowledge.\n\nReturn the completed summary in the following JSON format:\n{{\n    \"DescriptionLLM\": \"[Completed summary text]\"\n}}\n"
+        "content": "Here is the beginning of the summary for U.S. Congress bill {}:\n\"{}\"\n\nTo the best of your ability, please complete the summary of this bill using information available up until {}.\n\nReturn the completed summary in the following JSON format:\n{{\n    \"DescriptionLLM\": \"[Completed summary text]\"\n}}\n"
     }
 ]
