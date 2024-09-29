@@ -43,21 +43,23 @@ conda activate env_cb
 
 ## Replication Levels
 
+### Estimation Exercise 
+
 There are **2 possible levels of replication** that this code base allows for. You can run the entire pipeline or focus on specific steps, depending on the part of the experiment you are interested in.
 
 1. **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
     ```bash
-    chmod +x ./Code/run_all.sh
-    ./Code/run_all.sh
+    chmod +x ./Code/run_estimation.sh
+    ./Code/run_estimation.sh
     ```
 
 2. **Partial Replication:** 
   The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
     1. **Replicating Data Cleaning:** 
-        If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
+        If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/Estimation/bills.csv`:
         ```bash
-        python ./Code/1_clean_bills.py
+        python ./Code/clean_bills.py
         ```
 
     2. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
@@ -70,44 +72,45 @@ There are **2 possible levels of replication** that this code base allows for. Y
               echo 'OPENAI_API_KEY="your key"' > .env
               ```
 
-        Then, run the following commands to create the file `./Data/bills_llm.csv`:
+        Then, run the following commands to create the file `./Data/Estimation/bills_llm.csv`:
         ```bash
-        python ./Code/2.1_create_prompts.py
-        python ./Code/2.2_query_llm.py
-        python ./Code/2.3_download_responses.py
-        python ./Code/2.4_decode_responses.py
+        python ./Code/Estimation/1.1_create_prompts.py
+        python ./Code/Estimation/1.2_query_llm.py
+        python ./Code/Estimation/1.3_download_responses.py
+        python ./Code/Estimation/1.4_decode_responses.py
         ```
         [^1]: The token limit varies by user and you may need to split the prompts into more smaller batches.
 
     3. **Replicating Simulation Runs & Model Evaluation:** 
         If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
-        - `./Data/lhs_10k_human.csv`, `./Data/rhs_10k_human.csv`[^2]
-        - `./Data/lhs_10k_llm.csv`,  `./Data/rhs_10k_llm.csv`[^3]
-        - `./Data/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
+        - `./Data/Estimation/LHS/lhs_10k_human.csv`, `./Data/Estimation/RHS/rhs_10k_human.csv`[^2]
+        - `./Data/Estimation/LHS/lhs_10k_llm.csv`,  `./Data/Estimation/RHS/rhs_10k_llm.csv`[^3]
+        - `./Data/Estimation/LHS/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/Estimation/RHS/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
         ```bash
-        Rscript ./Code/3.1_run_lhs_simulations.r
-        Rscript ./Code/3.2_run_rhs_simulations.r
-        Rscript ./Code/3.3_summarize_lhs_simulations.r
-        Rscript ./Code/3.4_summarize_rhs_simulations.r
+        Rscript ./Code/Estimation/2.1.1_run_lhs_simulations.r
+        Rscript ./Code/Estimation/2.1.2_summarize_lhs_simulations.r
+        Rscript ./Code/Estimation/2.2.1_run_rhs_simulations.r
+        Rscript ./Code/Estimation/2.2.2_summarize_rhs_simulations.r
         ```
         [^2]: These files contain the regression results using `Yhuman` across all 10,000 bills. 
         [^3]: These files contain the regression results using `Yllm` across all 10,000 bills. 
         [^4]: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage averaged over $N = 1000$ simulation runs, relative to the `10k_Yhuman` regressions.
 
     4. **Replicating All Figures & Tables:** 
-        If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures and Tables` directory and its content:
+        If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures` and `./Tables` directories and their content:
         ```bash
-        python ./Code/4.1_est_llm_pred_error.py
-        Rscript ./Code/4.2_bills_llm_plots.r
-        Rscript -e "rmarkdown::render('./Code/4.3_lhs_results.rmd', output_dir = './Figures and Tables')"
-        Rscript -e "rmarkdown::render('./Code/4.4_rhs_results.rmd', output_dir = './Figures and Tables')"
+        python ./Code/Estimation/3.1_est_llm_pred_error.py
+        Rscript ./Code/Estimation/3.2_bills_llm_plots.r
+        Rscript ./Code/Estimation/3.3.1_lhs_figures.r
+        Rscript ./Code/Estimation/3.3.2_lhs_tables.r
+        Rscript ./Code/Estimation/3.4.1_rhs_figures.r
+        Rscript ./Code/Estimation/3.4.2_rhs_tables.r
         ```
 
-    5. **Replicating Figure 2 only from `4.3_lhs_results`:**
+    5. **Replicating Figure 2 only from LHS results:**
         ```bash
-        cd path/to/congressional_bills
-        Rscript ./Code/4.3_lhs_results_fig02.r
+        Rscript ./Code/Estimation/3.3.3_lhs_fig02.r
         ```
 
 # References
@@ -127,7 +130,9 @@ There are **2 possible levels of replication** that this code base allows for. Y
 - [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 - [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills#additional-notes-and-remarks)
 
-## Additional Notes and Remarks
+# Additional Notes and Remarks
+
+## Estimation
 
 ### LLM Models & Prompt Modifications
 
@@ -216,4 +221,6 @@ In step 4.1, we estimate the error in LLM predications using a logistic regressi
 \beta_{m,p}^\text{Lasso} &= \arg\min_{\beta} \Vert y_{m,p} - \sigma(X\beta) \Vert_2^2 + \lambda \Vert \beta \Vert_1
 \end{align*}
 ```
+
+## Prediction
 
