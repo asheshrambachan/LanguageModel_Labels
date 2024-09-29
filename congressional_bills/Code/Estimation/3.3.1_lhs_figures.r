@@ -64,8 +64,8 @@ data_fig01 <- data_llm %>%
 fig01 <- data_fig01 %>%
   ggplot(aes(x=prompt.sorted, color=model, shape=model)) +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) +
-  geom_errorbar(aes(ymin=lci, ymax=uci), position=position_dodge(width=0.5), width=0.5, linewidth=0.3) +
-  geom_point(aes(y=coef), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  geom_errorbar(aes(ymin=lci, ymax=uci), width=0.5, linewidth=0.3) +
+  geom_point(aes(y=coef), size=1.25, alpha=0.7) +
   geom_hline(aes(yintercept=coef, color=model), linewidth=0.5, data=data_human) +
   
   # theme and aesthetics
@@ -95,7 +95,7 @@ data_fig02 <- data_llm %>%
 fig02 <- data_fig02 %>%
   ggplot(aes(x=prompt.sorted, color=model, shape=model)) +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2) + # x-axis
-  geom_point(aes(y=t), size=1.25, alpha=0.7, position=position_dodge(width=0.5)) +
+  geom_point(aes(y=t), size=1.25, alpha=0.7) +
   
   # theme and aesthetics
   xlab("Prompt-Model Index (Sorted)") +
