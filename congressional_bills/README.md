@@ -5,20 +5,25 @@ Congressional Bills Experiment
 
 This repository contains the replication files for the congressional bills experiment. The code is a combination of Python and R scripts, labeled by their order in the workflow. 
 
-1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
-2. **Prompt Creation, LLM Querying, and Response Decoding:**
-   - **2.1** Generates 24 prompts per bill using 12 prompt templates and 2 models.
-   - **2.2** Queries LLMs to predict the major topic of each bill.
-   - **2.3** Downloads LLM responses.
-   - **2.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
-4. **Simulation Runs & Model Evaluation:**
-   - **3.1 and 3.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
-   - **3.3 and 3.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and  RHS.
-5. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
-   - **4.1** Estimates LLM prediction errors for each combination of prompt and model.
-   - **4.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
-   - **4.3 and 4.4** Generate figures and tables for regressions with proxy on the LHS and  RHS.
-
+- **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
+- **Estimation:**
+    1. **Prompt Creation, LLM Querying, and Response Decoding:**
+        - **1.1** Generates 24 prompts per bill using 12 prompt templates and 2 models.
+        - **1.2** Queries LLMs to predict the major topic of each bill.
+        - **1.3** Downloads LLM responses.
+        - **1.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
+    2. **Simulation Runs & Model Evaluation:**
+        - **2.1 and 2.3** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
+        - **2.2 and 2.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
+    3. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
+        - **3.1** Estimates LLM prediction errors for each combination of prompt and model.
+        - **3.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
+        - **3.3.1 and 3.3.2** Generate figures and tables for regressions with proxy on the LHS
+        - **3.4.1 and 4.4.2** Generate figures and tables for regressions with proxy on the RHS
+- **Prediction:**
+    1. **Prompt Creation, LLM Querying, and Response Decoding**
+    2. **...**
+    3. **Figure and Table Generation:**
 
 # Experiment Replication 
 
