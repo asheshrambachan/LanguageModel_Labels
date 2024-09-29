@@ -1,6 +1,0 @@
-[
-    {
-        "role": "user",
-        "content": "Here is the summary for U.S. Congress bill {}:\n\"{}\"\n\nTo the best of your ability, please answer the following using information available up until {}:\n1. Will this bill pass the Senate?\n2. Will this bill pass the House of Representatives?\n\nReturn the answers in the following JSON format:\n{{\n    \"PassSLLM\": 1 if the bill will pass the Senate, otherwise 0,\n    \"PassHLLM\": 1 if the bill will pass the House of Representatives, otherwise 0\n}}\n"
-    }
-]
