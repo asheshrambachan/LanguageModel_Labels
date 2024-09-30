@@ -1,0 +1,12 @@
+\begin{figure}
+    \begin{center}
+    \includegraphics[width=1.0\linewidth]{Figures/CongressionalBills_Estimation/LLM_On_LHS/fig02 t-score vs. Prompt-Model (Sorted).jpeg}
+    \caption{t-scores of $\beta$ vs. Prompt-Model Index. Proxy on the LHS.}
+    % \label{fig:enter-label}
+    \end{center}
+    Notes: 
+    The t-scores were obtained by fitting the model $Y_t = \alpha + \beta V$ using 10,000 bills, with 95\% confidence intervals computed via robust standard errors. 
+    Here, $Y_t$ are indicator for topic $t \in$ \{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\} and $V \in \{\text{Democrat}; \text{Senate}; \text{DW1}\}$ are the covariates. 
+    The human-based coefficients $\beta^\star$ (red) were estimated using $Y_{t}^\text{Human} := 1\{Y^\text{Human} = t\}$, while LLM-based coefficients $\beta^\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\text{LLM} := 1\{Y_{m,p}^\text{LLM} = t\}$, with $m \in \{\text{GPT-3.5}, \text{GPT-4o}\}$ denoting the LLM model and $p \in \{1, \ldots, 12\}$ representing the prompt. 
+    In each subplot, the t-score estimates were sorted in ascending order for clarity.
+\end{figure}

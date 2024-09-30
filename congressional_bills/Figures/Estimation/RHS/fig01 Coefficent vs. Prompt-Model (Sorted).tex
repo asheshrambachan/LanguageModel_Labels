@@ -1,0 +1,12 @@
+\begin{figure}
+    \begin{center}
+    \includegraphics[width=1.0\linewidth]{Figures/CongressionalBills_Estimation/LLM_On_RHS/fig01 Coefficent vs. Prompt-Model (Sorted).jpeg}
+    \caption{$\beta_t$  vs. Prompt-Model Index for all $t$. Proxy on the RHS.}
+    % \label{fig:enter-label}
+    \end{center}
+    Notes: 
+    The coefficients were obtained by fitting the model $V = Y^\top\beta = \sum_{t} Y_t \beta_t$ using 10,000 bills, with 95\% confidence intervals computed via robust standard errors. 
+    Here,  $V \in \{\text{Democrat}; \text{Senate}; \text{DW1}\}$ and $t \in$ \{Health; Banking, Finance, and Domestic Commerce; Defense; Government Operations; Public Lands and Water Management; Other\}. 
+    The human-based coefficients $\beta^\star$ (red) were estimated using $Y_t^\text{Human} := 1\{Y^\text{Human} = t\}$, while LLM-based coefficients $\beta^\text{LLM}$ (GPT-3.5 in green circles, GPT-4o in blue triangles) used $Y_{t,m,p}^\text{LLM} := 1\{Y_{m,p}^\text{LLM} = t\}$, with $m \in \{\text{GPT-3.5}, \text{GPT-4o}\}$ denoting the LLM model and $p \in \{1, \ldots, 12\}$ representing the prompt. 
+    In each subplot, the bias estimates were sorted in ascending order for clarity.
+\end{figure}

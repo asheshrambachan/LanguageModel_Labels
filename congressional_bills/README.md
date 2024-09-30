@@ -18,8 +18,7 @@ This repository contains the replication files for the congressional bills exper
     3. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
         - **3.1** Estimates LLM prediction errors for each combination of prompt and model.
         - **3.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
-        - **3.3.1 and 3.3.2** Generate figures and tables for regressions with proxy on the LHS
-        - **3.4.1 and 4.4.2** Generate figures and tables for regressions with proxy on the RHS
+        - **3.3** Generate figures and tables for regressions with proxy on the LHS and the RHS.
 - **Prediction:**
     1. **Prompt Creation, LLM Querying, and Response Decoding**
     2. **...**
@@ -55,7 +54,6 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 1. **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
     ```bash
-    python ./Code/clean_bills.py
     chmod +x ./Code/Estimation/run_all.sh
     ./Code/Estimation/run_all.sh
     ```
@@ -63,13 +61,13 @@ There are **2 possible levels of replication** that this code base allows for. Y
 2. **Partial Replication:** 
   The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
-    1. **Replicating Data Cleaning:** 
+    0. **Replicating Data Cleaning:** 
         If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/Estimation/bills.csv`:
         ```bash
         python ./Code/clean_bills.py
         ```
 
-    2. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
+    1. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
         If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, you first need to **Add your `OPENAI_API_KEY`** to `.env` file. To do that:
           1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
           2. Create a new API key and copy the generated key.
@@ -88,7 +86,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
         ```
         [^1]: The token limit varies by user and you may need to split the prompts into more smaller batches.
 
-    3. **Replicating Simulation Runs & Model Evaluation:** 
+    2. **Replicating Simulation Runs & Model Evaluation:** 
         If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
         - `./Data/Estimation/LHS/lhs_10k_human.csv`, `./Data/Estimation/RHS/rhs_10k_human.csv`[^2]
         - `./Data/Estimation/LHS/lhs_10k_llm.csv`,  `./Data/Estimation/RHS/rhs_10k_llm.csv`[^3]
@@ -104,7 +102,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
         [^3]: These files contain the regression results using `Yllm` across all 10,000 bills. 
         [^4]: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage averaged over $N = 1000$ simulation runs, relative to the `10k_Yhuman` regressions.
 
-    4. **Replicating All Figures & Tables:** 
+    3. **Replicating All Figures & Tables:** 
         If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures` and `./Tables` directories and their content:
         ```bash
         python ./Code/Estimation/3.1_est_llm_pred_error.py
@@ -122,7 +120,10 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 - Jones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
 
-
+Figures > CongressionalBills_Estimation > LLM_On_LHS
+Figures > CongressionalBills_Estimation > LLM_On_RHS
+Tables > CongressionalBills_Estimation > LHS
+Tables > CongressionalBills_Estimation > RHS
 
 ## TODO
 
