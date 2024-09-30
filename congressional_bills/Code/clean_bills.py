@@ -212,7 +212,7 @@ def sample_bills(bills, n_bills = 10e3, n_examples = 15, seed1 = 123, seed2 = 12
     bills_10k_estimation = bills.sample(n=int(n_bills), random_state=seed1)
 
     # Drop bills with missing IntrDate data
-    bills.dropna(inplace=True)
+    bills = bills.dropna()
     print(f'Removed bills with missing IntrDate from bills data, n = {len(bills)}.')
     bills_10k_prediction = bills.sample(n=int(n_bills), random_state=seed2)
 

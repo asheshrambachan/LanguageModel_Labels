@@ -55,8 +55,9 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 1. **Full Replication:** If you want to run the entire pipeline from data cleaning to figure and table generation, run:
     ```bash
-    chmod +x ./Code/run_estimation.sh
-    ./Code/run_estimation.sh
+    python ./Code/clean_bills.py
+    chmod +x ./Code/Estimation/run_all.sh
+    ./Code/Estimation/run_all.sh
     ```
 
 2. **Partial Replication:** 
@@ -108,15 +109,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
         ```bash
         python ./Code/Estimation/3.1_est_llm_pred_error.py
         Rscript ./Code/Estimation/3.2_bills_llm_plots.r
-        Rscript ./Code/Estimation/3.3.1_lhs_figures.r
-        Rscript ./Code/Estimation/3.3.2_lhs_tables.r
-        Rscript ./Code/Estimation/3.4.1_rhs_figures.r
-        Rscript ./Code/Estimation/3.4.2_rhs_tables.r
-        ```
-
-    5. **Replicating Figure 2 only from LHS results:**
-        ```bash
-        Rscript ./Code/Estimation/3.3.3_lhs_fig02.r
+        Rscript ./Code/Estimation/3.3_figures_tables.r
         ```
 
 # References
@@ -134,7 +127,9 @@ There are **2 possible levels of replication** that this code base allows for. Y
 ## TODO
 
 - [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
+- [ ] remove `3.3_lhs_results.rmd` and `3.4_rhs_results.rmd` and their pdf files
 - [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills#additional-notes-and-remarks)
+- [ ] remove `3.3.5_lhs_fig02`
 
 # Additional Notes and Remarks
 

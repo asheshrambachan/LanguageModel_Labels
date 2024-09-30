@@ -13,6 +13,7 @@ repo_dir <- "."
 data_dir <- file.path(repo_dir, "Data/Estimation/RHS")
 temp_dir <- file.path(repo_dir, "Temp/Estimation/RHS")
 rhs_dir <- file.path(temp_dir, "rds")
+dir.create(data_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Functions 
 bias = function(coef, coef.ref) return(coef - coef.ref) # Calculate bias

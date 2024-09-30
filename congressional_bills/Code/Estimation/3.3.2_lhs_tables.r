@@ -1,5 +1,5 @@
-require(dplyr)
-require(kableExtra)
+require(dplyr, warn.conflicts = FALSE)
+require(kableExtra, warn.conflicts = FALSE)
 
 # Directories 
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"

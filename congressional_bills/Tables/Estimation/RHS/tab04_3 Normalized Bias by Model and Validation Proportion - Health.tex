@@ -1,0 +1,36 @@
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-2}Normalized Bias Summary Statistics of $\beta_{t}$, $t=$ Health, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{rrlrrrrr}
+\toprule
+Model & Validation Proportion & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & 5\% & LLM & 0.212 & 1.089 & 0.483 & -1.480 & 1.463\\
+GPT-3.5 & 5\% & Human Validation & 0.008 & 0.034 & 0.006 & -0.049 & 0.063\\
+GPT-3.5 & 5\% & Debiased & 0.001 & 0.028 & 0.001 & -0.042 & 0.048\\
+GPT-3.5 & 10\% & LLM & 0.225 & 1.085 & 0.500 & -1.453 & 1.500\\
+GPT-3.5 & 10\% & Human Validation & 0.000 & 0.030 & -0.005 & -0.051 & 0.055\\
+GPT-3.5 & 10\% & Debiased & 0.005 & 0.028 & 0.006 & -0.032 & 0.046\\
+GPT-3.5 & 25\% & LLM & 0.230 & 1.094 & 0.538 & -1.462 & 1.493\\
+GPT-3.5 & 25\% & Human Validation & 0.006 & 0.025 & 0.011 & -0.031 & 0.041\\
+GPT-3.5 & 25\% & Debiased & 0.002 & 0.034 & 0.001 & -0.045 & 0.057\\
+GPT-3.5 & 50\% & LLM & 0.222 & 1.091 & 0.515 & -1.490 & 1.519\\
+GPT-3.5 & 50\% & Human Validation & -0.001 & 0.034 & -0.005 & -0.055 & 0.051\\
+GPT-3.5 & 50\% & Debiased & -0.006 & 0.027 & -0.004 & -0.050 & 0.038\\
+GPT-4o & 5\% & LLM & 0.084 & 0.507 & -0.119 & -0.510 & 0.824\\
+GPT-4o & 5\% & Human Validation & -0.005 & 0.029 & -0.003 & -0.051 & 0.037\\
+GPT-4o & 5\% & Debiased & 0.005 & 0.037 & 0.005 & -0.067 & 0.055\\
+GPT-4o & 10\% & LLM & 0.075 & 0.501 & -0.135 & -0.468 & 0.825\\
+GPT-4o & 10\% & Human Validation & -0.005 & 0.028 & -0.007 & -0.043 & 0.042\\
+GPT-4o & 10\% & Debiased & -0.006 & 0.036 & -0.006 & -0.074 & 0.052\\
+GPT-4o & 25\% & LLM & 0.078 & 0.513 & -0.136 & -0.483 & 0.857\\
+GPT-4o & 25\% & Human Validation & 0.006 & 0.032 & 0.006 & -0.048 & 0.055\\
+GPT-4o & 25\% & Debiased & -0.005 & 0.036 & -0.001 & -0.061 & 0.048\\
+GPT-4o & 50\% & LLM & 0.078 & 0.497 & -0.119 & -0.514 & 0.805\\
+GPT-4o & 50\% & Human Validation & 0.003 & 0.029 & 0.013 & -0.041 & 0.038\\
+GPT-4o & 50\% & Debiased & 0.001 & 0.032 & -0.004 & -0.041 & 0.066\\
+\bottomrule
+\end{tabular}
+\end{table}
