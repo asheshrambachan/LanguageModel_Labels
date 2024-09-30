@@ -1,0 +1,36 @@
+\begin{table}
+
+\caption{\label{tab:unnamed-chunk-1}Normalized Bias Summary Statistics of $\beta_{t}$, $t=$ Defense, by Model and Proportion of Validation Samples.
+      Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{rrlrrrrr}
+\toprule
+Model & Validation Proportion & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & 5\% & LLM & 0.075 & 0.568 & 0.189 & -0.712 & 0.900\\
+GPT-3.5 & 5\% & Human Validation & 0.000 & 0.033 & -0.007 & -0.052 & 0.056\\
+GPT-3.5 & 5\% & Debiased & 0.002 & 0.032 & 0.004 & -0.039 & 0.049\\
+GPT-3.5 & 10\% & LLM & 0.069 & 0.577 & 0.167 & -0.725 & 0.950\\
+GPT-3.5 & 10\% & Human Validation & -0.002 & 0.035 & 0.002 & -0.041 & 0.047\\
+GPT-3.5 & 10\% & Debiased & -0.001 & 0.035 & -0.002 & -0.062 & 0.048\\
+GPT-3.5 & 25\% & LLM & 0.073 & 0.566 & 0.150 & -0.688 & 0.930\\
+GPT-3.5 & 25\% & Human Validation & -0.011 & 0.031 & -0.015 & -0.056 & 0.043\\
+GPT-3.5 & 25\% & Debiased & 0.005 & 0.039 & 0.005 & -0.046 & 0.061\\
+GPT-3.5 & 50\% & LLM & 0.072 & 0.550 & 0.132 & -0.683 & 0.902\\
+GPT-3.5 & 50\% & Human Validation & -0.007 & 0.025 & -0.002 & -0.048 & 0.032\\
+GPT-3.5 & 50\% & Debiased & -0.004 & 0.031 & -0.007 & -0.051 & 0.045\\
+GPT-4o & 5\% & LLM & 0.160 & 0.328 & 0.140 & -0.276 & 0.693\\
+GPT-4o & 5\% & Human Validation & -0.006 & 0.033 & 0.000 & -0.055 & 0.048\\
+GPT-4o & 5\% & Debiased & -0.006 & 0.028 & -0.006 & -0.050 & 0.033\\
+GPT-4o & 10\% & LLM & 0.148 & 0.334 & 0.171 & -0.283 & 0.664\\
+GPT-4o & 10\% & Human Validation & 0.001 & 0.033 & -0.003 & -0.049 & 0.064\\
+GPT-4o & 10\% & Debiased & -0.005 & 0.030 & -0.002 & -0.055 & 0.037\\
+GPT-4o & 25\% & LLM & 0.169 & 0.322 & 0.152 & -0.241 & 0.685\\
+GPT-4o & 25\% & Human Validation & 0.001 & 0.037 & -0.006 & -0.045 & 0.071\\
+GPT-4o & 25\% & Debiased & 0.004 & 0.031 & 0.010 & -0.056 & 0.044\\
+GPT-4o & 50\% & LLM & 0.152 & 0.324 & 0.158 & -0.300 & 0.654\\
+GPT-4o & 50\% & Human Validation & -0.005 & 0.032 & -0.005 & -0.055 & 0.038\\
+GPT-4o & 50\% & Debiased & 0.000 & 0.030 & 0.003 & -0.054 & 0.040\\
+\bottomrule
+\end{tabular}
+\end{table}

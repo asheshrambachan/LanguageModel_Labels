@@ -170,13 +170,13 @@ cat(sprintf("Saved %s\n", fig_path))
 
 
 # Figure 5: Bias Density by Model and Validation Proportion
-facet.labeller <- labeller(
+proportion_labeller <- labeller(
   proportion = function(proportion) sprintf("Validation Proportion = %s%%", as.numeric(proportion)*100)
 )
 
 fig05 <- data_5k %>%
   filter(
-    proportion!=0.25,
+    # proportion!=0.25,
     regression!="Human Validation"
   ) %>%
   ggplot(aes(
@@ -189,7 +189,7 @@ fig05 <- data_5k %>%
   # theme and aesthetics
   xlab("Bias") +
   ylab("Probability Densities") +
-  facet_grid(model ~ proportion, labeller=facet.labeller) +
+  facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
@@ -197,14 +197,14 @@ fig05 <- data_5k %>%
 
 # save figure
 fig_path = file.path(fig_dir, "fig05 Bias Density by Model and Validation Proportion.jpeg")
-ggsave(fig_path, plot = fig05, height = 4.5, width = 8)
+ggsave(fig_path, plot = fig05, height = 4.5, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 
 # Figure 6: Normalized Bias Density by Model and Validation Proportion
 fig06 <- data_5k %>%
   filter(
-    proportion!=0.25,
+    # proportion!=0.25,
     regression!="Human Validation"
   ) %>%
   ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
@@ -214,7 +214,7 @@ fig06 <- data_5k %>%
   # theme and aesthetics
   xlab("Normalized Bias") +
   ylab("Probability Densities") +
-  facet_grid(model ~ proportion, labeller=facet.labeller) +
+  facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
@@ -222,14 +222,14 @@ fig06 <- data_5k %>%
 
 # save figure
 fig_path = file.path(fig_dir, "fig06 Normalized Bias Density by Model and Validation Proportion.jpeg")
-ggsave(fig_path, plot = fig06, height = 4.5, width = 8)
+ggsave(fig_path, plot = fig06, height = 4.5, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 
 # Figure 7: MSE CDF by Validation Proportion
 fig07 <- data_5k %>%
   filter(
-    proportion != 0.25,
+    # proportion != 0.25,
     regression != "LLM"
   ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
@@ -238,7 +238,7 @@ fig07 <- data_5k %>%
   # theme and aesthetics
   xlab("MSE") +
   ylab("Empirical CDF") +
-  facet_grid(. ~ proportion, labeller=facet.labeller) +
+  facet_grid(. ~ proportion, labeller=proportion_labeller) +
   scale_x_continuous(minor_breaks = seq(0,1,0.0001)) +
   scale_color_manual(name="", values=my_colors) +
   scale_linetype_manual(name="", values=c("dashed", "solid")) +
@@ -246,14 +246,14 @@ fig07 <- data_5k %>%
 
 # save figure
 fig_path = file.path(fig_dir, "fig07 MSE CDF by Validation Proportion.jpeg")
-ggsave(fig_path, plot = fig07, height = 3, width = 8)
+ggsave(fig_path, plot = fig07, height = 3, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 
 # Figure 8: MSE CDF by Model and Validation Proportion
 fig08 <- data_5k %>%
   filter(
-    proportion != 0.25,
+    # proportion != 0.25,
     regression != "LLM"
   ) %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
@@ -262,7 +262,7 @@ fig08 <- data_5k %>%
   # theme and aesthetics
   xlab("MSE") +
   ylab("Empirical CDF") +
-  facet_grid(model ~ proportion, labeller=facet.labeller) +
+  facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_x_continuous(minor_breaks = seq(0,1,0.0001)) +
   scale_color_manual(name="", values=my_colors) +
   scale_linetype_manual(name="", values=c("dashed", "solid")) +
@@ -270,5 +270,5 @@ fig08 <- data_5k %>%
 
 # save figure
 fig_path = file.path(fig_dir, "fig08 MSE CDF by Model and Validation Proportion.jpeg")
-ggsave(fig_path, plot = fig08, height = 4.5, width = 8)
+ggsave(fig_path, plot = fig08, height = 4.5, width = 9)
 cat(sprintf("Saved %s\n", fig_path))

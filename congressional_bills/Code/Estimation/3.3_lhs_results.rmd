@@ -86,21 +86,21 @@ fig04
 
 \clearpage
 
-```{r, fig.height=4.5, fig.width=8, fig.cap="Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r, fig.height=4.5, fig.width=9, fig.cap="Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 fig05
 ```
 
-```{r, fig.height=4.5, fig.width=8, fig.cap="Normalized Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r, fig.height=4.5, fig.width=9, fig.cap="Normalized Bias Density of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 fig06
 ```
 
 \clearpage
 
-```{r, fig.height=3, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r, fig.height=3, fig.width=9, fig.cap="MSE Empirical CDF of $\\beta$ by Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 fig07
 ```
 
-```{r, fig.height=4.5, fig.width=8, fig.cap="MSE Empirical CDF of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
+```{r, fig.height=4.5, fig.width=9, fig.cap="MSE Empirical CDF of $\\beta$ by Model and Proportion of Validation Samples. Proxy on the LHS.", fig.align="center"}
 fig08
 ```
 
