@@ -127,7 +127,7 @@ There are **2 possible levels of replication** that this code base allows for. Y
 ## TODO
 
 - [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
-- [ ] remove `3.3_lhs_results.rmd` and `3.4_rhs_results.rmd` and their pdf files
+- [ ] remove `lhs_results.rmd` and `rhs_results.rmd` and their pdf files
 - [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills#additional-notes-and-remarks)
 - [ ] remove `3.3.5_lhs_fig02`
 
