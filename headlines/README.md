@@ -47,6 +47,8 @@ For this particular exercise, navigate to the `headlines` folder. This is the ro
 
 The repository structure is the following:
 
+### Code
+
 * The `code` directory contains numbered python scripts used to write prompts, prompt each LLM, and parse the responses. The numbered scripts contain the functionality for the steps described in the section above:
 	* `s0_headlines.py` defines the script to merge headlines data with relevant stock returns data. 
 	* `s1_write_prompts.py` defines the script to write the prompts for each batch that we pass to the OpenAI API. Note that due to small data updates, the version of the prompts this script generates may be slightly different than the prompts found in the corresponding data folder. 
@@ -56,43 +58,41 @@ The repository structure is the following:
   * `s5_merge_returns.py` combines the cleaned responses with each type of stock return we are interested in. 
   * `s6_common_sample.py` contains the functionality to remove any duplicates and null responses, and then take a common sample of deduplicated headlines with valid responses. We take a common sample both within each model (so the intersection of valid responses to all 9 prompting strategies) and across model (the same intersection but for 9 strategies x 3 models). 
   * `s7_batch_metrics.py` reports the metrics on each batch (includes # of prompts, # of responses, # of empty/missing responses, # of duplicates, # of responses from the batch included in the common sample). 
-  * `s8_bad_responses.py` reports a sample of responses that were poorly formatted (by sampling a response from each batch that did not parse correctly in step 4). We do this to report idiosyncrasies in LLM behavior. 
+  * `s8_bad_responses.py` reports a sample of responses that were poorly formatted (by sampling a response from each batch that did not parse correctly in step 4). We do this to report idiosyncrasies in LLM behavior.
+  * Scripts of the form `s9.n_{return type}_{standard error type}.R` which run the corresponding regressions, where the LHS variable is the type of stock return and the RHS variables are the large language model labels we collect above. 
  
+### Data 
+
 * The `data` directory contains numbered directories with the raw data files that are the outputs from each of the python scripts in the code directory.
 	* `returns data` contains the outputs of the merge from `s0_headlines.py` in subdirectories corresponding to each return type. It also contains the raw data including the headlines data, market beta, and all data used to calculate returns. 
 	* `step1_batch_prompts` contains for each model, for each question, for each month, a set of prompts in  `.jsonl`  format. (Note: 2 files are included for October due to batch size limits). 
 	* `step2_batch_prompts`contains for each model, for each question, for each month, a set of LLM responses in `.jsonl` format. (Note: 2 files are included for October due to batch size limits). 
-	* 	`step4_batch_prompts`contains for each model, for each question, for each month, a set of processed LLM responses in `.csv` format. 
-	* 	`step5_merged_returns`contains for each return type, for each model, for each question, for each month, a directory of processed LLM responses merged with returns. Within each directory are 9 `.csv` files (each containing the responses to a particular prompt strategy and the corresponding stock returns). 
-	* 	`step6_common_sample` contains 2 subdirectories. 
+	* `step4_batch_prompts`contains for each model, for each question, for each month, a set of processed LLM responses in `.csv` format. 
+	* `step5_merged_returns`contains for each return type, for each model, for each question, for each month, a directory of processed LLM responses merged with returns. Within each directory are 9 `.csv` files (each containing the responses to a particular prompt strategy and the corresponding stock returns). 
+	* `step6_common_sample` contains 2 subdirectories. 
 		* `/within_model` includes, for each question, for each model, a common sample of the headlines with correctly parsed responses for all 9 prompting strategies. 
 		*  `/across_models` includes, for each question, a common sample of the headlines with correctly parsed responses for all 9 prompting strategies for all 3 models. 
-	* `step7_batch_metrics` is a `.csv` batch metadata and `step8_bad_responses` is a sampling of poor (non-parseable) LLM responses as described in the code section above. 
+	* `step7/batch_metrics.csv` contains batch metadata (number of rows of validated data for each model, prompt type, return type, question) and `step8/bad_responses.csv` contains a sample of poor (non-parseable and non-validated) LLM responses as described in the code section above. 
+	* `step9_reg_results` contains 3 `.csv` files with the output from the 3 types of regressions we run in step 9 above. 
 
-
-* The `r_scripts` directory contains the R code used to run the regressions and make tables and figures.
-	* The `common_sample.R` script replicates the functionality of common sample Python script. Tbh, it's a little faster but it just doesn't mesh with the rest of the pipeline
-	* `summary_figures_and_tables.R` makes histograms by prompting strategy for each model and question to see the distribution of LLM responses. 
-	* Within the `figures` folder,  `heatmaps.R` creates heatmaps that show the correlation across prompting stratgies for each economic question/LLM pair. The other 3 scripts in this directory run the regressions that we are interested in. 
-		* `abnormal_returns.R` regresses abnormal returns under both models on LLM labels. Standard errors are clustered by firm and date.
-		* `realized_returns_clustered.R` regresses realized returns under both models on LLM labels. Standard errors are clustered by firm and date.
-		*  `realized_returns_robust.R` regresses realized returns under both models on LLM labels. Heteroskedasticity robust SEs are reported. 
+### Figures
+* All figures and tables are contained in the `figures` directory. 
+* Figures and tables are produced by the code in `/code/produce_figures`. Note that this code will only work after generating the outputs of step 9 above. 
 
 ## Using this Code Base
-There are three possible levels of replication that this code base allows: 
+There are three possible levels of replication that this code base allows for: 
 1. Creating the dataset of headlines and rerunning the prompting exercise followed by steps 2 and 3 below.
 2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
 3. Generating the regression tables and figures. 
 
-For running any of the code, set the working directory to `./headlines`.
+For running any of the code, navigate to `./headlines`. There are 3 shell scripts here that replicate our work. 
+1. `run_prompting.sh`
+	* Navigate to the `./data/returns_data` directory. Unzip all the `.zip` files. 
+	* Now, run `./run_prompting.sh`. This will run a bash script that populates first the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
+	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists and you try to overwrite them by running this script, you will have to type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
+		* 	Note that you will have to set an API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
+2. `run_analysis.sh`
+3. `run_regs_figs.sh`
+	* The figures directory should be populated after this script executes. 
 
-### Recreating the Headlines Dataset and Prompting Exercise:
-
- - Navigate to the `./returns_data` directory. Unzip all the `.zip` files. Then, run `./run_prompting.sh`. This will run a bash script that populates the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
- - The bash script will then write the prompts based on the headlines data that was just generated. If a set of prompts already exists and you try to overwrite them by running this script, you will have to type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
- - You can run any of the individual scripts called by the bash script from the `./code` directory, and also modify the call to `main()` if you only want to run the prompting on a subset of the data. 
-
-### Analysis
-- `./code/run_all.py` will run steps 4-8. To individually run any of these steps, the individual scripts can be used. Make sure to pass into the main function the appropriate parameters (whichever subset of models, months, return types etc. that need to be analyzed)
-
-### Figures and Tables
+You can run any of the individual scripts called by the bash scripts from the `./code` directory, and also modify the call to `main()` within a python script if you only want to run the script on a subset of the data. 
