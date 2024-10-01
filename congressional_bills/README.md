@@ -5,24 +5,25 @@ Congressional Bills Experiment
 
 This repository contains the replication files for the congressional bills experiment. The code is a combination of Python and R scripts, labeled by their order in the workflow. 
 
-- **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
 - **Estimation:**
-    1. **Prompt Creation, LLM Querying, and Response Decoding:**
-        - **1.1** Generates 24 prompts per bill using 12 prompt templates and 2 models.
-        - **1.2** Queries LLMs to predict the major topic of each bill.
-        - **1.3** Downloads LLM responses.
-        - **1.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
-    2. **Simulation Runs & Model Evaluation:**
-        - **2.1 and 2.3** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
-        - **2.2 and 2.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
-    3. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
-        - **3.1** Estimates LLM prediction errors for each combination of prompt and model.
-        - **3.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
-        - **3.3** Generate figures and tables for regressions with proxy on the LHS and the RHS.
+    1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills.
+    2. **Prompt Creation, LLM Querying, and Response Decoding:**
+        - **2.1** Generates 24 prompts per bill using 12 prompt templates and 2 models.
+        - **2.2** Queries LLMs to predict the major topic of each bill.
+        - **2.3** Downloads LLM responses.
+        - **2.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
+    3. **Simulation Runs & Model Evaluation:**
+        - **3.1 and 3.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
+        - **3.4 and 3.5** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
+    4. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
+        - **4.1** Estimates LLM prediction errors for each combination of prompt and model.
+        - **4.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
+        - **4.3** Generate figures and tables for regressions with proxy on the LHS and the RHS.
 - **Prediction:**
-    1. **Prompt Creation, LLM Querying, and Response Decoding**
-    2. **...**
-    3. **Figure and Table Generation**
+    1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills with no missing introduction date.
+    2. **Prompt Creation, LLM Querying, and Response Decoding**
+    3. **Encode completion responses and compute similarity scores**
+    4. **Figure and Table Generation**
 
 # Experiment Replication 
 
@@ -61,13 +62,13 @@ There are **2 possible levels of replication** that this code base allows for. Y
 2. **Partial Replication:** 
   The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
-    0. **Replicating Data Cleaning:** 
+    1. **Replicating Data Cleaning:** 
         If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/Estimation/bills.csv`:
         ```bash
-        python ./Code/clean_bills.py
+        python ./Code/Estimation/1_clean_bills.py
         ```
 
-    1. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
+    2. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
         If you are only interested in generating prompts[^1], querying, and decoding the LLM responses, you first need to **Add your `OPENAI_API_KEY`** to `.env` file. To do that:
           1. Go to the [OpenAI API Keys](https://platform.openai.com/settings/profile?tab=api-keys) page.
           2. Create a new API key and copy the generated key.
@@ -79,35 +80,35 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
         Then, run the following commands to create the file `./Data/Estimation/bills_llm.csv`:
         ```bash
-        python ./Code/Estimation/1.1_create_prompts.py
-        python ./Code/Estimation/1.2_query_llm.py
-        python ./Code/Estimation/1.3_download_responses.py
-        python ./Code/Estimation/1.4_decode_responses.py
+        python ./Code/Estimation/2.1_create_prompts.py
+        python ./Code/Estimation/2.2_query_llm.py
+        python ./Code/Estimation/2.3_download_responses.py
+        python ./Code/Estimation/2.4_decode_responses.py
         ```
         [^1]: The token limit varies by user and you may need to split the prompts into more smaller batches.
 
-    2. **Replicating Simulation Runs & Model Evaluation:** 
+    3. **Replicating Simulation Runs & Model Evaluation:** 
         If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
         - `./Data/Estimation/LHS/lhs_10k_human.csv`, `./Data/Estimation/RHS/rhs_10k_human.csv`[^2]
         - `./Data/Estimation/LHS/lhs_10k_llm.csv`,  `./Data/Estimation/RHS/rhs_10k_llm.csv`[^3]
         - `./Data/Estimation/LHS/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/Estimation/RHS/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
         ```bash
-        Rscript ./Code/Estimation/2.1.1_run_lhs_simulations.r
-        Rscript ./Code/Estimation/2.1.2_summarize_lhs_simulations.r
-        Rscript ./Code/Estimation/2.2.1_run_rhs_simulations.r
-        Rscript ./Code/Estimation/2.2.2_summarize_rhs_simulations.r
+        Rscript ./Code/Estimation/3.1_run_lhs_simulations.r
+        Rscript ./Code/Estimation/3.2_run_rhs_simulations.r
+        Rscript ./Code/Estimation/3.3_summarize_lhs_simulations.r
+        Rscript ./Code/Estimation/3.4_summarize_rhs_simulations.r
         ```
         [^2]: These files contain the regression results using `Yhuman` across all 10,000 bills. 
         [^3]: These files contain the regression results using `Yllm` across all 10,000 bills. 
         [^4]: These files contain parameter estimates for regressions based on a 5,000-sample of the bills, used to run regressions with `Yllm`, `Yhuman`, and `Ytilde`. They also include the bias, MSE, and coverage averaged over $N = 1000$ simulation runs, relative to the `10k_Yhuman` regressions.
 
-    3. **Replicating All Figures & Tables:** 
+    4. **Replicating All Figures & Tables:** 
         If you are only interested in generating the figures and tables, run the following commands. This will generate the `./Figures` and `./Tables` directories and their content:
         ```bash
-        python ./Code/Estimation/3.1_est_llm_pred_error.py
-        Rscript ./Code/Estimation/3.2_bills_llm_plots.r
-        Rscript ./Code/Estimation/3.3_figures_tables.r
+        python  ./Code/Estimation/4.1_est_llm_pred_error.py
+        Rscript ./Code/Estimation/4.2_bills_llm_plots.r
+        Rscript ./Code/Estimation/4.3_figures_tables.r
         ```
 
 # References

@@ -38,7 +38,12 @@ data_fig02 <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
     Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
     accuracyS = as.integer(PassS==PassSLLM),
     accuracyH = as.integer(PassH==PassHLLM),
-    AddIntrDate = if_else(AddIntrDate=="True", "Yes", "No")
+    temp = as.integer(PassS==PassH),
+    AddIntrDate = factor(
+      AddIntrDate,
+      levels=c("False", "True"),
+      labels=c("Without Date Restriction", "With Date Restriction")
+    ) 
   ) 
 
 temp <- data_fig02 %>% filter(is.na(PassHLLM) | is.na(PassSLLM))
@@ -64,30 +69,16 @@ data_fig02 <- data_fig02 %>%
 # data_fig02$UCI = ci_value[,2]
 
 data_fig02 %>%
-  ggplot(aes(x=as.factor(AddIntrDate), y=Mean, color=Model, shape=Model)) +
-  # geom_col(position=position_dodge()) +
-  geom_point() + 
-  # geom_errorbar(aes(ymin=LCI, ymax=UCI), width=0.5, linewidth=0.3) +
+  ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
+  geom_col(position=position_dodge()) +
+  # geom_point() + 
+  # # geom_errorbar(aes(ymin=LCI, ymax=UCI), width=0.5, linewidth=0.3) +
   facet_grid(. ~ Chamber) +
-  xlab("Prompt with Date Restriction?") +
+  xlab("Prompt") +
   ylab("Accuracy of\nBill Passage Predictions") +
   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
-  scale_color_manual(name=NULL, values=my_colors) +
-  guides(color = guide_legend(override.aes = list(shape = c(16, 17))),
-         shape = "none") +  # merge color and shape legends
+  scale_fill_manual(name="", values=my_colors) +
   theme.bar
-
-# data_fig02 %>%
-#   ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
-#   geom_col(position=position_dodge()) +
-#   facet_grid(Model ~ Chamber) +
-#   xlab("Information Up to Intro Date Restriction in Prompt") +
-#   ylab("Accuracy") +
-#   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-#   scale_fill_manual(name="", values=my_colors) +
-#   theme.bar +
-#   guides(fill="none")
-
 ggsave(file.path(fig_dir, "Accuracy of Bill Passage Predictions.jpeg"), height = 3.5, width = 6)
 
 # Figure 3
@@ -101,7 +92,11 @@ data_fig03 <- read.csv(file.path(data_dir, "bills_llm_completion_similarity.csv"
       levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
       labels=c("GPT-3.5", "GPT-4o")
     ),
-    AddIntrDate = if_else(AddIntrDate=="True", "Yes", "No")
+    AddIntrDate = factor(
+      AddIntrDate,
+      levels=c("False", "True"),
+      labels=c("Without Date Restriction", "With Date Restriction")
+    )
   ) %>%
   tidyr::pivot_longer(cols = c(CosineSimilarity, EuclideanDistance), names_to = "Measure", values_to = "Distance") %>%
   mutate(Measure = ifelse(Measure == "CosineSimilarity", "Cosine Similarity", "Euclidean Distance")) %>%
@@ -121,17 +116,13 @@ data_fig03 <- read.csv(file.path(data_dir, "bills_llm_completion_similarity.csv"
 # data_fig03$UCI = ci_value[,2]
 
 data_fig03 %>%
-  ggplot(aes(x=as.factor(AddIntrDate), y=Mean, color=Model, shape=Model)) +
-  # geom_col(position=position_dodge()) +
-  geom_point(position=position_dodge(width=0.5)) + 
-  # geom_errorbar(aes(ymin=LCI, ymax=UCI), position=position_dodge(width=0.5), width=0.1, linewidth=0.3) +
+  ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
+  geom_col(position=position_dodge()) +
   facet_grid(. ~ Measure) +
-  xlab("Prompt with Date Restriction?") +
+  xlab("Prompt") +
   ylab("Distance between\nTrue vs. LLM-Completed Bill") +
   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
-  scale_color_manual(name=NULL, values=my_colors) +
-  guides(color = guide_legend(override.aes = list(shape = c(16, 17))),
-         shape = "none") +  # merge color and shape legends
+  scale_fill_manual(name="", values=my_colors) +
   theme.bar
 
   # guides(fill="none")
