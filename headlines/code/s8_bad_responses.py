@@ -32,7 +32,7 @@ def read_line_from_step2(step2_file, line_number):
  
 
 def main():
-    batch_summary_file = pd.read_csv(step7_path)
+    batch_summary_file = pd.read_csv(step7_path + "/batch_metrics.csv") 
     bad_responses = []
     
     # Filter rows where any model's "empty headlines" column is greater than 5
@@ -90,7 +90,7 @@ def main():
                     
     bad_responses  = pd.DataFrame(bad_responses)
     os.makedirs(step8_path, exist_ok=True)
-    bad_responses.to_csv(step8_path + "bad_responses.csv", index=False)
+    bad_responses.to_csv(step8_path + "/bad_responses.csv", index=False)
 
 if __name__ == "__main__":
     bad_responses = main()

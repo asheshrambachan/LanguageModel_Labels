@@ -74,7 +74,7 @@ for (q in questions) {
         
         # Loop over the datasets (different prompt strategies)
         for (i in seq_along(data_list)) {
-          variables <- c(predictor_types[[pred_type]], "ret_ld1", "ret_ld2", "ret_ld3")
+          variables <- c(predictor_types[[pred_type]])
           reg <- run_regression(data_list[[i]], outcome_var, variables)
           temp_reg_list <- c(temp_reg_list, list(reg))
           

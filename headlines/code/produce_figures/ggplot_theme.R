@@ -32,8 +32,8 @@ my_colors_bar <- c(
 )
 
 my_shapes <- c(
-  "GPT-3.5" =  15,
-  "GPT-4o-mini" = 16,
+  "GPT-4o-mini" = 15,
+  "GPT-3.5" =  16,
   "GPT-4o" = 17
 )
 

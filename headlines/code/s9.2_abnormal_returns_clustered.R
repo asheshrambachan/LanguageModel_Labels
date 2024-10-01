@@ -88,7 +88,7 @@ for (return_type in return_types) {
                 model = m, 
                 prompt = file_names[i], 
                 mag_v_conf = pred_type, 
-                ret = sub("sum_exret", "", outcome_var)
+                ret = sub("sum_exret_", "", outcome_var)
               )
             )
           }
