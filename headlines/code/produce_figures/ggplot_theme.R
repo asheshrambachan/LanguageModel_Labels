@@ -25,6 +25,12 @@ my_colors <- c(
   "GPT-4o" = my_palette[["blue"]]
 )
 
+my_colors_bar <- c(
+  "up" = my_palette[["green"]],
+  "down" =  my_palette[["red"]],
+  "neutral" = my_palette[["yellow"]]
+)
+
 my_shapes <- c(
   "GPT-3.5" =  15,
   "GPT-4o-mini" = 16,
@@ -48,27 +54,17 @@ theme.point <- theme_bw() +
 
 theme.bar <- theme_bw() + 
   theme(
+    panel.border = element_blank(),
     panel.grid.major.x=element_blank(), 
     panel.grid.minor.x=element_blank(), 
     panel.grid.major.y=element_line(linewidth=0.3),
     panel.grid.minor.y=element_line(linewidth=0.1),
     legend.position="top", 
     axis.text=element_text(size=7),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     axis.ticks=element_line(linewidth=0.3),
     text=element_text(size=12, family=font_family),
-    plot.subtitle=element_text(size=12, family=font_family)
-  )
-
-theme.mse <- theme_bw() + 
-  theme(
-    panel.grid.major.x=element_line(linewidth=0.3), 
-    panel.grid.minor.x=element_line(linewidth=0.1), 
-    panel.grid.major.y=element_line(linewidth=0.3),
-    panel.grid.minor.y=element_line(linewidth=0.1),
-    legend.position="top", 
-    axis.text=element_text(size=7),
-    axis.ticks=element_line(linewidth=0.3),
-    text=element_text(size=12, family=font_family),
+    plot.title = element_text(hjust = 0.5),
     plot.subtitle=element_text(size=12, family=font_family)
   )
 
@@ -87,4 +83,19 @@ theme.heatmap <- theme_bw() +
     plot.subtitle = element_text(size = 12, family = font_family, hjust = 0.5)
   )
 
+
+theme.boxplot <- theme_bw() +
+  theme(
+    panel.background = element_blank(),   
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),   
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5),
+    axis.text = element_text(size = 7),
+    axis.ticks = element_line(linewidth = 0.3),
+    text = element_text(size = 12, family = font_family),
+    plot.margin = margin(10, 10, 10, 10), 
+    plot.subtitle = element_text(size = 12, family = font_family, hjust = 0.5)
+  )
 

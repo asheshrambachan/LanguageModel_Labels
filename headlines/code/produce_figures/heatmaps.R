@@ -90,7 +90,7 @@ global_max <- -Inf
 for (return_type in return_types) {
   for (question in question_levels) {
     for (model in model_levels) {
-      path <- glue("../data/step6_common_sample/within_model/{return_type}/{model}/{question}/")
+      path <- glue("./data/step6_common_sample/within_model/{return_type}/{model}/{question}/")
       datasets <- read_datasets(path, prompt_types)
       
       # Store datasets for later use
@@ -115,7 +115,7 @@ lapply(names(agreement_matrices), function(name) {
   model <- split_name[3]
   
   plot <- plot_agreement_matrix(agreement_matrices[[name]], question, model, return_type, global_min, global_max)
-  ggsave(filename = glue("../figures/heatmaps/by_return_type/{return_type}/{question}_{model}.png"), plot = plot, width = 7, height = 8, units = "in")
+  ggsave(filename = glue("./figures/heatmaps/by_return_type/{return_type}/{question}_{model}.png"), plot = plot, width = 7, height = 8, units = "in")
   print(glue("Saved heatmap for {model}, {question}, {return_type}"))
 })
 
@@ -140,7 +140,7 @@ all_returns_matrices <- bind_rows(lapply(names(agreement_matrices), function(nam
 for (question in question_levels) {
   for (model in model_levels) {
     plot <- plot_agreement_matrix_all_returns(all_returns_matrices, model, question)
-    ggsave(filename = glue("../figures/heatmaps/all_returns/{question}_{model}.png"), plot = plot, width = 12, height = 6, units = "in")
+    ggsave(filename = glue("./figures/heatmaps/all_returns/{question}_{model}.png"), plot = plot, width = 12, height = 6, units = "in")
     print(glue("Saved heatmap for {model}, {question}"))
   }
 }

@@ -1,19 +1,29 @@
-library(tidyr)
-library(dplyr)
+library(tidyverse)
 library(ggplot2)
 library(stargazer)
-library(gridExtra)
-
-################################################################################
-# Create summary figures to compare labels across LLMs                         #
-################################################################################
-
-################################################################################
-# Define helper functions                                                      #
-################################################################################
 
 # Reset the workspace by removing all objects
 rm(list = ls())
+source(file.path("./code/produce_figures/ggplot_theme.r"))
+
+# Constants
+dataset_names <- c(
+  "Base: Fill in Blank", "Base: JSON", "COT: Careful", 
+  "COT: Explanation", "COT: Step-by-step", "Persona: Economic Agent", 
+  "Persona: Finance Expert", "Persona: Economy Expert", "Persona: Successful Trader"
+)
+dataset_files <- c("base_blanks", "base_json", "cot1", "cot2", 
+                   "cot3", "persona1", "persona2", "persona3", "persona4")
+
+question_levels <- c("q1", "q2", "q3", "q4", "q5")
+question_labels <- c("Positive, Negative, or Neutral?", 
+                     "Increase, Decrease, or Uncertain\n Change to Returns?",
+                     "Increase, Decrease, or Uncertain\n Change to Returns at Time?",
+                     "Increase, Decrease, or Uncertain\n Sentiment", 
+                     "Increase, Decrease, or Uncertain\n Sentiment at Time")
+model_levels <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
+model_labels <- c("GPT-3.5", "GPT-4o-mini", "GPT-4o")
+return_type <- "abnormal_CAPM"
 
 # Function to standardize headline labels across different prompting strategies
 convert_headline_type <- function(df) {
@@ -51,207 +61,120 @@ calculate_stats <- function(df) {
   cbind(stats, counts)
 }
 
-################################################################################
-# Iterate over all questions and models to process data and create summaries   #
-################################################################################
-
-# Initialize lists to store plots
-plot_lists <- list(freq = list(), conf = list(), 
-                   conf_split = list(), mag = list(), 
-                   mag_split = list())
-
-# Define questions and models to iterate over
-questions <- c("q1", "q2", "q3", "q4", "q5")
-models <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
-return_type <- "abnormal_CAPM"
+# Initialize a list to store the combined results for all plots
+all_results <- list()
 
 # Loop over each combination of question and model
-for (question in questions) {
-  for (model in models) {
-    
-    ############################################################################
-    # Read in data for the current model and question                          #
-    ############################################################################
-    
-    # Print the current model and question being processed
-    cat(model, question, "\n")
-  
+for (question in question_levels) {
+  for (model in model_levels) {
     # Define the file path based on the current model and question
-    path <- paste0("../data/step6_common_sample/across_models/", return_type, "/", 
+    path <- paste0("./data/step6_common_sample/across_models/", return_type, "/", 
                    model, "/", question, "/")
     
-
     # Read in data sets for various prompting strategies
-    datasets <- lapply(c("base_blanks", "base_json", "cot1", "cot2", 
-                         "cot3", "persona1", "persona2", "persona3", 
-                         "persona4"), 
-                       function(x) read.csv(paste0(path, x, ".csv")))
-    
-    dataset_names <- c("Base: Fill in Blank", "Base: JSON", 
-                       "COT: Careful", "COT: Explanation", 
-                       "COT: Step-by-step", "Persona: Economic Agent", 
-                       "Persona: Finance Expert", "Persona: Economy Expert", 
-                       "Persona: Successful Trader")
-    
-    # Confirm that data has been read successfully
-    print("read data")
-    
-    ############################################################################
-    # Create summary tables for the current model and question                 #
-    ############################################################################
+    datasets <- lapply(dataset_files, function(x) read.csv(paste0(path, x, ".csv")))
     
     # Standardize headline labels across datasets
     datasets <- lapply(datasets, convert_headline_type)
     
-    # Calculate statistics for each dataset and store the results
-    summary_results <- bind_rows(lapply(seq_along(datasets), function(i) {
-      cbind(Dataset = dataset_names[i], calculate_stats(datasets[[i]]))
+    # Combine all datasets into a single data frame and add model/question/dataset information
+    combined_df <- bind_rows(lapply(seq_along(datasets), function(i) {
+      datasets[[i]] %>%
+        mutate(
+          Dataset = dataset_names[i],
+          Model = factor(model, levels = model_levels, labels = model_labels),  # Use labels for models
+          Question = factor(question, levels = question_levels, labels = question_labels)  # Use labels for questions
+        )
     }))
     
-    results <- bind_rows(lapply(seq_along(datasets), function(i) {
-      cbind(Dataset = dataset_names[i], datasets[[i]])
-    }))
-    
-    # Display the summary statistics using stargazer
-    stargazer(summary_results, 
-              type = "text", 
-              summary = FALSE,
-              title = paste("Summary Statistics for Each Dataset", 
-                            model, question),
-              rownames = FALSE)
-    
-    # Transform the summary results to a long format for plotting
-    summary_results_long <- summary_results %>%
-      pivot_longer(cols = c(up, down, neutral), 
-                   names_to = "Type", 
-                   values_to = "Frequency") %>%
-      group_by(Dataset) %>%
-      mutate(Percentage = Frequency / sum(Frequency) * 100) %>%
-      ungroup()
-    
-    ############################################################################
-    # Create a plot of label frequencies for the current model and question    #
-    ############################################################################
-    
-    freq_plot <- ggplot(summary_results_long, 
-                        aes(x = Dataset, y = Percentage, fill = Type)) +
-      geom_bar(stat = "identity", position = "stack", color = "white") + 
-      scale_fill_manual(values = c("up" = "green3", "down" = "red2", 
-                                   "neutral" = "orange")) +  
-      labs(title = paste("Frequency of Headline Label by Prompting Strategy", 
-                         model, question, "\n"),
-           x = "Dataset", y = "Percentage", fill = "Headline Type") +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  
-            axis.text.y = element_text(size = 8),  
-            axis.title.x = element_text(size = 9),  
-            axis.title.y = element_text(size = 9),  
-            plot.title = element_text(size = 9),  
-            legend.text = element_text(size = 8),  
-            legend.title = element_text(size = 8))
-    
-    plot_lists$freq[[paste0(model, "_", question)]] <- freq_plot
-    
-    ############################################################################
-    # Boxplot of label confidence for the current model/question combo.        #
-    ############################################################################
-    
-    # Plot the distribution of confidence scores across all labels
-    conf_plot <- ggplot(results, aes(x = Dataset, y = confidence)) +
-      geom_boxplot(outlier.size = .5) +
-      labs(title = paste("Boxplot of Confidence by Dataset", 
-                         model, question, "\n"),
-           x = "Dataset", y = "Confidence") +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  
-            axis.text.y = element_text(size = 8),  
-            axis.title.x = element_text(size = 9),  
-            axis.title.y = element_text(size = 9),  
-            plot.title = element_text(size = 9),  
-            legend.text = element_text(size = 8),  
-            legend.title = element_text(size = 8))
-    
-    plot_lists$conf[[paste0(model, "_", question)]] <- conf_plot
-    
-    # Plot confidence levels by headline type
-    conf_split_plot <- ggplot(results %>%
-                                filter(!is.na(headline.type.common)) %>%
-                                pivot_longer(cols = confidence, 
-                                             names_to = "Metric", 
-                                             values_to = "Value"), 
-                              aes(x = Dataset, y = Value, 
-                                  fill = headline.type.common)) +
-      geom_boxplot(position = position_dodge(width = 0.75), 
-                   outlier.size = .5) +
-      labs(title = paste("Boxplot of Confidence by Dataset and Headline Type", 
-                         model, question, "\n"),
-           x = "Dataset", y = "Confidence", fill = "Headline Type") +
-      scale_fill_manual(values = c("up" = "green3", "down" = "red2", 
-                                   "neutral" = "orange")) +
-      ylim(-0.01, 1.01) +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  
-            axis.text.y = element_text(size = 8),  
-            axis.title.x = element_text(size = 9),  
-            axis.title.y = element_text(size = 9),  
-            plot.title = element_text(size = 9),  
-            legend.text = element_text(size = 8),  
-            legend.title = element_text(size = 8))
-    
-    plot_lists$conf_split[[paste0(model, "_", question)]] <- conf_split_plot
-    
-    ############################################################################
-    # Create a boxplot of label magnitude for the current model/question combo #
-    ############################################################################
-    
-    mag_plot <- ggplot(results, aes(x = Dataset, y = magnitude)) +
-      geom_boxplot(outlier.size = .5) +
-      labs(title = paste("Boxplot of Magnitude by Dataset", 
-                         model, question, "\n"),
-           x = "Dataset", y = "Magnitude") +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  
-            axis.text.y = element_text(size = 8),  
-            axis.title.x = element_text(size = 9),  
-            axis.title.y = element_text(size = 9),  
-            plot.title = element_text(size = 9),  
-            legend.text = element_text(size = 8),  
-            legend.title = element_text(size = 8))
-    
-    plot_lists$mag[[paste0(model, "_", question)]] <- mag_plot
-    
-    mag_split_plot <- ggplot(results %>%
-                               filter(!is.na(headline.type.common)) %>%
-                               pivot_longer(cols = magnitude, 
-                                            names_to = "Metric", 
-                                            values_to = "Value"), 
-                             aes(x = Dataset, y = Value, 
-                                 fill = headline.type.common)) +
-      geom_boxplot(position = position_dodge(width = 0.75), 
-                   outlier.size = .5) +
-      labs(title = paste("Boxplot of Magnitude by Dataset and Headline Type", 
-                         model, question, "\n"),
-           x = "Dataset", y = "Magnitude", fill = "Headline Type") +
-      scale_fill_manual(values = c("up" = "green3", "down" = "red2", 
-                                   "neutral" = "orange")) +
-      ylim(-0.01, 1.01) +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),  
-            axis.text.y = element_text(size = 8),  
-            axis.title.x = element_text(size = 9),  
-            axis.title.y = element_text(size = 9),  
-            plot.title = element_text(size = 9),  
-            legend.text = element_text(size = 8),  
-            legend.title = element_text(size = 8))
-    
-    plot_lists$mag_split[[paste0(model, "_", question)]] <- mag_split_plot
-    
-  }   
+    # Store the combined data for all models/questions
+    all_results[[paste0(model, "_", question)]] <- combined_df
+  }
 }
 
-# Arrange plots in a grid with 3 columns (one per model)
-grid.arrange(grobs = plot_lists$freq, ncol = 3)
-grid.arrange(grobs = plot_lists$conf, ncol = 3)
-grid.arrange(grobs = plot_lists$conf_split, ncol = 3)
-grid.arrange(grobs = plot_lists$mag, ncol = 3)
-grid.arrange(grobs = plot_lists$mag_split, ncol = 3)
+# Combine all results into a single data frame for plotting
+all_data <- bind_rows(all_results)
+
+# Calculate frequencies for plotting
+summary_results_long <- all_data %>%
+  count(Model, Question, Dataset, headline.type.common) %>%
+  group_by(Model, Question, Dataset) %>%
+  mutate(Percentage = n / sum(n) * 100) %>%
+  ungroup()
+
+# Create a faceted plot
+freq_plot <- ggplot(summary_results_long, 
+                    aes(x = Dataset, y = Percentage, fill = headline.type.common)) +
+  geom_bar(stat = "identity", position = "stack", color = "white") + 
+  geom_hline(yintercept = 0, color = my_palette[["gray"]], size = 0.5) +
+  labs(title = "Headline Labels by Prompting Strategy",
+       x = "Prompting Strategy", y = "Percentage", fill = "Headline Type: "
+  ) +
+  facet_grid(rows = vars(Model), cols = vars(Question)) + 
+  scale_fill_manual(values = my_colors_bar) +
+  theme.bar 
+
+ggsave(filename = glue("./figures/summary/label_frequency.png"), plot = freq_plot, width = 10, height = 8, units = "in")
+
+# Plot the distribution of confidence scores across all labels
+conf_plot <- ggplot(all_data, aes(x = Dataset, y = confidence)) +
+  geom_boxplot(outlier.size = 0.5) +
+  labs(
+    title = "Boxplot of Confidence by Dataset and Prompting Strategy",
+    x = "Prompting Strategy", y = "Confidence"
+  ) +
+  facet_grid(rows = vars(Model), cols = vars(Question)) +
+  theme.boxplot 
+
+ggsave(filename = glue("./figures/summary/conf_distribution.png"), plot = conf_plot, width = 11, height = 8, units = "in")
+
+# Plot the distribution of confidence scores across all labels
+mag_plot <- ggplot(all_data, aes(x = Dataset, y = magnitude)) +
+  geom_boxplot(outlier.size = 0.5) +
+  labs(
+    title = "Boxplot of Magnitude by Dataset and Prompting Strategy",
+    x = "Prompting Strategy", y = "Magnitude"
+  ) +
+  facet_grid(rows = vars(Model), cols = vars(Question)) +
+  theme.boxplot 
+
+ggsave(filename = glue("./figures/summary/mag_distribution.png"), plot = mag_plot, width = 11, height = 8, units = "in")
+
+# Plot confidence levels by headline type using all_data
+conf_split_plot <- ggplot(
+  all_data %>%
+    dplyr::filter(!is.na(headline.type.common)) %>%  
+    pivot_longer(cols = confidence, names_to = "Metric", values_to = "Value"), 
+  aes(x = Dataset, y = Value, fill = headline.type.common)
+  ) +
+  geom_boxplot(outlier.size = 0.2) +
+  labs(
+    title = "Confidence Label Distribution by Dataset and Headline Type",
+    x = "Dataset", y = "Confidence", fill = "Headline Type"
+  ) +
+  scale_fill_manual(values = my_colors_bar) +
+  facet_grid(rows = vars(Model), cols = vars(Question)) +
+  theme.boxplot 
+
+ggsave(filename = glue("./figures/summary/conf_type_distribution.png"), plot = conf_split_plot, width = 12, height = 8, units = "in")
+
+# Plot confidence levels by headline type using all_data
+mag_split_plot <- ggplot(
+  all_data %>%
+    dplyr::filter(!is.na(headline.type.common)) %>%  
+    pivot_longer(cols = magnitude, names_to = "Metric", values_to = "Value"), 
+  aes(x = Dataset, y = Value, fill = headline.type.common)
+) +
+  geom_boxplot(outlier.size = 0.2) +
+  labs(
+    title = "Magnitude Label Distribution by Dataset and Headline Type",
+    x = "Dataset", y = "Magnitude", fill = "Headline Type"
+  ) +
+  scale_fill_manual(values = my_colors_bar) +
+  facet_grid(rows = vars(Model), cols = vars(Question)) +
+  theme.boxplot 
+
+ggsave(filename = glue("./figures/summary/mag_type_distribution.png"), plot = mag_split_plot, width = 12, height = 8, units = "in")
+
+
+

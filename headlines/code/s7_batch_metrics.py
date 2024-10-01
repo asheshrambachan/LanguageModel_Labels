@@ -71,7 +71,7 @@ def main(questions, models, months, return_types, prompt_types):
 
     # Convert summary data to DataFrame and save
     os.makedirs(step7_path, exist_ok=True)
-    pd.DataFrame(monthly_batch_info).to_csv(step7_path + "batch_metrics.csv", index=False)
+    pd.DataFrame(monthly_batch_info).to_csv(step7_path + "/batch_metrics.csv", index=False)
 
 # Run the main function when the script is executed
 if __name__ == "__main__":
