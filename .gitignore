@@ -1,4 +1,9 @@
 .DS_Store
+.Rhistory
+
+code/__pycache__/
+/__pycache__/
+data/raw/*.csv.DS_Store
 settings.json
 .env
 .Rapp.history

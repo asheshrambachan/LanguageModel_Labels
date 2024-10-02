@@ -1,7 +1,0 @@
-Here is a piece of news about %s: 
-
-%s
-
-Is this news positive, negative, or neutral about %s?
-
-Write your answer.
