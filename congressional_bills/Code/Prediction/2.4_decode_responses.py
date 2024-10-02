@@ -20,6 +20,11 @@ def decode_responses_passage(responses):
     for _, response in responses.iterrows(): 
         response_text = response.response["body"]["choices"][0]["message"]["content"]
         response_json = json.loads(response_text)
+
+        if (response_json["PassSLLM"] is None) | (response_json["PassHLLM"] is None):
+            print(f'ID={response["ID"]}, PassSLLM={response_json["PassSLLM"]}, PassHLLM={response_json["PassHLLM"]}, dropped')
+            continue
+
         responses_decoded.append({
             "ID": response["ID"],
             "PassSLLM": response_json["PassSLLM"],
@@ -27,7 +32,7 @@ def decode_responses_passage(responses):
             "InputTokens": int(response.response["body"]["usage"]["prompt_tokens"]),
             "OutputTokens": int(response.response["body"]["usage"]["completion_tokens"])
         })
-    return(responses_decoded)
+    return(pd.json_normalize(responses_decoded))
 
 def decode_responses_completion(responses):
     responses_decoded = []
@@ -36,16 +41,16 @@ def decode_responses_completion(responses):
         response_text = response.response["body"]["choices"][0]["message"]["content"]
         
         if finish_reason!="stop":
-            print(f'{response["custom_id"]}, finish_reason = {finish_reason}')
             if (finish_reason=="length"):
                 response_text = response_text +'"}'
+                print(f'ID={response["ID"]}, finish_reason={finish_reason}, kept')
             else:
+                print(f'ID={response["ID"]}, finish_reason={finish_reason}, dropped')
                 continue
         
-        if response["custom_id"]==7323:
+        if response["ID"]==7323:
             response_text = response_text +'"}'
         
-
         # print(response_text)
         response_json = json.loads(response_text)
         
@@ -55,44 +60,67 @@ def decode_responses_completion(responses):
             "InputTokens": int(response.response["body"]["usage"]["prompt_tokens"]),
             "OutputTokens": int(response.response["body"]["usage"]["completion_tokens"])
         })
-    return(responses_decoded)
+    return(pd.json_normalize(responses_decoded))
 
 # def count_words(description):
 #     words = description.split() # Split the description into words
 #     word_count = len(words) # Total number of words
 #     return word_count
+
+import string
+import re
+import nltk
+
+REPO_DIR = "."
+nltk.download('stopwords', quiet=True)
+nltk.download('wordnet', quiet=True)
+STOPWORDS = nltk.corpus.stopwords.words('english')
+LEMMATIZER = nltk.stem.WordNetLemmatizer()
+
+def clean_text(x):    
+    # remove punctuation, lowercase, and remove tailing spaces
+    x = re.sub('[{}]'.format(string.punctuation), '', x)
+    x = re.sub(r'[^a-zA-Z]', ' ', x.lower()).strip()
+
+    # remove stopwords 
+    words = [word for word in x.split() if word not in set(STOPWORDS)]
+
+    # stemming (maybe omit and see if results change?)
+    words = [LEMMATIZER.lemmatize(word) for word in words]
+    
+    # join back into string and return (sklearn vectorizer wants string as input)
+    return ' '.join(words)
+
 def trim(df):
-    df["Description"] = df["Description"].replace(df["DescriptionTrim"], "", 1)
-
     # Since some responses still contain the first part of the text that we asked in the prompt to not include, we have to trim them mannually
-    df["DescriptionLLM"] = df["DescriptionLLM"].replace(df["DescriptionTrim"], "", 1)
-
-    if ((df["ID"]==74659)|(df["ID"]==74660)):
-        df["DescriptionLLM"]=df["DescriptionLLM"].replace(df["DescriptionTrim"].upper().rstrip(), "", 1)
-
-    if (df["ID"]==73092):
-        df["DescriptionLLM"]=df["DescriptionLLM"].replace("Relating to criminal penalties for violations of the Co", "", 1)
-
-    if (df["ID"==70428]):
-        df["DescriptionLLM"]=df["DescriptionLLM"].replace("To improve Federal laws relating to the trans", "", 1)
-
-    # 68259,
-    # To promote the well-being of animals held for commercial use
-    # This bill aims to establish minimum standards for the treatment of animals in commercial facilities, including requirements for housing, feeding, and veterinary care. It also includes provisions for regular inspections and enforcement mechanisms to ensure compliance with these standards. Additionally, the bill seeks to increase transparency in the commercial use of animals by requiring public disclosure of information related to their treatment and living conditions.
-
-
-    # 68260,
-    # To promote the well-being of animals held for commercial use
-    # This bill aims to establish minimum standards for the treatment of animals in commercial facilities, including requirements for housing, feeding, veterinary care, and humane handling. It also includes provisions for regular inspections and enforcement mechanisms to ensure compliance with these standards. Additionally, the bill seeks to improve transparency and accountability in the treatment of animals by requiring commercial facilities to maintain records of animal care and make them available to the public upon request.
-
-
-    if (df["DescriptionLLM"]==""):
-        return(df)
+    df["DescriptionClean"] = df["Description"]
+    df["DescriptionLLMClean"] = df["DescriptionLLM"]
     
-    # if ((df["DescriptionLLM"][0].isupper()) & (df["ID"]<63343)):
-    #     print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{df["DescriptionLLM"]}\n\n')
+    temp = df["DescriptionLLMClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
+    if ((temp=="") | temp.startswith(("The bill", "This bill","A bill"))):
+        # if true do not do any changes for the Description nor DescriptionLLM
+        print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently or result after trimming is null')
+        # ((df["ID"]==68259) | (df["ID"]==68260) | (df["ID"]==43356) | (df["ID"]==30460) | (df["ID"]==28956)| (df["ID"]==28955)):
+        # print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{temp}\n\n')
+    else:
+        df["DescriptionLLMClean"] = temp
+        if ((df["ID"]==74659)|(df["ID"]==74660)):
+            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace(df["DescriptionTrim"].upper().strip(), "", 1)
 
+        if (df["ID"]==73092):
+            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("Relating to criminal penalties for violations of the Co", "", 1)
+
+        if (df["ID"]==70428):
+            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("To improve Federal laws relating to the trans", "", 1)
+
+        #   if ((df["DescriptionLLMClean"][0].isupper()) & (df["ID"]<28955)):
+        #       print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{df["DescriptionLLMClean"]}\n\n')
+
+        df["DescriptionClean"] = df["DescriptionClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
     
+    df["DescriptionClean"] = clean_text(df["DescriptionClean"])
+    df["DescriptionLLMClean"] = clean_text(df["DescriptionLLMClean"])
+
     return(df)
 
 def main():
@@ -100,7 +128,7 @@ def main():
     temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
     os.makedirs(temp_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, f"bills_run2.csv"))
     prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
@@ -117,19 +145,11 @@ def main():
 
     # Decoded responses
     responses_passage = decode_responses_passage(responses_passage)
-
-    # save as jsonl file
-    responses_passage_path = os.path.join(temp_dir, f"responses_passage.jsonl")
-    with open(responses_passage_path, "w") as f:
-        for response in responses_passage:
-            f.write(json.dumps(response) + "\n")
-    print(f"Saved {os.path.basename(responses_passage_path)}, at {os.path.dirname(responses_passage_path)}")
-
+    
     # merge prompts and bills metadata with llm responses
-    responses_passage = pd.read_json(responses_passage_path, lines=True)
     bills_llm_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm_passage.drop(columns="ID", inplace=True)
-    bills_llm_passage.reset_index(drop=False, names="ID", inplace=True)
+    bills_llm_passage.set_index("ID", inplace=True, drop=False)
+    bills_llm_passage.sort_index(inplace=True)
 
     # print mean input and output tokens
     print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
@@ -145,30 +165,21 @@ def main():
     # decoded responses
     responses_completion = decode_responses_completion(responses_completion)
 
-    # save as jsonl file
-    responses_completion_path = os.path.join(temp_dir, f"responses_completion.jsonl")
-    with open(responses_completion_path, "w") as f:
-        for response in responses_completion:
-            f.write(json.dumps(response) + "\n")
-    print(f"Saved {os.path.basename(responses_completion_path)}, at {os.path.dirname(responses_completion_path)}")
-
     # merge prompts and bills metadata with llm responses
-    responses_completion = pd.read_json(responses_completion_path, lines=True)
     bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    
+    bills_llm_completion.set_index("ID", inplace=True, drop=False)
     bills_llm_completion.sort_index(inplace=True)
+
+    # Trim Description and DescriptionLLM if the begin the same
     bills_llm_completion = bills_llm_completion.apply(lambda x: trim(x), axis=1)
 
-    # bills_llm_completion.drop(columns="ID", inplace=True)
-    # bills_llm_completion.reset_index(drop=False, names="ID", inplace=True)
+    # print mean input and output tokens
+    print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
-    # # print mean input and output tokens
-    # print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
-
-    # # save
-    # bills_llm_completion_path = os.path.join(data_dir, f"bills_llm_completion.csv")
-    # bills_llm_completion.to_csv(bills_llm_completion_path, index=False)
-    # print(f"Saved {os.path.basename(bills_llm_completion_path)}, n = {len(bills_llm_completion)}, at {os.path.dirname(bills_llm_completion_path)}")
+    # save
+    bills_llm_completion_path = os.path.join(data_dir, f"bills_llm_completion.csv")
+    bills_llm_completion.to_csv(bills_llm_completion_path, index=False)
+    print(f"Saved {os.path.basename(bills_llm_completion_path)}, n = {len(bills_llm_completion)}, at {os.path.dirname(bills_llm_completion_path)}")
 
 if __name__ == "__main__":
     main()

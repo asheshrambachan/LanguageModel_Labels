@@ -25,3 +25,6 @@ congressional_bills/Rplots.pdf
 
 congressional_bills_v1
 zeims_et_al_clean/.DS_Store
+congressional_bills/Code/Prediction/clean.log
+congressional_bills/Code/Prediction/results.log
+congressional_bills/Code/Prediction/results.tex

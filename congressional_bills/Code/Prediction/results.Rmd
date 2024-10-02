@@ -1,0 +1,265 @@
+---
+title: "Results"
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage[capposition=top]{floatrow}
+  - \usepackage{caption}
+output: pdf_document
+date: "2024-10-02"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(kableExtra)
+knitr::opts_chunk$set(
+  warning=FALSE,
+  message=FALSE,
+  echo = FALSE
+)
+
+```
+
+```{r}
+require(latex2exp)
+require(kableExtra)
+require(extrafont)
+
+repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
+data_dir = file.path(repo_dir, "Data/Prediction") 
+fig_dir = file.path(repo_dir, "Figures/Prediction")
+dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+
+# Load required packages quietly and custom functions
+suppressPackageStartupMessages({
+  require(dplyr)
+  require(ggplot2)
+  require(lemon)
+})
+source(file.path(repo_dir, "Code/ggplot_theme.r"))
+
+stripe <- function(nstriped=3, nrow=50){
+  start_row <- rep(seq(0, (2*nstriped)*nrow, by=2*nstriped), each=nstriped)
+  return(start_row + rep(1:nstriped, times=length(start_row)/nstriped))
+}
+
+# Load data
+bills <- read.csv(file.path(data_dir, "bills_run2.csv"))
+
+bills_llm_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
+  rename(Prompt=PromptingStrategyID) %>%
+  mutate(
+    Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
+    AddIntrDate = factor(
+      AddIntrDate,
+      levels=c("False", "True"),
+      labels=c("Without Date Restriction", "With Date Restriction")
+    )
+  ) 
+
+bills_llm_completion <- read.csv(file.path(data_dir, "bills_llm_completion.csv")) %>%
+  rename(Prompt=PromptingStrategyID) %>%
+  mutate(
+    Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
+    AddIntrDate = factor(
+      AddIntrDate,
+      levels=c("False", "True"),
+      labels=c("Without Date Restriction", "With Date Restriction")
+    ),
+    TextSimilarity = as.integer(DescriptionClean==DescriptionLLMClean)
+  ) 
+
+bills_llm_completion_baseline <- read.csv(file.path(data_dir, "random_baseline_group.csv")) %>%
+  mutate(
+    Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
+    AddIntrDate = factor(
+      AddIntrDate,
+      levels=c("False", "True"),
+      labels=c("Without Date Restriction", "With Date Restriction")
+    ),
+  ) 
+```
+
+# 10K bills
+```{r}
+# Fig 1
+bills_over_years <- ggplot(bills, aes(x = Year)) +
+  geom_histogram(bins=22, color = "white", fill = my_palette[["green"]]) +
+  geom_hline(yintercept = 0, color = my_palette[["lightgray"]]) +
+  xlab("Year") +
+  ylab("Number of Bills") +
+  # scale_y_continuous(minor_breaks=seq(0,1000, by=20)) +
+  theme.bar
+
+# bills_over_years
+
+fig_path = file.path(fig_dir, "A histogram of the frequency of the 10K bills over years.jpeg")
+ggsave(fig_path, plot = bills_over_years, height = 2.5, width = 4)
+```
+
+# Passage Prediction
+
+## Passage Rates
+
+### True
+```{r, results='asis'}
+bills %>% 
+  select(c(PassS, PassH)) %>%
+  tidyr::pivot_longer(cols = c(PassS, PassH), names_to = "Chamber", values_to = "Pass") %>%
+  mutate(Chamber = ifelse(Chamber == "PassS", "Pass Senate", "Pass House")) %>%
+  group_by(Chamber) %>%
+  summarize(
+    "True Passage Rate" = sprintf("%2.3f%%", mean(Pass)*100),
+    .groups="drop"
+  ) %>%
+  kable(
+      caption="True Passage Rates",
+      digits=3, linesep = "", escape=F, booktabs=T, format = "latex"
+    ) 
+```
+
+
+### Predicted
+
+
+```{r}
+bills_llm_passage %>% 
+  select(c(Model, AddIntrDate, PassSLLM, PassHLLM)) %>%
+  tidyr::pivot_longer(cols = c(PassSLLM, PassHLLM), names_to = "Chamber", values_to = "PassPred") %>%
+  mutate(Chamber = ifelse(Chamber == "PassSLLM", "Pass Senate", "Pass House")) %>%
+  group_by(Chamber, Model, AddIntrDate) %>%
+  summarize(
+  "Predicted Passage Rate" = sprintf("%2.3f%%", mean(PassPred)*100),
+  .groups="drop"
+)
+```
+
+## Passage Rates Accuracy
+
+```{r}
+bills_llm_passage %>% 
+  group_by(Model, AddIntrDate) %>%
+  summarize(
+    Accuracy.S = mean(PassS==PassSLLM),
+    TPR.S = sum(PassS==1 & PassSLLM==1) / sum(PassS==1),
+    FPR.S = sum(PassS==0 & PassSLLM==1) / sum(PassS==0),
+    Accuracy.H = mean(PassH==PassHLLM),
+    TPR.H = sum(PassH==1 & PassHLLM==1) / sum(PassH==1),
+    FPR.H = sum(PassH==0 & PassHLLM==1) / sum(PassH==0),
+    .groups="drop"
+  ) %>%
+  mutate(id = row_number(), .before=1) %>%
+  tidyr::pivot_longer(
+    -c(id, Model, AddIntrDate),
+    names_to = c(".value", "Chamber"),
+    names_sep = "\\.") %>%
+  mutate(
+    Chamber = ifelse(Chamber == "S", "Pass Senate", "Pass House"),
+    "Accuracy of Passage Predictions" = sprintf("%2.3f%%", Accuracy*100),
+    "TPR (Specificity)" = sprintf("%2.3f%%", TPR*100),
+    "FPR (1 - Sensitivity)" = sprintf("%2.3f%%", FPR*100)
+  ) %>%
+  select(-c(id, Accuracy, TPR, FPR)) %>%
+  relocate(Chamber, 1) %>%
+  arrange(Chamber, Model, AddIntrDate)
+  
+
+# ci_value <- matrix(data_fig02$SE, ncol=1) %*% matrix(qnorm(probs) , ncol=2) + data_fig02$Mean
+# colnames(ci_value) <- sprintf("%.1f%%", probs*100)
+# data_fig02$LCI = ci_value[,1]
+# data_fig02$UCI = ci_value[,2]
+
+```
+
+```{r}
+# data_fig02 %>%
+#   ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
+#   geom_col(position=position_dodge()) +
+#   # geom_point() + 
+#   # # geom_errorbar(aes(ymin=LCI, ymax=UCI), width=0.5, linewidth=0.3) +
+#   facet_grid(. ~ Chamber) +
+#   xlab("Prompt") +
+#   ylab("Accuracy of\nBill Passage Predictions") +
+#   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
+#   scale_fill_manual(name="", values=my_colors) +
+#   theme.bar
+# ggsave(file.path(fig_dir, "Accuracy of Bill Passage Predictions.jpeg"), height = 3.5, width = 6)
+```
+
+
+
+# Summary Completion 
+
+
+
+## Text Comparison
+
+```{r}
+bills_llm_completion %>%
+  select(c(Prompt, Model, AddIntrDate, TextSimilarity)) %>%
+  group_by(Model, AddIntrDate) %>%
+  summarise(
+    TextSimilarityMean = sprintf("%2.2f%%", mean(TextSimilarity)*100),
+    .groups="drop"
+  ) 
+```
+
+## Embedded Comparison
+
+### Random Baseline
+
+```{r}
+bills_llm_completion %>%
+  select(c(Model, AddIntrDate, CosineSimilarity, EuclideanDistance)) %>%
+  group_by(Model, AddIntrDate) %>%
+  summarise(
+    Mean.CosineSimilarity = mean(CosineSimilarity),
+    Mean.EuclideanDistance = mean(EuclideanDistance),
+    .groups = "drop"
+  ) %>%
+  merge(bills_llm_completion_baseline, by = c("Model", "AddIntrDate")) %>%
+  mutate(
+    Relative.CosineSimilarity = Mean.CosineSimilarity/RandomBaseline.CosineSimilarity - 1,
+    Relative.EuclideanDistance = 1 - Mean.EuclideanDistance/RandomBaseline.EuclideanDistance,
+  ) %>%
+  # mutate(id = row_number(), .before=1) %>%
+  # tidyr::pivot_longer(
+  #   -c(id, Model, AddIntrDate),
+  #   names_to = c(".value", "Similarity Measure"),
+  #   names_sep = "\\.") %>%
+  # mutate(
+  #   Chamber = ifelse(Chamber == "S", "Pass Senate", "Pass House"),
+  #   "Accuracy of Passage Predictions" = sprintf("%2.3f%%", Accuracy*100),
+  #   "TPR (Specificity)" = sprintf("%2.3f%%", TPR*100),
+  #   "FPR (1 - Sensitivity)" = sprintf("%2.3f%%", FPR*100)
+  # ) %>%
+  # select(-c(id, Accuracy, TPR, FPR)) %>%
+  # relocate(Chamber, 1) %>%
+  arrange(Model, AddIntrDate)
+
+# data_fig03 <- data_fig03 %>%
+#   select(Measure, Model, AddIntrDate, CosineSimilarity, EuclideanDistance)
+#   tidyr::pivot_longer(cols = c(CosineSimilarity, EuclideanDistance), names_to = "Measure", values_to = "Distance") %>%
+#   mutate(Measure = ifelse(Measure == "CosineSimilarity", "Cosine Similarity", "Euclidean Distance")) %>%
+#   group_by(Measure, Model, AddIntrDate) %>%
+#   summarise(
+#     Mean = mean(Distance),
+#     SE = sd(Distance),
+#     .groups = "drop"
+#   )
+
+
+# data_fig03 %>%
+#   ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
+#   geom_col(position=position_dodge()) +
+#   facet_grid(. ~ Measure) +
+#   xlab("Prompt") +
+#   ylab("Distance between\nTrue vs. LLM-Completed Bill") +
+#   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
+#   scale_fill_manual(name="", values=my_colors) +
+#   theme.bar
+# 
+#   # guides(fill="none")
+# ggsave(file.path(fig_dir, "Distance between True vs. LLM Bill.jpeg"), height = 3.5, width = 6)
+```
