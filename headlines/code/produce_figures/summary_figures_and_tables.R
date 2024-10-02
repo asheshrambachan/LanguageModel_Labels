@@ -114,7 +114,7 @@ freq_plot <- ggplot(summary_results_long,
   scale_fill_manual(values = my_colors_bar) +
   theme.bar 
 
-ggsave(filename = glue("./figures/summary/label_frequency.png"), plot = freq_plot, width = 10, height = 8, units = "in")
+ggsave(filename = glue("./figures/summary/label_frequency.png"), plot = freq_plot, width = 11, height = 8, units = "in")
 
 # Plot the distribution of confidence scores across all labels
 conf_plot <- ggplot(all_data, aes(x = Dataset, y = confidence)) +
@@ -147,16 +147,17 @@ conf_split_plot <- ggplot(
     pivot_longer(cols = confidence, names_to = "Metric", values_to = "Value"), 
   aes(x = Dataset, y = Value, fill = headline.type.common)
   ) +
-  geom_boxplot(outlier.size = 0.2) +
+  geom_boxplot(outlier.shape = NA, size = 0.2) +
   labs(
     title = "Confidence Label Distribution by Dataset and Headline Type",
     x = "Dataset", y = "Confidence", fill = "Headline Type"
   ) +
   scale_fill_manual(values = my_colors_bar) +
+  ylim(.1, 1) +
   facet_grid(rows = vars(Model), cols = vars(Question)) +
   theme.boxplot 
 
-ggsave(filename = glue("./figures/summary/conf_type_distribution.png"), plot = conf_split_plot, width = 12, height = 8, units = "in")
+ggsave(filename = glue("./figures/summary/conf_type_distribution.png"), plot = conf_split_plot, width = 12, height = 10, units = "in")
 
 # Plot confidence levels by headline type using all_data
 mag_split_plot <- ggplot(
@@ -165,16 +166,17 @@ mag_split_plot <- ggplot(
     pivot_longer(cols = magnitude, names_to = "Metric", values_to = "Value"), 
   aes(x = Dataset, y = Value, fill = headline.type.common)
 ) +
-  geom_boxplot(outlier.size = 0.2) +
+  geom_boxplot(outlier.shape = NA, size = 0.2) +
   labs(
     title = "Magnitude Label Distribution by Dataset and Headline Type",
     x = "Dataset", y = "Magnitude", fill = "Headline Type"
   ) +
   scale_fill_manual(values = my_colors_bar) +
+  ylim(0, 1) +
   facet_grid(rows = vars(Model), cols = vars(Question)) +
   theme.boxplot 
 
-ggsave(filename = glue("./figures/summary/mag_type_distribution.png"), plot = mag_split_plot, width = 12, height = 8, units = "in")
+ggsave(filename = glue("./figures/summary/mag_type_distribution.png"), plot = mag_split_plot, width = 12, height = 10, units = "in")
 
 
 
