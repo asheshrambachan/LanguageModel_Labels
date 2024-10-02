@@ -31,29 +31,54 @@ fig_path = file.path(fig_dir, "A histogram of the frequency of the 10K bills ove
 ggsave(fig_path, plot = bills_over_years, height = 2.5, width = 4)
 
 # Fig 2
+bills <- read.csv(file.path(data_dir, "bills.csv"))
+bills %>% summarize(
+  PassH_mean = mean(PassH)*100,
+  PassS_mean = mean(PassS)*100
+)
 
 data_fig02 <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
   rename(Prompt=PromptingStrategyID) %>%
+  filter(!is.na(PassHLLM) & !is.na(PassSLLM)) %>%
   mutate(
     Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
     accuracyS = as.integer(PassS==PassSLLM),
     accuracyH = as.integer(PassH==PassHLLM),
-    temp = as.integer(PassS==PassH),
     AddIntrDate = factor(
       AddIntrDate,
       levels=c("False", "True"),
       labels=c("Without Date Restriction", "With Date Restriction")
     ) 
   ) 
+  
 
-temp <- data_fig02 %>% filter(is.na(PassHLLM) | is.na(PassSLLM))
-print(temp)
+data_fig02 %>%
+  group_by(Model, AddIntrDate) %>%
+  summarise(
+    accuracy_S = sum(PassS==PassSLLM)/n(),
+    tp_S = sum(PassS==1 & PassSLLM==1),
+    fn_S = sum(PassS==1 & PassSLLM==0),
+    fp_S = sum(PassS==0 & PassSLLM==1),
+    tn_S = sum(PassS==0 & PassSLLM==0),
+    TPR_S = tp_S / (tp_S + fn_S),
+    # TNR_S = tn_S / (tn_S + fp_S),
+    FPR_H = fp_S / (tn_S + fp_S),
+    accuracy_H = sum(PassH==PassHLLM)/n(),
+    tp_H = sum(PassH==1 & PassHLLM==1),
+    fn_H = sum(PassH==1 & PassHLLM==0),
+    fp_H = sum(PassH==0 & PassHLLM==1),
+    tn_H = sum(PassH==0 & PassHLLM==0),
+    TPR_H = tp_H / (tp_H + fn_H),
+    # TNR_H = tn_H / (tn_H + fp_H),
+    FPR_H = fp_H / (tn_H + fp_H),
+    .groups = "drop"
+  ) %>%
+  select(c(Model, AddIntrDate, accuracy_S, TPR_S, TNR_S, accuracy_H, TPR_H, TNR_H)) 
 
 # CI
 alpha <- 0.10
 probs <- c(alpha/2, 1-alpha/2)
 data_fig02 <- data_fig02 %>%
-  filter(!is.na(PassHLLM) & !is.na(PassSLLM)) %>%
   select(c(Prompt, Model, AddIntrDate, accuracyS, accuracyH)) %>%
   tidyr::pivot_longer(cols = c(accuracyS, accuracyH), names_to = "Chamber", values_to = "Accuracy") %>%
   mutate(Chamber = ifelse(Chamber == "accuracyS", "Pass Senate", "Pass House")) %>%
@@ -83,9 +108,34 @@ ggsave(file.path(fig_dir, "Accuracy of Bill Passage Predictions.jpeg"), height =
 
 # Figure 3
 
+data_fig03 <- read.csv(file.path(data_dir, "random_pairs.csv")) %>%
+  # rename(Prompt=PromptingStrategyID) %>%
+  select(c(
+    # Prompt, Model, AddIntrDate, 
+    CosineSimilarityRandomPairs, EuclideanDistanceRandomPairs
+    )) %>%
+  # mutate(
+  #   Model = factor(
+  #     Model, 
+  #     levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
+  #     labels=c("GPT-3.5", "GPT-4o")
+  #   ),
+  #   AddIntrDate = factor(
+  #     AddIntrDate,
+  #     levels=c("False", "True"),
+  #     labels=c("Without Date Restriction", "With Date Restriction")
+  #   )
+  # ) %>%
+  # group_by(Model, AddIntrDate) %>%
+  summarise(
+    CosineSimilarityRandomPairs_mean = mean(CosineSimilarityRandomPairs),
+    EuclideanDistanceRandomPairs_mean = mean(EuclideanDistanceRandomPairs),
+    .groups = "drop"
+  )
+
 data_fig03 <- read.csv(file.path(data_dir, "bills_llm_completion_similarity.csv")) %>%
   rename(Prompt=PromptingStrategyID) %>%
-  select(c(Prompt, Model, AddIntrDate, CosineSimilarity, EuclideanDistance)) %>%
+  select(c(Prompt, Model, AddIntrDate, CosineSimilarity, EuclideanDistance, EuclideanDistance)) %>%
   mutate(
     Model = factor(
       Model, 
@@ -98,6 +148,17 @@ data_fig03 <- read.csv(file.path(data_dir, "bills_llm_completion_similarity.csv"
       labels=c("Without Date Restriction", "With Date Restriction")
     )
   ) %>%
+  # group_by(Model, AddIntrDate) %>%
+  summarise(
+    CosineSimilarity_mean = mean(CosineSimilarity),
+    # CosineSimilarity_se = sd(CosineSimilarity),
+    EuclideanDistance_mean = mean(EuclideanDistance),
+    # EuclideanDistance_se = sd(EuclideanDistance),
+    .groups = "drop"
+  )
+
+data_fig03 <- data_fig03 %>%
+  select(Measure, Model, AddIntrDate, CosineSimilarity, EuclideanDistance)
   tidyr::pivot_longer(cols = c(CosineSimilarity, EuclideanDistance), names_to = "Measure", values_to = "Distance") %>%
   mutate(Measure = ifelse(Measure == "CosineSimilarity", "Cosine Similarity", "Euclidean Distance")) %>%
   group_by(Measure, Model, AddIntrDate) %>%

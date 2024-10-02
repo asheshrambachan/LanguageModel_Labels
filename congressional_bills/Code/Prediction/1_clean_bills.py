@@ -207,13 +207,6 @@ def merge_cap_cbp(cap, cbp):
     bills.reset_index(drop=True)
     return(bills)
 
-def sample_bills(bills, n_bills = 10e3, seed = 123):
-    
-
-    bills_10k_prediction = 
-
-    return(bills_10k_estimation, bills_10k_prediction, examples)
-
 def main():
     # Define directories
     data_dir = os.path.join(REPO_DIR, 'Data')

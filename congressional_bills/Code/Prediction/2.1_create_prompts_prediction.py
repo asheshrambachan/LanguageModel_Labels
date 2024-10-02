@@ -117,7 +117,7 @@ def create_batched_prompts(prompts, batched_prompts_dir):
         part = 0
         for i, prompt in prompts_model.iterrows():
             prompt_batched = {
-                    "custom_id": "ID_" + str(prompt["ID"]),
+                    "custom_id": str(prompt["ID"]),
                     "method": "POST",
                     "url": "/v1/chat/completions",
                     "body": {
