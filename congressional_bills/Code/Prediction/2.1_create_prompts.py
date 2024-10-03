@@ -116,7 +116,8 @@ def create_batched_prompts(prompts, batched_prompts_dir):
         prompts_batched = []
         part = 0
         for i, prompt in prompts_model.iterrows():
-            prompt_batched = {
+            if prompt["PromptingStrategyName"]=="Complete Bill Summary":
+                prompt_batched = {
                     "custom_id": str(prompt["ID"]),
                     "method": "POST",
                     "url": "/v1/chat/completions",
@@ -125,7 +126,19 @@ def create_batched_prompts(prompts, batched_prompts_dir):
                         "temperature": prompt["Temperature"],
                         "response_format": {"type": "json_object"} if (prompt["ResponseFormat"]=="JSON") else None,
                         "messages": prompt["Messages"],
-                        "max_tokens": prompt["MaxTokens"] if (prompt["PromptingStrategyName"]=="Complete Bill Summary") else None
+                        "max_tokens": prompt["MaxTokens"]
+                    }
+                }
+            else:
+                prompt_batched = {
+                    "custom_id": str(prompt["ID"]),
+                    "method": "POST",
+                    "url": "/v1/chat/completions",
+                    "body": {
+                        "model": prompt["Model"],
+                        "temperature": prompt["Temperature"],
+                        "response_format": {"type": "json_object"} if (prompt["ResponseFormat"]=="JSON") else None,
+                        "messages": prompt["Messages"]
                     }
                 }
             prompts_batched.append(prompt_batched)
@@ -150,14 +163,14 @@ def create_batched_prompts(prompts, batched_prompts_dir):
     return(pd.json_normalize(batches))
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data/Prediction")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
+    data_dir = os.path.join(REPO_DIR, "Data/Prediction_run1") # TODO: change this to Prediction
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1") # TODO: change this to Prediction
     
     batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, "bills.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, "bills.csv")) 
     prompting_strategies = pd.read_csv(os.path.join(data_dir, "prompt_templates.csv"))
     prompting_strategies["TemplatePath"] = prompting_strategies["TemplatePath"].apply(lambda x: os.path.join(data_dir, x))
     

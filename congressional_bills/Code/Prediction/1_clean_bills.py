@@ -209,7 +209,7 @@ def merge_cap_cbp(cap, cbp):
 
 def main():
     # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data/Prediction')
+    data_dir = os.path.join(REPO_DIR, 'Data')
     temp_dir = os.path.join(REPO_DIR, 'Temp')
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(temp_dir, exist_ok=True)
@@ -236,25 +236,24 @@ def main():
     # bills = merge_cap_cbp(cap, cbp)
     bills_228387_path = os.path.join(temp_dir, "bills_228387.csv")
     # bills.to_csv(bills_228387_path, index=False)
-    bills = pd.read_csv(bills_228387_path, low_memory=False)
-    print(f'Saved {os.path.basename(bills_228387_path)}, n = {len(bills)}, at {os.path.dirname(bills_228387_path)}') # n = 228,387
+    # print(f'Saved {os.path.basename(bills_228387_path)}, n = {len(bills)}, at {os.path.dirname(bills_228387_path)}') # n = 228,387
 
-    bills_run1 = pd.read_csv(os.path.join(data_dir, "bills_run1.csv"), low_memory=False)
-    bills_run2 = pd.read_csv(os.path.join(data_dir, "bills_run2.csv"), low_memory=False)
+    bills = pd.read_csv(bills_228387_path, low_memory=False)
+    
+    # Remove bills used for prompt modification
+    bills_run1 = pd.read_csv(os.path.join(data_dir, "Prediction_run1/bills.csv"), low_memory=False)
+    bills_run2 = pd.read_csv(os.path.join(data_dir, "Prediction_run1/bills.csv"), low_memory=False)
+    bills["UsedForPromptEngineering"] = bills["BillID"].apply(lambda x: any((x==bills_run1["BillID"]) | (x==bills_run2["BillID"]) ))
+    bills = bills[bills["UsedForPromptEngineering"]==False]
+    bills.drop(columns=["UsedForPromptEngineering"], inplace=True)
+
     # Draw 10k bills 
-    condition = True
-    random_state = 80
-    while (condition):
-        random_state = random_state + 1
-        print(f"Trying again ... using {random_state}")
-        bills_prediction = bills.sample(n=10_000, random_state=random_state)
-        condition = any(bills_prediction["BillID"].apply(lambda x: any((x==bills_run1["BillID"]) | (x==bills_run2["BillID"]) )))
-        
-    print(f"Found it {random_state}")
-    # # Save 10K bills data
-    # bills_prediction_path = os.path.join(data_dir, 'Prediction/bills.csv')
-    # bills_prediction.to_csv(bills_prediction_path, index=False)
-    # print(f'Saved {os.path.basename(bills_prediction_path)}, n = {len(bills_prediction)}, at {os.path.dirname(bills_prediction_path)}')
+    bills = bills.sample(n=10_000, random_state=123)
+
+    # Save 10K bills data
+    bills_path = os.path.join(data_dir, 'Prediction/bills.csv')
+    bills.to_csv(bills_path, index=False)
+    print(f'Saved {os.path.basename(bills_path)}, n = {len(bills)}, at {os.path.dirname(bills_path)}')
 
 if __name__ == "__main__":
     main()

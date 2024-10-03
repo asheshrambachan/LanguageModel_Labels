@@ -31,7 +31,7 @@ def query_llm(batches):
     return(batches)
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1")
 
     # Query LLM and store batches id 
     batches_path = os.path.join(temp_dir, "batches.csv")

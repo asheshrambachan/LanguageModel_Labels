@@ -38,7 +38,7 @@ def download_batched_responses(batches, out_dir):
         print(f"Saved {os.path.basename(responses_batched_path)} at {os.path.dirname(responses_batched_path)}")
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1")
     batched_responses_dir = os.path.join(temp_dir, "responses_batched")
     os.makedirs(batched_responses_dir, exist_ok=True)
 

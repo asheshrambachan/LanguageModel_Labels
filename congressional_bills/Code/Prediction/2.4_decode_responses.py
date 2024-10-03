@@ -124,8 +124,8 @@ def trim(df):
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data/Prediction")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
+    data_dir = os.path.join(REPO_DIR, "Data/Prediction_run1")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1")
     os.makedirs(temp_dir, exist_ok=True)
 
     bills = pd.read_csv(os.path.join(data_dir, f"bills_run2.csv"))
@@ -148,8 +148,9 @@ def main():
     
     # merge prompts and bills metadata with llm responses
     bills_llm_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm_passage.set_index("ID", inplace=True, drop=False)
-    bills_llm_passage.sort_index(inplace=True)
+    bills_llm_passage.set_index("ID", inplace=True, drop=True)
+    bills_llm_passage.sort_index(inplace=True, ignore_index=True)
+
 
     # print mean input and output tokens
     print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
@@ -167,12 +168,14 @@ def main():
 
     # merge prompts and bills metadata with llm responses
     bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm_completion.set_index("ID", inplace=True, drop=False)
-    bills_llm_completion.sort_index(inplace=True)
 
     # Trim Description and DescriptionLLM if the begin the same
     bills_llm_completion = bills_llm_completion.apply(lambda x: trim(x), axis=1)
 
+    bills_llm_completion.set_index("ID", inplace=True, drop=True)
+    bills_llm_completion.sort_index(inplace=True, ignore_index=True)
+    bills_llm_completion["ID"] = bills_llm_completion.index
+    
     # print mean input and output tokens
     print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 

@@ -1,0 +1,6 @@
+[
+    {
+        "role": "user",
+        "content": "Here is the beginning of the summary for U.S. Congress bill {}:\n\"{}\"\n\nTo the best of your ability, please complete the summary of this bill.\n\nDo not modify or paraphrase the provided portion of the bill summary and only complete it starting from where it ends. Only return the remaining part of the bill summary in the following JSON format:\n{{\n    \"DescriptionLLM\": \"[Remaining summary text]\"\n}}\n"
+    }
+]
