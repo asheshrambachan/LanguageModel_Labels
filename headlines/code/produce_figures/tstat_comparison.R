@@ -1,3 +1,4 @@
+# Load necessary libraries
 library(tidyverse)
 library(ggplot2)
 library(glue)
@@ -8,22 +9,27 @@ source(file.path("./code/produce_figures/ggplot_theme.r"))
 
 # Read in data and combine
 abnormal_CAPM <- read.csv("./data/step9_reg_results/abnormal_CAPM_returns_clustered.csv")
-abnormal_FF3 <- read.csv("./data/step9_reg_results/abnormal_FF3_returns_clustered.csv")
 realized <- read.csv("./data/step9_reg_results/realized_returns_clustered.csv")
 
-ret_all <- rbind(abnormal_CAPM, abnormal_FF3, realized) %>%
+ret_all <- rbind(abnormal_CAPM, realized) %>%
   rename(return_horizon = ret)
 
 # Define factor levels and labels
 model_levels <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
 model_labels <- c("GPT-3.5", "GPT-4o-mini", "GPT-4o")
-return_type_levels <- c("realized", "abnormal_CAPM", "abnormal_FF3")
-return_type_labels <- c("Realized Returns", "Abnormal Returns (CAPM)", "Abnormal Returns (FF3)")
-return_horizon_levels <- c(1,5,10)
-return_horizon_labels <- c("1-day", "5-day", "10-day")
+return_type_levels <- c("realized", "abnormal_CAPM")
+return_type_labels <- c("Realized Returns", "Abnormal Returns (CAPM)")
 
-# Helper function to arrange and apply ordering
-prompt_index <- function(plot_data, model_name, coef_col, se_col) {
+# Helper function to filter data by return horizon
+filter_data_by_horizon <- function(plot_data, return_horizon_levels) {
+  plot_data %>% filter(return_horizon %in% return_horizon_levels)
+}
+
+# Generalized helper function to arrange and apply ordering with flexible return horizons
+prompt_index_general <- function(plot_data, model_name, coef_col, se_col, return_horizon_levels, return_horizon_labels) {
+  
+  # Filter data by the specified return horizons
+  plot_data <- filter_data_by_horizon(plot_data, return_horizon_levels)
   
   # Arrange the data for the specified model
   ordered_data <- plot_data %>%
@@ -49,7 +55,12 @@ prompt_index <- function(plot_data, model_name, coef_col, se_col) {
     )
 }
 
-prompt_model_index <- function(plot_data, coef_col, se_col) {
+# Generalized helper function to create prompt model indices
+prompt_model_index_general <- function(plot_data, coef_col, se_col, return_horizon_levels, return_horizon_labels) {
+  
+  # Filter data by the specified return horizons
+  plot_data <- filter_data_by_horizon(plot_data, return_horizon_levels)
+  
   plot_data %>%
     filter(question == current_question) %>%
     mutate(tstat_value = !!sym(coef_col) / !!sym(se_col)) %>%
@@ -59,7 +70,7 @@ prompt_model_index <- function(plot_data, coef_col, se_col) {
     ungroup() %>%
     mutate(
       model = factor(model, levels = model_levels, labels = model_labels),
-      return_type = factor(return_type, levels = return_type_levels),
+      return_type = factor(return_type, levels = return_type_levels, labels = return_type_labels),
       return_horizon = factor(return_horizon, levels = return_horizon_levels, labels = return_horizon_labels)
     )
 }
@@ -78,7 +89,13 @@ create_comparison_plot <- function(data, metric_label, x_axis_label, alpha) {
     theme.point
 }
 
-# Iterate over questions and create plots
+# Define a list of return horizon combinations
+return_horizon_combinations <- list(
+  list(levels = c(5, 10), labels = c("5-day", "10-day"), width = 11, suffix = "5_10_day"),
+  list(levels = c(1), labels = c("1-day"), width = 5.5, suffix = "1_day")
+)
+
+# Iterate over return horizon combinations and questions to create plots
 questions <- c("q1", "q2", "q3", "q4", "q5")
 question_names <- c("Positive, Negative, or Neutral?", 
                     "Increase, Decrease, or Uncertain Change to Returns?",
@@ -86,41 +103,48 @@ question_names <- c("Positive, Negative, or Neutral?",
                     "Increase, Decrease, or Uncertain Sentiment", 
                     "Increase, Decrease, or Uncertain Sentiment at Time")
 
-for (i in seq_along(questions)) {
-  current_question <- questions[i]
-  x_axis_label <- paste("Question:", question_names[i])
+for (comb in return_horizon_combinations) {
+  return_horizon_levels <- comb$levels
+  return_horizon_labels <- comb$labels
+  fig_width <- comb$width
+  fig_suffix <- comb$suffix
   
-  # Create and apply order for 'up' and 'down'
-  up_index <- prompt_index(ret_all, "gpt-4o", "up.coef", "up.se")
-  down_index <- prompt_index(ret_all, "gpt-4o", "down.coef", "down.se")
-  
-  # Create plots using lapply for 'up' and 'down', 'magnitude' and 'confidence'
-  plot_params <- list(
-    list(data = up_index, metric_label = "magnitude", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
-    list(data = up_index, metric_label = "confidence", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
-    list(data = down_index, metric_label = "magnitude", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down"),
-    list(data = down_index, metric_label = "confidence", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down")
-  )
-  
-  prompt_index_plots <- lapply(plot_params, function(params) {
-    plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha)
-    ggsave(filename = glue("./figures/t_stats/{questions[i]}_prompt_{params$direction}_{params$metric_label}.png"), plot = plot, width = 10, height = 7)
-  })
-  
-  # Create prompt model indices
-  up_prompt_model_index <- prompt_model_index(ret_all, "up.coef", "up.se")
-  down_prompt_model_index <- prompt_model_index(ret_all, "down.coef", "down.se")
-  
-  # Create plots for model indices using lapply
-  prompt_model_index_params <- list(
-    list(data = up_prompt_model_index, metric_label = "magnitude", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
-    list(data = up_prompt_model_index, metric_label = "confidence", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
-    list(data = down_prompt_model_index, metric_label = "magnitude", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down"),
-    list(data = down_prompt_model_index, metric_label = "confidence", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down")
-  )
-  
-  prompt_model_index_plots <- lapply(prompt_model_index_params, function(params) {
-    plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha)
-    ggsave(filename = glue("./figures/t_stats/{questions[i]}_prompt_model_{params$direction}_{params$metric_label}.png"), plot = plot, width = 10, height = 7)
-  })
+  for (i in seq_along(questions)) {
+    current_question <- questions[i]
+    x_axis_label <- paste("Question:", question_names[i])
+    
+    # Create and apply order for 'up' and 'down' with current return horizons
+    up_index <- prompt_index_general(ret_all, "gpt-4o", "up.coef", "up.se", return_horizon_levels, return_horizon_labels)
+    down_index <- prompt_index_general(ret_all, "gpt-4o", "down.coef", "down.se", return_horizon_levels, return_horizon_labels)
+    
+    # Create plots using lapply for 'up' and 'down', 'magnitude' and 'confidence'
+    plot_params <- list(
+      list(data = up_index, metric_label = "magnitude", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
+      list(data = up_index, metric_label = "confidence", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
+      list(data = down_index, metric_label = "magnitude", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down"),
+      list(data = down_index, metric_label = "confidence", x_axis_label = glue("Prompt Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down")
+    )
+    
+    prompt_index_plots <- lapply(plot_params, function(params) {
+      plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha)
+      ggsave(filename = glue("./figures/t_stats/{questions[i]}_prompt_{params$direction}_{params$metric_label}_{fig_suffix}.png"), plot = plot, width = fig_width, height = 7)
+    })
+    
+    # Create prompt model indices with current return horizons
+    up_prompt_model_index <- prompt_model_index_general(ret_all, "up.coef", "up.se", return_horizon_levels, return_horizon_labels)
+    down_prompt_model_index <- prompt_model_index_general(ret_all, "down.coef", "down.se", return_horizon_levels, return_horizon_labels)
+    
+    # Create plots for model indices using lapply
+    prompt_model_index_params <- list(
+      list(data = up_prompt_model_index, metric_label = "magnitude", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
+      list(data = up_prompt_model_index, metric_label = "confidence", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "up"),
+      list(data = down_prompt_model_index, metric_label = "magnitude", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down"),
+      list(data = down_prompt_model_index, metric_label = "confidence", x_axis_label = glue("Prompt-Model Index (Sorted)\n {x_axis_label}"), alpha = 0.7, direction = "down")
+    )
+    
+    prompt_model_index_plots <- lapply(prompt_model_index_params, function(params) {
+      plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha)
+      ggsave(filename = glue("./figures/t_stats/{questions[i]}_prompt_model_{params$direction}_{params$metric_label}_{fig_suffix}.png"), plot = plot, width = fig_width, height = 7)
+    })
+  }
 }
