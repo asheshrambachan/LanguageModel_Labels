@@ -4,8 +4,7 @@ library(viridis)
 library(glue)
 
 rm(list = ls())
-setwd()
-source(file.path("./ggplot_theme.r"))
+source(file.path("./code/produce_figures/ggplot_theme.r"))
 
 # Define constants
 question_levels <- c("q1", "q2", "q3", "q4", "q5")
@@ -28,8 +27,8 @@ prompt_type_labels <- c("Base: Fill in Blank", "Base: JSON",
                         "Persona: Finance Expert", "Persona: Economy Expert",
                         "Persona: Successful Trader")
 
-return_types <- c("realized", "abnormal_CAPM", "abnormal_FF3")
-return_labels <- c("Realized Returns", "Abnormal Returns (CAPM)", "Abnormal Returns (FF3)")
+return_types <- c("realized", "abnormal_CAPM")
+return_labels <- c("Realized Returns", "Abnormal Returns (CAPM)")
 return_label_map <- setNames(return_labels, return_types)
 
 # Helper function to read datasets
@@ -52,8 +51,8 @@ create_agreement_matrix <- function(datasets) {
 plot_agreement_matrix <- function(agreement_df, question, model, return_type, global_min, global_max) {
   ggplot(agreement_df, aes(x = Var1, y = Var2, fill = Agreement)) +
     geom_tile() +
-    geom_text(aes(label = sprintf("%.1f", Agreement), color = ifelse(Agreement > 70, "white", "black")), size = 3, show.legend = FALSE) +
-    scale_fill_viridis_c(option = "rocket", direction = -1, limits = c(global_min, global_max)) +
+    geom_text(aes(label = sprintf("%.1f", Agreement), color = ifelse(Agreement > global_min + (global_max - global_min)/4, "white", "black")), size = 3, show.legend = FALSE) +
+    scale_fill_viridis_c(option = "plasma", direction = -1, limits = c(global_min, global_max)) +
     scale_color_identity() +
     labs(
       title = glue("Pairwise Agreement by Prompting Strategy\n"),
@@ -63,13 +62,13 @@ plot_agreement_matrix <- function(agreement_df, question, model, return_type, gl
     theme.heatmap
 }
 
-# Function to plot facet wrap agreement matrix
-plot_agreement_matrix_all_returns <- function(facet_data, model, question) {
+# Function to plot facet wrap agreement matrix (with global min/max as arguments)
+plot_agreement_matrix_all_returns <- function(facet_data, model, question, global_min, global_max) {
   ggplot(facet_data %>% filter(Model == model_label_map[model], Question == question_label_map[question]), 
          aes(x = Var1, y = Var2, fill = Agreement)) +
     geom_tile() +
-    geom_text(aes(label = sprintf("%.1f", Agreement), color = ifelse(Agreement > 70, "white", "black")), size = 3, show.legend = FALSE) +
-    scale_fill_viridis_c(option = "rocket", direction = -1, limits = c(global_min, global_max)) +
+    geom_text(aes(label = sprintf("%.1f", Agreement), color = ifelse(Agreement > global_min + (global_max - global_min)/4, "white", "black")), size = 3, show.legend = FALSE) +
+    scale_fill_viridis_c(option = "plasma", direction = -1, limits = c(global_min, global_max)) +
     scale_color_identity() +
     labs(
       title = glue("Pairwise Agreement by Prompting Strategy"),
@@ -77,14 +76,15 @@ plot_agreement_matrix_all_returns <- function(facet_data, model, question) {
       x = "Prompting Strategy", y = "Prompting Strategy", fill = "Pairwise Agreement Percent"
     ) +
     theme.heatmap +
-    facet_wrap(~ ReturnType, ncol = 3)
+    facet_wrap(~ ReturnType, ncol = 2)
 }
+
+# Create a list to store global min and max for each question
+global_min_max <- setNames(lapply(question_levels, function(x) list(global_min = Inf, global_max = -Inf)), question_levels)
 
 # Iterate over combinations and store data
 all_datasets <- list()
 agreement_matrices <- list()
-global_min <- Inf
-global_max <- -Inf
 
 # Read data and calculate agreement matrices
 for (return_type in return_types) {
@@ -100,25 +100,26 @@ for (return_type in return_types) {
       agreement_df <- create_agreement_matrix(datasets)
       agreement_matrices[[paste0(return_type, " ", question, " ", model)]] <- agreement_df
       
-      # Update global min and max
-      global_min <- min(global_min, min(agreement_df$Agreement, na.rm = TRUE))
-      global_max <- max(global_max, max(agreement_df$Agreement, na.rm = TRUE))
+      # Update global min and max for the current question
+      global_min_max[[question]]$global_min <- min(global_min_max[[question]]$global_min, min(agreement_df$Agreement, na.rm = TRUE))
+      global_min_max[[question]]$global_max <- max(global_min_max[[question]]$global_max, max(agreement_df$Agreement, na.rm = TRUE))
     }
   }
 }
 
-# Generate and save plots
+# Generate and save plots with question-specific scales
 lapply(names(agreement_matrices), function(name) {
   split_name <- strsplit(name, " ")[[1]]
   return_type <- split_name[1]
   question <- split_name[2]
   model <- split_name[3]
   
-  plot <- plot_agreement_matrix(agreement_matrices[[name]], question, model, return_type, global_min, global_max)
+  # Use the question-specific global min and max for the heatmap scale
+  plot <- plot_agreement_matrix(agreement_matrices[[name]], question, model, return_type, 
+                                global_min_max[[question]]$global_min, global_min_max[[question]]$global_max)
   ggsave(filename = glue("./figures/heatmaps/by_return_type/{return_type}/{question}_{model}.png"), plot = plot, width = 7, height = 8, units = "in")
   print(glue("Saved heatmap for {model}, {question}, {return_type}"))
 })
-
 
 # Combine all agreement matrices into one data frame for facet wrapping
 all_returns_matrices <- bind_rows(lapply(names(agreement_matrices), function(name) {
@@ -137,13 +138,13 @@ all_returns_matrices <- bind_rows(lapply(names(agreement_matrices), function(nam
 
 
 # Generate and save facet-wrap plots for each model and question combination
+# Generate and save facet-wrap plots for each model and question combination
 for (question in question_levels) {
   for (model in model_levels) {
-    plot <- plot_agreement_matrix_all_returns(all_returns_matrices, model, question)
-    ggsave(filename = glue("./figures/heatmaps/all_returns/{question}_{model}.png"), plot = plot, width = 12, height = 6, units = "in")
+    plot <- plot_agreement_matrix_all_returns(all_returns_matrices, model, question, 
+                                              global_min_max[[question]]$global_min, 
+                                              global_min_max[[question]]$global_max)
+    ggsave(filename = glue("./figures/heatmaps/all_returns/{question}_{model}.png"), plot = plot, width = 13, height = 8, units = "in")
     print(glue("Saved heatmap for {model}, {question}"))
   }
 }
-
-
-
