@@ -158,6 +158,15 @@ data_completion <- read.csv(file.path(data_dir, "bills_llm_completion_similarity
   ) %>%
   select(c(Model, Prompt, TextSimilarity, CosineSimilarity, EuclideanDistance))
 
+# temp <- data_completion %>%
+#   filter(
+#     Model=="GPT-4o",
+#     TextSimilarity==1,
+#     Prompt=="w/o date restriction"
+#     ) %>%
+#   select(c(Model, Prompt, TextSimilarity, CosineSimilarity, EuclideanDistance, DescriptionTrim, Description, DescriptionLLM, DescriptionClean, DescriptionLLMClean)) 
+# write.csv(temp, file=file.path(repo_dir, "Temp/Prediction/TextSimilarity1.csv"))
+
 data_completion_baselines <- read.csv(file.path(data_dir, "random_baseline_group.csv")) %>%
   mutate(
     Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),

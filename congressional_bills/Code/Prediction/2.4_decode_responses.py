@@ -110,7 +110,7 @@ def trim(df):
         
     elif description_llm.startswith(("The bill", "This bill", "A bill", "The ")):
         print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently')
-        # print(f'{df["ID"]},\n{part_to_trim}\n{description}\n{description_llm}\n\n')
+        print(f'{df["ID"]},\n{part_to_trim}\n{description}\n{description_llm}\n\n')
 
     else:
         # already trimmed, trim description only
