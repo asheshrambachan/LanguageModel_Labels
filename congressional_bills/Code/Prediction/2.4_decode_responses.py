@@ -36,22 +36,26 @@ def decode_responses_passage(responses):
 
 def decode_responses_completion(responses):
     responses_decoded = []
+    count = 0
     for _, response in responses.iterrows(): 
         finish_reason = response.response["body"]["choices"][0]["finish_reason"]
         response_text = response.response["body"]["choices"][0]["message"]["content"]
         
+        if response["ID"]==10503:
+            response_text = response_text.removesuffix('\\')
+
         if finish_reason!="stop":
             if (finish_reason=="length"):
+                count = count + 1
                 response_text = response_text +'"}'
                 print(f'ID={response["ID"]}, finish_reason={finish_reason}, kept')
             else:
                 print(f'ID={response["ID"]}, finish_reason={finish_reason}, dropped')
                 continue
         
-        if response["ID"]==7323:
+        if (response["ID"]==10835): 
             response_text = response_text +'"}'
-        
-        # print(response_text)
+
         response_json = json.loads(response_text)
         
         responses_decoded.append({
@@ -60,12 +64,9 @@ def decode_responses_completion(responses):
             "InputTokens": int(response.response["body"]["usage"]["prompt_tokens"]),
             "OutputTokens": int(response.response["body"]["usage"]["completion_tokens"])
         })
+    print(f'Number of responses exceeding max_token = {count}')
     return(pd.json_normalize(responses_decoded))
 
-# def count_words(description):
-#     words = description.split() # Split the description into words
-#     word_count = len(words) # Total number of words
-#     return word_count
 
 import string
 import re
@@ -95,40 +96,37 @@ def trim(df):
     # Since some responses still contain the first part of the text that we asked in the prompt to not include, we have to trim them mannually
     df["DescriptionClean"] = df["Description"]
     df["DescriptionLLMClean"] = df["DescriptionLLM"]
-    
-    temp = df["DescriptionLLMClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
-    if ((temp=="") | temp.startswith(("The bill", "This bill","A bill"))):
-        # if true do not do any changes for the Description nor DescriptionLLM
-        print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently or result after trimming is null')
-        # ((df["ID"]==68259) | (df["ID"]==68260) | (df["ID"]==43356) | (df["ID"]==30460) | (df["ID"]==28956)| (df["ID"]==28955)):
-        # print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{temp}\n\n')
+    part_to_trim = df["DescriptionTrim"].strip()
+    description =  df["Description"].strip()
+    description_llm = df["DescriptionLLM"].strip()
+
+    if (df["ID"]==76972):
+        description = description.replace('A bill entitled: ', "", 1)
+        part_to_trim = part_to_trim.replace('A bill entitled: ', "", 1)
+
+    if (description_llm.startswith(part_to_trim)):
+        description_llm = description_llm.replace(part_to_trim, "", 1)
+        description = description.replace(part_to_trim, "", 1)
+        
+    elif description_llm.startswith(("The bill", "This bill", "A bill", "The ")):
+        print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently')
+        # print(f'{df["ID"]},\n{part_to_trim}\n{description}\n{description_llm}\n\n')
+
     else:
-        df["DescriptionLLMClean"] = temp
-        if ((df["ID"]==74659)|(df["ID"]==74660)):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace(df["DescriptionTrim"].upper().strip(), "", 1)
-
-        if (df["ID"]==73092):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("Relating to criminal penalties for violations of the Co", "", 1)
-
-        if (df["ID"]==70428):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("To improve Federal laws relating to the trans", "", 1)
-
-        #   if ((df["DescriptionLLMClean"][0].isupper()) & (df["ID"]<28955)):
-        #       print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{df["DescriptionLLMClean"]}\n\n')
-
-        df["DescriptionClean"] = df["DescriptionClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
+        # already trimmed, trim description only
+        description = description.replace(part_to_trim, "", 1)
     
-    df["DescriptionClean"] = clean_text(df["DescriptionClean"])
-    df["DescriptionLLMClean"] = clean_text(df["DescriptionLLMClean"])
+    df["DescriptionClean"] = clean_text(description)
+    df["DescriptionLLMClean"] = clean_text(description_llm)
 
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data/Prediction_run1")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1")
+    data_dir = os.path.join(REPO_DIR, "Data/Prediction")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
     os.makedirs(temp_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, f"bills_run2.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
     prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
@@ -171,6 +169,9 @@ def main():
 
     # Trim Description and DescriptionLLM if the begin the same
     bills_llm_completion = bills_llm_completion.apply(lambda x: trim(x), axis=1)
+    condition = bills_llm_completion["DescriptionLLMClean"]==""
+    bills_llm_completion = bills_llm_completion[~condition]
+    print(f'Dropped {sum(condition)} observations with null completion response after cleaning')
 
     bills_llm_completion.set_index("ID", inplace=True, drop=True)
     bills_llm_completion.sort_index(inplace=True, ignore_index=True)

@@ -215,18 +215,18 @@ def sample_bills(bills, n_bills = 10e3, n_examples = 15, seed = 123):
 
 def main():
     # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data')
-    temp_dir = os.path.join(REPO_DIR, 'Temp')
+    data_dir = os.path.join(REPO_DIR, 'Data/Estimation')
+    temp_dir = os.path.join(REPO_DIR, 'Temp/Estimation')
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(temp_dir, exist_ok=True)
 
     # CAP and CBP data paths
-    # path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
-    # path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
-    # path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
-    path_cap = os.path.join(temp_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
-    path_cbp_80_92 = os.path.join(temp_dir, 'bills80-92.txt')
-    path_cbp_93_114 = os.path.join(temp_dir, 'bills93-114.csv')
+    path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
+    path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
+    path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
+    # path_cap = os.path.join(temp_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
+    # path_cbp_80_92 = os.path.join(temp_dir, 'bills80-92.txt')
+    # path_cbp_93_114 = os.path.join(temp_dir, 'bills93-114.csv')
     
     # Load and clean CAP
     cap = get_cap(path_cap)
@@ -248,12 +248,12 @@ def main():
 
     # Split the 15 examples into 3 sets for the 3 few-shot prompts
     bills_examples['ExampleSetNum'] = np.repeat([1, 2, 3], repeats=15/3)
-    bills_examples_path = os.path.join(data_dir, 'Estimation/bills_examples.csv')
+    bills_examples_path = os.path.join(data_dir, 'bills_examples.csv')
     bills_examples.to_csv(bills_examples_path, index=False)
     print(f'Saved {os.path.basename(bills_examples_path)}, n = {len(bills_examples)}, at {os.path.dirname(bills_examples_path)}')
 
     # Save 10K bills data for the estimation exercise 
-    bills_estimation_path = os.path.join(data_dir, 'Estimation/bills.csv')
+    bills_estimation_path = os.path.join(data_dir, 'bills.csv')
     bills_estimation.to_csv(bills_estimation_path, index=False)
     print(f'Saved {os.path.basename(bills_estimation_path)}, n = {len(bills_estimation)}, at {os.path.dirname(bills_estimation_path)}')
 

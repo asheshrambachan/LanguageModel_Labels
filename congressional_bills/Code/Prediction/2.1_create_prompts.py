@@ -84,8 +84,8 @@ def estimate_cost(prompts, batched=True):
     prompt2OutputTokens = {
         1: 22, 
         2: 22, 
-        3: 75.5, 
-        4: 47.0
+        3: 33.554983, 
+        4: 37.376825
     } 
     avg_output_tokens = prompts['PromptingStrategyID'].apply(lambda x: prompt2OutputTokens[x])
 
@@ -163,8 +163,8 @@ def create_batched_prompts(prompts, batched_prompts_dir):
     return(pd.json_normalize(batches))
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data/Prediction_run1") # TODO: change this to Prediction
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1") # TODO: change this to Prediction
+    data_dir = os.path.join(REPO_DIR, "Data/Prediction")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
     
     batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
     os.makedirs(temp_dir, exist_ok=True)

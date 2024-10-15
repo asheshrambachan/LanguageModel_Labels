@@ -21,8 +21,8 @@ knitr::opts_chunk$set(
 
 ```{r}
 repo_dir = "~/Documents/LanguageModel_Labels/congressional_bills"
-data_dir = file.path(repo_dir, "Data/Prediction_run1") 
-fig_dir = file.path(repo_dir, "Figures/Prediction_run1")
+data_dir = file.path(repo_dir, "Data/Prediction") 
+fig_dir = file.path(repo_dir, "Figures/Prediction") 
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Load required packages quietly and custom functions
@@ -42,7 +42,7 @@ stripe <- function(nstriped=3, nrow=50){
 }
 
 # Load data
-data_bills <- read.csv(file.path(data_dir, "bills_run2.csv"))
+data_bills <- read.csv(file.path(data_dir, "bills.csv"))
 
 data_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
   # rename(Prompt=PromptingStrategyID) %>%
@@ -54,10 +54,99 @@ data_passage <- read.csv(file.path(data_dir, "bills_llm_passage.csv")) %>%
       labels=c("w/o date restriction", "w/ date restriction")
     )
   ) %>%
-  select(Model, Prompt, PassS, PassH, PassSLLM, PassHLLM)
+  select(Model, Prompt, PassS, PassH, PassSLLM, PassHLLM) %>% 
+  group_by(Model, Prompt) %>%
+  summarize(
+    Accuracy.S = mean(PassS==PassSLLM),
+    TPR.S = sum(PassS==1 & PassSLLM==1) / sum(PassS==1),
+    FPR.S = sum(PassS==0 & PassSLLM==1) / sum(PassS==0),
+    Accuracy.H = mean(PassH==PassHLLM),
+    TPR.H = sum(PassH==1 & PassHLLM==1) / sum(PassH==1),
+    FPR.H = sum(PassH==0 & PassHLLM==1) / sum(PassH==0),
+    .groups="drop"
+  ) %>%
+  mutate(id = row_number(), .before=1) %>%
+  tidyr::pivot_longer(
+    -c(id, Model, Prompt),
+    names_to = c(".value", "Chamber"),
+    names_sep = "\\.") %>%
+  mutate(
+    Chamber = ifelse(Chamber == "S", "Pass Senate", "Pass House")
+  ) %>%
+  select(-id) %>%
+  relocate(Chamber, 1) %>%
+  arrange(Chamber, Model, Prompt) %>%
+  rename(c(
+    # "Accuracy of Predictions" = Accuracy,
+    # "TPR\\n(Specificity)" = TPR,
+    # "FPR (1 - Sensitivity)" = FPR
+    "Predicted Outcome"=Chamber
+  )) 
+```
 
+## Data Summary:
+
+- **Number of observations for bill passage predictions:** 40,000. 
+
+- **Number of observations for bill summary completion:** 39,997, 3 null responses were also dropped. A total of 38 responses exceeded the 750-token limit, and 31 responses modified the beginning of the provided bill summary, but were still included in the analysis.
+
+## Results
+
+### Bill Passage
+
+```{r, results='asis'}
+# True Passage Rates
+data_bills %>% 
+  select(c(PassS, PassH)) %>%
+  tidyr::pivot_longer(cols = c(PassS, PassH), names_to = "Chamber", values_to = "Pass") %>%
+  mutate(Chamber = ifelse(Chamber == "PassS", "Pass Senate", "Pass House")) %>%
+  group_by(Chamber) %>%
+  summarize(
+    "True Passage Rate" = mean(Pass),
+    .groups="drop"
+  ) %>%
+  kable(
+    caption="True Bill Passage Rates",
+    align="lr",
+    digits=3, linesep = "", escape=F, booktabs=T, format = "latex"
+  ) %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+```{r, results='asis'}
+# Passage Prediction: Passage Rates Accuracy
+data_passage %>%
+  kable(
+    caption="Performance Evaluation of LLM Predictions of Bill Passage",
+    align="lllrrr",
+    digits=3, linesep = "", booktabs=T, format = "latex"
+  ) %>%
+  row_spec(4, hline_after = TRUE, extra_latex_after = "%") %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+
+```{r, fig.height=3.5, fig.width=6}
+data_passage %>%
+  ggplot(aes(x=as.factor(Prompt), y=Accuracy, fill=Model)) +
+  geom_col(position=position_dodge()) +
+  facet_grid(. ~ `Predicted Outcome`) +
+  xlab("Prompt") +
+  ylab("Accuracy of\nBill Passage Predictions") +
+  scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
+  scale_fill_manual(name="", values=my_colors) +
+  theme.bar
+ggsave(file.path(fig_dir, "Accuracy of Bill Passage Predictions.jpeg"), height = 3.5, width = 6)
+```
+
+\clearpage
+
+### Bill Summary Completion
+
+```{r}
 data_completion <- read.csv(file.path(data_dir, "bills_llm_completion_similarity.csv")) %>%
-  # rename(Prompt=PromptingStrategyID) %>%
   mutate(
     Model = factor(Model, levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), labels=c("GPT-3.5", "GPT-4o")),
     Prompt = factor(
@@ -91,79 +180,25 @@ data_completion_baselines <- data_completion %>%
   mutate(
     RelativeImprovement.CosineSimilarity = (Mean.CosineSimilarity - RandomBaseline.CosineSimilarity) / RandomBaseline.CosineSimilarity,
     RelativeImprovement.EuclideanDistance = (RandomBaseline.EuclideanDistance - Mean.EuclideanDistance) / (RandomBaseline.EuclideanDistance),
-  )
-```
-
-## Data Summary:
-
-- **Number of observations for bill passage predictions:** 40,000. Initially, 4 requests returned null responses, but upon retrying with the same prompts and removing `max_token=null`, they returned non-null responses.
-- **Number of observations for bill summary completion:** 39,999. A total of 57 responses exceeded the token limit of 500, and 1 response was dropped due to content filtering.
-
-## Results
-
-### Bill Passage
-
-```{r, results='asis'}
-# True Passage Rates
-data_bills %>% 
-  select(c(PassS, PassH)) %>%
-  tidyr::pivot_longer(cols = c(PassS, PassH), names_to = "Chamber", values_to = "Pass") %>%
-  mutate(Chamber = ifelse(Chamber == "PassS", "Pass Senate", "Pass House")) %>%
-  group_by(Chamber) %>%
-  summarize(
-    "True Passage Rate" = mean(Pass),
-    .groups="drop"
-  ) %>%
-  kable(
-    caption="True Bill Passage Rates",
-    align="lr",
-    digits=3, linesep = "", escape=F, booktabs=T, format = "latex"
-  ) %>%
-  kable_styling(latex_options = "hold_position")
-```
-
-```{r, results='asis'}
-# Passage Prediction: Passage Rates Accuracy
-data_passage %>% 
-  group_by(Model, Prompt) %>%
-  summarize(
-    Accuracy.S = mean(PassS==PassSLLM),
-    TPR.S = sum(PassS==1 & PassSLLM==1) / sum(PassS==1),
-    FPR.S = sum(PassS==0 & PassSLLM==1) / sum(PassS==0),
-    Accuracy.H = mean(PassH==PassHLLM),
-    TPR.H = sum(PassH==1 & PassHLLM==1) / sum(PassH==1),
-    FPR.H = sum(PassH==0 & PassHLLM==1) / sum(PassH==0),
-    .groups="drop"
   ) %>%
   mutate(id = row_number(), .before=1) %>%
   tidyr::pivot_longer(
     -c(id, Model, Prompt),
-    names_to = c(".value", "Chamber"),
-    names_sep = "\\.") %>%
+    names_to = c(".value", "Metric"),
+    names_sep = "\\.")  %>%
+  select(-c(id)) %>%
+  relocate(Metric, 1) %>%
+  arrange(Metric, Model, Prompt) %>%
   mutate(
-    Chamber = ifelse(Chamber == "S", "Pass Senate", "Pass House")
-  ) %>%
-  select(-id) %>%
-  relocate(Chamber, 1) %>%
-  arrange(Chamber, Model, Prompt) %>%
+    Metric = if_else(Metric=="CosineSimilarity", "Cosine Similarity", "Euclidean Distance"),
+    RelativeImprovement = RelativeImprovement,
+    ) %>%
   rename(c(
-    # "Accuracy of Predictions" = Accuracy,
-    # "TPR\\n(Specificity)" = TPR,
-    # "FPR (1 - Sensitivity)" = FPR
-    "Predicted Outcome"=Chamber
-  )) %>%
-  kable(
-    caption="Performance Evaluation of LLM Predictions of Bill Passage",
-    align="lllrrr",
-    digits=3, linesep = "", booktabs=T, format = "latex"
-  ) %>%
-  row_spec(4, hline_after = TRUE, extra_latex_after = "%") %>%
-  kable_styling(latex_options = "hold_position")
+    "Average" = Mean,
+    "Baseline" = RandomBaseline,
+    "Relative to Baseline"="RelativeImprovement"
+  ))
 ```
-
-\clearpage
-
-### Bill Summary Completion
 
 ```{r, results='asis'}
 # Summary Completion: Non-Embedded Comparison
@@ -188,23 +223,6 @@ data_completion %>%
 ```{r, results='asis'}
 # Summary Completion: Embedded Comparison
 data_completion_baselines %>%
-  mutate(id = row_number(), .before=1) %>%
-  tidyr::pivot_longer(
-    -c(id, Model, Prompt),
-    names_to = c(".value", "Metric"),
-    names_sep = "\\.")  %>%
-  select(-c(id)) %>%
-  relocate(Metric, 1) %>%
-  arrange(Metric, Model, Prompt) %>%
-  mutate(
-    Metric = if_else(Metric=="CosineSimilarity", "Cosine Similarity", "Euclidean Distance"),
-    RelativeImprovement = RelativeImprovement,
-    ) %>%
-  rename(c(
-    "Average" = Mean,
-    "Baseline" = RandomBaseline,
-    "Relative to Baseline (↑ Better)"="RelativeImprovement"
-  )) %>%
   kable(
     caption="Performance Evaluation of LLM Completion of Bill Summaries (Embedded)",
     align="lllrrr",
@@ -215,50 +233,20 @@ data_completion_baselines %>%
 ```
 
 
-```{r}
-# ci_value <- matrix(data_fig02$SE, ncol=1) %*% matrix(qnorm(probs) , ncol=2) + data_fig02$Mean
-# colnames(ci_value) <- sprintf("%.1f%%", probs*100)
-# data_fig02$LCI = ci_value[,1]
-# data_fig02$UCI = ci_value[,2]
+```{r, fig.height=3.5, fig.width=6}
+data_completion_baselines %>%
+  mutate(
+    Metric = if_else(Metric=="Cosine Similarity", "Increase in Cosine Similarity between True vs. LLM-Computed Bill", "Reduction in Euclidean Distance between True vs. LLM-Computed Bill")
+    ) %>%
+  ggplot(aes(x=Prompt, y=`Relative to Baseline`, fill=Model)) +
+  geom_col(position=position_dodge()) +
+  facet_grid(. ~ Metric, labeller=label_wrap_gen(width=35)) +
+  xlab("Prompt") +
+  ylab("Change Rate Relative\nto Random Baseline") +
+  scale_y_continuous(minor_breaks=seq(0, 2, by=0.05)) +
+  scale_fill_manual(name="", values=my_colors) +
+  theme.bar
 
-# data_fig02 %>%
-#   ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
-#   geom_col(position=position_dodge()) +
-#   # geom_point() + 
-#   # # geom_errorbar(aes(ymin=LCI, ymax=UCI), width=0.5, linewidth=0.3) +
-#   facet_grid(. ~ Chamber) +
-#   xlab("Prompt") +
-#   ylab("Accuracy of\nBill Passage Predictions") +
-#   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
-#   scale_fill_manual(name="", values=my_colors) +
-#   theme.bar
-# ggsave(file.path(fig_dir, "Accuracy of Bill Passage Predictions.jpeg"), height = 3.5, width = 6)
-```
-
-
-```{r}
-# data_fig03 <- data_fig03 %>%
-#   select(Measure, Model, AddIntrDate, CosineSimilarity, EuclideanDistance)
-#   tidyr::pivot_longer(cols = c(CosineSimilarity, EuclideanDistance), names_to = "Measure", values_to = "Distance") %>%
-#   mutate(Measure = ifelse(Measure == "CosineSimilarity", "Cosine Similarity", "Euclidean Distance")) %>%
-#   group_by(Measure, Model, AddIntrDate) %>%
-#   summarise(
-#     Mean = mean(Distance),
-#     SE = sd(Distance),
-#     .groups = "drop"
-#   )
-
-
-# data_fig03 %>%
-#   ggplot(aes(x=as.factor(AddIntrDate), y=Mean, fill=Model)) +
-#   geom_col(position=position_dodge()) +
-#   facet_grid(. ~ Measure) +
-#   xlab("Prompt") +
-#   ylab("Distance between\nTrue vs. LLM-Completed Bill") +
-#   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
-#   scale_fill_manual(name="", values=my_colors) +
-#   theme.bar
-# 
-#   # guides(fill="none")
-# ggsave(file.path(fig_dir, "Distance between True vs. LLM Bill.jpeg"), height = 3.5, width = 6)
+  # guides(fill="none")
+ggsave(file.path(fig_dir, "Distance between True vs. LLM Bill.jpeg"), height = 3.5, width = 6)
 ```
