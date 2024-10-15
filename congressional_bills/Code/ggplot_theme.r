@@ -25,7 +25,7 @@ my_colors <- c(
   "Human" = my_palette[["red"]], 
   
   "LLM" = my_palette[["green"]], 
-  "Human Validation" = my_palette[["red"]],
+  "Validation" = my_palette[["red"]],
   "Debiased" = my_palette[["gray"]]
 )
 

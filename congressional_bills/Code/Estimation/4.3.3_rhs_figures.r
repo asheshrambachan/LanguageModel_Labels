@@ -24,7 +24,7 @@ names(Y_levels) <- Y_labels
 model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
 model_labels <- c("GPT-3.5", "GPT-4o", "Human")
 regression_levels <- c("5k_V_Yllm", "train_V_Yhuman", "Vtilde_Ytilde")
-regression_labels <- c("LLM", "Human Validation", "Debiased")
+regression_labels <- c("LLM", "Validation", "Debiased")
 
 # Load LLM Data
 data_llm <- read.csv(path_data_llm) %>%
@@ -194,7 +194,7 @@ for (Yi_label in unique(data_5k$Y)){
   fig05_Y <- data_5k %>%
     filter(
       # proportion != 0.25,
-      regression != "Human Validation",
+      regression != "Validation",
       Y == Yi_label
     ) %>%
     ggplot(aes(
@@ -229,7 +229,7 @@ for (Yi_label in unique(data_5k$Y)){
   fig06_Y <- data_5k %>%
     filter(
       # proportion != 0.25,
-      regression != "Human Validation",
+      regression != "Validation",
       Y == Yi_label
     ) %>%
     ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),

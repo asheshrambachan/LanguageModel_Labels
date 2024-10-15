@@ -21,7 +21,7 @@ model_labels <- c("GPT-3.5", "GPT-4o", "Human")
 Y_levels <- c(3, 14, 15, 19, 20)
 Y_labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
 regression_levels <- c("5k_Yllm_V", "train_Yhuman_V", "Ytilde_V")
-regression_labels <- c("LLM", "Human Validation", "Debiased")
+regression_labels <- c("LLM", "Validation", "Debiased")
 
 # Load LLM Data
 data_llm <- read.csv(path_data_llm) %>%
@@ -116,29 +116,34 @@ cat(sprintf("Saved %s\n", fig_path))
 
 
 # Figure 3: Bias Density of the LLM Coefficent
-n_bins <- 30
+n_bins <- 64
 
 fig03 <- data_5k %>%
   filter(
-    proportion==0.05, 
+    proportion==0.10, 
     regression=="LLM"
   ) %>%
-  ggplot(aes(x=bias_mean, y=after_stat(count/sum(count)), fill=regression)) +
+  ggplot(aes(
+    x=bias_mean, 
+    y=after_stat(count/sum(count)), 
+    fill=regression,
+    color=regression
+    )) +
   geom_vline(xintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
-  geom_histogram(bins=n_bins, color="white") +  
-  geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
+  geom_histogram(bins=n_bins, position="identity", alpha=0.3) +  
   
   # theme and aesthetics
   xlab("Bias") +
   ylab("Probability Densities") +
   scale_fill_manual(name=NULL, values=my_colors) +
+  scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0, 1, by=0.01), limits=c(0,0.25)) +
   theme.bar + 
-  guides(fill="none")
+  guides(fill="none", color="none")
 
 # save figure
-fig_path = file.path(fig_dir, "fig03 Bias Density LLM.jpeg")
+fig_path = file.path(fig_dir, "fig03 Bias Density, Val Prop 10, LLM Only.jpeg")
 ggsave(fig_path, plot = fig03, height = 3.5, width = 4)
 cat(sprintf("Saved %s\n", fig_path))
 
@@ -146,25 +151,30 @@ cat(sprintf("Saved %s\n", fig_path))
 # Figure 4: Normalized Bias Density of the LLM Coefficent
 fig04 <- data_5k %>%
   filter(
-    proportion==0.05,
+    proportion==0.10,
     regression=="LLM"
   ) %>%
-  ggplot(aes(x=bias_norm, y=after_stat(count/sum(count)), fill=regression)) +
+  ggplot(aes(
+    x=bias_norm, 
+    y=after_stat(count/sum(count)), 
+    fill=regression,
+    color=regression
+    )) +
   geom_vline(xintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
-  geom_histogram(bins=n_bins, color="white") +
-  geom_hline(yintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
+  geom_histogram(bins=n_bins, position="identity", alpha=0.3) +
   
   # theme and aesthetics
   xlab("Normalized Bias") +
   ylab("Probability Densities") + 
   scale_fill_manual(name=NULL, values=my_colors) +
+  scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1,by=0.01), limits=c(0,0.25)) +
   theme.bar + 
-  guides(fill="none")
+  guides(fill="none", color="none")
 
 # save figure
-fig_path = file.path(fig_dir, "fig04 Normalized Bias Density LLM.jpeg")
+fig_path = file.path(fig_dir, "fig04 Normalized Bias Density, Val Prop 10, LLM Only.jpeg")
 ggsave(fig_path, plot = fig04, height = 3.5, width = 4)
 cat(sprintf("Saved %s\n", fig_path))
 
@@ -175,22 +185,21 @@ proportion_labeller <- labeller(
 )
 
 fig05 <- data_5k %>%
-  filter(
-    # proportion!=0.25,
-    regression!="Human Validation"
-  ) %>%
+  filter(regression!="Validation") %>%
   ggplot(aes(
     x=bias_mean, 
     y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
-    group=regression, fill=regression
+    color=regression, 
+    fill=regression
   )) +
-  geom_histogram(bins=n_bins, position=position_dodge()) +
+  geom_histogram(bins=n_bins, position="identity", alpha=0.3) +
   
   # theme and aesthetics
   xlab("Bias") +
   ylab("Probability Densities") +
   facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_fill_manual(name=NULL, values=my_colors) +
+  scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
   theme.bar
@@ -203,19 +212,21 @@ cat(sprintf("Saved %s\n", fig_path))
 
 # Figure 6: Normalized Bias Density by Model and Validation Proportion
 fig06 <- data_5k %>%
-  filter(
-    # proportion!=0.25,
-    regression!="Human Validation"
-  ) %>%
-  ggplot(aes(x=bias_norm, y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
-             group=regression, fill=regression)) +
-  geom_histogram(binwidth=0.09, position=position_dodge()) +
+  filter(regression!="Validation") %>%
+  ggplot(aes(
+    x=bias_norm, 
+    y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
+    color=regression, 
+    fill=regression
+    )) +
+  geom_histogram(bins=n_bins, position="identity", alpha=0.3) +
   
   # theme and aesthetics
   xlab("Normalized Bias") +
   ylab("Probability Densities") +
   facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_fill_manual(name=NULL, values=my_colors) +
+  scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
   theme.bar
