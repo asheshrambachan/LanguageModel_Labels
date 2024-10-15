@@ -1,13 +1,13 @@
 
 font_family <- "Helvetica"
-# if ("extrafont" %in% rownames(installed.packages())){
-#   # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
-#   # 2. install ttf files via GUI on mac
-#   extrafont::font_import(paths="~/Library/Fonts/", pattern="cmuns*.ttf", prompt=FALSE)
-#   extrafont::loadfonts(quiet=T)
-#   if ("CMU Sans Serif" %in% names(pdfFonts()))
-#     font_family <- "CMU Sans Serif"
-# }
+if ("extrafont" %in% rownames(installed.packages())){
+  # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
+  # 2. install ttf files via GUI on mac
+  extrafont::font_import(paths="~/Library/Fonts/", pattern="cmuns*.ttf", prompt=FALSE)
+  extrafont::loadfonts(quiet=T)
+  if ("CMU Sans Serif" %in% names(pdfFonts()))
+    font_family <- "CMU Sans Serif"
+}
 
 my_palette <- c(
   "red"="#F85427", 

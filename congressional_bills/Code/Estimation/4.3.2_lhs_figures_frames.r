@@ -1,11 +1,9 @@
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 data_dir <- file.path(repo_dir, "Data/Estimation/LHS")
-fig_dir <- file.path(repo_dir, "Figures/Slides/Estimation/LHS")
+fig_dir <- file.path(repo_dir, "Figures/Estimation/LHS Frames")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
-path_data_llm <- file.path(data_dir, "lhs_10k_llm.csv")
-path_data_human <- file.path(data_dir, "lhs_10k_human.csv")
 path_data_5k <- file.path(data_dir, "lhs_5k_llm_human_debiased_averaged.csv")
 
 # Load packages and ggplot themes
@@ -18,10 +16,11 @@ source(file.path(repo_dir, "Code/ggplot_theme.r"))
 V_levels <- c("Democrat", "Senate", "DW1")
 model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13", "Human")
 model_labels <- c("GPT-3.5", "GPT-4o", "Human")
-Y_levels <- c(3, 14, 15, 19, 20)
-Y_labels <- c( "Health", "Banking, Finance, and Domestic Commerce", "Defense", "Government Operations", "Public Lands and Water Management")
 regression_levels <- c("5k_Yllm_V", "train_Yhuman_V", "Ytilde_V")
 regression_labels <- c("LLM", "Human Validation", "Debiased")
+
+n_bins <- 40
+binwidth <- 0.09
 
 # Load averaged simulation data
 data_5k <- read.csv(path_data_5k) %>%
@@ -38,8 +37,6 @@ data_5k <- read.csv(path_data_5k) %>%
     ) %>%
   select(model, regression, bias_norm, mse_mean, coverage_mean)
 
-n_bins <- 40
-binwidth <- 0.09
 
 # Figure: Normalized Bias Density of the LLM Coefficent, Validation 10%
 fig_data <- data_5k %>%
