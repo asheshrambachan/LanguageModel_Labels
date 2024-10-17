@@ -140,6 +140,14 @@ def description_mismatch(d1, d2):
     condition = description_cap!=description_cbp
     return condition
 
+import string
+import re
+def clean_text(x):    
+    # remove punctuation, lowercase, and remove tailing spaces
+    x = re.sub('[{}]'.format(string.punctuation), '', x)
+    x = re.sub(r'[^a-zA-Z0-9]', ' ', x.lower()).strip()
+    return x
+
 def merge_cap_cbp(cap, cbp):
     # Merge CAP and CBP
     bills = cap.merge(cbp, on=['BillID', 'Major', 'Party', 'PassS', 'PassH', 'Chamber'], suffixes=('', '_CBP'))
@@ -152,8 +160,8 @@ def merge_cap_cbp(cap, cbp):
     bills = bills[bills['Major']!=99]
 
     # Remove duplicates based on Description (lower cased)
-    bills['Description_lower'] = bills['Description'].apply(lambda x: x.lower())
-    bills.drop_duplicates(subset='Description_lower', inplace=True)
+    bills['DescriptionClean'] = bills['Description'].apply(lambda x: clean_text(x))
+    bills.drop_duplicates(subset='DescriptionClean', inplace=True)
     
     # Map PAP/CAP major topic IDs to our IDs 
     major_PAP2Ours = {
@@ -235,9 +243,9 @@ def main():
     # Merge CAP and CBP data
     bills = merge_cap_cbp(cap, cbp)
 
-    bills_131091_path = os.path.join(temp_dir, "bills_131091.csv")
-    bills.to_csv(bills_131091_path, index=False)
-    print(f'Saved {os.path.basename(bills_131091_path)}, n = {len(bills)}, at {os.path.dirname(bills_131091_path)}')
+    bills_all_path = os.path.join(temp_dir, f"bills_{len(bills)}.csv")
+    bills.to_csv(bills_all_path, index=False)
+    print(f'Saved {os.path.basename(bills_all_path)}, n = {len(bills)}, at {os.path.dirname(bills_all_path)}')
 
     # Draw 10k bills 
     bills = bills.sample(n=10_000, random_state=321)

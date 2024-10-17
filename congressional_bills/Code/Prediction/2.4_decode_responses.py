@@ -41,9 +41,6 @@ def decode_responses_completion(responses):
         finish_reason = response.response["body"]["choices"][0]["finish_reason"]
         response_text = response.response["body"]["choices"][0]["message"]["content"]
         
-        if response["ID"]==10503:
-            response_text = response_text.removesuffix('\\')
-
         if finish_reason!="stop":
             if (finish_reason=="length"):
                 count = count + 1
@@ -53,7 +50,7 @@ def decode_responses_completion(responses):
                 print(f'ID={response["ID"]}, finish_reason={finish_reason}, dropped')
                 continue
         
-        if (response["ID"]==10835): 
+        if (response["ID"]==35875): 
             response_text = response_text +'"}'
 
         response_json = json.loads(response_text)
@@ -71,53 +68,48 @@ def decode_responses_completion(responses):
 import string
 import re
 import nltk
-
-REPO_DIR = "."
 nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
 STOPWORDS = nltk.corpus.stopwords.words('english')
-LEMMATIZER = nltk.stem.WordNetLemmatizer()
 
-def clean_text(x):    
+def clean_text(x, remove_stop_words=False):    
     # remove punctuation, lowercase, and remove tailing spaces
     x = re.sub('[{}]'.format(string.punctuation), '', x)
-    x = re.sub(r'[^a-zA-Z]', ' ', x.lower()).strip()
+    x = re.sub(r'[^a-zA-Z0-9]', ' ', x.lower()).strip()
+    words = x.split()
 
     # remove stopwords 
-    words = [word for word in x.split() if word not in set(STOPWORDS)]
-
-    # stemming (maybe omit and see if results change?)
-    words = [LEMMATIZER.lemmatize(word) for word in words]
-    
+    if (remove_stop_words):
+        words = [word for word in words if word not in set(STOPWORDS)]
+        
     # join back into string and return (sklearn vectorizer wants string as input)
     return ' '.join(words)
 
-def trim(df):
-    # Since some responses still contain the first part of the text that we asked in the prompt to not include, we have to trim them mannually
-    df["DescriptionClean"] = df["Description"]
-    df["DescriptionLLMClean"] = df["DescriptionLLM"]
+def add_trimmed(df):
     part_to_trim = df["DescriptionTrim"].strip()
-    description =  df["Description"].strip()
+    description = df["Description"].strip()
     description_llm = df["DescriptionLLM"].strip()
 
-    if (df["ID"]==76972):
-        description = description.replace('A bill entitled: ', "", 1)
-        part_to_trim = part_to_trim.replace('A bill entitled: ', "", 1)
+    part_to_trim = part_to_trim.replace("A bill entitled: ", "", 1)
+    description = description.replace("A bill entitled: ", "", 1)
+    description_llm = description_llm.replace("A bill entitled: ", "", 1)
 
-    if (description_llm.startswith(part_to_trim)):
-        description_llm = description_llm.replace(part_to_trim, "", 1)
+    if (not description_llm.startswith((part_to_trim, "The bill", "This bill", "A bill", "The "))):
+        # LLM model outputs sometimes include a leading space, and other times they don't, making it difficult to append to the bill summary consistently. To handle this, we strip any leading spaces and manually add a space if the true summary starts with one.
         description = description.replace(part_to_trim, "", 1)
+        if (description[0]==" "):
+            description_llm = " " + description_llm
         
-    elif description_llm.startswith(("The bill", "This bill", "A bill", "The ")):
-        print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently')
-        print(f'{df["ID"]},\n{part_to_trim}\n{description}\n{description_llm}\n\n')
+        description = part_to_trim + description
+        description_llm = part_to_trim + description_llm
+    # else:
+    #     print(df["ID"])
+    #     print(part_to_trim[:100])
+    #     print(description[:100])
+    #     print(description_llm[:100])
 
-    else:
-        # already trimmed, trim description only
-        description = description.replace(part_to_trim, "", 1)
-    
-    df["DescriptionClean"] = clean_text(description)
-    df["DescriptionLLMClean"] = clean_text(description_llm)
+    df["DescriptionTrim"] = part_to_trim
+    df["Description"] = description
+    df["DescriptionLLM"] = description_llm
 
     return(df)
 
@@ -167,11 +159,14 @@ def main():
     # merge prompts and bills metadata with llm responses
     bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
 
-    # Trim Description and DescriptionLLM if the begin the same
-    bills_llm_completion = bills_llm_completion.apply(lambda x: trim(x), axis=1)
-    condition = bills_llm_completion["DescriptionLLMClean"]==""
-    bills_llm_completion = bills_llm_completion[~condition]
-    print(f'Dropped {sum(condition)} observations with null completion response after cleaning')
+    # Add the DescriptionTrim to the beginning of DescriptionLLM if it doesn't start with it.
+     
+    # Add the provided beginning of bill summary to DescriptionLLM if not included
+    bills_llm_completion = bills_llm_completion.apply(lambda x: add_trimmed(x), axis=1)
+
+    # Remove non-alphanumeric characters, keeping stop-words
+    bills_llm_completion["DescriptionClean"] = bills_llm_completion["Description"].apply(lambda x: clean_text(x, remove_stop_words=False))
+    bills_llm_completion["DescriptionLLMClean"] = bills_llm_completion["DescriptionLLM"].apply(lambda x: clean_text(x, remove_stop_words=False))
 
     bills_llm_completion.set_index("ID", inplace=True, drop=True)
     bills_llm_completion.sort_index(inplace=True, ignore_index=True)
