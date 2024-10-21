@@ -36,22 +36,23 @@ def decode_responses_passage(responses):
 
 def decode_responses_completion(responses):
     responses_decoded = []
+    count = 0
     for _, response in responses.iterrows(): 
         finish_reason = response.response["body"]["choices"][0]["finish_reason"]
         response_text = response.response["body"]["choices"][0]["message"]["content"]
         
         if finish_reason!="stop":
             if (finish_reason=="length"):
+                count = count + 1
                 response_text = response_text +'"}'
                 print(f'ID={response["ID"]}, finish_reason={finish_reason}, kept')
             else:
                 print(f'ID={response["ID"]}, finish_reason={finish_reason}, dropped')
                 continue
         
-        if response["ID"]==7323:
+        if (response["ID"]==35875): 
             response_text = response_text +'"}'
-        
-        # print(response_text)
+
         response_json = json.loads(response_text)
         
         responses_decoded.append({
@@ -60,75 +61,64 @@ def decode_responses_completion(responses):
             "InputTokens": int(response.response["body"]["usage"]["prompt_tokens"]),
             "OutputTokens": int(response.response["body"]["usage"]["completion_tokens"])
         })
+    print(f'Number of responses exceeding max_token = {count}')
     return(pd.json_normalize(responses_decoded))
 
-# def count_words(description):
-#     words = description.split() # Split the description into words
-#     word_count = len(words) # Total number of words
-#     return word_count
 
 import string
 import re
 import nltk
-
-REPO_DIR = "."
 nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
 STOPWORDS = nltk.corpus.stopwords.words('english')
-LEMMATIZER = nltk.stem.WordNetLemmatizer()
 
-def clean_text(x):    
+def clean_text(x, remove_stop_words=False):    
     # remove punctuation, lowercase, and remove tailing spaces
     x = re.sub('[{}]'.format(string.punctuation), '', x)
-    x = re.sub(r'[^a-zA-Z]', ' ', x.lower()).strip()
+    x = re.sub(r'[^a-zA-Z0-9]', ' ', x.lower()).strip()
+    words = x.split()
 
     # remove stopwords 
-    words = [word for word in x.split() if word not in set(STOPWORDS)]
-
-    # stemming (maybe omit and see if results change?)
-    words = [LEMMATIZER.lemmatize(word) for word in words]
-    
+    if (remove_stop_words):
+        words = [word for word in words if word not in set(STOPWORDS)]
+        
     # join back into string and return (sklearn vectorizer wants string as input)
     return ' '.join(words)
 
-def trim(df):
-    # Since some responses still contain the first part of the text that we asked in the prompt to not include, we have to trim them mannually
-    df["DescriptionClean"] = df["Description"]
-    df["DescriptionLLMClean"] = df["DescriptionLLM"]
-    
-    temp = df["DescriptionLLMClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
-    if ((temp=="") | temp.startswith(("The bill", "This bill","A bill"))):
-        # if true do not do any changes for the Description nor DescriptionLLM
-        print(f'ID={df["ID"]}, did not trim Description nor DescriptionLLM because they start differently or result after trimming is null')
-        # ((df["ID"]==68259) | (df["ID"]==68260) | (df["ID"]==43356) | (df["ID"]==30460) | (df["ID"]==28956)| (df["ID"]==28955)):
-        # print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{temp}\n\n')
-    else:
-        df["DescriptionLLMClean"] = temp
-        if ((df["ID"]==74659)|(df["ID"]==74660)):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace(df["DescriptionTrim"].upper().strip(), "", 1)
+def add_trimmed(df):
+    part_to_trim = df["DescriptionTrim"].strip()
+    description = df["Description"].strip()
+    description_llm = df["DescriptionLLM"].strip()
 
-        if (df["ID"]==73092):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("Relating to criminal penalties for violations of the Co", "", 1)
+    part_to_trim = part_to_trim.replace("A bill entitled: ", "", 1)
+    description = description.replace("A bill entitled: ", "", 1)
+    description_llm = description_llm.replace("A bill entitled: ", "", 1)
 
-        if (df["ID"]==70428):
-            df["DescriptionLLMClean"]=df["DescriptionLLMClean"].replace("To improve Federal laws relating to the trans", "", 1)
+    if (not description_llm.startswith((part_to_trim, "The bill", "This bill", "A bill", "The "))):
+        # LLM model outputs sometimes include a leading space, and other times they don't, making it difficult to append to the bill summary consistently. To handle this, we strip any leading spaces and manually add a space if the true summary starts with one.
+        description = description.replace(part_to_trim, "", 1)
+        if (description[0]==" "):
+            description_llm = " " + description_llm
+        
+        description = part_to_trim + description
+        description_llm = part_to_trim + description_llm
+    # else:
+    #     print(df["ID"])
+    #     print(part_to_trim[:100])
+    #     print(description[:100])
+    #     print(description_llm[:100])
 
-        #   if ((df["DescriptionLLMClean"][0].isupper()) & (df["ID"]<28955)):
-        #       print(f'{df["ID"]},\n{df["DescriptionTrim"]}\n{df["DescriptionLLMClean"]}\n\n')
-
-        df["DescriptionClean"] = df["DescriptionClean"].strip().replace(df["DescriptionTrim"].strip(), "", 1)
-    
-    df["DescriptionClean"] = clean_text(df["DescriptionClean"])
-    df["DescriptionLLMClean"] = clean_text(df["DescriptionLLMClean"])
+    df["DescriptionTrim"] = part_to_trim
+    df["Description"] = description
+    df["DescriptionLLM"] = description_llm
 
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data/Prediction_run1")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction_run1")
+    data_dir = os.path.join(REPO_DIR, "Data/Prediction")
+    temp_dir = os.path.join(REPO_DIR, "Temp/Prediction")
     os.makedirs(temp_dir, exist_ok=True)
 
-    bills = pd.read_csv(os.path.join(data_dir, f"bills_run2.csv"))
+    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
     prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
@@ -169,8 +159,14 @@ def main():
     # merge prompts and bills metadata with llm responses
     bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
 
-    # Trim Description and DescriptionLLM if the begin the same
-    bills_llm_completion = bills_llm_completion.apply(lambda x: trim(x), axis=1)
+    # Add the DescriptionTrim to the beginning of DescriptionLLM if it doesn't start with it.
+     
+    # Add the provided beginning of bill summary to DescriptionLLM if not included
+    bills_llm_completion = bills_llm_completion.apply(lambda x: add_trimmed(x), axis=1)
+
+    # Remove non-alphanumeric characters, keeping stop-words
+    bills_llm_completion["DescriptionClean"] = bills_llm_completion["Description"].apply(lambda x: clean_text(x, remove_stop_words=False))
+    bills_llm_completion["DescriptionLLMClean"] = bills_llm_completion["DescriptionLLM"].apply(lambda x: clean_text(x, remove_stop_words=False))
 
     bills_llm_completion.set_index("ID", inplace=True, drop=True)
     bills_llm_completion.sort_index(inplace=True, ignore_index=True)

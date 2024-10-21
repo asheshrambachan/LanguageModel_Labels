@@ -1,0 +1,6 @@
+[
+    {
+        "role": "user",
+        "content": "Here is the summary for U.S. Congress bill {}:\n\"{}\"\n\nTo the best of your ability, please answer the following:\n1. Is it likely that this bill will pass the Senate?\n2. Is it likely that this bill will pass the House of Representatives?\n\nReturn the answers in the following JSON format:\n{{\n    \"PassSLLM\": 1 if the bill is likely to pass the Senate, otherwise 0,\n    \"PassHLLM\": 1 if the bill is likely to pass the House of Representatives, otherwise 0\n}}\n"
+    }
+]

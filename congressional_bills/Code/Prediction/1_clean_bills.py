@@ -140,6 +140,14 @@ def description_mismatch(d1, d2):
     condition = description_cap!=description_cbp
     return condition
 
+import string
+import re
+def clean_text(x):    
+    # remove punctuation, lowercase, and remove tailing spaces
+    x = re.sub('[{}]'.format(string.punctuation), '', x)
+    x = re.sub(r'[^a-zA-Z0-9]', ' ', x.lower()).strip()
+    return x
+
 def merge_cap_cbp(cap, cbp):
     # Merge CAP and CBP
     bills = cap.merge(cbp, on=['BillID', 'Major', 'Party', 'PassS', 'PassH', 'Chamber'], suffixes=('', '_CBP'))
@@ -152,8 +160,8 @@ def merge_cap_cbp(cap, cbp):
     bills = bills[bills['Major']!=99]
 
     # Remove duplicates based on Description (lower cased)
-    bills['Description_lower'] = bills['Description'].apply(lambda x: x.lower())
-    bills.drop_duplicates(subset='Description_lower', inplace=True)
+    bills['DescriptionClean'] = bills['Description'].apply(lambda x: clean_text(x))
+    bills.drop_duplicates(subset='DescriptionClean', inplace=True)
     
     # Map PAP/CAP major topic IDs to our IDs 
     major_PAP2Ours = {
@@ -209,49 +217,41 @@ def merge_cap_cbp(cap, cbp):
 
 def main():
     # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data')
-    temp_dir = os.path.join(REPO_DIR, 'Temp')
+    data_dir = os.path.join(REPO_DIR, 'Data/Prediction')
+    temp_dir = os.path.join(REPO_DIR, 'Temp/Prediction')
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(temp_dir, exist_ok=True)
 
-    # # CAP and CBP data paths
-    # # path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
-    # # path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
-    # # path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
+    # CAP and CBP data paths
+    path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
+    path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
+    path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
     # path_cap = os.path.join(temp_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
     # path_cbp_80_92 = os.path.join(temp_dir, 'bills80-92.txt')
     # path_cbp_93_114 = os.path.join(temp_dir, 'bills93-114.csv')
     
-    # # Load and clean CAP
-    # cap = get_cap(path_cap)
+    # Load and clean CAP
+    cap = get_cap(path_cap)
     # cap.to_csv(os.path.join(temp_dir, "cap.csv"), index=False)
     # print(f'Saved cap.csv, n = {len(cap)}, at {temp_dir}')
 
-    # # Load and clean CBP
-    # cbp = get_cbp(path_cbp_80_92, path_cbp_93_114)
+    # Load and clean CBP
+    cbp = get_cbp(path_cbp_80_92, path_cbp_93_114)
     # cbp.to_csv(os.path.join(temp_dir, "cbp.csv"), index=False)
     # print(f'Saved cbp.csv, n = {len(cbp)}, at {temp_dir}')
 
-    # # Merge CAP and CBP data
-    # bills = merge_cap_cbp(cap, cbp)
-    bills_228387_path = os.path.join(temp_dir, "bills_228387.csv")
-    # bills.to_csv(bills_228387_path, index=False)
-    # print(f'Saved {os.path.basename(bills_228387_path)}, n = {len(bills)}, at {os.path.dirname(bills_228387_path)}') # n = 228,387
+    # Merge CAP and CBP data
+    bills = merge_cap_cbp(cap, cbp)
 
-    bills = pd.read_csv(bills_228387_path, low_memory=False)
-    
-    # Remove bills used for prompt modification
-    bills_run1 = pd.read_csv(os.path.join(data_dir, "Prediction_run1/bills.csv"), low_memory=False)
-    bills_run2 = pd.read_csv(os.path.join(data_dir, "Prediction_run1/bills.csv"), low_memory=False)
-    bills["UsedForPromptEngineering"] = bills["BillID"].apply(lambda x: any((x==bills_run1["BillID"]) | (x==bills_run2["BillID"]) ))
-    bills = bills[bills["UsedForPromptEngineering"]==False]
-    bills.drop(columns=["UsedForPromptEngineering"], inplace=True)
+    bills_all_path = os.path.join(temp_dir, f"bills_{len(bills)}.csv")
+    bills.to_csv(bills_all_path, index=False)
+    print(f'Saved {os.path.basename(bills_all_path)}, n = {len(bills)}, at {os.path.dirname(bills_all_path)}')
 
     # Draw 10k bills 
-    bills = bills.sample(n=10_000, random_state=123)
+    bills = bills.sample(n=10_000, random_state=321)
 
     # Save 10K bills data
-    bills_path = os.path.join(data_dir, 'Prediction/bills.csv')
+    bills_path = os.path.join(data_dir, 'bills.csv')
     bills.to_csv(bills_path, index=False)
     print(f'Saved {os.path.basename(bills_path)}, n = {len(bills)}, at {os.path.dirname(bills_path)}')
 

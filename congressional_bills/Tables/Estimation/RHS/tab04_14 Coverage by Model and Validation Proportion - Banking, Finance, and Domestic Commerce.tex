@@ -1,0 +1,35 @@
+\begin{table}
+
+\caption{Coverage Summary Statistics of $\beta_{t}$, $t=$ Banking, Finance, and Domestic Commerce, by Model and Proportion of Validation Samples. Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{rrlrrrrr}
+\toprule
+Model & Validation Proportion & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & 5\% & LLM & 0.596 & 0.255 & 0.650 & 0.178 & 0.903\\
+GPT-3.5 & 5\% & Validation & 0.917 & 0.010 & 0.917 & 0.901 & 0.933\\
+GPT-3.5 & 5\% & Debiased & 0.944 & 0.006 & 0.944 & 0.936 & 0.956\\
+GPT-3.5 & 10\% & LLM & 0.599 & 0.255 & 0.667 & 0.200 & 0.913\\
+GPT-3.5 & 10\% & Validation & 0.932 & 0.008 & 0.932 & 0.916 & 0.944\\
+GPT-3.5 & 10\% & Debiased & 0.942 & 0.010 & 0.943 & 0.926 & 0.953\\
+GPT-3.5 & 25\% & LLM & 0.599 & 0.256 & 0.659 & 0.172 & 0.915\\
+GPT-3.5 & 25\% & Validation & 0.943 & 0.008 & 0.944 & 0.931 & 0.953\\
+GPT-3.5 & 25\% & Debiased & 0.946 & 0.009 & 0.947 & 0.933 & 0.959\\
+GPT-3.5 & 50\% & LLM & 0.602 & 0.255 & 0.649 & 0.184 & 0.921\\
+GPT-3.5 & 50\% & Validation & 0.947 & 0.007 & 0.948 & 0.937 & 0.959\\
+GPT-3.5 & 50\% & Debiased & 0.948 & 0.006 & 0.949 & 0.939 & 0.957\\
+GPT-4o & 5\% & LLM & 0.775 & 0.147 & 0.777 & 0.540 & 0.941\\
+GPT-4o & 5\% & Validation & 0.917 & 0.008 & 0.917 & 0.905 & 0.928\\
+GPT-4o & 5\% & Debiased & 0.933 & 0.010 & 0.935 & 0.920 & 0.946\\
+GPT-4o & 10\% & LLM & 0.779 & 0.150 & 0.792 & 0.524 & 0.950\\
+GPT-4o & 10\% & Validation & 0.934 & 0.008 & 0.935 & 0.919 & 0.945\\
+GPT-4o & 10\% & Debiased & 0.939 & 0.007 & 0.940 & 0.928 & 0.949\\
+GPT-4o & 25\% & LLM & 0.774 & 0.146 & 0.786 & 0.536 & 0.940\\
+GPT-4o & 25\% & Validation & 0.943 & 0.008 & 0.944 & 0.928 & 0.955\\
+GPT-4o & 25\% & Debiased & 0.946 & 0.006 & 0.944 & 0.938 & 0.957\\
+GPT-4o & 50\% & LLM & 0.777 & 0.148 & 0.793 & 0.537 & 0.939\\
+GPT-4o & 50\% & Validation & 0.947 & 0.008 & 0.948 & 0.934 & 0.958\\
+GPT-4o & 50\% & Debiased & 0.948 & 0.008 & 0.949 & 0.936 & 0.959\\
+\bottomrule
+\end{tabular}
+\end{table}

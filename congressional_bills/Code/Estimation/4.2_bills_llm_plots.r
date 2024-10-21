@@ -1,10 +1,12 @@
 # Results Bills and LLM
 # Sep 23, 2024
 
-repo_dir <- "."
+repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 data_dir <- file.path(repo_dir, "Data/Estimation") 
 fig_dir <- file.path(repo_dir, "Figures/Estimation")
+slides_fig_dir <- file.path(repo_dir, "Figures/Figures_For_Slides/CongressionalBills_Estimation")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+dir.create(slides_fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Load required packages quietly and custom functions
 suppressPackageStartupMessages({
@@ -42,15 +44,29 @@ bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
 
 accuracy <- bills_llm %>%
   ggplot(aes(x=as.factor(prompt), y=accuracy, fill=model)) +
-  geom_col(position=position_dodge()) +
+  geom_col(width=0.75, position=position_dodge()) +
   xlab("Prompt Index") +
   ylab("Accuracy") +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  scale_fill_manual(name="", values=my_colors) +
+  scale_fill_manual(name=NULL, values=my_colors) +
   theme.bar
 
-accuracy
-ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 3.5, width = 4)
+# save figure
+ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 4, width = 6)
+
+# Create frames for the slides from the figure above
+fig_color <- my_colors[as.character(sort(unique(bills_llm$model)))]
+
+accuracy_frame1 <- accuracy + 
+  scale_fill_manual(name=NULL, values=alpha(fig_color, 0)) +
+  guides(fill = guide_legend(override.aes = list(fill=fig_color)))
+
+accuracy_frame2 <- accuracy
+
+# save figure
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 1.jpeg"), plot = accuracy_frame1, height = 4, width = 6)
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 2.jpeg"), plot = accuracy_frame2, height = 4, width = 6)
+
 
 # Fig 3 & 4
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
@@ -76,7 +92,7 @@ unique_llm <- stat %>%
   geom_col(position=position_dodge()) +
   xlab("Number of unique LLM major topic labels") +
   ylab("Share of Bills") +
-  scale_fill_manual(name="", values=my_colors) +
+  scale_fill_manual(name=NULL, values=my_colors) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.04)) +
   theme.bar
 
@@ -98,7 +114,7 @@ unique_llm_fewshot <- stat %>%
   geom_col(position=position_dodge()) +
   xlab("Number of unique LLM major topic labels in fewshot prompts") +
   ylab("Share of Bills") +
-  scale_fill_manual(name="", values=my_colors) +
+  scale_fill_manual(name=NULL, values=my_colors) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.04)) +
   theme.bar
 

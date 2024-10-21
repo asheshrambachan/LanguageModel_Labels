@@ -1,0 +1,35 @@
+\begin{table}
+
+\caption{MSE Summary Statistics by Model and Proportion of Validation Samples, Pooled Across All $\beta_{t}$ Coefficients. Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{rrlrrrrr}
+\toprule
+Model & Validation Proportion & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & 5\% & LLM & 0.001 & 0.001 & 0.001 & 0.000 & 0.003\\
+GPT-3.5 & 5\% & Validation & 0.009 & 0.004 & 0.009 & 0.004 & 0.016\\
+GPT-3.5 & 5\% & Debiased & 1.395 & 15.009 & 0.019 & 0.007 & 0.264\\
+GPT-3.5 & 10\% & LLM & 0.001 & 0.001 & 0.001 & 0.000 & 0.003\\
+GPT-3.5 & 10\% & Validation & 0.005 & 0.002 & 0.004 & 0.002 & 0.008\\
+GPT-3.5 & 10\% & Debiased & 0.016 & 0.016 & 0.009 & 0.003 & 0.055\\
+GPT-3.5 & 25\% & LLM & 0.001 & 0.001 & 0.001 & 0.000 & 0.003\\
+GPT-3.5 & 25\% & Validation & 0.002 & 0.001 & 0.002 & 0.001 & 0.003\\
+GPT-3.5 & 25\% & Debiased & 0.007 & 0.007 & 0.004 & 0.002 & 0.025\\
+GPT-3.5 & 50\% & LLM & 0.001 & 0.001 & 0.001 & 0.000 & 0.003\\
+GPT-3.5 & 50\% & Validation & 0.001 & 0.000 & 0.001 & 0.000 & 0.002\\
+GPT-3.5 & 50\% & Debiased & 0.006 & 0.005 & 0.004 & 0.002 & 0.017\\
+GPT-4o & 5\% & LLM & 0.001 & 0.000 & 0.001 & 0.000 & 0.001\\
+GPT-4o & 5\% & Validation & 0.009 & 0.004 & 0.009 & 0.004 & 0.016\\
+GPT-4o & 5\% & Debiased & 0.064 & 0.371 & 0.011 & 0.005 & 0.095\\
+GPT-4o & 10\% & LLM & 0.001 & 0.000 & 0.001 & 0.000 & 0.001\\
+GPT-4o & 10\% & Validation & 0.005 & 0.002 & 0.004 & 0.002 & 0.008\\
+GPT-4o & 10\% & Debiased & 0.010 & 0.010 & 0.005 & 0.003 & 0.035\\
+GPT-4o & 25\% & LLM & 0.001 & 0.000 & 0.001 & 0.000 & 0.001\\
+GPT-4o & 25\% & Validation & 0.002 & 0.001 & 0.002 & 0.001 & 0.003\\
+GPT-4o & 25\% & Debiased & 0.005 & 0.004 & 0.003 & 0.001 & 0.015\\
+GPT-4o & 50\% & LLM & 0.001 & 0.000 & 0.001 & 0.000 & 0.001\\
+GPT-4o & 50\% & Validation & 0.001 & 0.000 & 0.001 & 0.000 & 0.002\\
+GPT-4o & 50\% & Debiased & 0.004 & 0.003 & 0.003 & 0.001 & 0.012\\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,5 +1,5 @@
 
-font_family <- "Helvetica"
+# font_family <- "Helvetica"
 # if ("extrafont" %in% rownames(installed.packages())){
 #   # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
 #   # 2. install ttf files via GUI on mac
@@ -8,6 +8,7 @@ font_family <- "Helvetica"
 #   if ("CMU Sans Serif" %in% names(pdfFonts()))
 #     font_family <- "CMU Sans Serif"
 # }
+font_family <- "CMU Sans Serif"
 
 my_palette <- c(
   "red"="#F85427", 
@@ -22,10 +23,8 @@ my_palette <- c(
 my_colors <- c(
   "GPT-3.5" =  my_palette[["green"]],
   "GPT-4o" = my_palette[["blue"]],
-  "Human" = my_palette[["red"]], 
-  
   "LLM" = my_palette[["green"]], 
-  "Human Validation" = my_palette[["red"]],
+  "Validation" = my_palette[["red"]],
   "Debiased" = my_palette[["gray"]]
 )
 

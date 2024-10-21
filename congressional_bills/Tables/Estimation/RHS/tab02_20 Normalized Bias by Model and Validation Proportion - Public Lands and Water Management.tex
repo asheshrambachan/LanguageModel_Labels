@@ -1,0 +1,35 @@
+\begin{table}
+
+\caption{Normalized Bias Summary Statistics of $\beta_{t}$, $t=$ Public Lands and Water Management, by Model and Proportion of Validation Samples. Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{rrlrrrrr}
+\toprule
+Model & Validation Proportion & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & 5\% & LLM & 0.068 & 0.557 & 0.023 & -0.676 & 0.977\\
+GPT-3.5 & 5\% & Validation & 0.001 & 0.038 & 0.003 & -0.070 & 0.052\\
+GPT-3.5 & 5\% & Debiased & 0.009 & 0.030 & 0.012 & -0.040 & 0.053\\
+GPT-3.5 & 10\% & LLM & 0.072 & 0.558 & 0.040 & -0.657 & 0.938\\
+GPT-3.5 & 10\% & Validation & 0.005 & 0.032 & 0.001 & -0.038 & 0.055\\
+GPT-3.5 & 10\% & Debiased & 0.000 & 0.036 & 0.001 & -0.053 & 0.059\\
+GPT-3.5 & 25\% & LLM & 0.070 & 0.561 & 0.012 & -0.680 & 0.950\\
+GPT-3.5 & 25\% & Validation & 0.012 & 0.028 & 0.011 & -0.031 & 0.057\\
+GPT-3.5 & 25\% & Debiased & 0.002 & 0.032 & -0.008 & -0.037 & 0.066\\
+GPT-3.5 & 50\% & LLM & 0.076 & 0.554 & 0.052 & -0.673 & 0.943\\
+GPT-3.5 & 50\% & Validation & 0.004 & 0.029 & -0.002 & -0.037 & 0.053\\
+GPT-3.5 & 50\% & Debiased & -0.001 & 0.038 & 0.003 & -0.059 & 0.059\\
+GPT-4o & 5\% & LLM & -0.085 & 0.697 & 0.038 & -1.051 & 0.757\\
+GPT-4o & 5\% & Validation & -0.003 & 0.031 & 0.001 & -0.050 & 0.042\\
+GPT-4o & 5\% & Debiased & -0.006 & 0.028 & -0.010 & -0.039 & 0.041\\
+GPT-4o & 10\% & LLM & -0.076 & 0.695 & 0.041 & -1.062 & 0.803\\
+GPT-4o & 10\% & Validation & -0.003 & 0.028 & 0.002 & -0.052 & 0.032\\
+GPT-4o & 10\% & Debiased & 0.008 & 0.029 & 0.010 & -0.041 & 0.050\\
+GPT-4o & 25\% & LLM & -0.087 & 0.677 & 0.042 & -1.030 & 0.752\\
+GPT-4o & 25\% & Validation & -0.005 & 0.031 & 0.001 & -0.057 & 0.044\\
+GPT-4o & 25\% & Debiased & -0.003 & 0.029 & -0.007 & -0.044 & 0.041\\
+GPT-4o & 50\% & LLM & -0.083 & 0.677 & 0.047 & -1.015 & 0.699\\
+GPT-4o & 50\% & Validation & -0.001 & 0.038 & 0.003 & -0.068 & 0.053\\
+GPT-4o & 50\% & Debiased & 0.001 & 0.033 & 0.001 & -0.045 & 0.059\\
+\bottomrule
+\end{tabular}
+\end{table}
