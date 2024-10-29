@@ -28,5 +28,6 @@ dependencies:
   - r-latex2exp
   - r-lemon
   - r-kableExtra
+  - r-viridis
   # - r-extrafont
 

@@ -151,18 +151,18 @@ Each model is paired with **12** prompt modifications, resulting in **24 prompts
 
 | #	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
-1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/01.json](./Data/prompt_templates/01.json) | 
-2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/02.json](./Data/prompt_templates/02.json) | 
-3	 | Persona | ❌ | ❌ | JSON	|	[./Data/prompt_templates/03.json](./Data/prompt_templates/03.json) |
-4	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/04.json](./Data/prompt_templates/04.json) |
-5	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/05.json](./Data/prompt_templates/05.json) |
-6	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/06.json](./Data/prompt_templates/06.json) |
-7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/prompt_templates/07.json](./Data/prompt_templates/07.json) |
-8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/08.json](./Data/prompt_templates/08.json) |
-9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/09.json](./Data/prompt_templates/09.json) |
-10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/prompt_templates/10.json](./Data/prompt_templates/10.json) |
-11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/prompt_templates/11.json](./Data/prompt_templates/11.json) |
-12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](./Data/prompt_templates/12.json) |
+1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/Estimation/prompt_templates/01.json](./Data/Estimation/prompt_templates/01.json) | 
+2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/Estimation/prompt_templates/02.json](./Data/Estimation/prompt_templates/02.json) | 
+3	 | Persona | ❌ | ❌ | JSON	|	[./Data/Estimation/prompt_templates/03.json](./Data/Estimation/prompt_templates/03.json) |
+4	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/04.json](./Data/Estimation/prompt_templates/04.json) |
+5	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/05.json](./Data/Estimation/prompt_templates/05.json) |
+6	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/06.json](./Data/Estimation/prompt_templates/06.json) |
+7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/Estimation/prompt_templates/07.json](./Data/Estimation/prompt_templates/07.json) |
+8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/Estimation/prompt_templates/08.json](./Data/Estimation/prompt_templates/08.json) |
+9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/Estimation/prompt_templates/09.json](./Data/Estimation/prompt_templates/09.json) |
+10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/Estimation/prompt_templates/10.json](./Data/Estimation/prompt_templates/10.json) |
+11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/Estimation/prompt_templates/11.json](./Data/Estimation/prompt_templates/11.json) |
+12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/Estimation/prompt_templates/12.json](./Data/Estimation/prompt_templates/12.json) |
 
 
 ### Data Cleaning Remarks
