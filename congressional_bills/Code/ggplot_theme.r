@@ -69,4 +69,18 @@ theme.mse <- theme_bw() +
     plot.subtitle=element_text(size=12, family=font_family)
   )
 
-
+theme.heatmap <- theme_bw() + 
+  theme(
+    panel.grid.major.x=element_blank(), 
+    panel.grid.minor.x=element_blank(), 
+    panel.grid.major.y=element_blank(),
+    panel.grid.minor.y=element_blank(),
+    legend.position="top", 
+    axis.text=element_text(size=7),
+    axis.ticks=element_line(linewidth=0.3),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    text=element_text(size=12, family=font_family),
+    legend.text=element_text(size=7, family=font_family),
+    legend.key.width = unit(0.5,"cm"),
+    legend.key.spacing = unit(0.1,"cm")
+  )
