@@ -411,7 +411,28 @@ sample_successful %>%
   kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
   row_spec(1:9, hline_after = TRUE, extra_latex_after = "%") %>%
   column_spec(1:3, width = "1.4cm") %>%
-  column_spec(4:6, width = "3.2cm") # 
+  column_spec(4:6, width = "3.2cm")
+
+tab03 <- sample_successful %>%
+  rename(
+    "ID"=BillID,
+    "Provided Text"=DescriptionTrim,
+    "True Summary (Cleaned)"=DescriptionClean,
+    "LLM-Completed Summary (Cleaned)"=DescriptionLLMClean
+  ) %>%
+  kable(
+    caption="Examples of Successful Completion of Bill Summaries (Non-Embedded)",
+    digits=3, linesep = "", escape=F, booktabs=T, format = "latex", row.names = FALSE
+  ) %>% 
+  kable_styling(latex_options = c("hold_position")) %>%
+  row_spec(1:9, hline_after = TRUE, extra_latex_after = "%") %>%
+  column_spec(1:3, width = "1.4cm") %>%
+  column_spec(4:6, width = "3.2cm") 
+
+# save
+tab_path <- file.path(tables_dir, "Examples of Successful Completion of Bill Summaries.tex")
+save_kable(tab03, file = tab_path)
+# cat(sprintf("Saved %s\n", tab_path))
 ```
 
 \clearpage
