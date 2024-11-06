@@ -1,7 +1,7 @@
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
 data_dir <- file.path(repo_dir, "Data/Estimation/RHS")
-fig_dir <- file.path(repo_dir, "Figures/Estimation/RHS/Validation_Prop_10")
+fig_dir <- file.path(repo_dir, "Figures/Estimation/RHS")
 slides_fig_dir <- file.path(repo_dir, "Figures/Figures_For_Slides/CongressionalBills_Estimation/LLM_On_RHS")
 
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
@@ -59,10 +59,7 @@ data_5k <- read.csv(path_data_5k) %>%
     regression = factor(regression, levels=regression_levels, labels=regression_labels)
   ) %>%
   rename(proportion=train_proportion) %>%
-  filter(
-    coef_name!="Other",
-    proportion==0.1
-    )
+  filter(coef_name!="Other")
 
 # Figure 1:
 # sort prompts by coef estimate
@@ -130,6 +127,7 @@ n_bins <- 64
 
 fig03 <- data_5k %>%
   filter(
+    proportion==0.10, 
     regression=="LLM"
   ) %>%
   ggplot(aes(
@@ -137,7 +135,7 @@ fig03 <- data_5k %>%
     y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
     fill=regression,
     color=regression
-    )) +
+  )) +
   geom_vline(xintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
   geom_histogram(bins=n_bins, position="identity", alpha=0.3) +  
   
@@ -153,7 +151,7 @@ fig03 <- data_5k %>%
   guides(fill="none", color="none")
 
 # save figure
-fig_path = file.path(fig_dir, "Bias Density by Model, Val Prop 10, LLM Only.jpeg")
+fig_path = file.path(fig_dir, "fig03 Bias Density by Model, Val Prop 10, LLM Only.jpeg")
 ggsave(fig_path, plot = fig03, height = 3.75, width = 8)
 cat(sprintf("Saved %s\n", fig_path))
 
@@ -161,6 +159,7 @@ cat(sprintf("Saved %s\n", fig_path))
 # Figure 4: Normalized Bias Density by Model, Val Prop 10, LLM Only
 fig04 <- data_5k %>%
   filter(
+    proportion==0.10,
     regression=="LLM"
   ) %>%
   ggplot(aes(
@@ -168,7 +167,7 @@ fig04 <- data_5k %>%
     y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]), 
     fill=regression,
     color=regression
-    )) +
+  )) +
   geom_vline(xintercept=0, color=my_palette[["lightgray"]], linewidth=0.3) +
   geom_histogram(bins=n_bins, position="identity") +  
   
@@ -184,7 +183,7 @@ fig04 <- data_5k %>%
   guides(fill="none", color="none")
 
 # save figure
-fig_path = file.path(fig_dir, "Normalized Bias Density by Model, Val Prop 10, LLM Only.jpeg")
+fig_path = file.path(fig_dir, "fig04 Normalized Bias Density by Model, Val Prop 10, LLM Only.jpeg")
 ggsave(fig_path, plot = fig04, height = 3.75, width = 8)
 cat(sprintf("Saved %s\n", fig_path))
 
@@ -199,7 +198,7 @@ ggsave(file.path(slides_fig_dir, "Normalized Bias Density by Model, Val Prop 10,
 ggsave(file.path(slides_fig_dir, "Normalized Bias Density by Model, Val Prop 10, LLM Only, Frame 2.jpeg"), plot = fig04_frame2, height = 3.75, width = 8)
 
 
-# Figure 5: Bias Density by Model, Val Prop 10
+# Figure 5: Bias Density by Model and Validation Proportion
 fig05 <- data_5k %>%
   filter(regression != "Validation") %>%
   ggplot(aes(
@@ -213,7 +212,7 @@ fig05 <- data_5k %>%
   # theme and aesthetics
   xlab("Bias") +
   ylab("Probability Densities") +
-  facet_grid(. ~ model, labeller=proportion_labeller, scales = "free_x") +
+  facet_grid(model ~ proportion, labeller=proportion_labeller, scales = "free_x") +
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
@@ -221,12 +220,12 @@ fig05 <- data_5k %>%
   theme.bar
 
 # save figure
-fig_path = file.path(fig_dir, "Bias Density by Model, Val Prop 10, LLM and Debiased, Pooled.jpeg")
-ggsave(fig_path, plot = fig05, height = 4, width = 8)
+fig_path = file.path(fig_dir, "fig05 Bias Density by Model and Validation Proportion, Pooled.jpeg")
+ggsave(fig_path, plot = fig05, height = 4, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 
-# Figure 6: Normalized Bias Density by Model, Val Prop 10
+# Figure 6: Normalized Bias Density by Model and Validation Proportion
 fig06 <- data_5k %>%
   filter(regression != "Validation") %>%
   ggplot(aes(
@@ -234,13 +233,13 @@ fig06 <- data_5k %>%
     y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
     color=regression, 
     fill=regression
-    )) +
+  )) +
   geom_histogram(bins=n_bins, position="identity", alpha=0.3) +
   
   # theme and aesthetics
   xlab("Normalized Bias") +
   ylab("Probability Densities") +
-  facet_grid(~ model, labeller=proportion_labeller) +
+  facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_fill_manual(name=NULL, values=my_colors) +
   scale_color_manual(name=NULL, values=my_colors) +
   scale_x_symmetric(mid=0) +
@@ -248,8 +247,8 @@ fig06 <- data_5k %>%
   theme.bar
 
 # save figure
-fig_path = file.path(fig_dir, "Normalized Bias Density by Model, Val Prop 10, LLM and Debiased, Pooled.jpeg")
-ggsave(fig_path, plot = fig06, height = 4, width = 8)
+fig_path = file.path(fig_dir, "fig06 Normalized Bias Density by Model and Validation Proportion, Pooled.jpeg")
+ggsave(fig_path, plot = fig06, height = 4, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 # Create frames for the slides: Normalized Bias Density by Model, Val Prop 10%
@@ -287,7 +286,7 @@ ggsave(file.path(slides_fig_dir, "Normalized Bias Density by Model, Val Prop 10,
 ggsave(file.path(slides_fig_dir, "Normalized Bias Density by Model, Val Prop 10, LLM and Debiased, Pooled, Frame 2.jpeg"), plot = fig06_prop10_frame2, height = 4, width = 8)
 
 
-# Figure 7: MSE CDF, Val Prop 10
+# Figure 7: MSE CDF by Validation Proportion
 fig07 <- data_5k %>%
   filter(regression != "LLM") %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
@@ -296,15 +295,16 @@ fig07 <- data_5k %>%
   # theme and aesthetics
   xlab("MSE") +
   ylab("Empirical CDF") +
+  facet_grid(~ proportion, labeller=proportion_labeller) +
   scale_x_continuous(minor_breaks = seq(0,1,0.002)) +
   coord_cartesian(xlim=c(0,0.04)) +
   scale_color_manual(name=NULL, values=my_colors) +
   scale_linetype_manual(name=NULL, values=c("dashed", "solid")) +
   theme.mse
-  
+
 # save figure
-fig_path = file.path(fig_dir, "MSE CDF, Val Prop 10, Pooled.jpeg")
-ggsave(fig_path, plot = fig07, height = 4, width = 5)
+fig_path = file.path(fig_dir, "fig07 MSE CDF by Validation Proportion, Pooled.jpeg")
+ggsave(fig_path, plot = fig07, height = 3, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 # Create frames for the slides: MSE CDF, Validation 10%
@@ -335,7 +335,7 @@ ggsave(file.path(slides_fig_dir, "MSE CDF, Val Prop 10, Frame 2.jpeg"), plot = f
 
 
 
-# Figure 8: MSE CDF by Model, Val Prop 10
+# Figure 8: MSE CDF by Model and Validation Proportion
 fig08 <- data_5k %>%
   filter(regression != "LLM") %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
@@ -344,7 +344,7 @@ fig08 <- data_5k %>%
   # theme and aesthetics
   xlab("MSE") +
   ylab("Empirical CDF") +
-  facet_grid(~ model, labeller=proportion_labeller) +
+  facet_grid(model ~ proportion, labeller=proportion_labeller) +
   scale_x_continuous(minor_breaks = seq(0,1,0.002)) +
   coord_cartesian(xlim=c(0,0.04)) +
   scale_color_manual(name=NULL, values=my_colors) +
@@ -352,8 +352,8 @@ fig08 <- data_5k %>%
   theme.mse
 
 # save figure
-fig_path = file.path(fig_dir, "MSE CDF by Model, Val Prop 10, Pooled.jpeg")
-ggsave(fig_path, plot = fig08, height = 4, width = 8)
+fig_path = file.path(fig_dir, "fig08 MSE CDF by Model and Validation Proportion, Pooled.jpeg")
+ggsave(fig_path, plot = fig08, height = 4.5, width = 9)
 cat(sprintf("Saved %s\n", fig_path))
 
 

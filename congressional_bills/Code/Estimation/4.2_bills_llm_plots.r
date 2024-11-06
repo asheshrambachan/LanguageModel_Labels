@@ -32,44 +32,6 @@ bills_over_years
 ggsave(file.path(fig_dir, "A histogram of the frequency of the 10K bills over years.jpeg"), height = 2.5, width = 4)
 
 # Fig 2
-bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
-  rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
-  select(c(prompt, model, Yhuman, Yllm)) %>%
-  mutate(model = factor(
-    model, 
-    levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
-    labels=c("GPT-3.5", "GPT-4o")
-  )) %>%
-  group_by(model, prompt) %>%
-  summarise(accuracy = mean(Yhuman==Yllm), .groups="drop")
-
-accuracy <- bills_llm %>%
-  ggplot(aes(x=as.factor(prompt), y=accuracy, fill=model)) +
-  geom_col(width=0.75, position=position_dodge()) +
-  xlab("Prompt Index") +
-  ylab("Accuracy") +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  scale_fill_manual(name=NULL, values=my_colors) +
-  theme.bar
-
-# save figure
-ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 4, width = 6)
-
-# Create frames for the slides from the figure above
-fig_color <- my_colors[as.character(sort(unique(bills_llm$model)))]
-
-accuracy_frame1 <- accuracy + 
-  scale_fill_manual(name=NULL, values=alpha(fig_color, 0)) +
-  guides(fill = guide_legend(override.aes = list(fill=fig_color)))
-
-accuracy_frame2 <- accuracy
-
-# save figure
-ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 1.jpeg"), plot = accuracy_frame1, height = 4, width = 6)
-ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 2.jpeg"), plot = accuracy_frame2, height = 4, width = 6)
-
-
-# Heat maps, code based on headlines/code/produce_figures/heatmaps.R
 model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
 model_labels <- c("GPT-3.5", "GPT-4o")
 prompt_labels_values <- c(
@@ -82,10 +44,51 @@ prompt_labels_values <- c(
   `4`="Persona: Political Scientist",
   `5`="Persona: US Politics Expert",
   `6`="Persona: Research Assistant",
-  `10`="Few-Shot: Example Set 1",
-  `11`="Few-Shot: Example Set 2",
-  `12`="Few-Shot: Example Set 3"
+  `10`="Few-Shot: Set 1",
+  `11`="Few-Shot: Set 2",
+  `12`="Few-Shot: Set 3"
 )
+
+
+bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
+  rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
+  select(c(prompt, model, Yhuman, Yllm)) %>%
+  mutate(
+    model = factor(model, levels=model_levels, labels=model_labels),
+    prompt = factor(prompt, levels=names(prompt_labels_values), labels=prompt_labels_values)
+  ) %>%
+  group_by(model, prompt) %>%
+  summarise(accuracy = mean(Yhuman==Yllm), .groups="drop")
+
+accuracy <- bills_llm %>%
+  ggplot(aes(x=prompt, y=accuracy, fill=model)) +
+  geom_col(width=0.5, position=position_dodge()) +
+  # facet_grid(. ~ model ) +
+  xlab("Prompt Index") +
+  ylab("Accuracy") +
+  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
+  scale_fill_manual(name=NULL, values=my_colors) +
+  theme.bar + 
+  scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 11))
+
+# save figure
+ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 4, width = 8)
+
+# Create frames for the slides from the figure above
+fig_color <- my_colors[as.character(sort(unique(bills_llm$model)))]
+
+accuracy_frame1 <- accuracy + 
+  scale_fill_manual(name=NULL, values=alpha(fig_color, 0)) +
+  guides(fill = guide_legend(override.aes = list(fill=fig_color)))
+
+accuracy_frame2 <- accuracy
+
+# save figure
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 1.jpeg"), plot = accuracy_frame1, height = 4, width = 8)
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 2.jpeg"), plot = accuracy_frame2, height = 4, width = 8)
+
+
+# Heat maps, code based on headlines/code/produce_figures/heatmaps.R
 
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
   rename(c(bill_id=BillID, prompt=PromptingStrategyID, model=Model, Yllm=MajorLLM)) %>%

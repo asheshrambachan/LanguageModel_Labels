@@ -1,0 +1,17 @@
+\begin{table}
+
+\caption{Bias Summary Statistics by Model, Pooled Across All $\beta_{t}$ Coefficients. Proxy on the RHS: $V = Y^\top \beta = \sum_{t} Y_t \beta_t$.}
+\centering
+\begin{tabular}[t]{llrrrrr}
+\toprule
+Model & Proxy & Mean & SD & Median & 5\% & 95\%\\
+\midrule
+GPT-3.5 & LLM & 0.002 & 0.023 & 0.003 & -0.039 & 0.039\\
+GPT-3.5 & Validation & 0.000 & 0.002 & 0.000 & -0.004 & 0.003\\
+GPT-3.5 & Debiased & 0.000 & 0.005 & 0.000 & -0.007 & 0.009\\
+GPT-4o & LLM & 0.001 & 0.015 & 0.001 & -0.028 & 0.030\\
+GPT-4o & Validation & 0.000 & 0.002 & 0.000 & -0.003 & 0.003\\
+GPT-4o & Debiased & 0.000 & 0.003 & 0.000 & -0.005 & 0.005\\
+\bottomrule
+\end{tabular}
+\end{table}
