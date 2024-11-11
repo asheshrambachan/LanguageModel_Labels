@@ -32,8 +32,11 @@ mutate_data <- function(df, question) {
 # Function to run regressions and add results to list
 run_regression <- function(df, outcome_var, variables) {
   formula <- as.formula(paste(outcome_var, "~", paste(variables, collapse = " + "), "- 1"))
-  feols(formula, cluster = ~company_name + date, data = df)
+  reg <- feols(formula, cluster = ~company_name + date, data = df)
+  outcome_val <- mean(df[[outcome_var]], na.rm = TRUE)  # Calculating the mean as an example
+  list(reg = reg, outcome_val = outcome_val)
 }
+
 
 # Main processing loop
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", "persona1", "persona2", "persona3", "persona4")
@@ -65,6 +68,11 @@ for (return_type in return_types) {
           c("positive", "negative", "neutral", "positive_confidence", "negative_confidence", "neutral_confidence")
         } else {
           c("increase", "decrease", "uncertain", "increase_confidence", "decrease_confidence", "uncertain_confidence")
+        },
+        no_interaction = if (q == "q1") {
+          c("positive", "negative", "neutral")
+        } else {
+          c("increase", "decrease", "uncertain")
         }
       )
       
@@ -77,7 +85,10 @@ for (return_type in return_types) {
           # Loop over the datasets (different prompt strategies)
           for (i in seq_along(data_list)) {
             variables <- c(predictor_types[[pred_type]])
-            reg <- run_regression(data_list[[i]], outcome_var, variables)
+            regression_results <- run_regression(data_list[[i]], outcome_var, variables)
+            reg <- regression_results$reg
+            outcome_val <- regression_results$outcome_val
+            
             temp_reg_list <- c(temp_reg_list, list(reg))
             
             # Collect metadata
@@ -88,6 +99,7 @@ for (return_type in return_types) {
                 model = m, 
                 prompt = file_names[i], 
                 mag_v_conf = pred_type, 
+                outcome_val = outcome_val,
                 ret = sub("sum_exret_", "", outcome_var)
               )
             )
@@ -100,14 +112,18 @@ for (return_type in return_types) {
           coef_labels <- if (q == "q1") {
             if (pred_type == "magnitude") {
               c("Positive", "Negative", "Neutral", "Positive Magnitude", "Negative Magnitude", "Neutral Magnitude")
-            } else {
+            } else if (pred_type == "confidence") {
               c("Positive", "Negative", "Neutral", "Positive Confidence", "Negative Confidence", "Neutral Confidence")
+            } else {
+              c("Positive", "Negative", "Neutral")
             }
           } else {
             if (pred_type == "magnitude") {
               c("Increase", "Decrease", "Uncertain", "Increase Magnitude", "Decrease Magnitude", "Uncertain Magnitude")
-            } else {
+            } else if (pred_type == "confidence") {
               c("Increase", "Decrease", "Uncertain", "Increase Confidence", "Decrease Confidence", "Uncertain Confidence")
+            } else {
+              c("Increase", "Decrease", "Uncertain")
             }
           }
           
@@ -130,6 +146,7 @@ for (return_type in return_types) {
     
     data.frame(
       question = meta_data$question[i],
+      return = meta_data$outcome_val[i],
       model = meta_data$model[i],
       prompt = meta_data$prompt[i],
       mag_v_conf = meta_data$mag_v_conf[i],

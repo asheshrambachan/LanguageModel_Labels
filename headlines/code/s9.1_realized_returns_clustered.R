@@ -3,6 +3,7 @@ library(ggplot2)
 library(stargazer)
 library(fixest)
 library(modelsummary)
+library(glue)
 
 # Reset environment 
 rm(list = ls())
@@ -32,8 +33,11 @@ mutate_data <- function(df, question) {
 # Function to run regressions and add results to list
 run_regression <- function(df, outcome_var, variables) {
   formula <- as.formula(paste(outcome_var, "~", paste(variables, collapse = " + "), "- 1"))
-  feols(formula, cluster = ~company_name + date, data = df)
+  reg <- feols(formula, cluster = ~company_name + date, data = df)
+  outcome_val <- mean(df[[outcome_var]], na.rm = TRUE)  # Calculating the mean as an example
+  list(reg = reg, outcome_val = outcome_val)
 }
+
 
 # Main processing loop
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", "persona1", "persona2", "persona3", "persona4")
@@ -55,14 +59,19 @@ for (q in questions) {
     outcome_vars <- c("ret_fd1", "ret_fd5", "ret_fd10")
     predictor_types <- list(
       magnitude = if (q == "q1") {
-        c("positive", "negative", "neutral", "positive_magnitude", "negative_magnitude", "neutral_magnitude")
+        c("positive", "negative", "neutral", "positive_magnitude", "negative_magnitude", "neutral_magnitude", "ret_ld1", "ret_ld2", "ret_ld3")
       } else {
-        c("increase", "decrease", "uncertain", "increase_magnitude", "decrease_magnitude", "uncertain_magnitude")
+        c("increase", "decrease", "uncertain", "increase_magnitude", "decrease_magnitude", "uncertain_magnitude", "ret_ld1", "ret_ld2", "ret_ld3")
       },
       confidence = if (q == "q1") {
-        c("positive", "negative", "neutral", "positive_confidence", "negative_confidence", "neutral_confidence")
+        c("positive", "negative", "neutral", "positive_confidence", "negative_confidence", "neutral_confidence", "ret_ld1", "ret_ld2", "ret_ld3")
       } else {
-        c("increase", "decrease", "uncertain", "increase_confidence", "decrease_confidence", "uncertain_confidence")
+        c("increase", "decrease", "uncertain", "increase_confidence", "decrease_confidence", "uncertain_confidence", "ret_ld1", "ret_ld2", "ret_ld3")
+      },
+      no_interaction = if (q == "q1") {
+        c("positive", "negative", "neutral", "ret_ld1", "ret_ld2", "ret_ld3")
+      } else {
+        c("increase", "decrease", "uncertain", "ret_ld1", "ret_ld2", "ret_ld3")
       }
     )
     
@@ -75,7 +84,10 @@ for (q in questions) {
         # Loop over the datasets (different prompt strategies)
         for (i in seq_along(data_list)) {
           variables <- c(predictor_types[[pred_type]])
-          reg <- run_regression(data_list[[i]], outcome_var, variables)
+          regression_results <- run_regression(data_list[[i]], outcome_var, variables)
+          reg <- regression_results$reg
+          outcome_val <- regression_results$outcome_val
+          
           temp_reg_list <- c(temp_reg_list, list(reg))
           
           # Collect metadata
@@ -86,6 +98,7 @@ for (q in questions) {
               model = m, 
               prompt = file_names[i], 
               mag_v_conf = pred_type, 
+              outcome_val = outcome_val, 
               ret = sub("ret_fd", "", outcome_var)
             )
           )
@@ -98,22 +111,26 @@ for (q in questions) {
         coef_labels <- if (q == "q1") {
           if (pred_type == "magnitude") {
             c("Positive", "Negative", "Neutral", "Positive Magnitude", "Negative Magnitude", "Neutral Magnitude", "Ret LD1", "Ret LD2", "Ret LD3")
-          } else {
+          } else if (pred_type == "confidence") {
             c("Positive", "Negative", "Neutral", "Positive Confidence", "Negative Confidence", "Neutral Confidence", "Ret LD1", "Ret LD2", "Ret LD3")
+          } else {
+            c("Positive", "Negative", "Neutral", "Ret LD1", "Ret LD2", "Ret LD3")
           }
         } else {
           if (pred_type == "magnitude") {
             c("Increase", "Decrease", "Uncertain", "Increase Magnitude", "Decrease Magnitude", "Uncertain Magnitude", "Ret LD1", "Ret LD2", "Ret LD3")
-          } else {
+          } else if (pred_type == "confidence") {
             c("Increase", "Decrease", "Uncertain", "Increase Confidence", "Decrease Confidence", "Uncertain Confidence", "Ret LD1", "Ret LD2", "Ret LD3")
+          } else {
+            c("Increase", "Decrease", "Uncertain", "Ret LD1", "Ret LD2", "Ret LD3")
           }
         }
         
-        print(modelsummary(
+        table_output <- as.character(modelsummary(
           temp_reg_list,
           coef_rename = coef_labels,
+          stars = c('*' = 0.05, '**' = 0.01, '***' = 0.001),
           gof_omit = "AIC|BIC|Std.Errors|R2 Adj.|RMSE",
-          stars = TRUE,
           output = "markdown"
         ))
       }
@@ -129,6 +146,7 @@ plot_results <- map_dfr(seq_along(all_reg_list), function(i) {
   
   data.frame(
     question = meta_data$question[i],
+    return = meta_data$outcome_val[i],
     model = meta_data$model[i],
     prompt = meta_data$prompt[i],
     mag_v_conf = meta_data$mag_v_conf[i],

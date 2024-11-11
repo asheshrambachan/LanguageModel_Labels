@@ -55,8 +55,6 @@ plot_agreement_matrix <- function(agreement_df, question, model, return_type, gl
     scale_fill_viridis_c(option = "plasma", direction = -1, limits = c(global_min, global_max)) +
     scale_color_identity() +
     labs(
-      title = glue("Pairwise Agreement by Prompting Strategy\n"),
-      subtitle = glue("Question: {question_label_map[question]}\nModel: {model_label_map[model]}\nReturn Type: {return_label_map[return_type]}"),
       x = "Prompting Strategy", y = "Prompting Strategy", fill = "Pairwise Agreement Percent"
     ) +
     theme.heatmap
@@ -71,8 +69,6 @@ plot_agreement_matrix_all_returns <- function(facet_data, model, question, globa
     scale_fill_viridis_c(option = "plasma", direction = -1, limits = c(global_min, global_max)) +
     scale_color_identity() +
     labs(
-      title = glue("Pairwise Agreement by Prompting Strategy"),
-      subtitle = glue("Model: {model_label_map[model]} | Question: {question_label_map[question]}"),
       x = "Prompting Strategy", y = "Prompting Strategy", fill = "Pairwise Agreement Percent"
     ) +
     theme.heatmap +
