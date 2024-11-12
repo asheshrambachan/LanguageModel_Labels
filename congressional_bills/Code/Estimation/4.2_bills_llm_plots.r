@@ -13,6 +13,7 @@ suppressPackageStartupMessages({
   require(dplyr)
   require(ggplot2)
   require(lemon)
+  require(viridis)
 })
 source(file.path(repo_dir, "Code/ggplot_theme.r"))
 
@@ -31,28 +32,47 @@ bills_over_years
 ggsave(file.path(fig_dir, "A histogram of the frequency of the 10K bills over years.jpeg"), height = 2.5, width = 4)
 
 # Fig 2
+model_levels <- c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13")
+model_labels <- c("GPT-3.5", "GPT-4o")
+prompt_labels_values <- c(
+  `1`="Base: Fill in Blank", 
+  `2`="Base: JSON",
+  `7`="COT: Careful", 
+  `8`="COT: Step-by-step", 
+  `9`="COT: Explanation",
+  `3`="Persona: Political Analyst", 
+  `4`="Persona: Political Scientist",
+  `5`="Persona: US Politics Expert",
+  `6`="Persona: Research Assistant",
+  `10`="Few-Shot: Set 1",
+  `11`="Few-Shot: Set 2",
+  `12`="Few-Shot: Set 3"
+)
+
+
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
   rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
   select(c(prompt, model, Yhuman, Yllm)) %>%
-  mutate(model = factor(
-    model, 
-    levels=c("gpt-3.5-turbo-0125", "gpt-4o-2024-05-13"), 
-    labels=c("GPT-3.5", "GPT-4o")
-  )) %>%
+  mutate(
+    model = factor(model, levels=model_levels, labels=model_labels),
+    prompt = factor(prompt, levels=names(prompt_labels_values), labels=prompt_labels_values)
+  ) %>%
   group_by(model, prompt) %>%
   summarise(accuracy = mean(Yhuman==Yllm), .groups="drop")
 
 accuracy <- bills_llm %>%
-  ggplot(aes(x=as.factor(prompt), y=accuracy, fill=model)) +
-  geom_col(width=0.75, position=position_dodge()) +
+  ggplot(aes(x=prompt, y=accuracy, fill=model)) +
+  geom_col(width=0.5, position=position_dodge()) +
+  # facet_grid(. ~ model ) +
   xlab("Prompt Index") +
   ylab("Accuracy") +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
   scale_fill_manual(name=NULL, values=my_colors) +
-  theme.bar
+  theme.bar + 
+  scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 11))
 
 # save figure
-ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 4, width = 6)
+ggsave(file.path(fig_dir, "Accuracy of Topic Predictions vs. Prompt.jpeg"), height = 4, width = 8)
 
 # Create frames for the slides from the figure above
 fig_color <- my_colors[as.character(sort(unique(bills_llm$model)))]
@@ -64,11 +84,115 @@ accuracy_frame1 <- accuracy +
 accuracy_frame2 <- accuracy
 
 # save figure
-ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 1.jpeg"), plot = accuracy_frame1, height = 4, width = 6)
-ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 2.jpeg"), plot = accuracy_frame2, height = 4, width = 6)
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 1.jpeg"), plot = accuracy_frame1, height = 4, width = 8)
+ggsave(file.path(slides_fig_dir, "Accuracy of Topic Predictions vs. Prompt, Frame 2.jpeg"), plot = accuracy_frame2, height = 4, width = 8)
 
 
-# Fig 3 & 4
+# Heat maps, code based on headlines/code/produce_figures/heatmaps.R
+
+bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
+  rename(c(bill_id=BillID, prompt=PromptingStrategyID, model=Model, Yllm=MajorLLM)) %>%
+  select(c(bill_id, prompt, model, Yllm)) %>%
+  mutate(
+    model = factor(model, levels=model_levels, labels=model_labels),
+    prompt = factor(prompt, levels=names(prompt_labels_values), labels=prompt_labels_values),
+  ) %>%
+  tidyr::pivot_wider(id_cols=c(bill_id, model), names_from=prompt, values_from=Yllm)
+
+# Function to calculate agreement matrix
+create_agreement_matrix <- function(datasets) {
+  agreement_matrix <- expand.grid(
+    prompt_x = prompt_labels_values, 
+    prompt_y = prompt_labels_values
+    ) %>%
+    mutate(agreement = mapply(
+      function(x, y) mean(x == y, na.rm = TRUE) * 100, 
+      datasets[prompt_x], 
+      datasets[prompt_y]
+      ))
+}
+
+# Iterate over models and compute the agreement_matrix
+agreement_matrices <- list()
+for (curr_model in unique(bills_llm$model)) {
+  datasets <- bills_llm %>% 
+    filter(model==curr_model)
+  
+  # Calculate and store agreement matrix
+  agreement_df <- create_agreement_matrix(datasets)
+  agreement_df$model <- curr_model
+  agreement_matrices[[curr_model]] <- agreement_df
+}
+agreement_matrices <- bind_rows(agreement_matrices)
+
+# Store global min and max
+global_min <- min(agreement_matrices$agreement, na.rm = TRUE)
+global_max <- max(agreement_matrices$agreement, na.rm = TRUE)
+
+# Plot agreement matrix
+agreement_fig <- agreement_matrices %>%
+  # filter(model=="GPT-4o") %>%
+  ggplot(aes(x=prompt_x, y=prompt_y, fill=agreement)) +
+  geom_tile() +
+  facet_grid(~ model) +
+  labs(
+    x = "Prompting Strategy", 
+    y = "Prompting Strategy", 
+    fill = "Pairwise Agreement Percent"
+  ) + 
+  scale_fill_viridis_c(
+    option = "plasma", 
+    direction = -1, 
+    limits = c(global_min, global_max)
+  ) +
+  # Add agreement percentage with appropriate font color for clarity.
+  geom_text(aes(
+    label = sprintf("%.1f", agreement), 
+    color = ifelse(agreement > 0.7*global_min+0.3*global_max, "white", "black")
+    ), size = 2.5, show.legend = FALSE) + 
+  scale_color_identity() +
+  theme.heatmap +
+  guides(fill = guide_colourbar(title.vjust = .8))
+
+agreement_fig
+# save figure
+fig_path = file.path(fig_dir, "Pairwise Agreement by Model.jpeg")
+ggsave(fig_path, plot = agreement_fig, height = 5, width = 8)
+cat(sprintf("Saved %s\n", fig_path))
+
+# Plot agreement matrix for GPT-4o only
+agreement_fig_gpt4o <- agreement_matrices %>%
+  filter(model=="GPT-4o") %>%
+  ggplot(aes(x=prompt_x, y=prompt_y, fill=agreement)) +
+  geom_tile() +
+  labs(
+    x = "Prompting Strategy", 
+    y = "Prompting Strategy", 
+    fill = "Pairwise Agreement Percent"
+  ) + 
+  scale_fill_viridis_c(
+    option = "plasma", 
+    direction = -1, 
+    limits = c(global_min, global_max)
+  ) +
+  # Add agreement percentage with appropriate font color for clarity.
+  geom_text(aes(
+    label = sprintf("%.1f", agreement), 
+    color = ifelse(agreement > 0.7*global_min+0.3*global_max, "white", "black")
+  ), size = 2.5, show.legend = FALSE) + 
+  scale_color_identity() +
+  theme.heatmap +
+  guides(fill = guide_colourbar(title.vjust = .8))
+
+agreement_fig_gpt4o
+
+# save figure
+fig_path = file.path(fig_dir, "Pairwise Agreement, GPT-4o.jpeg")
+ggsave(fig_path, plot = agreement_fig_gpt4o, height = 5.2, width = 5.2)
+cat(sprintf("Saved %s\n", fig_path))
+
+
+ # Fig 3 & 4
 bills_llm <- read.csv(file.path(data_dir, "bills_llm.csv")) %>%
   rename(c(prompt=PromptingStrategyID, model=Model, Yhuman=Major, Yllm=MajorLLM)) %>%
   mutate(model = factor(

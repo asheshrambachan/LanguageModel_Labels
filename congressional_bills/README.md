@@ -20,8 +20,12 @@ This repository contains the replication files for the congressional bills exper
         - **4.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
         - **4.3** Generate figures and tables for regressions with proxy on the LHS and the RHS.
 - **Prediction:**
-    1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills with no missing introduction date.
+    1. **Data Cleaning:** Downloads and cleans the congressional bills data, creating a sample of 10,000 bills with unique description and no missing introduction date.
     2. **Prompt Creation, LLM Querying, and Response Decoding**
+        - **2.1** Generates 8 prompts per bill using 4 prompt templates and 2 models.
+        - **2.2** Queries LLM models.
+        - **2.3** Downloads LLM responses.
+        - **2.4** Decodes LLM responses and merge with metadata.
     3. **Encode completion responses and compute similarity scores**
     4. **Figure and Table Generation**
 
@@ -131,7 +135,7 @@ Tables > CongressionalBills_Estimation > RHS
 - [ ] complete all codebooks at `./Data/Codebooks/` <!-- Variable codes in CBP follows the coding scheme of ICPSR. The original link (http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=3371&ds=2&file_id=965434&path=ICPSR) doesn't work. Maybe they mean (https://www.icpsr.umich.edu/web/ICPSR/studies/3371)? TODO: correct this -->
 - [ ] remove `lhs_results.rmd` and `rhs_results.rmd` and their pdf files
 - [ ] remove [Additional Notes and Remarks](https://github.com/asheshrambachan/LanguageModel_Labels/tree/main/congressional_bills#additional-notes-and-remarks)
-- [ ] remove `3.3.5_lhs_fig02`
+- [ ] update prediction readme file
 
 # Additional Notes and Remarks
 
@@ -147,18 +151,18 @@ Each model is paired with **12** prompt modifications, resulting in **24 prompts
 
 | #	| Name	| Examples	| Explanation	| Response Format	| Template | 
 | -------- | -------- | ------- | -------- | ------- | -------- | 
-1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/prompt_templates/01.json](./Data/prompt_templates/01.json) | 
-2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/prompt_templates/02.json](./Data/prompt_templates/02.json) | 
-3	 | Persona | ❌ | ❌ | JSON	|	[./Data/prompt_templates/03.json](./Data/prompt_templates/03.json) |
-4	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/04.json](./Data/prompt_templates/04.json) |
-5	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/05.json](./Data/prompt_templates/05.json) |
-6	 | Persona | ❌ | ❌ | JSON	| [./Data/prompt_templates/06.json](./Data/prompt_templates/06.json) |
-7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/prompt_templates/07.json](./Data/prompt_templates/07.json) |
-8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/08.json](./Data/prompt_templates/08.json) |
-9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/prompt_templates/09.json](./Data/prompt_templates/09.json) |
-10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/prompt_templates/10.json](./Data/prompt_templates/10.json) |
-11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/prompt_templates/11.json](./Data/prompt_templates/11.json) |
-12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/prompt_templates/12.json](./Data/prompt_templates/12.json) |
+1	 | Base Prompt	| ❌	| ❌ |	Fill-in-the-Blanks | [./Data/Estimation/prompt_templates/01.json](./Data/Estimation/prompt_templates/01.json) | 
+2	 | Base Prompt	| ❌	| ❌ |	JSON  | [./Data/Estimation/prompt_templates/02.json](./Data/Estimation/prompt_templates/02.json) | 
+3	 | Persona | ❌ | ❌ | JSON	|	[./Data/Estimation/prompt_templates/03.json](./Data/Estimation/prompt_templates/03.json) |
+4	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/04.json](./Data/Estimation/prompt_templates/04.json) |
+5	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/05.json](./Data/Estimation/prompt_templates/05.json) |
+6	 | Persona | ❌ | ❌ | JSON	| [./Data/Estimation/prompt_templates/06.json](./Data/Estimation/prompt_templates/06.json) |
+7	 | Chain-of-Thoughts | ❌ | ✅	|	JSON | [./Data/Estimation/prompt_templates/07.json](./Data/Estimation/prompt_templates/07.json) |
+8	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/Estimation/prompt_templates/08.json](./Data/Estimation/prompt_templates/08.json) |
+9	 | Chain-of-Thoughts | ❌ |	✅	| JSON | [./Data/Estimation/prompt_templates/09.json](./Data/Estimation/prompt_templates/09.json) |
+10 | Few-Shot | ✅ (Set 1) | ❌ | JSON | [./Data/Estimation/prompt_templates/10.json](./Data/Estimation/prompt_templates/10.json) |
+11 | Few-Shot | ✅ (Set 2) | ❌	| JSON | [./Data/Estimation/prompt_templates/11.json](./Data/Estimation/prompt_templates/11.json) |
+12 | Few-Shot | ✅ (Set 3) | ❌	| JSON | [./Data/Estimation/prompt_templates/12.json](./Data/Estimation/prompt_templates/12.json) |
 
 
 ### Data Cleaning Remarks

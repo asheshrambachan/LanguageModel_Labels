@@ -28,3 +28,10 @@ zeims_et_al_clean/.DS_Store
 congressional_bills/Code/Prediction/clean.log
 congressional_bills/Code/Prediction/results.log
 congressional_bills/Code/Prediction/results.tex
+
+headlines/code/.DS_Store
+headlines/data/step1_batch_prompts/.DS_Store
+
+
+headlines_completion/Temp
+headlines_completion/Data/returns_data_realized
