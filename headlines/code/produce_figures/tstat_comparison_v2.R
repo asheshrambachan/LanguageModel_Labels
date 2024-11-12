@@ -10,15 +10,16 @@ source(file.path("./code/produce_figures/ggplot_theme.r"))
 # Read in data and combine
 abnormal_CAPM <- read.csv("./data/step9_reg_results/abnormal_CAPM_returns_clustered.csv")
 realized <- read.csv("./data/step9_reg_results/realized_returns_clustered.csv")
+realized_fe <- read.csv("./data/step9_reg_results/realized_returns_fe.csv")
 
-ret_all <- rbind(abnormal_CAPM, realized) %>%
+ret_all <- rbind(abnormal_CAPM, realized, realized_fe) %>%
   rename(return_horizon = ret)
 
 # Define factor levels and labels
 model_levels <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
 model_labels <- c("GPT-3.5", "GPT-4o-mini", "GPT-4o")
-return_type_levels <- c("realized", "abnormal_CAPM")
-return_type_labels <- c("Realized Returns", "Abnormal Returns (CAPM)")
+return_type_levels <- c("realized", "abnormal_CAPM", "realized_fe")
+return_type_labels <- c("Realized Returns", "Abnormal Returns (CAPM)", "Realized Returns (Company and Date Fixed Effects)")
 
 # Helper function to filter data by return horizon
 filter_data_by_horizon <- function(plot_data, return_horizon_levels) {
@@ -165,7 +166,7 @@ question_names <- c("Positive, Negative, or Neutral?",
 
 
 for (ret_type in return_type_levels) {
-  
+  cat("processing return type: ", ret_type)
   for (comb in return_horizon_combinations) {
     return_horizon_levels <- comb$levels
     return_horizon_labels <- comb$labels
@@ -173,8 +174,11 @@ for (ret_type in return_type_levels) {
     fig_suffix <- comb$suffix
     
     for (i in seq_along(questions)) {
+      
+      cat("processing question: ", questions[i])
       current_question <- questions[i]
       x_axis_label <- paste("Question:", question_names[i])
+  
       
       # Generate combined data using prompt_index
       combined_data <- bind_rows(
@@ -182,10 +186,10 @@ for (ret_type in return_type_levels) {
           mutate(up_down = "up"),
         prompt_index(ret_all, "gpt-4o", "down.coef", "down.se", return_horizon_levels, return_horizon_labels) %>%
           mutate(up_down = "down")
-      ) %>%
-        filter(return_type == ret_type) %>%
-        mutate(up_down = factor(up_down, levels = c("up", "down")))
-      
+        )  %>%
+         filter(return_type == ret_type) %>%
+         mutate(up_down = factor(up_down, levels = c("up", "down")))
+
       # Generate combined data using prompt_model_index
       combined_data_model <- bind_rows(
         prompt_model_index(ret_all, "up.coef", "up.se", return_horizon_levels, return_horizon_labels) %>%
@@ -195,44 +199,44 @@ for (ret_type in return_type_levels) {
       ) %>%
         filter(return_type == ret_type) %>%
         mutate(up_down = factor(up_down, levels = c("up", "down")))
-      
+
       # Apply conditional labels based on the question type
       label_up <- if (current_question == "q1") "Positive" else "Increase"
       label_down <- if (current_question == "q1") "Negative" else "Decrease"
-      
+
       # Apply labels after all transformations, filtering, and calculations
       combined_data <- combined_data %>%
         mutate(up_down = fct_recode(up_down, !!label_up := "up", !!label_down := "down"))
-      
+
       combined_data_model <- combined_data_model %>%
         mutate(up_down = fct_recode(up_down, !!label_up := "up", !!label_down := "down"))
-      
+
       # Compute global y-axis limits for the current subset
       ylim_ranges <- get_global_ylim_for_plots(
         combined_data %>% filter(up_down == label_up),
         combined_data %>% filter(up_down == label_down),
         "up.coef", "up.se", "down.coef", "down.se", padding = 0.5
       )
-      
+
       # Define plot parameters for magnitude and confidence
       plot_params <- list(
         list(data = combined_data, metric_label = "magnitude", x_axis_label = glue("Prompt Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_magnitude),
         list(data = combined_data, metric_label = "confidence", x_axis_label = glue("Prompt Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_confidence),
         list(data = combined_data, metric_label = "no_interaction", x_axis_label = glue("Prompt Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_no_interaction)
       )
-      
+
       plot_params_model <- list(
         list(data = combined_data_model, metric_label = "magnitude", x_axis_label = glue("Prompt-Model Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_magnitude),
         list(data = combined_data_model, metric_label = "confidence", x_axis_label = glue("Prompt-Model Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_confidence),
         list(data = combined_data_model, metric_label = "no_interaction", x_axis_label = glue("Prompt-Model Index (Sorted)"), alpha = 0.7, ylim = ylim_ranges$ylim_no_interaction)
       )
-      
+
       # Generate and save plots for each metric using prompt_index
       prompt_index_plots <- lapply(plot_params, function(params) {
         plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha, params$ylim)
         ggsave(filename = glue("./figures/t_stats/{questions[i]}_{ret_type}_{params$metric_label}_{fig_suffix}.png"), plot = plot, width = 11, height = fig_width)
       })
-      
+
       # Generate and save plots for each metric using prompt_model_index
       prompt_model_index_plots <- lapply(plot_params_model, function(params) {
         plot <- create_comparison_plot(params$data, params$metric_label, params$x_axis_label, params$alpha, params$ylim)
