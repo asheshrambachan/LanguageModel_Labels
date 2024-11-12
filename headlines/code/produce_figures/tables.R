@@ -24,6 +24,7 @@ load_and_preprocess <- function(filepath) {
 
 abnormal_CAPM <- load_and_preprocess("./data/step9_reg_results/abnormal_CAPM_returns_clustered.csv")
 realized <- load_and_preprocess("./data/step9_reg_results/realized_returns_clustered.csv")
+realized_fe <- load_and_preprocess("./data/step9_reg_results/realized_returns_fe.csv")
 
 # Define a function to calculate summary statistics by group with renaming
 calculate_summary <- function(data, coef_column) {
@@ -54,6 +55,11 @@ realized_summary <- list(
   down = calculate_summary(realized, down.coef)
 )
 
+realized_fe_summary <- list(
+  up = calculate_summary(realized_fe, up.coef),
+  down = calculate_summary(realized_fe, down.coef)
+)
+
 # Filter data for specific return values
 filter_return <- function(summary_data, ret_values) {
   summary_data %>% filter(`Return Horizon` %in% ret_values)
@@ -79,6 +85,7 @@ for (name in names(abnormal_CAPM_summary)) {
   for (label in names(ret_values)) {
     save_tables(abnormal_CAPM_summary[[name]], paste0("abnormal_CAPM_", name), ret_values[[label]], label)
     save_tables(realized_summary[[name]], paste0("realized_", name), ret_values[[label]], label)
+    save_tables(realized_fe_summary[[name]], paste0("realized_fe_", name), ret_values[[label]], label)
   }
 }
 
@@ -98,6 +105,8 @@ for (question_number in unique(abnormal_CAPM$question)) {
       filter_and_save(abnormal_CAPM_summary$down, ret_values[[label]], "abnormal_CAPM_down")
       filter_and_save(realized_summary$up, ret_values[[label]], "realized_up")
       filter_and_save(realized_summary$down, ret_values[[label]], "realized_down")
+      filter_and_save(realized_fe_summary$up, ret_values[[label]], "realized_fe_up")
+      filter_and_save(realized_fe_summary$down, ret_values[[label]], "realized_fe_down")
     }
   }
 }

@@ -34,6 +34,9 @@ mutate_data <- function(df, question) {
 run_regression <- function(df, outcome_var, variables) {
   formula <- as.formula(paste(outcome_var, "~", paste(variables, collapse = " + "), "| company_name + date"))
   reg <- feols(formula, data = df)
+  if (!is.null(reg$collin.var)) {
+    print(formula)
+  }
   outcome_val <- mean(df[[outcome_var]], na.rm = TRUE)  # Calculating the mean as an example
   list(reg = reg, outcome_val = outcome_val)
 }
@@ -59,33 +62,34 @@ for (q in questions) {
     outcome_vars <- c("ret_fd1", "ret_fd5", "ret_fd10")
     predictor_types <- list(
       magnitude = if (q == "q1") {
-        c("positive", "negative", "neutral", "positive_magnitude", "negative_magnitude", "neutral_magnitude")
+        c("positive", "negative", "magnitude", "positive_magnitude", "negative_magnitude")
       } else {
-        c("increase", "decrease", "uncertain", "increase_magnitude", "decrease_magnitude", "uncertain_magnitude")
+        c("increase", "decrease", "magnitude", "increase_magnitude", "decrease_magnitude")
       },
       confidence = if (q == "q1") {
-        c("positive", "negative", "neutral", "positive_confidence", "negative_confidence", "neutral_confidence")
+        c("positive", "negative", "confidence", "positive_confidence", "negative_confidence")
       } else {
-        c("increase", "decrease", "uncertain", "increase_confidence", "decrease_confidence", "uncertain_confidence")
+        c("increase", "decrease", "confidence", "increase_confidence", "decrease_confidence")
       },
       no_interaction = if (q == "q1") {
-        c("positive", "negative", "neutral")
+        c("positive", "negative")
       } else {
-        c("increase", "decrease", "uncertain")
+        c("increase", "decrease")
       }
     )
     
     # Loop over outcome variables (1-day, 5-day, 10-day)
     for (outcome_var in outcome_vars) {
       # Loop over predictor types ('magnitude' and 'confidence')
+      
       for (pred_type in names(predictor_types)) {
         temp_reg_list <- list()  # Temporary list for the current predictor type
         
         # Loop over the datasets (different prompt strategies)
         for (i in seq_along(data_list)) {
+          
           variables <- c(predictor_types[[pred_type]])
           regression_results <- run_regression(data_list[[i]], outcome_var, variables)
-          print(regression_results)
           reg <- regression_results$reg
           outcome_val <- regression_results$outcome_val
           

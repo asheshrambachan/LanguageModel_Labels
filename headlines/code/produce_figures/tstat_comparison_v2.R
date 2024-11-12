@@ -166,7 +166,7 @@ question_names <- c("Positive, Negative, or Neutral?",
 
 
 for (ret_type in return_type_levels) {
-  cat("processing return type: ", ret_type)
+  cat("processing return type: ", ret_type, "\n")
   for (comb in return_horizon_combinations) {
     return_horizon_levels <- comb$levels
     return_horizon_labels <- comb$labels
@@ -175,7 +175,7 @@ for (ret_type in return_type_levels) {
     
     for (i in seq_along(questions)) {
       
-      cat("processing question: ", questions[i])
+      cat("processing question: ", questions[i], "\n")
       current_question <- questions[i]
       x_axis_label <- paste("Question:", question_names[i])
   
