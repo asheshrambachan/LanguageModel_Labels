@@ -34,7 +34,7 @@ mutate_data <- function(df, question) {
 run_regression <- function(df, outcome_var, variables) {
   formula <- as.formula(paste(outcome_var, "~", paste(variables, collapse = " + "), "- 1"))
   reg <- feols(formula, cluster = ~company_name + date, data = df)
-  outcome_val <- mean(df[[outcome_var]], na.rm = TRUE)  # Calculating the mean as an example
+  outcome_val <- mean(df[[outcome_var]], na.rm = TRUE) 
   list(reg = reg, outcome_val = outcome_val)
 }
 

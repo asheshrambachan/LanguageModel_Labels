@@ -152,8 +152,9 @@ create_comparison_plot <- function(data, metric_label, x_axis_label, alpha, ylim
 
 # Define a list of return horizon combinations
 return_horizon_combinations <- list(
-  list(levels = c(5, 10), labels = c("5-day", "10-day"), width = 8, suffix = "5_10_day"),
-  list(levels = c(1), labels = c("1-day"), width = 4, suffix = "1_day")
+  # list(levels = c(5, 10), labels = c("5-day", "10-day"), width = 8, suffix = "5_10_day"),
+  # list(levels = c(1), labels = c("1-day"), width = 4, suffix = "1_day")
+  list(levels = c(1, 5, 10), labels = c("1-day", "5-day", "10-day"), width = 8, suffix = "all")
 )
 
 # Iterate over return horizon combinations and questions to create plots
