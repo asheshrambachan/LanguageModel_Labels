@@ -33,8 +33,8 @@ calculate_summary <- function(data, coef_column) {
     summarize(
       Mean = mean({{ coef_column }}, na.rm = TRUE),
       Median = median({{ coef_column }}, na.rm = TRUE),
-      `25th Percentile` = quantile({{ coef_column }}, 0.25, na.rm = TRUE),
-      `75th Percentile` = quantile({{ coef_column }}, 0.75, na.rm = TRUE),
+      `5th Percentile` = quantile({{ coef_column }}, 0.05, na.rm = TRUE),
+      `95th Percentile` = quantile({{ coef_column }}, 0.95, na.rm = TRUE),
       `Average Return` = mean(return, na.rm = TRUE)
     ) %>%
     ungroup() %>%
