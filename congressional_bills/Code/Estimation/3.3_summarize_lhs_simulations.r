@@ -10,7 +10,7 @@ suppressPackageStartupMessages({
 # Define and set the working directory
 setwd("~/Documents/LanguageModel_Labels/congressional_bills/")
 repo_dir <- "."
-data_dir <- file.path(repo_dir, "Data/Estimation/LHS")
+data_dir <- file.path(repo_dir, "Data/Estimation")
 temp_dir <- file.path(repo_dir, "Temp/Estimation/LHS")
 lhs_dir <- file.path(temp_dir, "rds")
 dir.create(data_dir, showWarnings=FALSE, recursive = TRUE)
@@ -37,11 +37,11 @@ log_info("Saved lhs_other.csv at {temp_dir}")
 data <- data %>% filter(regression %in% regressions_of_intreset)
 
 # Save the 10k_Yllm_V results in a separate file. 
-data %>% 
+data_llm <- data %>% 
   filter(regression=="10k_Yllm_V") %>%
   select(c("prompt", "model", "V", "Y", "regression", "coef_name", "coef", "se", "t", "lci", "uci")) %>%
-  distinct() %>%
-  write.csv(file.path(data_dir, "lhs_10k_llm.csv"), row.names=FALSE)
+  distinct()
+write.csv(data_llm, file.path(data_dir, "lhs_10k_llm.csv"), row.names=FALSE)
 log_info("Saved lhs_10k_llm.csv at {data_dir}")
 
 # Extract reference regression results (10k_Yhuman_V). 

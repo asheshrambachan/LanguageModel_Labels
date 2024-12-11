@@ -99,5 +99,5 @@ theme.heatmap <- theme_bw() +
     legend.key.spacing = unit(0.1,"cm")
   )
 
-global_min <- 0.65
-global_max <- 1.00
+heatmap_global_min <- 0.65
+heatmap_global_max <- 1.00

@@ -1,4 +1,4 @@
-# Aug 12, 2024
+# Dec 5, 2024
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -25,10 +25,10 @@ coverage = function(coef.ref, lci, uci) return(as.integer((lci <= coef.ref) & (c
 rds_paths <- list.files(rhs_dir, pattern="*.rds", full.names=TRUE)
 
 data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
-  rename(c(V=variable))
+  rename(c(V=variable)) 
 log_info("Loaded *.rds files at {rhs_dir}")
 
-regressions_of_intreset <- c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "Vtilde_Ytilde")
+regressions_of_intreset <- c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "alpha_star")
 data %>% 
   filter(!(regression %in% regressions_of_intreset)) %>%
   write.csv(file.path(temp_dir, "rhs_other.csv"), row.names=FALSE)
@@ -54,7 +54,7 @@ log_info("Saved rhs_10k_human.csv at {data_dir}")
 
 # Filter out the remaining regressions of interest. Compute the bias/mse/coverage relative to the reference regression
 regressions <- data %>% 
-  filter(regression %in% c("5k_V_Yllm", "train_V_Yhuman", "Vtilde_Ytilde")) %>%
+  filter(regression %in% c("5k_V_Yllm", "train_V_Yhuman", "alpha_star")) %>%
   merge(x=., y=regression.ref, by=c("V", "coef_name"), suffixes=c("",".ref")) %>%
   mutate(
     bias = bias(coef, coef.ref), # Calculate bias

@@ -22,6 +22,9 @@ congressional_bills/Data/US-*.csv
 congressional_bills/Data/bills80*.txt
 congressional_bills/Data/bills93*.csv
 congressional_bills/Rplots.pdf
+congressional_bills/Figures_v1/*
+congressional_bills/Tables_v1/*
+
 
 congressional_bills_v1
 zeims_et_al_clean/.DS_Store

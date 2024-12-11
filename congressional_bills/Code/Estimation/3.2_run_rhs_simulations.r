@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------
 
 # --- User Configurable Parameters ----------------------------------
-n_cores <- 50
+n_cores <- 8
 N <- 1000 # Number of simulations per a single combination
 B <- 1000 # Number of bootstrap samples
 n_samples <- 5000 # Number of samples drawn from 10K bill in each of the N simulations
@@ -35,7 +35,7 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(furrr)
   library(logger)
-    library(simUtils)
+  library(simUtils)
 })
 
 # --- Functions ------------------------------------------------------
@@ -46,58 +46,60 @@ suppressPackageStartupMessages({
 #'
 #' @param train A data frame representing the training set, with columns V, Yhuman, Yllm, and possibly weights.
 #' @param test A data frame representing the test set, with columns V, Yhuman, Yllm, and possibly weights.
-#' @param suppressWarnings Logical. If TRUE, suppresses warnings during model fitting.
 #' @return A list containing:
-#'   \item{coef_nu_Yllm}{Coefficients from the regression of nu on Yllm.}
-#'   \item{coef_Vtilde_Ytilde}{Debiased coefficients from the regression of Vtilde on Ytilde.}
-#'   \item{other}{A list of intermediate regressions, including V ~ Yhuman, V ~ Yllm, and Yhuman ~ Yllm.}
+#'   \item{coef_alpha_star}{Debiased coefficients.}
 rhs_debias <- function(train, test, suppressWarnings=FALSE) {
-  
-  # (i) Train data
-  # beta
   # if no Bayesian bootstrap weights are provided, don't perform weighted LS by keeping w=NULL
   if (is.null(train$w) | is.null(test$w)){
-    train$w = 1
-    test$w = 1
+    train$w = 1/nrow(train)
+    test$w = 1/nrow(test)
   }
-  V_Yhuman <- robust(lm(V ~ Yhuman + 0, weights=w, train), "train_V_Yhuman", suppressWarnings=suppressWarnings)
-  coef_V_Yhuman <- coef(V_Yhuman)
   
-  # delta_{V, \hat{Y}}
-  V_Yllm <- robust(lm(V ~ Yllm + 0, weights=w, train), "train_V_Yllm", suppressWarnings=suppressWarnings) 
-  coef_V_Yllm <- coef(V_Yllm)
+  omega <- train$w
+  V_hat <- model.matrix(~ Yllm + 0, data=train)
+  V <- model.matrix(~ Yhuman + 0, data=train)
+  W <- train$V
+  N <- nrow(train)
   
-  # delta_{Y, \hat{Y}}
-  sqrt_weights <- diag(sqrt(train$w))
-  Yhuman <- sqrt_weights %*% model.matrix(~ Yhuman + 0, data=train)
-  Yllm <- sqrt_weights %*% model.matrix(~ Yllm + 0, data=train)
-  Yhuman_Yllm <- robust(lm(Yhuman ~ Yllm + 0), "train_Yhuman_Yllm", suppressWarnings=suppressWarnings)
-  coef_Yhuman_Yllm <- coef(Yhuman_Yllm) # 20*20, Yllm * Yhuman
+  term3 <- matrix(0, nrow=ncol(V_hat), ncol=ncol(V_hat))
+  for (r in 1:N){
+    V_r <- matrix(V[r,], ncol=1)
+    V_hat_r <- matrix(V_hat[r,], ncol=1)
+    gamma_r <- V_hat_r %*% t(V_hat_r) - V_r %*% t(V_r)
+    term3 <- term3 + omega[r] * gamma_r
+  }
   
-  # delta_{nu, \hat{Y}} = delta_{V, \hat{Y}} - delta_{Y, \hat{Y}} beta
-  coef_nu_Yllm <- coef_V_Yllm - as.vector(coef_Yhuman_Yllm %*% coef_V_Yhuman)
+  term4 <- matrix(0, nrow=ncol(V_hat), ncol=1)
+  for (r in 1:N){
+    V_r <- matrix(V[r,], ncol=1)
+    V_hat_r <- matrix(V_hat[r,], ncol=1)
+    Delta_r <- V_hat_r - V_r
+    term4 <- term4 + omega[r] * Delta_r %*% W[r]
+  }
   
   # (ii) Test data
-  Yllm <- model.matrix(~ Yllm + 0, data=test)
+  omega <- test$w
+  V_hat <- model.matrix(~ Yllm + 0, data=test)
+  W <- test$V
+  N <- nrow(test)
   
-  # Ytilde: predicted Yhuman
-  Ytilde <- Yllm %*% coef_Yhuman_Yllm
-  colnames(Ytilde) <- sub("human","tilde", colnames(Ytilde))
+  term1 <- matrix(0, nrow=ncol(V_hat), ncol=ncol(V_hat))
+  for (r in 1:N){
+    V_hat_r <- matrix(V_hat[r,], ncol=1)
+    term1 <- term1 + omega[r] * V_hat_r %*% t(V_hat_r)
+  }
   
-  # V_tilde
-  test$V_tilde <- test$V - Yllm %*% coef_nu_Yllm 
+  term2 <- matrix(0, nrow=ncol(V_hat), ncol=1)
+  for (r in 1:N){
+    V_hat_r <- matrix(V_hat[r,], ncol=1)
+    term2 <- term2 + omega[r] * V_hat_r %*% W[r]
+  }
   
-  # Regress Vtilde ~ Ytilde
-  formula <- sprintf("V_tilde ~ %s + 0", paste(colnames(Ytilde), collapse=" + "))
-  Vtilde_Ytilde <- lm(formula, weights=w, data=cbind(test, Ytilde))
+  alpha_star <- as.numeric(solve(term1 - term3) %*% (term2 - term4))
+  names(alpha_star) <- colnames(V_hat)
   
   return(list(
-    coef_nu_Yllm = coef_nu_Yllm, 
-    coef_Vtilde_Ytilde = coef(Vtilde_Ytilde), 
-    other = list( # return intermediate regressions
-      V_Yhuman,
-      V_Yllm,
-      Yhuman_Yllm)
+    coef_alpha_star = alpha_star
   ))
 }
 
@@ -176,7 +178,7 @@ rhs_simulate <- function(
     V_Yllm <- robust(lm(V ~ Yllm + 0, data_sample), "5k_V_Yllm")
     
     # (i) On train data, regress Yhuman ~ V (beta). Report robust standard errors
-    # This is done and recorded in get_debiased_rhs().
+    V_Yhuman <- robust(lm(V ~ Yhuman + 0, train), "train_V_Yhuman")
     
     # (ii) Using train and test data, regress V_tilde ~ Ytilde, see get_debiased_rhs() for more details
     # Perform bootstrap on test_Ytilde_V to calculate standard errors and confidence intervals
@@ -187,8 +189,8 @@ rhs_simulate <- function(
         test = test,
         B = B, 
         type_boot = type_boot, 
-        fun_out_boot = c("coef_nu_Yllm", "coef_Vtilde_Ytilde"),
-        regression_name = c("nu_Yllm", "Vtilde_Ytilde")
+        fun_out_boot = c("coef_alpha_star"),
+        regression_name = c("alpha_star")
       ),
       warning = function(w){
         logger::log_warn("{log.prefix} {conditionMessage(w)}")
@@ -199,7 +201,7 @@ rhs_simulate <- function(
     # Combine summaries for current iteration/sim_number, then append to all regressions 
     regressions <- bind_rows(
       regressions, 
-      summary(list(V_Yllm, out$coef_Vtilde_Ytilde, out$coef_nu_Yllm, out$other)) %>% 
+      summary(list(V_Yllm, V_Yhuman, out$coef_alpha_star)) %>% 
         mutate(sim_number=i, .before=1)) 
   }
   
@@ -262,7 +264,8 @@ rhs_combinations <- expand.grid(
     variable = variable, 
     stringsAsFactors = FALSE
   ) %>%
-  mutate(combination_id=1:n(), .before=1) # Assign a unique ID to each combination; used as seed for reproducibility
+  mutate(combination_id=1:n(), .before=1) %>% # Assign a unique ID to each combination; used as seed for reproducibility
+  filter(train_proportion==0.1) 
 
 # Filter out completed combinations
 completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(rhs_rds_dir, pattern = "*.rds")))
