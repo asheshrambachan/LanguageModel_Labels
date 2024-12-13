@@ -164,7 +164,7 @@ def create_batched_prompts(prompts, batched_prompts_dir):
 
 def main():
     data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
     
     batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
     os.makedirs(temp_dir, exist_ok=True)

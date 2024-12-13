@@ -115,7 +115,7 @@ def add_trimmed(df):
 
 def main():
     data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
     os.makedirs(temp_dir, exist_ok=True)
 
     bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))

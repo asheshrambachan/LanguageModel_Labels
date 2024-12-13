@@ -31,7 +31,7 @@ def query_llm(batches):
     return(batches)
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
 
     # Query LLM and store batches id 
     batches = pd.read_csv(os.path.join(temp_dir, "batches.csv"))
