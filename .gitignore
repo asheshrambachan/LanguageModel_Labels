@@ -38,3 +38,9 @@ cb_estimation/Code/lhs_results.pdf
 cb_estimation/Code/rhs_results.pdf
 cb_estimation/Code/lhs_results.rmd
 cb_estimation/Code/rhs_results.rmd
+
+
+
+headlines_prediction/Temp/*
+headlines_prediction/Tables/*
+headlines_prediction/Figures/*
