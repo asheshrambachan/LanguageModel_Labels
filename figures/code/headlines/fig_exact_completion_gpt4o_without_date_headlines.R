@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/headlines")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "headlines_prediction/Data/headlines_completion_similarity.csv")
+data_path <- file.path(repo_dir, "headlines_prediction/Data/headlines_completion.csv")
 fig_path <- file.path(fig_dir, "fig_exact_completion_exact_gpt4o_without_date_headlines.tex")
 
 # Load packages 

@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_prediction/Data/bills_llm_completion_similarity.csv")
+data_path <- file.path(repo_dir, "cb_prediction/Data/bills_llm_completion.csv")
 fig_path <- file.path(fig_dir, "fig_exact_completion_gpt4o_without_date_cb.tex")
 
 # Load packages and ggplot themes
