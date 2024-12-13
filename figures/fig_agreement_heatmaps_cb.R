@@ -6,21 +6,19 @@
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-fig_dir <- file.path(repo_dir, "Figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+repo_dir <- "~/Documents/LanguageModel_Labels"
+fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "Data/Estimation/bills_llm.csv")
-fig_path <- file.path(fig_dir, "figA04_cb_llm_agreement_heatmaps.jpeg")
-fig_width <- 9
-fig_height <- 5.5
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/bills_llm.csv")
+fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_cb.jpeg")
+fig_width <- 8
+fig_height <- 4.9
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
-require(lemon, warn.conflicts = FALSE)
-source(file.path(repo_dir, "Code/ggplot_theme.r"))
+source(file.path(fig_dir, "ggplot_theme.r"))
 
 # Factor labels and levels
 model_labels_levels <- c(
@@ -59,7 +57,7 @@ create_agreement_matrix <- function(datasets) {
       prompt_y = prompt_labels_values
     ) %>%
     mutate(agreement = mapply(
-      function(x, y) mean(x == y, na.rm = TRUE), 
+      function(x, y) mean(x == y, na.rm = TRUE) * 100, 
       datasets[prompt_x], 
       datasets[prompt_y]
     ))
@@ -94,8 +92,8 @@ fig <- agreement_matrices %>%
 fig <- fig +
   labs(
     x = "Prompting Strategy", 
-    y = "Prompting Strategy", 
-    fill = "Pairwise Agreement"
+    y = "", 
+    fill = "Pairwise Agreement Percent"
   ) + 
   scale_fill_viridis_c(
     option = "plasma", 
@@ -104,13 +102,13 @@ fig <- fig +
   ) +
   # Add agreement percentage with appropriate font color for clarity.
   geom_text(aes(
-    label = sprintf("%.2f", agreement), 
+    label = sprintf("%.1f", agreement), 
     color = ifelse(agreement > 0.7*heatmap_global_min+0.3*heatmap_global_max, "white", "black")
-  ), size = 3, show.legend = FALSE) + 
+  ), size = 2.5, show.legend = FALSE) + 
   scale_color_identity() +
   theme.heatmap +
   guides(fill = guide_colourbar(title.vjust = .8)) +
-  theme(panel.spacing = unit(0.5, "cm", data = NULL))
+  theme(panel.spacing = unit(0.75, "cm", data = NULL))
 
 
 # Save figure

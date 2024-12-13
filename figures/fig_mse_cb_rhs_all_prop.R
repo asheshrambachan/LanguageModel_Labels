@@ -1,4 +1,4 @@
-# Figure: Normalized bias of the plug-in regression and bias-corrected regression across Monte Carlo simulations based on congressional legislation as the validation sample size varies.
+# Figure: Cumulative distribution function of mean square error for the bias-corrected estimator against validation-sample only estimator, varying the size of the validation sample using policy topic as a covariate.
 # Dec 10, 2024
 
 # Removing all objects
@@ -9,8 +9,8 @@ repo_dir <- "~/Documents/LanguageModel_Labels"
 fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_5k_llm_human_debiased_averaged.csv")
-fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_lhs_all_prop.jpeg")
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/rhs_5k_llm_human_debiased_averaged.csv")
+fig_path <- file.path(fig_dir, "fig_mse_cb_rhs_all_prop.jpeg")
 fig_width <- 9
 fig_height <- 4
 
@@ -27,9 +27,9 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_Yllm_V"="Plug-In", 
-  "train_Yhuman_V"="Validation", 
-  "Ytilde_V"="Debiased"
+  "5k_V_Yllm"="Plug-In", 
+  "train_V_Yhuman"="Validation", 
+  "alpha_star"="Debiased"
 )
 proportion_labels_levels <- c(
   `0.05`="Validation Proportion = 5%", 
@@ -49,34 +49,29 @@ data <- read.csv(data_path) %>%
     proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
   filter(
-    coef_name!="(Intercept)",
-    regression!="Validation"
-    )
+    coef_name!="Other",
+    regression!="Plug-In"
+  )
 
 # Plot figure
 fig <- data %>%
-  ggplot(aes(
-    x=bias_norm, 
-    y=after_stat(max(group)*count/tapply(count, PANEL, FUN=sum)[PANEL]),
-    color=regression, 
-    fill=regression
-  )) +
-  geom_histogram(bins=64, position="identity") +
+  ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
+  stat_ecdf(linewidth=0.5) +
   facet_grid(model ~ proportion)
-  
+
 # Add theme and aesthetics
 fig <- fig +
   labs(
-    x = "Normalized Bias",
-    y = "Probability Densities",
+    x = "MSE",
+    y = "Empirical CDF",
     color = NULL,
-    fill = NULL
-  ) +
-  scale_fill_manual(values=alpha(my_colors, 0.3)) +
+    linetype = NULL
+  ) + 
   scale_color_manual(values=my_colors) +
-  scale_x_symmetric(mid=0) +
-  scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  theme.bar
+  scale_linetype_manual(values=my_linetype) +
+  scale_x_continuous(minor_breaks = seq(0,1,0.001)) +
+  coord_cartesian(xlim=c(0,0.022)) +
+  theme.mse 
 
 # save figure
 ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)

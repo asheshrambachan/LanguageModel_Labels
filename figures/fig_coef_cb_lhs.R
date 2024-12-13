@@ -1,27 +1,24 @@
 # Figure: Variation in pairwise agreement between large language model labels across prompting strategies on congressional legislation.
 # Dec 10, 2024
-# Code based on headlines/code/produce_figures/heatmaps.R
 
 # Removing all objects
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-fig_dir <- file.path(repo_dir, "Figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+repo_dir <- "~/Documents/LanguageModel_Labels"
+fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_llm_path <- file.path(repo_dir, "Data/Estimation/lhs_10k_llm.csv")
-data_human_path <- file.path(repo_dir, "Data/Estimation/lhs_10k_human.csv")
-fig_path <- file.path(fig_dir, "fig_cb_lhs_coef.jpeg")
+data_llm_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_10k_llm.csv")
+data_human_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_10k_human.csv")
+fig_path <- file.path(fig_dir, "fig_coef_cb_lhs.jpeg")
 fig_width <- 9
 fig_height <- 4.5
 
 # Load packages
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
-require(lemon, warn.conflicts = FALSE)
-source(file.path(repo_dir, "Code/ggplot_theme.r"))
+source(file.path(fig_dir, "ggplot_theme.r"))
 
 # Factor labels and levels
 V_levels <- c("Democrat", "Senate", "DW1")
@@ -32,7 +29,7 @@ model_labels_levels <- c(
 )
 Y_labels_levels <- c(
   `3` ="Health", 
-  `14`="Banking, Finance, & Domestic Commerce", 
+  `14`="Banking, Finance & Domestic Commerce", 
   `15`="Defense", 
   `19`="Government Operations", 
   `20`="Public Lands & Water Management"
@@ -46,8 +43,11 @@ data_llm <- read.csv(data_llm_path) %>%
     Y = recode_factor(Y, !!!Y_labels_levels)
   ) %>%
   filter(coef_name!="(Intercept)") %>%
-  group_by(V, Y, coef_name) %>%
-  arrange(V, Y, coef_name, coef) %>% 
+  select(!c(regression, coef_name)) %>% 
+  
+  # sort prompts by coef
+  group_by(V, Y) %>%
+  arrange(V, Y, coef) %>% 
   mutate(prompt.sorted = row_number()) %>% 
   ungroup() %>%
   mutate(prompt.sorted = as.factor(prompt.sorted))
@@ -59,7 +59,8 @@ data_human <- read.csv(data_human_path) %>%
     V = factor(V, levels=V_levels),
     Y = recode_factor(Y, !!!Y_labels_levels)
   ) %>%
-  filter(coef_name!="(Intercept)")
+  filter(coef_name!="(Intercept)") %>%
+  select(!c(regression, coef_name))
 
 # Plot figure
 fig <- data_llm %>%

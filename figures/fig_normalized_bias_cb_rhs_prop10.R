@@ -1,4 +1,4 @@
-# Figure: Normalized bias of the plug-in regression and bias-corrected regression across Monte Carlo simulations based on congressional legislation as the validation sample size varies.
+# Figure: Normalized bias of the plug-in regression and bias-corrected regression using policy topic as a covariate across Monte Carlo simulations based on congressional legislation.
 # Dec 10, 2024
 
 # Removing all objects
@@ -9,8 +9,8 @@ repo_dir <- "~/Documents/LanguageModel_Labels"
 fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_5k_llm_human_debiased_averaged.csv")
-fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_lhs_all_prop.jpeg")
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/rhs_5k_llm_human_debiased_averaged.csv")
+fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_rhs_prop10.jpeg")
 fig_width <- 9
 fig_height <- 4
 
@@ -27,31 +27,25 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_Yllm_V"="Plug-In", 
-  "train_Yhuman_V"="Validation", 
-  "Ytilde_V"="Debiased"
-)
-proportion_labels_levels <- c(
-  `0.05`="Validation Proportion = 5%", 
-  `0.10`="Validation Proportion = 10%", 
-  `0.25`="Validation Proportion = 25%",
-  `0.50`="Validation Proportion = 50%"
+  "5k_V_Yllm"="Plug-In", 
+  "train_V_Yhuman"="Validation", 
+  "alpha_star"="Debiased"
 )
 
 # Load and format data
 data <- read.csv(data_path) %>%
-  rename(proportion=train_proportion) %>%
   mutate(
     bias_norm = bias_mean/coef_sd, 
     V = factor(V, levels=V_levels),
     model = recode_factor(model, !!!model_labels_levels),
-    regression = recode_factor(regression, !!!regression_labels_levels),
-    proportion = recode_factor(proportion, !!!proportion_labels_levels)
+    regression = recode_factor(regression, !!!regression_labels_levels)
   ) %>%
+  rename(proportion=train_proportion) %>%
   filter(
-    coef_name!="(Intercept)",
+    coef_name!="Other",
+    proportion==0.1,
     regression!="Validation"
-    )
+  )
 
 # Plot figure
 fig <- data %>%
@@ -62,22 +56,23 @@ fig <- data %>%
     fill=regression
   )) +
   geom_histogram(bins=64, position="identity") +
-  facet_grid(model ~ proportion)
-  
+  facet_grid(. ~ model)
+
 # Add theme and aesthetics
-fig <- fig +
+fig <- fig + 
   labs(
     x = "Normalized Bias",
     y = "Probability Densities",
     color = NULL,
     fill = NULL
   ) +
-  scale_fill_manual(values=alpha(my_colors, 0.3)) +
   scale_color_manual(values=my_colors) +
+  scale_fill_manual(values=alpha(my_colors, 0.3)) +
   scale_x_symmetric(mid=0) +
   scale_y_continuous(minor_breaks=seq(0,1, by=0.05), limits=c(0,1)) +
-  theme.bar
+  theme.bar +
+  theme(panel.spacing = unit(0.5, "cm", data = NULL))
 
-# save figure
+# Save figure
 ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
 cat(sprintf("Saved %s\n", fig_path))

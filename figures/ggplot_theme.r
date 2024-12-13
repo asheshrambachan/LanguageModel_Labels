@@ -23,7 +23,7 @@ my_palette <- c(
 my_colors <- c(
   "GPT-3.5" =  my_palette[["green"]],
   "GPT-4o" = my_palette[["blue"]],
-  "GPT-4o-mini" =  my_palette[["yellow"]],
+  "GPT-4o-mini" =  my_palette[["red"]],
   "Plug-In" = my_palette[["green"]], 
   "Validation" = my_palette[["red"]],
   "Debiased" = my_palette[["gray"]]
@@ -99,5 +99,5 @@ theme.heatmap <- theme_bw() +
     legend.key.spacing = unit(0.1,"cm")
   )
 
-heatmap_global_min <- 0.65
-heatmap_global_max <- 1.00
+heatmap_global_min <- 0.65 * 100
+heatmap_global_max <- 1.00 * 100

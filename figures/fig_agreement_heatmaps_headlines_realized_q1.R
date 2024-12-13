@@ -7,27 +7,25 @@ rm(list = ls())
 
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels"
-fig_dir <- file.path(repo_dir, "congressional_bills/Figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
 data_path <- file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q1/base_blanks.csv")
-fig_path <- file.path(fig_dir, "fig03_headlines_llm_agreement_heatmaps.jpeg")
+fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q1.jpeg")
 fig_width <- 9
 fig_height <- 4.5
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
-source(file.path(repo_dir, "congressional_bills/Code/ggplot_theme.r"))
+source(file.path(fig_dir, "ggplot_theme.r"))
 
+# Factor labels and levels
 model_labels_values <- c(
   "gpt-3.5-turbo"="GPT-3.5", 
   "gpt-4o"="GPT-4o",
   "gpt-4o-mini"="GPT-4o-mini"
 )
-  
-
 prompt_labels_values <- c(
   "base_blanks"="Base: Fill in Blank", 
   "base_json"="Base: JSON",
@@ -73,7 +71,7 @@ create_agreement_matrix <- function(datasets) {
     prompt_y = prompt_labels_values
   ) %>%
     mutate(agreement = mapply(
-      function(x, y) mean(x == y, na.rm = TRUE),
+      function(x, y) mean(x == y, na.rm = TRUE) * 100,
       datasets[prompt_x],
       datasets[prompt_y]
     ))
@@ -108,8 +106,8 @@ fig <- agreement_matrices %>%
 fig <- fig +
   labs(
     x = "Prompting Strategy", 
-    y = "Prompting Strategy", 
-    fill = "Pairwise Agreement"
+    y = "", 
+    fill = "Pairwise Agreement Percent"
   ) + 
   scale_fill_viridis_c(
     option = "plasma", 
@@ -118,13 +116,12 @@ fig <- fig +
   ) +
   # Add agreement percentage with appropriate font color for clarity.
   geom_text(aes(
-    label = sprintf("%.2f", agreement), 
+    label = sprintf("%.1f", agreement), 
     color = ifelse(agreement > 0.7*heatmap_global_min+0.3*heatmap_global_max, "white", "black")
-  ), size = 2.8, show.legend = FALSE) + 
+  ), size = 2.5, show.legend = FALSE) + 
   scale_color_identity() +
   theme.heatmap +
-  guides(fill = guide_colourbar(title.vjust = .8))
-
+  guides(fill = guide_colourbar(title.vjust = .8)) 
 # Save figure
 ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
 cat(sprintf("Saved %s\n", fig_path))

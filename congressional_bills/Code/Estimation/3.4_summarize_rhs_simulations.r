@@ -8,10 +8,9 @@ suppressPackageStartupMessages({
 })
 
 # Define and set the working directory
-# setwd("~/Documents/LanguageModel_Labels/congressional_bills/")
-repo_dir <- "."
-data_dir <- file.path(repo_dir, "Data/Estimation/RHS")
-temp_dir <- file.path(repo_dir, "Temp/Estimation/RHS")
+repo_dir <- "~/Documents/LanguageModel_Labels"
+data_dir <- file.path(repo_dir, "congressional_bills/Data/Estimation")
+temp_dir <- file.path(repo_dir, "congressional_bills/Temp/Estimation/RHS")
 rhs_dir <- file.path(temp_dir, "rds")
 dir.create(data_dir, showWarnings=FALSE, recursive = TRUE)
 
@@ -25,7 +24,8 @@ coverage = function(coef.ref, lci, uci) return(as.integer((lci <= coef.ref) & (c
 rds_paths <- list.files(rhs_dir, pattern="*.rds", full.names=TRUE)
 
 data <- bind_rows(lapply(rds_paths, readRDS)) %>% 
-  rename(c(V=variable)) 
+  rename(c(V=variable)) %>%
+  mutate(model = if_else(model=="gpt-4o", "gpt-4o-2024-05-13", model))
 log_info("Loaded *.rds files at {rhs_dir}")
 
 regressions_of_intreset <- c("10k_V_Yhuman", "10k_V_Yllm", "5k_V_Yllm", "train_V_Yhuman", "alpha_star")

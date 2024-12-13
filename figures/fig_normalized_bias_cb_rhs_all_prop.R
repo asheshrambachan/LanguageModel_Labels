@@ -1,5 +1,5 @@
-# Figure: Normalized bias of the plug-in regression and bias-corrected regression across Monte Carlo simulations based on congressional legislation as the validation sample size varies.
-# Dec 10, 2024
+# Figure: Normalized bias of the plug-in regression and bias-corrected regression using policy topic as a covariate across Monte Carlo simulations based on congressional legislation as the validation sample size varies.
+# Dec 12, 2024
 
 # Removing all objects
 rm(list = ls())
@@ -9,8 +9,8 @@ repo_dir <- "~/Documents/LanguageModel_Labels"
 fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_5k_llm_human_debiased_averaged.csv")
-fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_lhs_all_prop.jpeg")
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/rhs_5k_llm_human_debiased_averaged.csv")
+fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_rhs_all_prop.jpeg")
 fig_width <- 9
 fig_height <- 4
 
@@ -27,9 +27,9 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_Yllm_V"="Plug-In", 
-  "train_Yhuman_V"="Validation", 
-  "Ytilde_V"="Debiased"
+  "5k_V_Yllm"="Plug-In", 
+  "train_V_Yhuman"="Validation", 
+  "alpha_star"="Debiased"
 )
 proportion_labels_levels <- c(
   `0.05`="Validation Proportion = 5%", 
@@ -49,9 +49,9 @@ data <- read.csv(data_path) %>%
     proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
   filter(
-    coef_name!="(Intercept)",
+    coef_name!="Other",
     regression!="Validation"
-    )
+  )
 
 # Plot figure
 fig <- data %>%
@@ -63,7 +63,7 @@ fig <- data %>%
   )) +
   geom_histogram(bins=64, position="identity") +
   facet_grid(model ~ proportion)
-  
+
 # Add theme and aesthetics
 fig <- fig +
   labs(

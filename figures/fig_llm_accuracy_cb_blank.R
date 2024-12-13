@@ -1,11 +1,11 @@
-# Create a blank version of fig06_cb_llm_accuracy.R
+# Create a blank version of fig_llm_accuracy_cb.R
 # Dec 10, 2024
 
 # Load figure
-source("./Code/Figures/fig06_cb_llm_accuracy.R")
+source("./figures/fig_llm_accuracy_cb.R")
 
 # Figure path
-blank_fig_path <- file.path(fig_dir, "fig06_cb_llm_accuracy_blank.jpeg")
+blank_fig_path <- file.path(fig_dir, "fig_llm_accuracy_cb_blank.jpeg")
 
 # Plot blank figure
 blank_fig <- fig + 

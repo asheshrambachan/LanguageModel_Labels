@@ -10,7 +10,7 @@
 # -------------------------------------------------------------------
 
 # --- User Configurable Parameters ----------------------------------
-n_cores <- 8
+n_cores <- 50
 N <- 1000 # Number of simulations per a single combination
 B <- 1000 # Number of bootstrap samples
 n_samples <- 5000 # Number of samples drawn from 10K bill in each of the N simulations
@@ -41,14 +41,14 @@ suppressPackageStartupMessages({
 # --- Functions ------------------------------------------------------
 #' Perform Debiasing Regression for Right-Hand-Side (RHS) Simulation
 #'
-#' This function performs a debiasing regression for RHS variables, regressing the variable of interest (Vtilde) on the predicted values (Ytilde).
+#' This function performs a debiasing regression for RHS variables.
 #' The function calculates intermediate regressions and predicts debiased coefficients for the test data.
 #'
 #' @param train A data frame representing the training set, with columns V, Yhuman, Yllm, and possibly weights.
 #' @param test A data frame representing the test set, with columns V, Yhuman, Yllm, and possibly weights.
 #' @return A list containing:
-#'   \item{coef_alpha_star}{Debiased coefficients.}
-rhs_debias <- function(train, test, suppressWarnings=FALSE) {
+#'   \item{coef_alpha_star}{Debiased coefficients from the regression.}
+rhs_debias <- function(train, test) {
   # if no Bayesian bootstrap weights are provided, don't perform weighted LS by keeping w=NULL
   if (is.null(train$w) | is.null(test$w)){
     train$w = 1/nrow(train)
@@ -197,11 +197,15 @@ rhs_simulate <- function(
         invokeRestart("muffleWarning")
       }
     )
-    
+
     # Combine summaries for current iteration/sim_number, then append to all regressions 
     regressions <- bind_rows(
       regressions, 
-      summary(list(V_Yllm, V_Yhuman, out$coef_alpha_star)) %>% 
+      summary(list(
+        V_Yllm, 
+        V_Yhuman, 
+        out$coef_alpha_star
+        )) %>% 
         mutate(sim_number=i, .before=1)) 
   }
   
@@ -265,7 +269,7 @@ rhs_combinations <- expand.grid(
     stringsAsFactors = FALSE
   ) %>%
   mutate(combination_id=1:n(), .before=1) %>% # Assign a unique ID to each combination; used as seed for reproducibility
-  filter(train_proportion==0.1) 
+  filter(train_proportion!=0.1)
 
 # Filter out completed combinations
 completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(rhs_rds_dir, pattern = "*.rds")))

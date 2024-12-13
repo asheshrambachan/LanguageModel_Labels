@@ -1,11 +1,11 @@
-# Create a blank version of fig_tscores_cb_lhs.R
+# Create a blank version of fig_tscores_headlines_realized_q2_confidence_1_day.R
 # Dec 10, 2024
 
 # Load figure
-source("./figures/fig_tscores_cb_lhs.R")
+source("./figures/fig_tscores_headlines_realized_q2_confidence_1_day.R")
 
 # Figure path
-blank_fig_path <- file.path(fig_dir, "fig_tscores_cb_lhs_blank.jpeg")
+blank_fig_path <- file.path(fig_dir, "fig_tscores_headlines_realized_q2_confidence_1_day_blank.jpeg")
 
 # Plot blank figure
 blank_fig <- fig + 
@@ -13,7 +13,7 @@ blank_fig <- fig +
 
 # Add legend aesthetics
 blank_fig <- blank_fig + 
-  guides(color = guide_legend(override.aes = list(alpha=1, size=2)))
+  guides(color = guide_legend(override.aes = list(alpha=1)))
 
 # Save figures
 ggsave(blank_fig_path, plot = blank_fig, height = fig_height, width = fig_width)

@@ -5,21 +5,19 @@
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-fig_dir <- file.path(repo_dir, "Figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+repo_dir <- "~/Documents/LanguageModel_Labels"
+fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "Data/Estimation/bills_llm.csv")
-fig_path <- file.path(fig_dir, "fig06_cb_llm_accuracy.jpeg")
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/bills_llm.csv")
+fig_path <- file.path(fig_dir, "fig_llm_accuracy_cb.jpeg")
 fig_width <- 9
 fig_height <- 4.5
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
-require(lemon, warn.conflicts = FALSE)
-source(file.path(repo_dir, "Code/ggplot_theme.r"))
+source(file.path(fig_dir, "ggplot_theme.r"))
 
 # Factor labels and levels
 model_labels_levels <- c(
@@ -30,7 +28,7 @@ prompt_labels_values <- c(
   `1`="Base: Fill in Blank", 
   `2`="Base: JSON",
   `7`="COT: Careful", 
-  `8`="COT: Step-by-  step", 
+  `8`="COT: Step-by-step", 
   `9`="COT: Explanation",
   `3`="Persona: Political Analyst", 
   `4`="Persona: Political Scientist",
@@ -68,7 +66,7 @@ fig <- fig +
   ) +
   scale_fill_manual(values=my_colors) +
   scale_y_continuous(minor_breaks=seq(0,1,by=0.05), limits=c(0,1)) +
-  scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 11)) +
+  scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 11, whitespace_only=F)) +
   theme.bar # + 
   # theme(axis.text=element_text(size=8.5))
 

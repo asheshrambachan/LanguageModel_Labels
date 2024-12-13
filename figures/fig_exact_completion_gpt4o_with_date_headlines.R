@@ -6,12 +6,14 @@ rm(list = ls())
 
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels"
-fig_dir <- file.path(repo_dir, "congressional_bills/Figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
+fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
 data_path <- file.path(repo_dir, "headlines_completion/Data/headlines_completion_similarity.csv")
-fig_path <- file.path(fig_dir, "figA02_headlines_completion_exact_gpt4o_with_date.tex")
+fig_path <- file.path(fig_dir, "fig_exact_completion_gpt4o_with_date_headlines.tex")
+
+# Load packages and ggplot themes
+require(dplyr, warn.conflicts = FALSE)
 
 # Factor labels and levels
 prompt_labels_levels <- c(

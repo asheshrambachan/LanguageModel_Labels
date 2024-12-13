@@ -1,5 +1,5 @@
-# Figure: Variation in t-statistics across large language models and prompting strategies on congressional legislation.
-# Dec 10, 2024
+# Figure: Variation in t-statistics across large language models and prompting strategies on congressional legislation, using the economic concept as a covariate.
+# Dec 12, 2024
 
 # Removing all objects
 rm(list = ls())
@@ -9,8 +9,8 @@ repo_dir <- "~/Documents/LanguageModel_Labels"
 fig_dir <- file.path(repo_dir, "figures")
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_10k_llm.csv")
-fig_path <- file.path(fig_dir, "fig_tscores_cb_lhs.jpeg")
+data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/rhs_10k_llm.csv")
+fig_path <- file.path(fig_dir, "fig_tscores_cb_rhs.jpeg")
 fig_width <- 9
 fig_height <- 4.5
 
@@ -38,9 +38,9 @@ data <- read.csv(data_path) %>%
   mutate(
     model = recode_factor(model, !!!model_labels_levels),
     V = factor(V, levels=V_levels),
-    Y = recode_factor(Y, !!!Y_labels_levels)
+    Y = recode_factor(coef_name, !!!Y_labels_levels)
   ) %>%
-  filter(coef_name!="(Intercept)") %>%
+  filter(coef_name!="Other") %>%
   select(!c(regression, coef_name)) %>% 
   
   # sort prompts by t-score
@@ -54,11 +54,10 @@ data <- read.csv(data_path) %>%
 fig <- data %>%
   ggplot(aes(x=prompt.sorted, y=t, color=model, shape=model)) +
   geom_point(size=1.25) +
-  facet_grid(V ~ Y, labeller=label_wrap_gen(width=20))
-  
+  facet_grid(V ~ Y, labeller=label_wrap_gen(width=20), scales="free_y")
+
 # Add theme and aesthetics
 fig <- fig +
-  geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2, alpha=0.7) + # x-axis
   labs(
     x = "Prompt-Model Index (Sorted)",
     y = "t-scores",

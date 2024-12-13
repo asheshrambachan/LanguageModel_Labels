@@ -7,7 +7,6 @@ rm(list = ls())
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels"
 fig_dir <- file.path(repo_dir, "figures")
-dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
 data_path <- file.path(repo_dir, "congressional_bills/Data/Estimation/lhs_5k_llm_human_debiased_averaged.csv")
