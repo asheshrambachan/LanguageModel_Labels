@@ -7,30 +7,26 @@ data/raw/*.csv.DS_Store
 settings.json
 .env
 .Rapp.history
-
 .rds
 *.rds
-
 *.Rhistory
 *.RData
 
-congressional_bills/Temp/*
-congressional_bills/Log/*
-congressional_bills/Papers and bib/*
-congressional_bills/Code/*.log
-congressional_bills/Data/US-*.csv
-congressional_bills/Data/bills80*.txt
-congressional_bills/Data/bills93*.csv
-congressional_bills/Rplots.pdf
-congressional_bills/Figures_v1/*
-congressional_bills/Tables_v1/*
+cb_estimation/Data/Codebooks
+cb_estimation/Temp/*
+cb_estimation/Log/*
+cb_estimation/Papers and bib/*
+cb_estimation/Code/*.log
+cb_estimation/Figures_v1/*
+cb_estimation/Tables_v1/*
 
+cb_prediction/Temp/*
 
 congressional_bills_v1
+
 zeims_et_al_clean/.DS_Store
-congressional_bills/Code/Prediction/clean.log
-congressional_bills/Code/Prediction/results.log
-congressional_bills/Code/Prediction/results.tex
+
+
 
 headlines/code/.DS_Store
 headlines/data/step1_batch_prompts/.DS_Store
@@ -38,3 +34,7 @@ headlines/data/step1_batch_prompts/.DS_Store
 
 headlines_completion/Temp
 headlines_completion/Data/returns_data_realized
+cb_estimation/Code/lhs_results.pdf
+cb_estimation/Code/rhs_results.pdf
+cb_estimation/Code/lhs_results.rmd
+cb_estimation/Code/rhs_results.rmd
