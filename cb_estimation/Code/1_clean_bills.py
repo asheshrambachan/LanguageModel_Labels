@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from copy import deepcopy
 
-REPO_DIR = '.'
+REPO_DIR = './cb_estimation'
 MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):

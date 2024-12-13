@@ -4,7 +4,7 @@ import pandas as pd
 import json
 import re
 
-REPO_DIR = "."
+REPO_DIR = './cb_estimation'
 MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def merge_batched_responses(responses_batched_paths):

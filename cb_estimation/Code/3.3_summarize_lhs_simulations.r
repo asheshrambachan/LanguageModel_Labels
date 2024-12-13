@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
 })
 
 # Define and set the working directory
-setwd("~/Documents/LanguageModel_Labels/cb_estimation/")
+setwd("~/Documents/LanguageModel_Labels/cb_estimation")
 repo_dir <- "."
 data_dir <- file.path(repo_dir, "Data")
 temp_dir <- file.path(repo_dir, "Temp/LHS")

@@ -4,7 +4,7 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = "."
+REPO_DIR = './cb_estimation'
 
 def create_prompts(prompting_strategies, bills, min_confidence=0.9, max_confidence=1):
     id = 0

@@ -21,7 +21,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 
 # Set directories
-repo_dir <- "."
+repo_dir <- "./cb_estimation"
 data_path <- file.path(repo_dir, "Data/bills_llm.csv")
 lhs_rds_dir <- file.path(repo_dir, "Temp/LHS/rds")
 

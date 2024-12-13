@@ -2,9 +2,9 @@ require(dplyr, warn.conflicts = FALSE)
 require(kableExtra, warn.conflicts = FALSE)
 
 # Directories 
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-data_dir <- file.path(repo_dir, "Data/Estimation/RHS")
-tables_dir <- file.path(repo_dir, "Tables/Estimation/RHS/Validation_Prop_10")
+repo_dir <- "~/Documents/LanguageModel_Labels/cb_estimation"
+data_dir <- file.path(repo_dir, "Data/RHS")
+tables_dir <- file.path(repo_dir, "Tables/RHS/Validation_Prop_10")
 dir.create(tables_dir, showWarnings=FALSE, recursive = TRUE)
 
 

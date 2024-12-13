@@ -2,9 +2,9 @@ require(dplyr, warn.conflicts = FALSE)
 require(kableExtra, warn.conflicts = FALSE)
 
 # Directories 
-repo_dir <- "~/Documents/LanguageModel_Labels/congressional_bills"
-data_dir <- file.path(repo_dir, "Data/Estimation/LHS")
-tables_dir <- file.path(repo_dir, "Tables/Estimation/LHS")
+repo_dir <- "~/Documents/LanguageModel_Labels/cb_estimation"
+data_dir <- file.path(repo_dir, "Data/LHS")
+tables_dir <- file.path(repo_dir, "Tables/LHS")
 dir.create(tables_dir, showWarnings=FALSE, recursive = TRUE)
 path_data_5k <- file.path(data_dir, "lhs_5k_llm_human_debiased_averaged.csv")
 

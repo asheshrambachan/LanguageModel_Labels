@@ -22,7 +22,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # Set directories
 
 # setwd("~/Documents/LanguageModel_Labels/cb_estimation/")
-repo_dir <- "."
+repo_dir <- "./cb_estimation"
 data_path <- file.path(repo_dir, "Data/bills_llm.csv")
 rhs_rds_dir <- file.path(repo_dir, "Temp/RHS/rds")
 
