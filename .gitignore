@@ -22,25 +22,18 @@ cb_estimation/Tables_v1/*
 
 cb_prediction/Temp/*
 
-congressional_bills_v1
-
-zeims_et_al_clean/.DS_Store
-
-
-
-headlines/code/.DS_Store
-headlines/data/step1_batch_prompts/.DS_Store
-
-
-headlines_completion/Temp
-headlines_completion/Data/returns_data_realized
-cb_estimation/Code/lhs_results.pdf
-cb_estimation/Code/rhs_results.pdf
-cb_estimation/Code/lhs_results.rmd
-cb_estimation/Code/rhs_results.rmd
-
-
-
 headlines_prediction/Temp/*
 headlines_prediction/Tables/*
 headlines_prediction/Figures/*
+
+tables/4.3.*.r
+tables/lhs_results.pdf
+tables/rhs_results.pdf
+tables/lhs_results.rmd
+tables/rhs_results.rmd
+
+congressional_bills_v1
+
+zeims_et_al_clean/.DS_Store
+headlines/code/.DS_Store
+headlines/data/step1_batch_prompts/.DS_Store

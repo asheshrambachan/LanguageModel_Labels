@@ -30,14 +30,8 @@ Rscript ./Code/Estimation/3.3_summarize_lhs_simulations.r
 echo "Summarizing RHS simulations..."
 Rscript ./Code/Estimation/3.4_summarize_rhs_simulations.r
 
-# Step 4: Figure and Table Generation
-echo "Estimating LLM prediction errors..."
-python ./Code/Estimation/4.1_est_llm_pred_error.py
-
-echo "Generating bills distribution and LLM accuracy plots..."
-Rscript ./Code/Estimation/4.2_bills_llm_plots.r
-
-echo "Generating figures and tables..."
-Rscript ./Code/Estimation/4.3_figures_tables.r
+# # Step 4: Figure and Table Generation
+# echo "Estimating LLM prediction errors..."
+# python ./Code/Estimation/est_llm_pred_error.py
 
 echo "Pipeline completed."
