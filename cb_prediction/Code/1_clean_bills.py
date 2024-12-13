@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-REPO_DIR = '.'
+REPO_DIR = './cb_prediction'
 MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):

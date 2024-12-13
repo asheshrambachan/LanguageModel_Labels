@@ -3,7 +3,7 @@ import glob
 import pandas as pd
 import json
 
-REPO_DIR = "."
+REPO_DIR = "./cb_prediction"
 
 def merge_batched_responses(responses_batched_paths):
     responses = []

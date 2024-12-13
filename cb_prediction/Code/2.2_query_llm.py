@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Place API_KEY in the .env file
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "."
+REPO_DIR = "./cb_prediction"
 
 def query_llm(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)

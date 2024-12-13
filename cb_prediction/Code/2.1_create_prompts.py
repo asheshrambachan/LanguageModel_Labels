@@ -5,7 +5,7 @@ import json
 import tiktoken
 from datetime import datetime
 
-REPO_DIR = "."
+REPO_DIR = "./cb_prediction"
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 # a function to trim a string 
