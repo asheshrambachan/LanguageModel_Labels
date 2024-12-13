@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Place API_KEY in the .env file
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "."
+REPO_DIR = "./headlines_prediction"
 
 def query_llm(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -31,7 +31,7 @@ def query_llm(batches):
     return(batches)
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "headlines_prediction/Temp/LLM")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
 
     # Query LLM and store batches id 
     batches_path = os.path.join(temp_dir, "batches.csv")

@@ -5,7 +5,7 @@ import json
 import tiktoken
 from datetime import datetime
 
-REPO_DIR = "."
+REPO_DIR = "./headlines_prediction"
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 # a function to trim a string 
@@ -142,8 +142,8 @@ def create_batched_prompts(prompts, batched_prompts_dir):
     return(pd.json_normalize(batches))
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "headlines_prediction/Data")
-    temp_dir = os.path.join(REPO_DIR, "headlines_prediction/Temp/LLM")
+    data_dir = os.path.join(REPO_DIR, "Data")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
     batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
     os.makedirs(temp_dir, exist_ok=True)
     os.makedirs(batched_prompts_dir, exist_ok=True)

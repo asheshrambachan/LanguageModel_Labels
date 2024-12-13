@@ -3,7 +3,7 @@ import pandas as pd
 import string
 import re
 
-REPO_DIR = '.'
+REPO_DIR = './headlines_prediction'
 
 def clean_text(x):    
     # remove punctuation, lowercase, and remove tailing spaces
@@ -13,13 +13,13 @@ def clean_text(x):
 
 def main():
     # Define directories
-    data_dir = os.path.join(REPO_DIR, 'headlines_prediction/Data')
-    temp_dir = os.path.join(REPO_DIR, 'headlines_prediction/Temp')
+    data_dir = os.path.join(REPO_DIR, 'Data')
+    temp_dir = os.path.join(REPO_DIR, 'Temp')
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(temp_dir, exist_ok=True)
 
     # data paths
-    returns_dir = os.path.join(REPO_DIR, "headlines/data/step0_returns_data/realized")
+    returns_dir = os.path.join("./headlines/data/step0_returns_data/realized")
     
     # Create an empty list to store individual DataFrames
     dfs = []

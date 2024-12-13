@@ -3,7 +3,7 @@ import glob
 import pandas as pd
 import json
 
-REPO_DIR = "."
+REPO_DIR = "./headlines_prediction"
 
 def merge_batched_responses(responses_batched_paths):
     responses = []
@@ -97,8 +97,8 @@ def add_trimmed(df):
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "headlines_prediction/Data")
-    temp_dir = os.path.join(REPO_DIR, "headlines_prediction/Temp/LLM")
+    data_dir = os.path.join(REPO_DIR, "Data")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
     os.makedirs(temp_dir, exist_ok=True)
 
     headlines = pd.read_csv(os.path.join(data_dir, f"headlines.csv"))

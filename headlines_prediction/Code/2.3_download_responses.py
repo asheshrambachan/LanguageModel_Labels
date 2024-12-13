@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Place API_KEY in the .env file or replace os.environ.get('OPENAI_API_KEY') with the key
 load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "."
+REPO_DIR = "./headlines_prediction"
 
 # Check status of all batches
 def check_batches_status(batches):
@@ -38,7 +38,7 @@ def download_batched_responses(batches, out_dir):
         print(f"Saved {os.path.basename(responses_batched_path)} at {os.path.dirname(responses_batched_path)}")
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "headlines_prediction/Temp/LLM")
+    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
     batched_responses_dir = os.path.join(temp_dir, "responses_batched")
     os.makedirs(batched_responses_dir, exist_ok=True)
 
