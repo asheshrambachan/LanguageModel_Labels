@@ -11,6 +11,8 @@ settings.json
 *.rds
 *.Rhistory
 *.RData
+.python-version
+.envrc
 
 cb_estimation/Data/Codebooks
 cb_estimation/Temp/*
