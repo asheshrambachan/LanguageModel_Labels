@@ -34,7 +34,7 @@ tables/rhs_results.pdf
 tables/lhs_results.rmd
 tables/rhs_results.rmd
 tables/4_results.Rmd
-tables/output/*
+tables/output_mine/*
 
 congressional_bills_v1
 
