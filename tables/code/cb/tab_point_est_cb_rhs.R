@@ -1,4 +1,4 @@
-# Table: Variation in point estimates using policy topic as a covariate across large language models and prompting strategies on Congressional bills.
+# Table: Variation in point estimates across large language models and prompting strategies on Congressional bills, using the economic concept as a covariate.
 # Dec 10, 2024
 
 # Removing all objects

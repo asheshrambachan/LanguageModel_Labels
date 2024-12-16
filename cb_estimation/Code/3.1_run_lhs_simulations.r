@@ -16,7 +16,7 @@ B <- 1000 # Number of bootstrap samples
 n_samples <- 5000 # Number of samples drawn from 10K bill in each of the N simulations
 type_boot <- "bayesian" # "nonparametric"
 sel_topics <- c(3, 14, 15, 19, 20) # This list represents the most common major topics based on the Major/Yhuman column.
-train_proportion <- c(0.05, 0.1, 0.25, 0.5) # Proportions for training data: 5%, 10%, 25%, 50%
+train_proportion <- c(0.025, 0.05, 0.1, 0.25, 0.5) # Proportions for training data: 2.5%, 5%, 10%, 25%, 50%
 variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 
@@ -225,8 +225,17 @@ lhs_combinations <- expand.grid(
     variable = variable, 
     major_topic = sel_topics, # Dependent variables of interest. These are the most common major topics based on Major/Yhuman column.
     stringsAsFactors = FALSE
-  ) %>%
+  )
+  
+lhs_combinations_run1 <- lhs_combinations %>%
+  filter(train_proportion!=0.025) %>%
   mutate(combination_id=1:n(), .before=1) # Assign a unique ID to each combination; used as seed for reproducibility
+
+lhs_combinations_run2 <- lhs_combinations %>%
+  filter(train_proportion==0.025) %>%
+  mutate(combination_id=(1:n())+nrow(lhs_combinations_run1), .before=1)
+
+lhs_combinations <- bind_rows(lhs_combinations_run1, lhs_combinations_run2)
 
 # Filter out completed combinations
 completed_id <- as.numeric(gsub("combination|\\.rds", "", list.files(lhs_rds_dir, pattern = "*.rds")))
