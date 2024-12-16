@@ -14,28 +14,31 @@ settings.json
 .python-version
 .envrc
 
-cb_estimation/Data/Codebooks
-cb_estimation/Temp/*
-cb_estimation/Log/*
-cb_estimation/Papers and bib/*
-cb_estimation/Code/*.log
-cb_estimation/Figures_v1/*
-cb_estimation/Tables_v1/*
+estimation_cb/Data/Codebooks
+estimation_cb/Temp/*
+estimation_cb/Log/*
+estimation_cb/Papers and bib/*
+estimation_cb/Code/*.log
+estimation_cb/Figures_v1/*
+estimation_cb/Tables_v1/*
 
-cb_prediction/Temp/*
+prediction_cb/Temp/*
 
-headlines_prediction/Temp/*
-headlines_prediction/Tables/*
-headlines_prediction/Figures/*
+prediction_headlines/Temp/*
+prediction_headlines/Tables/*
+prediction_headlines/Figures/*
 
 tables/4.3.*.r
 tables/lhs_results.pdf
 tables/rhs_results.pdf
 tables/lhs_results.rmd
 tables/rhs_results.rmd
+tables/4_results.Rmd
+tables/output/*
 
 congressional_bills_v1
 
 zeims_et_al_clean/.DS_Store
 headlines/code/.DS_Store
 headlines/data/step1_batch_prompts/.DS_Store
+

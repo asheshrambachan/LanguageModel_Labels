@@ -1,4 +1,4 @@
-# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR) of GPT-4o’s predictions on Congressional legislation, without date.
+# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR) of GPT-4o’s predictions on Congressional legislation, with date.
 # Dec 10, 2024
 
 # Removing all objects
@@ -11,7 +11,7 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
 data_path <- file.path(repo_dir, "cb_prediction/Data/bills_llm_passage.csv") 
-tab_path <- file.path(tab_dir, "tab_prediction_gpt4o_without_date_cb.tex")
+tab_path <- file.path(tab_dir, "tab_prediction_gpt4o_with_date_cb.tex")
 
 # Load required packages quietly and custom functions
 require(dplyr, warn.conflicts = FALSE)
@@ -51,7 +51,7 @@ data <- read.csv(data_path) %>%
   arrange(PredictedOutcome, Model, Prompt) %>%
   filter(
     Model=="GPT-4o",
-    Prompt=="Base prompt"
+    Prompt=="Prompt with date restriction"
     ) %>%
   select(!c(Prompt, Model))
 

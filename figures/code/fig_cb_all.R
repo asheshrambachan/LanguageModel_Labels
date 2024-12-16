@@ -28,3 +28,6 @@ source("./figures/code/cb/fig_mse_cb_lhs_prop10_blank.R")
 
 source("./figures/code/cb/fig_mse_cb_lhs_all_prop.R")
 source("./figures/code/cb/fig_mse_cb_rhs_all_prop.R")
+
+source("./figures/code/cb/fig_prediction_gpt4o_cb_base_prompt.R")
+source("./figures/code/cb/fig_prediction_gpt4o_cb.R")
