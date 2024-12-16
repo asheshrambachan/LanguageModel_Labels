@@ -1,4 +1,4 @@
-# Congressional Bills Prediction Tasks
+# Prediction Task: Congressional Bills
 
 This subdirectory contains the code and data required to perform prediction tasks for Congressional Bills as described in the paper "[Large Language Models: An Applied Econometric Framework](https://arxiv.org/pdf/2412.07031)". 
 
