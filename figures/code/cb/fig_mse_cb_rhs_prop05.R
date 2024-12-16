@@ -1,4 +1,4 @@
-# Figure: Cumulative distribution function of mean square error for the bias-corrected estimator against validation-sample only estimator.
+# Figure: Cumulative distribution function of mean square error for the bias-corrected estimator against validation-sample only estimator using policy topic as a covariate.
 # Dec 10, 2024
 
 # Removing all objects
@@ -10,8 +10,8 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
-fig_path <- file.path(fig_dir, "fig_mse_cb_lhs_prop10.jpeg")
+data_path <- file.path(repo_dir, "estimation_cb/Data/rhs_5k_llm_human_debiased_averaged.csv")
+fig_path <- file.path(fig_dir, "fig_mse_cb_rhs_prop05.jpeg")
 fig_width <- 9
 fig_height <- 4
 
@@ -28,9 +28,9 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_Yllm_V"="Plug-In", 
-  "train_Yhuman_V"="Validation", 
-  "Ytilde_V"="Debiased"
+  "5k_V_Yllm"="Plug-In", 
+  "train_V_Yhuman"="Validation", 
+  "alpha_star"="Debiased"
 )
 
 # Load and format data
@@ -43,8 +43,8 @@ data <- read.csv(data_path) %>%
   ) %>%
   rename(proportion=train_proportion) %>%
   filter(
-    coef_name!="(Intercept)",
-    proportion==0.1,
+    coef_name!="Other",
+    proportion==0.05,
     regression!="Plug-In"
   )
 
@@ -53,7 +53,7 @@ fig <- data %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   stat_ecdf(linewidth=0.5) +
   facet_grid(. ~ model)
-  
+
 # Add theme and aesthetics
 fig <- fig + 
   labs(
@@ -64,8 +64,8 @@ fig <- fig +
   ) +
   scale_color_manual(values=my_colors) +
   scale_linetype_manual(values=my_linetype) +
-  scale_x_continuous(minor_breaks = seq(0,1,0.0002)) +
-  coord_cartesian(xlim=c(0,0.0032)) +
+  scale_x_continuous(minor_breaks = seq(0,1,0.001)) +
+  coord_cartesian(xlim=c(0,0.022)) +
   theme.mse +
   theme(panel.spacing = unit(0.5, "cm", data = NULL))
 

@@ -1,4 +1,4 @@
-# Table: Summary statistics for normalized bias and coverage across Monte Carlo simulations based on Congressional legislation, GPT-3.5.
+# Table: Summary statistics for normalized bias and coverage across Monte Carlo simulations based on Congressional legislation, GPT-4o.
 # Dec 10, 2024
 
 # Removing all objects
@@ -11,7 +11,7 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
 data_path <-  file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
-tab_path <- file.path(tab_dir, "tab_summary_stat_gpt3_cb_lhs_prop10.tex")
+tab_path <- file.path(tab_dir, "tab_summary_stat_gpt4o_cb_lhs_prop05.tex")
 
 # Load required packages quietly and custom functions
 require(dplyr, warn.conflicts = FALSE)
@@ -55,7 +55,7 @@ data <- read.csv(data_path) %>%
   tidyr::pivot_longer(
     cols = c(bias_norm, coverage_mean),
     names_to = "statistic"
-    ) %>%
+  ) %>%
   group_by(Model, Proxy, proportion, statistic) %>%
   summarise(
     "Median" = median(value),
@@ -64,9 +64,9 @@ data <- read.csv(data_path) %>%
     .groups = "drop"
   ) %>%
   filter(
-    proportion==0.10,
+    proportion==0.05,
     Proxy!="Validation",
-    Model=="GPT-3.5"
+    Model=="GPT-4o"
   ) %>%
   arrange(statistic, Proxy) %>%
   select(Proxy, Median, `5\\%`, `95\\%`)

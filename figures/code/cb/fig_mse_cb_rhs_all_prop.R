@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_estimation/Data/rhs_5k_llm_human_debiased_averaged.csv")
+data_path <- file.path(repo_dir, "estimation_cb/Data/rhs_5k_llm_human_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_mse_cb_rhs_all_prop.jpeg")
 fig_width <- 9
 fig_height <- 4

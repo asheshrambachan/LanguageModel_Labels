@@ -1,5 +1,5 @@
-# Table: Summary statistics for normalized bias and coverage across Monte Carlo simulations based on Congressional legislation, GPT-3.5.
-# Dec 10, 2024
+# Table: Summary statistics for normalized bias and coverage for Monte Carlo simulations on congressional legislation using policy topic as a covariate, GPT-3.5.
+# Dec 16, 2024
 
 # Removing all objects
 rm(list = ls())
@@ -10,8 +10,8 @@ tab_dir <- file.path(repo_dir, "tables/output/cb")
 dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
-data_path <-  file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
-tab_path <- file.path(tab_dir, "tab_summary_stat_gpt3_cb_lhs_prop10.tex")
+data_path <-  file.path(repo_dir, "estimation_cb/Data/rhs_5k_llm_human_debiased_averaged.csv")
+tab_path <- file.path(tab_dir, "tab_summary_stat_gpt3_cb_rhs_prop10.tex")
 
 # Load required packages quietly and custom functions
 require(dplyr, warn.conflicts = FALSE)
@@ -24,9 +24,9 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_Yllm_V" = "Plug-In",
-  "train_Yhuman_V" = "Validation",
-  "Ytilde_V" = "Debiased"
+  "5k_V_Yllm" = "Plug-In",
+  "train_V_Yhuman" = "Validation",
+  "alpha_star" = "Debiased"
 )
 proportion_levels <- c(0.05, 0.10, 0.25, 0.50)
 proportion_labels <- sprintf("%s\\%%", proportion_levels*100)
@@ -39,7 +39,7 @@ probs <- c(alpha/2, 1-alpha/2)
 data <- read.csv(data_path) %>%
   rename(proportion=train_proportion) %>%
   filter(
-    coef_name!="(Intercept)"
+    coef_name!="Other"
   ) %>%
   mutate(
     bias_norm = bias_mean/coef_sd, 
@@ -55,7 +55,7 @@ data <- read.csv(data_path) %>%
   tidyr::pivot_longer(
     cols = c(bias_norm, coverage_mean),
     names_to = "statistic"
-    ) %>%
+  ) %>%
   group_by(Model, Proxy, proportion, statistic) %>%
   summarise(
     "Median" = median(value),

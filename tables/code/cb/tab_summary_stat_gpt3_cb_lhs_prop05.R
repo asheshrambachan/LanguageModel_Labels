@@ -11,7 +11,7 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
 data_path <-  file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
-tab_path <- file.path(tab_dir, "tab_summary_stat_gpt3_cb_lhs_prop10.tex")
+tab_path <- file.path(tab_dir, "tab_summary_stat_gpt3_cb_lhs_prop05.tex")
 
 # Load required packages quietly and custom functions
 require(dplyr, warn.conflicts = FALSE)
@@ -64,7 +64,7 @@ data <- read.csv(data_path) %>%
     .groups = "drop"
   ) %>%
   filter(
-    proportion==0.10,
+    proportion==0.05,
     Proxy!="Validation",
     Model=="GPT-3.5"
   ) %>%

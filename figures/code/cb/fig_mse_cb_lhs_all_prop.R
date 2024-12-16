@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_estimation/Data/lhs_5k_llm_human_debiased_averaged.csv")
+data_path <- file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_mse_cb_lhs_all_prop.jpeg")
 fig_width <- 9
 fig_height <- 4
@@ -70,8 +70,8 @@ fig <- fig +
   ) + 
   scale_color_manual(values=my_colors) +
   scale_linetype_manual(values=my_linetype) +
-  scale_x_continuous(breaks=seq(0,1,0.001), minor_breaks = seq(0,1,0.0001)) +
-  coord_cartesian(xlim=c(0,0.0025)) +
+  scale_x_continuous(breaks=seq(0,1,0.001), minor_breaks = seq(0,1,0.0002)) +
+  coord_cartesian(xlim=c(0,0.0032)) +
   theme.mse 
 
 # save figure

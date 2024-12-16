@@ -10,7 +10,7 @@ tab_dir <- file.path(repo_dir, "tables/output/cb")
 dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
-data_path <-  file.path(repo_dir, "cb_estimation/Data/lhs_5k_llm_human_debiased_averaged.csv")
+data_path <-  file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
 tab_path <- file.path(tab_dir, "tab_summary_stat_gpt4o_cb_lhs_prop10.tex")
 
 # Load required packages quietly and custom functions
