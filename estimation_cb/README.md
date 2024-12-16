@@ -13,7 +13,7 @@ This subdirectory contains the replication files for the congressional bills exp
     - **2.4** Decodes LLM responses and merges them with the corresponding bill and prompt metadata.
 3. **Simulation Runs & Model Evaluation:**
     - **3.1 and 3.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
-    - **3.4 and 3.5** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
+    - **3.3 and 3.4** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
     <!-- - **4.1** Estimates LLM prediction errors for each combination of prompt and model. -->
 
 ## File Structure
