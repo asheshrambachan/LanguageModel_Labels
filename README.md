@@ -30,17 +30,17 @@ This repository is organized to facilitate the replication of results presented 
 ## Using the Repository
 
 1. Create a Conda environment with all packages needed for both Python and R code:
-```bash
-cd path/to/LanguageModel_Labels
-conda update conda
-conda config --set channel_priority strict
-conda env create -f conda_llm_env.yaml
-conda activate llm_env
-```
-2. Follow the instructions in the respective subdirectory README.md files to replicate the data generation process
-    - [Prediction tasks Congressional bills](./prediction_cb)
-    - [Prediction tasks financial headlines](./prediction_headlines)
+    ```bash
+    cd path/to/LanguageModel_Labels
+    conda update conda
+    conda config --set channel_priority strict
+    conda env create -f conda_llm_env.yaml
+    conda activate llm_env
+    ```
+2. Follow the instructions in the respective subdirectory `README.md` files to replicate the data generation process
     - [Estimation tasks Congressional bills](./estimation_cb)
     - [Estimation tasks financial headlines](./estimation_headlines)
+    - [Prediction tasks Congressional bills](./prediction_cb)
+    - [Prediction tasks financial headlines](./prediction_headlines)
 3. Run the provided scripts in the [`figures/code/`](./figures/code) directory to generate all figures. Results will be saved in [`figures/output/`](./figures/output).
 4. Run the provided scripts in the [`tables/code/`](./tables/code) directory to generate all tables. Results will be saved in [`tables/output/`](./tables/output).
