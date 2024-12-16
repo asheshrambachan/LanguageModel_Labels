@@ -14,11 +14,7 @@ This subdirectory contains the replication files for the congressional bills exp
 3. **Simulation Runs & Model Evaluation:**
     - **3.1 and 3.2** Fit regression models using major topic labels, with the major topic on the LHS and the RHS.
     - **3.4 and 3.5** Estimate regression coefficients, bias, normalized bias, MSE, and coverage relative to human-annotated major topics for regressions with proxy on the LHS and RHS.
-4. **Figure and Table Generation:** Produces visualizations and summary tables for the results.
-    - **4.1** Estimates LLM prediction errors for each combination of prompt and model.
-    - **4.2** Plots the distribution of bills over years, unique LLM major topics vs. prompt, and accuracy of LLM predictions.
-    - **4.3** Generate figures and tables for regressions with proxy on the LHS and the RHS.
-
+    <!-- - **4.1** Estimates LLM prediction errors for each combination of prompt and model. -->
 
 ## File Structure
 
@@ -35,8 +31,8 @@ There are **2 possible levels of replication** that this code base allows for. Y
 
 If you want to run the entire pipeline from data cleaning to figure and table generation, run:
 ```bash
-chmod +x ./Code/Estimation/run_all.sh
-./Code/Estimation/run_all.sh
+chmod +x ./estimation_cb/Code/run_all.sh
+./estimation_cb/Code/run_all.sh
 ```
 
 ### Partial Replication
@@ -44,9 +40,9 @@ chmod +x ./Code/Estimation/run_all.sh
 The repo contains all the necessary data for you to run a specific steps (e.g., model evaluation or figure generation).
 
 1. **Replicating Data Cleaning:** 
-    If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/Estimation/bills.csv`:
+    If you are only interested in replicating the data cleaning step, run the following code. It will create the file `./Data/bills.csv`:
     ```bash
-    python ./Code/Estimation/1_clean_bills.py
+    python ./estimation_cb/Code/1_clean_bills.py
     ```
 
 2. **Replicating Prompt Creation, LLM Querying, and Response Decoding:** 
@@ -59,26 +55,26 @@ The repo contains all the necessary data for you to run a specific steps (e.g., 
             echo 'OPENAI_API_KEY="your key"' > .env
             ```
 
-    Then, run the following commands to create the file `./Data/Estimation/bills_llm.csv`:
+    Then, run the following commands to create the file `./estimation_cb/Data/bills_llm.csv`:
     ```bash
-    python ./Code/Estimation/2.1_create_prompts.py
-    python ./Code/Estimation/2.2_query_llm.py
-    python ./Code/Estimation/2.3_download_responses.py
-    python ./Code/Estimation/2.4_decode_responses.py
+    python ./estimation_cb/Code/2.1_create_prompts.py
+    python ./estimation_cb/Code/2.2_query_llm.py
+    python ./estimation_cb/Code/2.3_download_responses.py
+    python ./estimation_cb/Code/2.4_decode_responses.py
     ```
     [^1]: The token limit varies by user and you may need to split the prompts into more smaller batches.
 
 3. **Replicating Simulation Runs & Model Evaluation:** 
     If you are only interested in running the simulation and model evaluation, run the following commands. This will generate the following files: 
-    - `./Data/Estimation/LHS/lhs_10k_human.csv`, `./Data/Estimation/RHS/rhs_10k_human.csv`[^2]
-    - `./Data/Estimation/LHS/lhs_10k_llm.csv`,  `./Data/Estimation/RHS/rhs_10k_llm.csv`[^3]
-    - `./Data/Estimation/LHS/lhs_5k_llm_human_debiased_averaged.csv`, `./Data/Estimation/RHS/rhs_5k_llm_human_debiased_averaged.csv`[^4]
+    - `./estimation_cb/Data/lhs_10k_human.csv`, `./estimation_cb/Data/rhs_10k_human.csv`[^2]
+    - `./estimation_cb/Data/lhs_10k_llm.csv`,  `./estimation_cb/Data/rhs_10k_llm.csv`[^3]
+    - `./estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv`, `./estimation_cb/Data/rhs_5k_llm_human_debiased_averaged.csv`[^4]
 
     ```bash
-    Rscript ./Code/Estimation/3.1_run_lhs_simulations.r
-    Rscript ./Code/Estimation/3.2_run_rhs_simulations.r
-    Rscript ./Code/Estimation/3.3_summarize_lhs_simulations.r
-    Rscript ./Code/Estimation/3.4_summarize_rhs_simulations.r
+    Rscript ./estimation_cb/Code/3.1_run_lhs_simulations.r
+    Rscript ./estimation_cb/Code/3.2_run_rhs_simulations.r
+    Rscript ./estimation_cb/Code/3.3_summarize_lhs_simulations.r
+    Rscript ./estimation_cb/Code/3.4_summarize_rhs_simulations.r
     ```
     [^2]: These files contain the regression results using `Yhuman` across all 10,000 bills. 
     [^3]: These files contain the regression results using `Yllm` across all 10,000 bills. 
