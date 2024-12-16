@@ -1,6 +1,6 @@
 # Large Language Models: An Applied Econometric Framework
 
-This repository contains the code, data, and outputs associated with the paper "[Large Language Models: An Applied Econometric Framework](https://arxiv.org/pdf/2412.07031)" by Jens Ludwig, Sendhil Mullainathan, and Ashesh Rambachan.
+<!-- This repository contains the code, data, and outputs associated with the paper "[Large Language Models: An Applied Econometric Framework](https://arxiv.org/pdf/2412.07031)" by Jens Ludwig, Sendhil Mullainathan, and Ashesh Rambachan.
 
 TODO: Add two lines about the paper.
 
@@ -15,7 +15,7 @@ If you use this repository, please cite the paper:
     journal={arXiv preprint arXiv:2412.07031},
     url={https://arxiv.org/abs/2412.07031}, 
 }
-```
+``` -->
 
 ## Repository Structure
 
