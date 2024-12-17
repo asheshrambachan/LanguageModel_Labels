@@ -1,0 +1,9 @@
+"Model","Prompt","Chamber","Accuracy","TPR","FPR"
+"GPT-3.5","Base prompt","Senate",0.2555,0.973154362416107,0.78998298596342
+"GPT-3.5","Base prompt","House",0.1728,0.985074626865672,0.89182770160855
+"GPT-3.5","Prompt with date restriction","Senate",0.2739,0.974832214765101,0.77052318162484
+"GPT-3.5","Prompt with date restriction","House",0.1861,0.983717774762551,0.877361545935442
+"GPT-4o","Base prompt","Senate",0.9249,0.224832214765101,0.0307316035729477
+"GPT-4o","Base prompt","House",0.9123,0.198100407055631,0.0308755262873799
+"GPT-4o","Prompt with date restriction","Senate",0.6954,0.711409395973154,0.305614632071459
+"GPT-4o","Prompt with date restriction","House",0.6444,0.690637720488467,0.359278851344057
