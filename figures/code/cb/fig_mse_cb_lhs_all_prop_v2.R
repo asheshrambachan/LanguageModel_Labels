@@ -1,4 +1,4 @@
-# Figure: Cumulative distribution function of mean square error for the bias-corrected estimator against validation-sample only estimator, varying the size of the validation sample using policy topic as a covariate.
+# Figure: Cumulative distribution function of mean square error for the bias-corrected estimator against validation-sample only estimator, varying the size of the validation sample.
 # Dec 10, 2024
 
 # Removing all objects
@@ -10,8 +10,8 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "estimation_cb/Data/rhs_5k_llm_human_debiased_averaged.csv")
-fig_path <- file.path(fig_dir, "fig_mse_cb_rhs_all_prop.jpeg")
+data_path <- file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
+fig_path <- file.path(fig_dir, "fig_mse_cb_lhs_all_prop_v2.jpeg")
 fig_width <- 9
 fig_height <- 4
 
@@ -28,9 +28,9 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 regression_labels_levels <- c(
-  "5k_V_Yllm"="Plug-In", 
-  "train_V_Yhuman"="Validation", 
-  "alpha_star"="Debiased"
+  "5k_Yllm_V"="Plug-In", 
+  "train_Yhuman_V"="Validation", 
+  "Ytilde_V"="Debiased"
 )
 proportion_labels_levels <- c(
   `0.025`="2.5% Validation Prop.", 
@@ -39,7 +39,6 @@ proportion_labels_levels <- c(
   `0.25`="25% Validation Prop.",
   `0.50`="50% Validation Prop."
 )
-
 
 # Load and format data
 data <- read.csv(data_path) %>%
@@ -52,9 +51,8 @@ data <- read.csv(data_path) %>%
     proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
   filter(
-    coef_name!="Other",
-    regression!="Plug-In",
-    proportion!="2.5% Validation Prop."
+    coef_name!="(Intercept)",
+    regression!="Plug-In"
   )
 
 # Plot figure
@@ -73,8 +71,8 @@ fig <- fig +
   ) + 
   scale_color_manual(values=my_colors) +
   scale_linetype_manual(values=my_linetype) +
-  scale_x_continuous(minor_breaks = seq(0,1,0.001)) +
-  coord_cartesian(xlim=c(0,0.022)) +
+  scale_x_continuous(breaks=seq(0,1,0.002), minor_breaks = seq(0,1,0.0002)) +
+  coord_cartesian(xlim=c(0,0.005)) +
   theme.mse 
 
 # save figure

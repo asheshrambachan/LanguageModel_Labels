@@ -9,7 +9,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_prediction/Data/bills_llm_passage.csv")
+data_path <- file.path(repo_dir, "prediction_cb/Data/bills_llm_passage.csv")
 fig_path <- file.path(fig_dir, "fig_prediction_gpt4o_cb_base_prompt.jpeg")
 fig_width <- 4.5
 fig_height <- 3.5

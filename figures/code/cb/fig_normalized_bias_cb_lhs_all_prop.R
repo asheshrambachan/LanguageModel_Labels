@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_estimation/Data/lhs_5k_llm_human_debiased_averaged.csv")
+data_path <- file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_lhs_all_prop.jpeg")
 fig_width <- 9
 fig_height <- 4
@@ -33,10 +33,11 @@ regression_labels_levels <- c(
   "Ytilde_V"="Debiased"
 )
 proportion_labels_levels <- c(
-  `0.05`="Validation Proportion = 5%", 
-  `0.10`="Validation Proportion = 10%", 
-  `0.25`="Validation Proportion = 25%",
-  `0.50`="Validation Proportion = 50%"
+  `0.025`="2.5% Validation Prop.", 
+  `0.05`="5% Validation Prop.", 
+  `0.10`="10% Validation Prop.", 
+  `0.25`="25% Validation Prop.",
+  `0.50`="50% Validation Prop."
 )
 
 # Load and format data
@@ -51,7 +52,8 @@ data <- read.csv(data_path) %>%
   ) %>%
   filter(
     coef_name!="(Intercept)",
-    regression!="Validation"
+    regression!="Validation",
+    proportion!="2.5% Validation Prop."
     )
 
 # Plot figure

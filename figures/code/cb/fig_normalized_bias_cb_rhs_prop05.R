@@ -32,20 +32,28 @@ regression_labels_levels <- c(
   "train_V_Yhuman"="Validation", 
   "alpha_star"="Debiased"
 )
+proportion_labels_levels <- c(
+  `0.025`="2.5% Validation Prop.", 
+  `0.05`="5% Validation Prop.", 
+  `0.10`="10% Validation Prop.", 
+  `0.25`="25% Validation Prop.",
+  `0.50`="50% Validation Prop."
+)
 
 # Load and format data
 data <- read.csv(data_path) %>%
+  rename(proportion=train_proportion) %>%
   mutate(
     bias_norm = bias_mean/coef_sd, 
     V = factor(V, levels=V_levels),
     model = recode_factor(model, !!!model_labels_levels),
-    regression = recode_factor(regression, !!!regression_labels_levels)
+    regression = recode_factor(regression, !!!regression_labels_levels),
+    proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
-  rename(proportion=train_proportion) %>%
   filter(
     coef_name!="Other",
-    proportion==0.05,
-    regression!="Validation"
+    regression!="Validation",
+    proportion=="5% Validation Prop."
   )
 
 # Plot figure

@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/cb")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "cb_estimation/Data/lhs_5k_llm_human_debiased_averaged.csv")
+data_path <- file.path(repo_dir, "estimation_cb/Data/lhs_5k_llm_human_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_lhs_prop10.jpeg")
 fig_width <- 9
 fig_height <- 4
@@ -32,20 +32,28 @@ regression_labels_levels <- c(
   "train_Yhuman_V"="Validation", 
   "Ytilde_V"="Debiased"
 )
+proportion_labels_levels <- c(
+  `0.025`="2.5% Validation Prop.", 
+  `0.05`="5% Validation Prop.", 
+  `0.10`="10% Validation Prop.", 
+  `0.25`="25% Validation Prop.",
+  `0.50`="50% Validation Prop."
+)
 
 # Load and format data
 data <- read.csv(data_path) %>%
+  rename(proportion=train_proportion) %>%
   mutate(
     bias_norm = bias_mean/coef_sd, 
     V = factor(V, levels=V_levels),
     model = recode_factor(model, !!!model_labels_levels),
-    regression = recode_factor(regression, !!!regression_labels_levels)
+    regression = recode_factor(regression, !!!regression_labels_levels),
+    proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
-  rename(proportion=train_proportion) %>%
   filter(
     coef_name!="(Intercept)",
-    proportion==0.1,
-    regression!="Validation"
+    regression!="Validation",
+    proportion=="10% Validation Prop."
   )
   
 # Plot figure

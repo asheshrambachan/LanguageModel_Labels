@@ -33,10 +33,11 @@ regression_labels_levels <- c(
   "Ytilde_V"="Debiased"
 )
 proportion_labels_levels <- c(
-  `0.05`="Validation Proportion = 5%", 
-  `0.10`="Validation Proportion = 10%", 
-  `0.25`="Validation Proportion = 25%",
-  `0.50`="Validation Proportion = 50%"
+  `0.025`="2.5% Validation Prop.", 
+  `0.05`="5% Validation Prop.", 
+  `0.10`="10% Validation Prop.", 
+  `0.25`="25% Validation Prop.",
+  `0.50`="50% Validation Prop."
 )
 
 # Load and format data
@@ -51,7 +52,8 @@ data <- read.csv(data_path) %>%
   ) %>%
   filter(
     coef_name!="(Intercept)",
-    regression!="Plug-In"
+    regression!="Plug-In",
+    proportion!="2.5% Validation Prop."
   )
 
 # Plot figure
