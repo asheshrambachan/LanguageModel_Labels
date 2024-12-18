@@ -1,14 +1,10 @@
 # Prediction Tasks: Congressional Bills
 
-This subdirectory contains scripts, data, and outputs for **prediction tasks** using **Congressional bills** data. The workflow involves cleaning and preparing the data, querying LLMs, generating embeddings for similarity analysis, and summarizing the results for use in plots and tables.
+This subdirectory contains scripts, data, and outputs for **prediction tasks** using **Congressional bills** data. The workflow involves cleaning and preparing the data, querying LLMs, generating embeddings for similarity analysis, and summarizing the results for use in figures and tables.
 
 ## Directory Structure
+
 - `code/`: Python and R scripts for data cleaning, prompt creation, querying LLMs, embedding generation, and result summarization.
-    - `1_clean_bills.py`: Cleans and preprocesses Congressional Bills data.
-    - `2.*.py`: Scripts for prompt creation, LLM querying, and response decoding using the specified prompt templates and LLM models (see [here](./data/prompt_templates.csv)).
-    - `3.*.py`: Scripts for embedding generation and similarity analysis.
-    - `4.*.py`: Scripts for summarizing prediction and completion results.
-    - `run_all.sh`: Shell script to execute the entire workflow in sequence.
 - `data/`: Contains input and output data files, including:
 - `temp`/: Temporary directory for intermediate files during execution.
 
@@ -28,7 +24,7 @@ You can replicate the workflow using the following methods:
     python ./prediction_cb/code/1_clean_bills.py
     ```
 
-    2. Run prediction prompts
+    2. Prompt creation, LLM querying, and response decoding using the specified prompt templates and LLM models (see [here](./data/prompt_templates.csv)).
         - Prompt creation:
         ```sh
         python ./prediction_cb/code/2.1_create_prompts.py
@@ -45,7 +41,7 @@ You can replicate the workflow using the following methods:
         ```sh
         python ./prediction_cb/code/2.4_decode_responses.py
         ```
-    3. Generate embeddings of LLM responses
+    3. Embedding generation and similarity analysis
         - Create embedding prompts:
         ```sh
         python ./prediction_cb/code/3.1_create_embed_prompts.py
@@ -62,11 +58,17 @@ You can replicate the workflow using the following methods:
         ```sh
         python ./prediction_cb/code/3.4_decode_embed_responses.py
         ```
-    4. Summarize results
+    4. Summarize prediction and completion results
     ```sh
     Rscript ./prediction_cb/code/4.1_summarize_prediction.R
     Rscript ./prediction_cb/code/4.2_summarize_completion.R
     ```
+
+## Notes
+
+- Steps involving querying LLMs (i.e., `2.2_query_llm.py`, `3.2_query_embed_prompts.py`) require you to wait for responses before proceeding.
+- Generated prompts and responses are stored in the `temp/` directory.
+- Final outputs are saved in the `data/` directory as `.csv` files, ready for use in figures and tables.
 
 <!-- 
 ## Usage Instructions
