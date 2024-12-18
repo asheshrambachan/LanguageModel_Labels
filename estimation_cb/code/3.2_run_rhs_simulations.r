@@ -24,7 +24,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # setwd("~/Documents/LanguageModel_Labels/estimation_cb/")
 repo_dir <- "."
 data_path <- file.path(repo_dir, "estimation_cb/data/bills_llm.csv")
-rhs_rds_dir <- file.path(repo_dir, "estimation_cb/temp/RHS/rds")
+rhs_rds_dir <- file.path(repo_dir, "estimation_cb/temp/RHS")
 
 # Install our simUtils package
 install.packages(file.path(repo_dir, "estimation_cb/code/simUtils_1.0.0.tar.gz"), repos = NULL, quiet = TRUE)

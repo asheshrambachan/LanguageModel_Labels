@@ -14,8 +14,7 @@ suppressPackageStartupMessages({
 # Setup directories
 repo_dir <- "."
 data_dir <- file.path(repo_dir, "estimation_cb/data")
-temp_dir <- file.path(repo_dir, "estimation_cb/temp/RHS")
-rhs_dir <- file.path(temp_dir, "rds")
+rhs_dir <- file.path(repo_dir, "estimation_cb/temp/RHS")
 dir.create(data_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data paths

@@ -229,13 +229,13 @@ def main():
     
     # Load and clean CAP
     cap = get_cap(path_cap)
-    cap.to_csv(os.path.join(temp_dir, "cap.csv"), index=False)
-    print(f'Saved cap.csv, n = {len(cap)}, at {temp_dir}')
+    # cap.to_csv(os.path.join(temp_dir, "cap.csv"), index=False)
+    # print(f'Saved cap.csv, n = {len(cap)}, at {temp_dir}')
 
     # Load and clean CBP
     cbp = get_cbp(path_cbp_80_92, path_cbp_93_114)
-    cbp.to_csv(os.path.join(temp_dir, "cbp.csv"), index=False)
-    print(f'Saved cbp.csv, n = {len(cbp)}, at {temp_dir}')
+    # cbp.to_csv(os.path.join(temp_dir, "cbp.csv"), index=False)
+    # print(f'Saved cbp.csv, n = {len(cbp)}, at {temp_dir}')
 
     # Merge CAP and CBP data
     bills = merge_cap_cbp(cap, cbp)
