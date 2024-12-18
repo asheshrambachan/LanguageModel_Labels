@@ -30,38 +30,40 @@ You can replicate the workflow using the following methods:
 
     2. Run prediction prompts
         - Prompt creation:
-        ```
+        ```sh
         python ./prediction_cb/code/2.1_create_prompts.py
         ```
         - Querying LLMs:
-        ```
+        ```sh
         python ./prediction_cb/code/2.2_query_llm.py
         ```
         - Downloading LLM responses: 
+        ```sh
         python ./prediction_cb/code/2.3_download_responses.py
-
+        ```
         - Decoding LLM responses:
+        ```sh
         python ./prediction_cb/code/2.4_decode_responses.py
-
+        ```
     3. Generate embeddings of LLM responses
         - Create embedding prompts:
-        ```
+        ```sh
         python ./prediction_cb/code/3.1_create_embed_prompts.py
         ```
         - Query `text-embedding-3-small` model:
-        ```
+        ```sh
         python ./prediction_cb/code/3.2_query_embed_llm.py
         ```
         - Download embedding results:
-        ```
+        ```sh
         python ./prediction_cb/code/3.3_download_embed_responses.py
         ```
         - Decode responses and perform similarity analysis:
-        ```
+        ```sh
         python ./prediction_cb/code/3.4_decode_embed_responses.py
         ```
     4. Summarize results
-    ```
+    ```sh
     Rscript ./prediction_cb/code/4.1_summarize_prediction.R
     Rscript ./prediction_cb/code/4.2_summarize_completion.R
     ```
