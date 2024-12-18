@@ -23,12 +23,12 @@ You can replicate the tables using the following methods:
     ./tables/code/run_all.sh
     ```
 
-2. **Individual Table Generation:** o generate a specific table, run its relevant R script. For example:
+2. **Partial Replication:** to generate a specific table, run its relevant R script. For example:
     ```
     Rscript ./tables/code/prediction_cb/tab_completion_cosine_euclidean_gpt4o_cb_base_prompt.R
     ```
 
 ## Notes
 - All necessary data files are included in this repository. There is no need to regenerate data for table creation.
-- Tables are saved within the `./tables/output/` directory.
+- Tables are saved within the `output/` subdirectory.
 
