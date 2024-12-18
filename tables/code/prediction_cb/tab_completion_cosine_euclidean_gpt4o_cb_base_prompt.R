@@ -10,7 +10,7 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
 data_path <- file.path(repo_dir, "prediction_cb/Data/completion_cosine_euclidean.csv")
-tab_path <- file.path(tab_dir, "tab_completion_cosine_euclidean_gpt4o_without_date_cb.tex")
+tab_path <- file.path(tab_dir, "tab_completion_cosine_euclidean_gpt4o_cb_base_prompt.tex")
 
 # Load required packages quietly and custom functions
 require(dplyr, warn.conflicts = FALSE)

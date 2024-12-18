@@ -45,7 +45,7 @@ completion_exact_examples <- data %>%
 
 # Place samples used in paper and slides at the top
 index_first <- c(626, 239, 574, 306, 257, 401)
-index_last <- (1:nrow(data))[-index_first]
+index_last <- (1:nrow(completion_exact_examples))[-index_first]
 index <- c(index_first, index_last)
 completion_exact_examples <- completion_exact_examples[index, ] 
 write.csv(completion_exact_examples, completion_exact_examples_path, row.names=FALSE)

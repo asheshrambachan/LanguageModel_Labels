@@ -7,10 +7,15 @@ rm(list = ls())
 
 # Setup directories
 repo_dir <- "~/Documents/LanguageModel_Labels"
-fig_dir <- file.path(repo_dir, "figures/output/headlines")
+fig_dir <- file.path(repo_dir, "figures/output/estimation_headlines")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
+data_paths <- list(
+  "GPT-3.5" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q1"),
+  "GPT-4o" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o/q1"),
+  "GPT-4o-mini" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q1")
+)
 fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q1.jpeg")
 fig_width <- 9
 fig_height <- 4.75
@@ -21,11 +26,6 @@ require(ggplot2, warn.conflicts = FALSE)
 source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 
 # Factor labels and levels
-model_labels_values <- c(
-  "gpt-3.5-turbo"="GPT-3.5", 
-  "gpt-4o"="GPT-4o",
-  "gpt-4o-mini"="GPT-4o-mini"
-)
 prompt_labels_values <- c(
   "base_blanks"="Base: Fill in Blank", 
   "base_json"="Base: JSON",
@@ -81,20 +81,16 @@ create_agreement_matrix <- function(datasets) {
 
 # Iterate over combinations and store data
 agreement_matrices <- list()
-for (model in names(model_labels_values)) {
-  path <- file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized", model, "q1")
+for (model in names(data_paths)) {
+  path <- data_paths[model]
   datasets <- read_datasets(path)
   
   # Calculate and store agreement matrix
   agreement_df <- create_agreement_matrix(datasets)
-  agreement_df$model <- model_labels_values[model]
+  agreement_df$model <- model
   agreement_matrices[[model]] <- agreement_df
 }
 agreement_matrices <- bind_rows(agreement_matrices)
-
-# Store global min and max
-# heatmap_global_min <- min(agreement_matrices$agreement, na.rm = TRUE)
-# heatmap_global_max <- max(agreement_matrices$agreement, na.rm = TRUE)
 
 # Plot figure
 fig <- agreement_matrices %>%
@@ -122,6 +118,7 @@ fig <- fig +
   scale_color_identity() +
   theme.heatmap +
   guides(fill = guide_colourbar(title.vjust = .8)) 
+
 # Save figure
 ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
 cat(sprintf("Saved %s\n", fig_path))

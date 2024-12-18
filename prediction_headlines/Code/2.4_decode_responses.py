@@ -34,12 +34,10 @@ def decode_responses(responses):
         if (response["id"]==829) | (response["id"]==20828) | (response["id"]==24548) | (response["id"]==26143) | (response["id"]==33259): 
             response_text = response_text +'"}'
 
-        if (response["id"]==33260): # | (response["id"]==34772): 
+        if (response["id"]==33260): 
             print(f'id={response["id"]}, incorrect formatting, dropped')
             continue
 
-        # print(response["id"])
-        # print(response_text)
         response_json = json.loads(response_text)
         
         responses_decoded.append({
@@ -85,11 +83,6 @@ def add_trimmed(df):
         headline = part_to_trim + headline
         headline_llm = part_to_trim + headline_llm
         
-    # else:
-    #     print(df["id"])
-    #     print(part_to_trim[:100])
-    #     print(headline[:100])
-    #     print(headline_llm[:100])
     df["headline_trim"] = part_to_trim
     df["headline"] = headline
     df["headline_llm"] = headline_llm

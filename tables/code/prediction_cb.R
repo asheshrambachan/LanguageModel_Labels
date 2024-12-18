@@ -10,3 +10,4 @@ source("./tables/code/prediction_cb/tab_completion_cosine_euclidean_gpt4o_cb_pro
 source("./tables/code/prediction_cb/tab_completion_cosine_euclidean_gpt4o_cb_all_prompts.R")
 
 source("./tables/code/prediction_cb/tab_completion_exact_rates_cb.R")
+source("./tables/code/prediction_cb/tab_completion_exact_examples_cb.R")

@@ -43,8 +43,7 @@ data <- read.csv(data_path) %>%
     proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
   filter(
-    regression!="Validation",
-    proportion!="2.5% Validation Prop."
+    regression!="Validation"
   )
 
 # Plot figure

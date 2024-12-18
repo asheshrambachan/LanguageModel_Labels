@@ -23,11 +23,11 @@ model_labels_levels <- c(
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 proportion_labels_levels <- c(
-  `0.025` = "2.5%",
-  `0.05` = "5%",
-  `0.10` = "10%",
-  `0.25` = "25%",
-  `0.50` = "50%"
+  `0.025` = "2.5\\%",
+  `0.05` = "5\\%",
+  `0.10` = "10\\%",
+  `0.25` = "25\\%",
+  `0.50` = "50\\%"
 )
 
 # Load averaged simulation data
@@ -40,8 +40,7 @@ data <- read.csv(data_path) %>%
   filter(
     statistic_name %in% c("bias_norm", "coverage_mean"),
     regression=="Debiased",
-    model=="GPT-3.5",
-    proportion!="2.5%"
+    model=="GPT-3.5"
   ) %>%
   select(proportion, Median, CI05, CI95) %>%
   rename(c(
@@ -52,9 +51,9 @@ data <- read.csv(data_path) %>%
   
 tab <- data %>%
   kable(digits=3, linesep = "", escape=F, booktabs=T, format = "latex") %>%
-  row_spec(4, hline_after = TRUE, extra_latex_after = "%") %>%
-  pack_rows("Normalized Bias", 1, 4, italic=T, bold=F)  %>%
-  pack_rows("Coverage", 5, 8, italic=T, bold=F)
+  row_spec(5, hline_after = TRUE, extra_latex_after = "%") %>%
+  pack_rows("Normalized Bias", 1, 5, italic=T, bold=F)  %>%
+  pack_rows("Coverage", 6, 10, italic=T, bold=F)
 
 tab <- gsub("\\\\addlinespace\\[0.3em\\]\n", "", tab)
 tab <- gsub("\\\\hspace\\{1em\\}", "", tab)

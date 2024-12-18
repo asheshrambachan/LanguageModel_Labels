@@ -44,8 +44,7 @@ data <- read.csv(data_path) %>%
     proportion = recode_factor(proportion, !!!proportion_labels_levels)
   ) %>%
   filter(
-    regression!="Plug-In",
-    proportion!="2.5% Validation Prop."
+    regression!="Plug-In"
   )
 
 # Plot figure
@@ -64,8 +63,8 @@ fig <- fig +
   ) + 
   scale_color_manual(values=my_colors) +
   scale_linetype_manual(values=my_linetype) +
-  scale_x_continuous(minor_breaks = seq(0,1,0.001)) +
-  coord_cartesian(xlim=c(0,0.022)) +
+  scale_x_continuous(breaks=seq(0,1,0.01), minor_breaks = seq(0,1,0.002)) +
+  coord_cartesian(xlim=c(0,0.032)) +
   theme.mse 
 
 # save figure

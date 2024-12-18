@@ -2,7 +2,7 @@
 # Dec 10, 2024
 
 # Load figure
-source("./figures/code/headlines/fig_tscores_headlines_realized_q1_confidence_1_day.R")
+source("./figures/code/estimation_headlines/fig_tscores_headlines_realized_q1_confidence_1_day.R")
 
 # Figure path
 blank_fig_path <- file.path(fig_dir, "fig_tscores_headlines_realized_q1_confidence_1_day_blank.jpeg")

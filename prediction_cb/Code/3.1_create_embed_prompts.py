@@ -75,7 +75,7 @@ def main():
     cost_description_llm = estimate_cost(bills_llm_completion["DescriptionLLMClean"], batched=True)
     print(f"Estimated cost to embed DescriptionLLM using Batch API is ${cost_description_llm:.2f}")
 
-    # create prompts
+    # Create prompts
     batches = create_embed_requests(bills_llm_completion, requests_dir, embedding_model="text-embedding-3-small")
     batches_path = os.path.join(temp_dir, "batches.csv")
     batches.to_csv(batches_path, index=False)

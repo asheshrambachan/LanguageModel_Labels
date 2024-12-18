@@ -16,16 +16,6 @@ fig_path <- file.path(fig_dir, "fig_completion_exact_gpt4o_cb_prompt_with_date.t
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 
-# Factor labels and levels
-prompt_labels_levels <- c(
-  "False"="Base prompt", 
-  "True"="Prompt with date restriction"
-)
-model_labels_levels <- c(
-  "gpt-3.5-turbo-0125"="GPT-3.5", 
-  "gpt-4o-2024-05-13"="GPT-4o"
-)
-
 # Load and format data
 data <- read.csv(data_path) %>%
   filter(
