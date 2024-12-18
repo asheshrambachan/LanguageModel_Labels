@@ -18,6 +18,7 @@ This subdirectory contains scripts for generating the tables presented in the pa
 You can replicate the tables using the following methods:
 
 1. **Full Replication**
+
     To generate all tables for all tasks and datasets in sequence, run the run_all.sh shell script:
     ```
     chmod +x ./tables/code/run_all.sh
@@ -25,6 +26,7 @@ You can replicate the tables using the following methods:
     ```
 
 2. **Individual Table Generation**
+
     To generate a specific table, navigate to the appropriate subdirectory in ./tables/code/ and run the relevant R script. For example:
     ```
     Rscript ./tables/code/prediction_cb/tab_completion_cosine_euclidean_gpt4o_cb_base_prompt.R
