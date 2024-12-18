@@ -4,7 +4,10 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = './prediction_cb'
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/Embeddings")
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embedding_model="text-embedding-3-small"):
     df = df[[id_col_name, text_col_name]].drop_duplicates()
@@ -62,12 +65,10 @@ def estimate_cost(descriptions, model="text-embedding-3-small", batched=True):
     return total_cost
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Embeddings")
-    requests_dir = os.path.join(temp_dir, "Requests")
+    requests_dir = os.path.join(TEMP_DIR, "Requests")
     os.makedirs(requests_dir, exist_ok=True)
 
-    bills_llm_completion = pd.read_csv(os.path.join(data_dir, "bills_llm_completion.csv"))
+    bills_llm_completion = pd.read_csv(os.path.join(DATA_DIR, "bills_llm_completion.csv"))
 
     # Estimate cost using Batch API
     cost_description = estimate_cost(bills_llm_completion["DescriptionClean"].unique(), batched=True)
@@ -77,7 +78,7 @@ def main():
 
     # Create prompts
     batches = create_embed_requests(bills_llm_completion, requests_dir, embedding_model="text-embedding-3-small")
-    batches_path = os.path.join(temp_dir, "batches.csv")
+    batches_path = os.path.join(TEMP_DIR, "batches.csv")
     batches.to_csv(batches_path, index=False)
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")
 

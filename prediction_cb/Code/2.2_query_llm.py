@@ -3,10 +3,12 @@ import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 
+REPO_DIR = "."
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/LLM")
+
 # Place API_KEY in the .env file
-load_dotenv()
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = "./prediction_cb"
+load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)
+OPENAI_API_KEY = os.environ.get('API_KEY')
 
 def query_llm(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -31,10 +33,8 @@ def query_llm(batches):
     return(batches)
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-
     # Query LLM and store batches id 
-    batches_path = os.path.join(temp_dir, "batches.csv")
+    batches_path = os.path.join(TEMP_DIR, "batches.csv")
     batches = pd.read_csv(batches_path)
     batches = query_llm(batches)
     batches.to_csv(batches_path, index=False)

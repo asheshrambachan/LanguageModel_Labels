@@ -3,7 +3,15 @@ import pandas as pd
 import string
 import re
 
-REPO_DIR = './prediction_headlines'
+
+# Define directories
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, 'prediction_headlines/data')
+TEMP_DIR = os.path.join(REPO_DIR, 'prediction_headlines/temp')
+RETURNS_DATA_DIR = os.path.join(REPO_DIR, 'headlines/data/step0_returns_data/realized')
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 
 def clean_text(x):    
     # remove punctuation, lowercase, and remove tailing spaces
@@ -12,23 +20,14 @@ def clean_text(x):
     return x
 
 def main():
-    # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data')
-    temp_dir = os.path.join(REPO_DIR, 'Temp')
-    os.makedirs(data_dir, exist_ok=True)
-    os.makedirs(temp_dir, exist_ok=True)
-
-    # data paths
-    returns_dir = os.path.join("./headlines/data/step0_returns_data/realized")
-    
     # Create an empty list to store individual DataFrames
     dfs = []
 
     # Loop through all files in the directory
-    for file in os.listdir(returns_dir):
+    for file in os.listdir(RETURNS_DATA_DIR):
         # Check if the file is a CSV
         if file.endswith(".csv"):
-            file_path = os.path.join(returns_dir, file)
+            file_path = os.path.join(RETURNS_DATA_DIR, file)
             df = pd.read_csv(file_path)
             dfs.append(df)
 
@@ -44,19 +43,13 @@ def main():
     print(f'Removed duplicate headlines, n = {len(headlines)}.')
     headlines.drop(columns="headline_clean", inplace=True)
 
-    # # Drop bills with missing date
-    # headlines = headlines.dropna()
-    # print(f'Removed headlines with missing date, n = {len(headlines)}.')
-
     # Add id column
     headlines.reset_index(inplace=True, drop=True)
     headlines['headline_id'] = headlines.index
-
-    temp1 = headlines["headline"]
+    
     headlines['headline'] = headlines['headline'].str.replace('"', r'', regex=False) #.str.replace('\'', r'', regex=False)
-    print((temp1!=headlines['headline'] ).mean())
 
-    headlines_path = os.path.join(data_dir, f"headlines_{len(headlines)}.csv")
+    headlines_path = os.path.join(DATA_DIR, f"headlines_{len(headlines)}.csv")
     headlines.to_csv(headlines_path, index=False)
     print(f'Saved {os.path.basename(headlines_path)}, n = {len(headlines)}, at {os.path.dirname(headlines_path)}')
 
@@ -64,7 +57,7 @@ def main():
     headlines = headlines.sample(n=10_000, random_state=123)
 
     # Save 10K sample
-    headlines_path = os.path.join(data_dir, 'headlines.csv')
+    headlines_path = os.path.join(DATA_DIR, 'headlines.csv')
     headlines.to_csv(headlines_path, index=False)
     print(f'Saved {os.path.basename(headlines_path)}, n = {len(headlines)}, at {os.path.dirname(headlines_path)}')
 

@@ -21,12 +21,12 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 # --- End of User Configurable Parameters ---------------------------
 
 # Set directories
-repo_dir <- "./estimation_cb"
-data_path <- file.path(repo_dir, "Data/bills_llm.csv")
-lhs_rds_dir <- file.path(repo_dir, "Temp/LHS/rds")
+repo_dir <- "."
+data_path <- file.path(repo_dir, "estimation_cb/data/bills_llm.csv")
+lhs_rds_dir <- file.path(repo_dir, "estimation_cb/temp/LHS/rds")
 
 # Install our simUtils package
-install.packages(file.path(repo_dir, "Code/simUtils_1.0.0.tar.gz"), repos = NULL, quiet = TRUE)
+install.packages(file.path(repo_dir, "estimation_cb/code/simUtils_1.0.0.tar.gz"), repos = NULL, quiet = TRUE)
 
 # Load required packages quietly
 suppressPackageStartupMessages({

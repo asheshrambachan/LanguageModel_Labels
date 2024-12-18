@@ -3,7 +3,10 @@ import glob
 import pandas as pd
 import json
 
-REPO_DIR = "./prediction_headlines"
+REPO_DIR = "."
+DATA_DIR = os.path.join(REPO_DIR, "prediction_headlines/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/LLM")
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 def merge_batched_responses(responses_batched_paths):
     responses = []
@@ -90,16 +93,12 @@ def add_trimmed(df):
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-    os.makedirs(temp_dir, exist_ok=True)
-
-    headlines = pd.read_csv(os.path.join(data_dir, f"headlines.csv"))
-    prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
+    headlines = pd.read_csv(os.path.join(DATA_DIR, f"headlines.csv"))
+    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["messages"], inplace=True)
 
     # # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(temp_dir, f'responses_batched/*.jsonl'))
+    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
     responses = merge_batched_responses(responses_batched_paths)
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["id",  "prompt_template_id", "headline_id", "add_date"]], on="id")
@@ -127,7 +126,7 @@ def main():
     print(headlines_completion[["prompt_template_id", "input_tokens", "output_tokens"]].groupby("prompt_template_id").agg(['mean']))
 
     # save
-    headlines_completion_path = os.path.join(data_dir, f"headlines_completion.csv")
+    headlines_completion_path = os.path.join(DATA_DIR, f"headlines_completion.csv")
     headlines_completion.to_csv(headlines_completion_path, index=False)
     print(f"Saved {os.path.basename(headlines_completion_path)}, n = {len(headlines_completion)}, at {os.path.dirname(headlines_completion_path)}")
 

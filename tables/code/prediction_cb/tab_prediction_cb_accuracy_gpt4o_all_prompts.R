@@ -13,9 +13,9 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 data_path <- file.path(repo_dir, "prediction_cb/Data/prediction_accuracy.csv") 
 tab_path <- file.path(tab_dir, "tab_prediction_cb_accuracy_gpt4o_all_prompts.tex")
 
-# Load required packages quietly and custom functions
+# Load required packages quietly
 require(dplyr, warn.conflicts = FALSE)
-
+require(kableExtra, warn.conflicts = FALSE)
 
 # Load and format data
 data <- read.csv(data_path) %>%

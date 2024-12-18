@@ -10,7 +10,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 import matplotlib.pyplot as plt
 
-REPO_DIR = './estimation_cb'
+REPO_DIR = '.'
+data_dir = os.path.join(REPO_DIR, "estimation_cb/data")
+fig_dir = os.path.join(REPO_DIR, "estimation_cb/figures")
+os.makedirs(fig_dir, exist_ok=True)
+
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
 STOPWORDS = nltk.corpus.stopwords.words('english')
@@ -77,10 +81,7 @@ def predict_error(bills_llm, seed = 123):
     return(pd.json_normalize(regressions))
 
 def main():
-    fig_dir = os.path.join(REPO_DIR, "Figures")
-    os.makedirs(fig_dir, exist_ok=True)
-
-    bills_llm = pd.read_csv(os.path.join(REPO_DIR, f"Data/bills_llm.csv"))
+    bills_llm = pd.read_csv(os.path.join(data_dir, f"bills_llm.csv"))
     regressions = predict_error(bills_llm, seed = 123)
 
     # AUC plots

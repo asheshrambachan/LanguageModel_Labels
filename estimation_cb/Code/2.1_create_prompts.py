@@ -4,7 +4,10 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = './estimation_cb'
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, "estimation_cb/data")
+TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 def create_prompts(prompting_strategies, bills, min_confidence=0.9, max_confidence=1):
     id = 0
@@ -141,28 +144,25 @@ def create_batched_prompts(prompts, batched_prompts_dir):
     return(pd.json_normalize(batches))
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp")
-    batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
-    os.makedirs(temp_dir, exist_ok=True)
+    batched_prompts_dir = os.path.join(TEMP_DIR, "prompts_batched")
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
-    prompting_strategies = pd.read_csv(os.path.join(data_dir, "prompt_templates.csv"))
-    prompting_strategies["TemplatePath"] = prompting_strategies["TemplatePath"].apply(lambda x: os.path.join(data_dir, x))
-    bills = pd.read_csv(os.path.join(data_dir, "bills.csv"))
+    prompting_strategies = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates.csv"))
+    prompting_strategies["TemplatePath"] = prompting_strategies["TemplatePath"].apply(lambda x: os.path.join(DATA_DIR, x))
+    bills = pd.read_csv(os.path.join(DATA_DIR, "bills.csv"))
 
     # Create `prompts.jsonl`
     prompts_json = create_prompts(prompting_strategies, bills)
-    with open(os.path.join(temp_dir, "prompts.jsonl"), "w") as f:
+    with open(os.path.join(TEMP_DIR, "prompts.jsonl"), "w") as f:
         for prompt in prompts_json:
             f.write(json.dumps(prompt) + "\n")
-    print(f"Saved prompts.jsonl, n = {len(prompts_json)}, at {temp_dir}")
+    print(f"Saved prompts.jsonl, n = {len(prompts_json)}, at {TEMP_DIR}")
     prompts = pd.json_normalize(prompts_json)
 
     # Create `prompts_batched_*.jsonl`
     batches = create_batched_prompts(prompts, batched_prompts_dir)
-    batches.to_csv(os.path.join(temp_dir, "batches.csv"), index=False)
-    print(f"Created batched prompts with batch details stored at batches.csv, n = {len(batches)}, at {temp_dir}")
+    batches.to_csv(os.path.join(TEMP_DIR, "batches.csv"), index=False)
+    print(f"Created batched prompts with batch details stored at batches.csv, n = {len(batches)}, at {TEMP_DIR}")
 
     # Estimate cost using Batch API
     cost = estimate_cost(prompts, batched=True)

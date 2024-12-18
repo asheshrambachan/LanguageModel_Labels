@@ -3,10 +3,12 @@ import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 
+REPO_DIR = '.'
+TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
+
 # Place API_KEY in the .env file
-load_dotenv()
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-REPO_DIR = './estimation_cb'
+load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)
+OPENAI_API_KEY = os.environ.get('API_KEY')
 
 def query_llm(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -31,13 +33,11 @@ def query_llm(batches):
     return(batches)
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-
     # Query LLM and store batches id 
-    batches = pd.read_csv(os.path.join(temp_dir, "batches.csv"))
+    batches = pd.read_csv(os.path.join(TEMP_DIR, "batches.csv"))
     batches = query_llm(batches)
-    batches.to_csv(os.path.join(temp_dir, "batches.csv"), index=False)
-    print(f"Added batch_id to batches.csv, n = {len(batches)}, at {temp_dir}")
+    batches.to_csv(os.path.join(TEMP_DIR, "batches.csv"), index=False)
+    print(f"Added batch_id to batches.csv, n = {len(batches)}, at {TEMP_DIR}")
 
 if __name__ == "__main__":
     main()

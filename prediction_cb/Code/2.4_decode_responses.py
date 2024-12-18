@@ -3,7 +3,10 @@ import glob
 import pandas as pd
 import json
 
-REPO_DIR = "./prediction_cb"
+REPO_DIR = "."
+DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/LLM")
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 def merge_batched_responses(responses_batched_paths):
     responses = []
@@ -114,16 +117,12 @@ def add_trimmed(df):
     return(df)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-    os.makedirs(temp_dir, exist_ok=True)
-
-    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
-    prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
+    bills = pd.read_csv(os.path.join(DATA_DIR, f"bills.csv"))
+    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
     # # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(temp_dir, f'responses_batched/*.jsonl'))
+    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
     responses = merge_batched_responses(responses_batched_paths)
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["ID",  "PromptingStrategyID", "PromptingStrategyName", "BillID", "TrimText", "AddIntrDate"]], on="ID")
@@ -146,7 +145,7 @@ def main():
     print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     # save
-    bills_llm_passage_path = os.path.join(data_dir, f"bills_llm_passage.csv")
+    bills_llm_passage_path = os.path.join(DATA_DIR, f"bills_llm_passage.csv")
     bills_llm_passage.to_csv(bills_llm_passage_path, index=False)
     print(f"Saved {os.path.basename(bills_llm_passage_path)}, n = {len(bills_llm_passage)}, at {os.path.dirname(bills_llm_passage_path)}")
 
@@ -174,7 +173,7 @@ def main():
     print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     # save
-    bills_llm_completion_path = os.path.join(data_dir, f"bills_llm_completion.csv")
+    bills_llm_completion_path = os.path.join(DATA_DIR, f"bills_llm_completion.csv")
     bills_llm_completion.to_csv(bills_llm_completion_path, index=False)
     print(f"Saved {os.path.basename(bills_llm_completion_path)}, n = {len(bills_llm_completion)}, at {os.path.dirname(bills_llm_completion_path)}")
 

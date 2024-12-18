@@ -4,20 +4,23 @@
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels"
-data_dir <- file.path(repo_dir, "prediction_cb/Data")
+# repo_dir <- "~/Documents/LanguageModel_Labels"
+repo_dir <- "."
+data_dir <- file.path(repo_dir, "prediction_cb/data")
 
 # Data and figure paths
 data_path <- file.path(data_dir, "bills_llm_completion.csv")
-benchmark_data_path <- file.path(repo_dir, "prediction_cb/Data/benchmark.csv")
+benchmark_data_path <- file.path(repo_dir, "prediction_cb/data/benchmark.csv")
 
 completion_exact_examples_path <- file.path(data_dir, "completion_exact_examples.csv")
 completion_exact_rates_path <- file.path(data_dir, "completion_exact_rates.csv")
 completion_cosine_euclidean_path <-  file.path(data_dir, "completion_cosine_euclidean.csv")
 
-# Load packages and ggplot themes
-require(dplyr, warn.conflicts = FALSE)
-require(logger, warn.conflicts = FALSE)
+# Load required packages quietly
+suppressPackageStartupMessages({
+  library(tidyr)
+  library(dplyr)
+})
 
 # Factor labels and levels
 prompt_labels_levels <- c(
@@ -49,7 +52,7 @@ index_last <- (1:nrow(completion_exact_examples))[-index_first]
 index <- c(index_first, index_last)
 completion_exact_examples <- completion_exact_examples[index, ] 
 write.csv(completion_exact_examples, completion_exact_examples_path, row.names=FALSE)
-log_info("Saved {completion_exact_examples_path}")
+cat(sprintf("Saved %s\n", completion_exact_examples_path))
 
 # Rates of exact completion
 completion_exact_rates <- data %>%
@@ -61,7 +64,7 @@ completion_exact_rates <- data %>%
     .groups = "drop"
   ) 
 write.csv(completion_exact_rates, completion_exact_rates_path, row.names=FALSE)
-log_info("Saved {completion_exact_rates_path}")
+cat(sprintf("Saved %s\n", completion_exact_rates_path))
 
 # Similarity using embeddings
 completion_cosine_euclidean <- data %>%
@@ -72,7 +75,7 @@ completion_cosine_euclidean <- data %>%
     Average.EuclideanDistance = mean(EuclideanDistance),
     .groups = "drop"
   ) %>%
-  tidyr::pivot_longer(
+  pivot_longer(
     -c(Model, Prompt),
     names_to = c(".value", "Metric"),
     names_sep = "\\."
@@ -82,4 +85,4 @@ completion_cosine_euclidean <- data %>%
   merge(benchmark_data, by="Metric") %>%
   mutate(Metric = if_else(Metric=="CosineSimilarity", "Cosine similarity", "Euclidean distance")) 
 write.csv(completion_cosine_euclidean, completion_cosine_euclidean_path, row.names=FALSE)
-log_info("Saved {completion_cosine_euclidean_path}")
+cat(sprintf("Saved %s\n", completion_cosine_euclidean_path))

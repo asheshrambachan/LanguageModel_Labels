@@ -2,7 +2,9 @@ import os
 import pandas as pd
 import numpy as np
 
-REPO_DIR = './prediction_cb'
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/Embeddings")
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -42,11 +44,8 @@ def create_random_benchmark(data, N=10_000, seed=123):
 
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Embeddings")
-
-    responses_description_path = os.path.join(temp_dir, 'Responses/responses_DescriptionClean.jsonl')
-    responses_description_llm_path = os.path.join(temp_dir, 'Responses/responses_DescriptionLLMClean.jsonl')
+    responses_description_path = os.path.join(TEMP_DIR, 'Responses/responses_DescriptionClean.jsonl')
+    responses_description_llm_path = os.path.join(TEMP_DIR, 'Responses/responses_DescriptionLLMClean.jsonl')
 
     description_embeddings = decode_embed_responses(pd.read_json(responses_description_path, lines=True))
     description_llm_embeddings = decode_embed_responses(pd.read_json(responses_description_llm_path, lines=True))
@@ -65,12 +64,12 @@ def main():
     
     # Create benchmark
     benchmark = create_random_benchmark(description_embeddings['DescriptionCleanEmbed'], N=10_000, seed=123)
-    benchmark_path = os.path.join(data_dir, "benchmark.csv")
+    benchmark_path = os.path.join(DATA_DIR, "benchmark.csv")
     benchmark.to_csv(benchmark_path, index=False)
     print(f"Saved {os.path.basename(benchmark_path)}, n = {len(benchmark)}, at {os.path.dirname(benchmark_path)}")
 
     # Add similarity columns to bills_llm_completion.csv
-    bills_llm_completion = pd.read_csv(os.path.join(data_dir, f"bills_llm_completion.csv"))
+    bills_llm_completion = pd.read_csv(os.path.join(DATA_DIR, f"bills_llm_completion.csv"))
     bills_llm_completion = bills_llm_completion.merge(description_embeddings, on="BillID").merge(description_llm_embeddings, on="ID")
 
     bills_llm_completion["TextSimilarity"] = bills_llm_completion["DescriptionClean"] == bills_llm_completion["DescriptionLLMClean"]
@@ -83,7 +82,7 @@ def main():
     'MaxTokens', 'Year', 'Major', 'MajorText', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal', 'IntrDate',
     'DescriptionTrim', 'Description', 'DescriptionLLM', 'DescriptionClean', 'DescriptionLLMClean',
     'CosineSimilarity', 'EuclideanDistance', 'TextSimilarity']]
-    bills_llm_completion_similarity_path = os.path.join(data_dir, "bills_llm_completion.csv")
+    bills_llm_completion_similarity_path = os.path.join(DATA_DIR, "bills_llm_completion.csv")
     bills_llm_completion_similarity.to_csv(bills_llm_completion_similarity_path, index=False)
     print(f"Saved {os.path.basename(bills_llm_completion_similarity_path)}, n = {len(bills_llm_completion_similarity)}, at {os.path.dirname(bills_llm_completion_similarity_path)}")
 

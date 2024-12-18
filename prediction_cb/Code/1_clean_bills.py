@@ -1,11 +1,15 @@
 import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from copy import deepcopy
 
-REPO_DIR = './prediction_cb'
-MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
+# Define directories
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, 'prediction_cb/data')
+TEMP_DIR = os.path.join(REPO_DIR, 'prediction_cb/temp')
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+MAJOR_CODE = pd.read_csv(os.path.join(DATA_DIR, "major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):
     # Load CAP data from path
@@ -216,34 +220,24 @@ def merge_cap_cbp(cap, cbp):
     return(bills)
 
 def main():
-    # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data')
-    temp_dir = os.path.join(REPO_DIR, 'Temp')
-    os.makedirs(data_dir, exist_ok=True)
-    os.makedirs(temp_dir, exist_ok=True)
-
     # CAP and CBP data paths
     path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
     path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
     path_cbp_93_114 = 'http://congressionalbills.org/billfiles/bills93-114.zip' 
-    # path_cap = os.path.join(temp_dir, 'US-Legislative-congressional_bills_19.3_3_3.csv')
-    # path_cbp_80_92 = os.path.join(temp_dir, 'bills80-92.txt')
-    # path_cbp_93_114 = os.path.join(temp_dir, 'bills93-114.csv')
+    # path_cap = os.path.join(TEMP_DIR, 'US-Legislative-congressional_bills_19.3_3_3.csv')
+    # path_cbp_80_92 = os.path.join(TEMP_DIR, 'bills80-92.txt')
+    # path_cbp_93_114 = os.path.join(TEMP_DIR, 'bills93-114.csv')
     
     # Load and clean CAP
     cap = get_cap(path_cap)
-    # cap.to_csv(os.path.join(temp_dir, "cap.csv"), index=False)
-    # print(f'Saved cap.csv, n = {len(cap)}, at {temp_dir}')
 
     # Load and clean CBP
     cbp = get_cbp(path_cbp_80_92, path_cbp_93_114)
-    # cbp.to_csv(os.path.join(temp_dir, "cbp.csv"), index=False)
-    # print(f'Saved cbp.csv, n = {len(cbp)}, at {temp_dir}')
 
     # Merge CAP and CBP data
     bills = merge_cap_cbp(cap, cbp)
 
-    bills_all_path = os.path.join(temp_dir, f"bills_{len(bills)}.csv")
+    bills_all_path = os.path.join(TEMP_DIR, f"bills_{len(bills)}.csv")
     bills.to_csv(bills_all_path, index=False)
     print(f'Saved {os.path.basename(bills_all_path)}, n = {len(bills)}, at {os.path.dirname(bills_all_path)}')
 
@@ -251,7 +245,7 @@ def main():
     bills = bills.sample(n=10_000, random_state=321)
 
     # Save 10K bills data
-    bills_path = os.path.join(data_dir, 'bills.csv')
+    bills_path = os.path.join(DATA_DIR, 'bills.csv')
     bills.to_csv(bills_path, index=False)
     print(f'Saved {os.path.basename(bills_path)}, n = {len(bills)}, at {os.path.dirname(bills_path)}')
 

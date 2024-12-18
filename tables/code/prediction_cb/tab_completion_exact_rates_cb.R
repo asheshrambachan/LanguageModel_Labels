@@ -12,8 +12,9 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 data_path <- file.path(repo_dir, "prediction_cb/Data/completion_exact_rates.csv")
 tab_path <- file.path(tab_dir, "tab_completion_exact_rates_cb.tex")
 
-# Load required packages quietly and custom functions
+# Load required packages quietly
 require(dplyr, warn.conflicts = FALSE)
+require(kableExtra, warn.conflicts = FALSE)
 
 # Load data
 data <- read.csv(data_path) %>% 

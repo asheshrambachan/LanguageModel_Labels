@@ -32,6 +32,7 @@ dependencies:
   - r-kableExtra
   - r-viridis
   - r-tidyverse
+  - r-tidyr
   - r-stargazer
   - r-fixest
   - r-modelsummary

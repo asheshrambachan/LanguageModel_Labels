@@ -3,8 +3,14 @@ import pandas as pd
 import numpy as np
 from copy import deepcopy
 
-REPO_DIR = './estimation_cb'
-MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
+# Define directories
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, 'estimation_cb/data')
+temp_dir = os.path.join(REPO_DIR, 'estimation_cb/temp')
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(temp_dir, exist_ok=True)
+
+MAJOR_CODE = pd.read_csv(os.path.join(DATA_DIR, "major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def get_cap(path_cap):
     # Load CAP data from path
@@ -213,12 +219,6 @@ def sample_bills(bills, n_bills = 10e3, n_examples = 15, seed = 123):
     return(bills_10k_estimation, examples)
 
 def main():
-    # Define directories
-    data_dir = os.path.join(REPO_DIR, 'Data')
-    temp_dir = os.path.join(REPO_DIR, 'Temp')
-    os.makedirs(data_dir, exist_ok=True)
-    os.makedirs(temp_dir, exist_ok=True)
-
     # CAP and CBP data paths
     path_cap = 'https://comparativeagendas.s3.amazonaws.com/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv' 
     path_cbp_80_92 = 'http://congressionalbills.org/billfiles/bills80-92.zip' 
@@ -247,12 +247,12 @@ def main():
 
     # Split the 15 examples into 3 sets for the 3 few-shot prompts
     bills_examples['ExampleSetNum'] = np.repeat([1, 2, 3], repeats=15/3)
-    bills_examples_path = os.path.join(data_dir, 'bills_examples.csv')
+    bills_examples_path = os.path.join(DATA_DIR, 'bills_examples.csv')
     bills_examples.to_csv(bills_examples_path, index=False)
     print(f'Saved {os.path.basename(bills_examples_path)}, n = {len(bills_examples)}, at {os.path.dirname(bills_examples_path)}')
 
     # Save 10K bills data for the estimation exercise 
-    bills_estimation_path = os.path.join(data_dir, 'bills.csv')
+    bills_estimation_path = os.path.join(DATA_DIR, 'bills.csv')
     bills_estimation.to_csv(bills_estimation_path, index=False)
     print(f'Saved {os.path.basename(bills_estimation_path)}, n = {len(bills_estimation)}, at {os.path.dirname(bills_estimation_path)}')
 

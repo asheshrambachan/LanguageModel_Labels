@@ -4,12 +4,12 @@
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels"
-data_dir <- file.path(repo_dir, "prediction_headlines/Data")
+repo_dir <- "."
+data_dir <- file.path(repo_dir, "prediction_headlines/data")
 
 # Data and figure paths
 data_path <- file.path(data_dir, "headlines_completion.csv")
-benchmark_data_path <- file.path(repo_dir, "prediction_headlines/Data/benchmark.csv")
+benchmark_data_path <- file.path(repo_dir, "prediction_headlines/data/benchmark.csv")
 
 completion_exact_examples_path <- file.path(data_dir, "completion_exact_examples.csv")
 completion_exact_rates_path <- file.path(data_dir, "completion_exact_rates.csv")

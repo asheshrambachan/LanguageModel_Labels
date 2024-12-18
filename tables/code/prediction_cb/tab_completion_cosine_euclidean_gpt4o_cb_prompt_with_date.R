@@ -12,8 +12,9 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 data_path <- file.path(repo_dir, "prediction_cb/Data/completion_cosine_euclidean.csv")
 tab_path <- file.path(tab_dir, "tab_completion_cosine_euclidean_gpt4o_cb_prompt_with_date.tex")
 
-# Load required packages quietly and custom functions
+# Load required packages quietly
 require(dplyr, warn.conflicts = FALSE)
+require(kableExtra, warn.conflicts = FALSE)
 
 data <- read.csv(data_path)  %>%
   rename("Distance"=Metric) %>%

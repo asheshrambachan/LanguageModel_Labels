@@ -1,6 +1,3 @@
-repo_dir <- "~/Documents/LanguageModel_Labels"
-setwd(repo_dir)
-
 source("./figures/code/estimation_cb/fig_agreement_heatmaps_cb.R")
 
 source("./figures/code/estimation_cb/fig_tscores_cb_lhs.R")

@@ -4,8 +4,11 @@ import pandas as pd
 import json
 import re
 
-REPO_DIR = './estimation_cb'
-MAJOR_CODE = pd.read_csv(os.path.join(REPO_DIR, "Data/major_topics.csv")).set_index('Major')['MajorText'].to_dict()
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, "estimation_cb/data")
+TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
+
+MAJOR_CODE = pd.read_csv(os.path.join(DATA_DIR, "major_topics.csv")).set_index('Major')['MajorText'].to_dict()
 
 def merge_batched_responses(responses_batched_paths):
     responses = []
@@ -46,16 +49,12 @@ def decode_responses(responses):
     return(responses_decoded)
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-    os.makedirs(temp_dir, exist_ok=True)
-
-    bills = pd.read_csv(os.path.join(data_dir, f"bills.csv"))
-    prompts = pd.read_json(os.path.join(temp_dir, f"prompts.jsonl"), lines=True) 
+    bills = pd.read_csv(os.path.join(DATA_DIR, f"bills.csv"))
+    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
     prompts.drop(columns=["Messages"], inplace=True)
 
     # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(temp_dir, f'responses_batched/*.jsonl'))
+    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
     responses = merge_batched_responses(responses_batched_paths)
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["ID", "BillID", "ResponseFormat", "AddExplanation"]], on="ID")
@@ -64,16 +63,16 @@ def main():
 
     # Decoded responses and save aas jsonl file
     responses = decode_responses(responses)
-    responses_path = os.path.join(temp_dir, f"responses.jsonl")
+    responses_path = os.path.join(TEMP_DIR, f"responses.jsonl")
     with open(responses_path, "w") as f:
         for response in responses:
             f.write(json.dumps(response) + "\n")
     print(f"Saved {responses_path}")
 
     # Merge prompts and bills metadata with llm responses
-    responses = pd.read_json(os.path.join(temp_dir, f"responses.jsonl"), lines=True)
+    responses = pd.read_json(os.path.join(TEMP_DIR, f"responses.jsonl"), lines=True)
     bills_llm = prompts.merge(responses, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm_path = os.path.join(data_dir, f"bills_llm.csv")
+    bills_llm_path = os.path.join(DATA_DIR, f"bills_llm.csv")
     bills_llm.to_csv(bills_llm_path, index=False)
     print(f"Saved {os.path.basename(bills_llm_path)}, n = {len(bills_llm)}, at {os.path.dirname(bills_llm_path)}")
 

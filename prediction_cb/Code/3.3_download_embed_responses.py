@@ -3,10 +3,12 @@ import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 
-REPO_DIR = "./prediction_cb"
-load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+REPO_DIR = "."
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/Embeddings")
 
+# Place API_KEY in the .env file
+load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)
+OPENAI_API_KEY = os.environ.get('API_KEY')
 
 def check_batches_status(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -36,11 +38,10 @@ def download_batched_responses(batches, out_dir):
         print(f"Saved {os.path.basename(responses_batched_path)} at {os.path.dirname(responses_batched_path)}")
 
 def main():
-    temp_dir = os.path.join(REPO_DIR, "Temp/Embeddings")
-    responses_dir = os.path.join(temp_dir, "Responses")
+    responses_dir = os.path.join(TEMP_DIR, "Responses")
     os.makedirs(responses_dir, exist_ok=True)
 
-    batches = pd.read_csv(os.path.join(temp_dir, "batches.csv"))
+    batches = pd.read_csv(os.path.join(TEMP_DIR, "batches.csv"))
     check_batches_status(batches)
     download_batched_responses(batches, responses_dir)
 

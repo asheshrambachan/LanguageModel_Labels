@@ -4,7 +4,10 @@ import numpy as np
 import json
 import tiktoken
 
-REPO_DIR = './prediction_headlines'
+REPO_DIR = '.'
+DATA_DIR = os.path.join(REPO_DIR, "prediction_headlines/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/Embeddings")
+
 os.chdir(REPO_DIR)
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
@@ -75,12 +78,10 @@ def estimate_cost(text, model="text-embedding-3-small", batched=True):
     return total_cost
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/Embeddings")
-    requests_dir = os.path.join(temp_dir, "Requests")
+    requests_dir = os.path.join(TEMP_DIR, "Requests")
     os.makedirs(requests_dir, exist_ok=True)
 
-    headlines_completion = pd.read_csv(os.path.join(data_dir, "headlines_completion.csv"))
+    headlines_completion = pd.read_csv(os.path.join(DATA_DIR, "headlines_completion.csv"))
 
     # Estimate cost using Batch API
     cost_description = estimate_cost(headlines_completion["headline_clean"].unique(), batched=True)
@@ -90,7 +91,7 @@ def main():
 
     # Create prompts
     batches = create_embed_requests(headlines_completion, requests_dir, embedding_model="text-embedding-3-small")
-    batches_path = os.path.join(temp_dir, "batches.csv")
+    batches_path = os.path.join(TEMP_DIR, "batches.csv")
     batches.to_csv(batches_path, index=False)
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")
 

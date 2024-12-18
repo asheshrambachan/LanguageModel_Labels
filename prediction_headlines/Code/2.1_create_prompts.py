@@ -5,7 +5,11 @@ import json
 import tiktoken
 from datetime import datetime
 
-REPO_DIR = "./prediction_headlines"
+REPO_DIR = "."
+DATA_DIR = os.path.join(REPO_DIR, "prediction_headlines/data")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/LLM")
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 # a function to trim a string 
@@ -142,19 +146,16 @@ def create_batched_prompts(prompts, batched_prompts_dir):
     return(pd.json_normalize(batches))
 
 def main():
-    data_dir = os.path.join(REPO_DIR, "Data")
-    temp_dir = os.path.join(REPO_DIR, "Temp/LLM")
-    batched_prompts_dir = os.path.join(temp_dir, "prompts_batched")
-    os.makedirs(temp_dir, exist_ok=True)
+    batched_prompts_dir = os.path.join(TEMP_DIR, "prompts_batched")
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
-    headlines = pd.read_csv(os.path.join(data_dir, "headlines.csv")) 
-    prompt_templates = pd.read_csv(os.path.join(data_dir, "prompt_templates.csv"))
-    prompt_templates["template_path"] = prompt_templates["template_path"].apply(lambda x: os.path.join(data_dir, x))
+    headlines = pd.read_csv(os.path.join(DATA_DIR, "headlines.csv")) 
+    prompt_templates = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates.csv"))
+    prompt_templates["template_path"] = prompt_templates["template_path"].apply(lambda x: os.path.join(DATA_DIR, x))
     
     # Create `prompts.jsonl`
     prompts_json = create_prompts(prompt_templates, headlines)
-    prompts_json_path = os.path.join(temp_dir, "prompts.jsonl")
+    prompts_json_path = os.path.join(TEMP_DIR, "prompts.jsonl")
     with open(prompts_json_path, "w") as f:
         for prompt in prompts_json:
             f.write(json.dumps(prompt) + "\n")
@@ -163,7 +164,7 @@ def main():
     
     # Create `prompts_batched_*.jsonl`
     batches = create_batched_prompts(prompts, batched_prompts_dir)
-    batches_path = os.path.join(temp_dir, "batches.csv")
+    batches_path = os.path.join(TEMP_DIR, "batches.csv")
     batches.to_csv(batches_path, index=False)
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")
 

@@ -4,8 +4,9 @@
 rm(list = ls())
 
 # Setup directories
-repo_dir <- "~/Documents/LanguageModel_Labels"
-data_dir <- file.path(repo_dir, "prediction_cb/Data") 
+# repo_dir <- "~/Documents/LanguageModel_Labels"
+repo_dir <- "."
+data_dir <- file.path(repo_dir, "prediction_cb/data") 
 
 # Data and table paths
 bills_data_path <- file.path(data_dir, "bills.csv")
@@ -13,9 +14,11 @@ data_path <- file.path(data_dir, "bills_llm_passage.csv")
 prediction_passage_rates_path <- file.path(data_dir, "prediction_passage_rates.csv")
 prediction_accuracy_path <- file.path(data_dir, "prediction_accuracy.csv")
 
-# Load required packages quietly and custom functions
-require(dplyr, warn.conflicts = FALSE)
-require(logger, warn.conflicts = FALSE)
+# Load required packages quietly
+suppressPackageStartupMessages({
+  library(tidyr)
+  library(dplyr)
+})
 
 # Factor labels and levels
 prompt_labels_levels <- c(
@@ -36,7 +39,7 @@ true_rates <- read.csv(bills_data_path) %>%
     Prompt = ""
   ) %>%
   select(c(Model, Prompt, Senate, House)) %>%
-  tidyr::pivot_longer(
+  pivot_longer(
     cols = c(Senate, House), 
     names_to = "Chamber", 
     values_to = "Pass"
@@ -55,7 +58,7 @@ llm_rates <- read.csv(data_path) %>%
     Prompt = recode_factor(AddIntrDate, !!!prompt_labels_levels)
   ) %>%
   select(c(Model, Prompt, Senate, House)) %>%
-  tidyr::pivot_longer(
+  pivot_longer(
     cols = c(Senate, House), 
     names_to = "Chamber", 
     values_to = "Pass"
@@ -68,7 +71,7 @@ llm_rates <- read.csv(data_path) %>%
 
 prediction_passage_rates <- bind_rows(true_rates, llm_rates)
 write.csv(prediction_passage_rates, prediction_passage_rates_path, row.names=FALSE)
-log_info("Saved {prediction_passage_rates_path}")
+cat(sprintf("Saved %s\n", prediction_passage_rates_path))
 
 # Load and format data
 prediction_accuracy <- read.csv(data_path) %>%
@@ -86,11 +89,11 @@ prediction_accuracy <- read.csv(data_path) %>%
     `FPR.House` = sum(PassH==0 & PassHLLM==1) / sum(PassH==0),
     .groups="drop"
   ) %>%
-  tidyr::pivot_longer(
+  pivot_longer(
     -c(Model, Prompt),
     names_to = c(".value", "Chamber"),
     names_sep = "\\."
   ) 
 
 write.csv(prediction_accuracy, prediction_accuracy_path, row.names=FALSE)
-log_info("Saved {prediction_accuracy_path}")
+cat(sprintf("Saved %s\n", prediction_accuracy_path))

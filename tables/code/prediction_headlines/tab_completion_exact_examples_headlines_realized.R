@@ -12,6 +12,10 @@ dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 data_path <- file.path(repo_dir, "prediction_headlines/Data/completion_exact_examples.csv")
 tab_path <- file.path(tab_dir, "tab_completion_exact_examples_headlines_realized.tex")
 
+# Load required packages quietly
+require(dplyr, warn.conflicts = FALSE)
+require(kableExtra, warn.conflicts = FALSE)
+
 # Load and format
 data <- read.csv(data_path) %>%
   rename(
