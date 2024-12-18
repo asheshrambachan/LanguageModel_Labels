@@ -1,0 +1,15 @@
+﻿Variable Name,Variable Description,Values
+combination_id,"Identifier for each combination. For details, see 04_simulations/combinations_lhs.csv.",integers from 1 to 1440
+train_proportion,Proportion of the 5K sample bills allocated for training.,"0.05, 0.10, 0.25, 0.50"
+model,The LLM model used for the prompt.,"gpt-3.5-turbo-0125, gpt-4o"
+prompt,"ID for the prompt modification used. For details, see 02_llm/prompting_strategies.csv.",integers from 1 to 12
+variable (V),"The indepent variable used in the regression model. For details, see 01_bills/codebook_bills.csv","Senate, Democrat, DW1"
+major_topic (Y),"The major topic ID used with the indicator function as the dependent variable. For details, see 01_bills/codebook_bills.csv.","3, 14, 15, 19, 20"
+regression,Name of the regression model run,see below
+, Yllm_V: 1{Yllm=y} = β0 + β1 V,Yllm_V
+,"train_Yhuman_V: 1{Yhuman=y} = β0 + β1 V, ",train_Yhuman_V
+,"test_Ytilde_V: 1{Ytilde=y} = β0 + β1 V, where Ytilde is the debiased estimate. For details, see the paper.",test_Ytilde_V
+coef_name,"Name of the coefficient. Includes intercept and independent variable, V.","(Intercept), Senate, Democrat, DW1"
+bias,"The average difference between E[β - β*] across N=1000 simulation runs, where β* is the true value of the coefficient using all 10K bills and Yhuman","(-∞, ∞)"
+mse,The mean squared error E[(β - β*)^2] averaged across N=1000 simulation runs.,"[0, ∞)"
+coverage,"The coverage probability E[1{β* ∈ CI(β)}] averaged across N=1000 simulation runs, where CI(β) is the confidence interval of β.","[0,1]"

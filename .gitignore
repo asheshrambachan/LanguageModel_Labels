@@ -15,11 +15,10 @@ settings.json
 .envrc
 
 estimation_cb/data/Codebooks
+
 estimation_cb/temp/*
-estimation_cb/code/*.log
 prediction_cb/temp/*
 prediction_headlines/temp/*
-
 Papers and bib/*
 
 zeims_et_al_clean/.DS_Store
