@@ -1,16 +1,76 @@
-# Prediction Task: Congressional Bills
+# Prediction Tasks: Financial News Headlines
 
-This subdirectory contains the code and data required to perform prediction tasks for Congressional Bills as described in the paper "[Large Language Models: An Applied Econometric Framework](https://arxiv.org/pdf/2412.07031)". 
+This subdirectory contains scripts, data, and outputs for **prediction tasks** using **financial news headlines** data. The workflow involves cleaning and preparing the data, querying LLMs, generating embeddings for similarity analysis, and summarizing the results for use in figures and tables.
 
 ## Directory Structure
-```
-prediction_cb/
-├── Code/              # Code for data cleaning, prompt creation, querying, response decoding, and analysis.
-├── Date/              # Contains Congressional Bills data, LLM responses, similarity computations and benchmark data.
-├── Temp/              # Generated embeddings and associated metadata.
-└── README.md          # Documentation for this subdirectory.
-```
 
+- `code/`: Python and R scripts for data cleaning, prompt creation, querying LLMs, embedding generation, and result summarization.
+- `data/`: Contains input and output data files, including:
+- `temp`/: Temporary directory for intermediate files during execution.
+
+## Replication Options
+
+You can replicate the workflow using the following methods:
+1. **Full Replication:** Run the shell script run_all.sh to execute all steps in sequence:
+    ```
+    chmod +x ./prediction_headlines/code/run_all.sh
+    ./prediction_headlines/code/run_all.sh
+    ```
+
+2. **Partial Replication:** Run individual scripts for specific steps.
+
+    1. Data cleaning
+    ```
+    python ./prediction_headlines/code/1_clean_headlines.py
+    ```
+
+    2. Prompt creation, LLM querying, and response decoding using the specified prompt templates and LLM models (see [here](./data/prompt_templates.csv)).
+        - Prompt creation:
+        ```sh
+        python ./prediction_headlines/code/2.1_create_prompts.py
+        ```
+        - Querying LLMs:
+        ```sh
+        python ./prediction_headlines/code/2.2_query_llm.py
+        ```
+        - Downloading LLM responses: 
+        ```sh
+        python ./prediction_headlines/code/2.3_download_responses.py
+        ```
+        - Decoding LLM responses:
+        ```sh
+        python ./prediction_headlines/code/2.4_decode_responses.py
+        ```
+    3. Embedding generation and similarity analysis
+        - Create embedding prompts:
+        ```sh
+        python ./prediction_headlines/code/3.1_create_embed_prompts.py
+        ```
+        - Query `text-embedding-3-small` model:
+        ```sh
+        python ./prediction_headlines/code/3.2_query_embed_llm.py
+        ```
+        - Download embedding results:
+        ```sh
+        python ./prediction_headlines/code/3.3_download_embed_responses.py
+        ```
+        - Decode responses and perform similarity analysis:
+        ```sh
+        python ./prediction_headlines/code/3.4_decode_embed_responses.py
+        ```
+    4. Summarize prediction and completion results
+    ```sh
+    Rscript ./prediction_headlines/code/4.1_summarize_prediction.R
+    Rscript ./prediction_headlines/code/4.2_summarize_completion.R
+    ```
+
+## Notes
+
+- Steps involving querying LLMs (i.e., `2.2_query_llm.py`, `3.2_query_embed_prompts.py`) require you to wait for responses before proceeding.
+- Generated prompts and responses are stored in the `temp/` directory.
+- Final outputs are saved in the `data/` directory as `.csv` files, ready for use in figures and tables.
+
+<!-- 
 ## Usage Instructions
 The code are labeled by their order in the workflow.
 1. **Data Cleaning:** Downloads and cleans data. Creates a sample of 10,000 bills with unique descriptions, and no missing introduction dates.
@@ -21,6 +81,6 @@ The code are labeled by their order in the workflow.
     - **2.4** Decodes LLM responses and merges them with metadata.
 3. **Embedding for Similarity Analysis**
     - **3.1** Generates embeddings for Original bill and LLM-completed summaries. Note: We append the provided part of the bill summary if missing, and leaving responses unchanged if they start differently from the provided summary. We also removing non-alphanumeric characters, and converting all text to lowercase prior to generating the embeddings.
-    - **3.2** Queries the `text-embedding-3-small` embedding model with a default embedding size of `1536`.
+    - **3.2** Queries the embedding model with a default embedding size of `1536`.
     - **3.3** Downloads embedding responses.
-    - **3.4** Compute Cosine similarity and Euclidean distance between embeddings + random benchmark using true completion embeddings.
+    - **3.4** Compute Cosine similarity and Euclidean distance between embeddings + random benchmark using true completion embeddings. -->
