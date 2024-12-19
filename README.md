@@ -73,10 +73,14 @@ If you use this repository, please cite the paper:
 
 ## References
 
-- Adler, E Scott and John Wilkerson, _"Congressional Bills Project: 1947-2016,"_ NSF 00880066 and 00880061 2024. Accessed July 5, 2024. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html).
+- Adler, E Scott, and John Wilkerson. 2020. _Congressional Bills Project_, NSF 00880066 and 00880061. [`http://congressionalbills.org/download.html`](http://congressionalbills.org/download.html) (accessed July 5, 2024).
 
-- Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei, _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models,"_ in Advances in Neural Information Processing Systems, Vol. 36, 2023. Replication code available at: [`https://osf.io/gjt87/`]( https://osf.io/gjt87/)
+- Aenlle, Miguel. 2020. _Daily Financial News for 6000+ Stocks_. [`https://www.kaggle.com/ datasets/miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests`](https://www.kaggle.com/ datasets/miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests ) (accessed August 1, 2024).
 
-- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, _``Policy Agendas Project: Congressional Bills,''_ 2023. Accessed July 5, 2024. [`https://www.comparativeagendas.net/#congressional_hearings`](https://www.comparativeagendas.net/#congressional_hearings).
+- Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei. 2023. _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models"_. Advances in Neural Information Processing Systems, Vol. 36. Replication code available at: [`https://osf.io/gjt87/`]( https://osf.io/gjt87/).
 
-- Jones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan, “Policy Agendas Project: Codebook,” 2023. Accessed July 5, 2024. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf).
+- Jones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Codebook_. [`https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf`](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf) (accessed July 5, 2024).
+
+- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Congressional Bills_. [`https://www. comparativeagendas.net/#congressional_hearings`](https://www. comparativeagendas.net/#congressional_hearings) (accessed July 5, 2024).
+
+- WRDS Research Team. 2023. _Beta Suite by WRDS_. [`https://wrds-www.wharton.upenn. edu/pages/grid-items/beta-suite-wrds`](https://wrds-www.wharton.upenn. edu/pages/grid-items/beta-suite-wrds) (accessed August 1, 2024).
