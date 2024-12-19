@@ -47,10 +47,10 @@ You can replicate the results presented in the paper using one of the following 
     ```
 
 2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed `README.md` file with instructions for task-specific replication.
-    - [Prediction Tasks: Congressional Bills](./prediction_cb)
     - [Prediction Tasks: Financial News Headlines](./prediction_headlines)
-    - [Estimation Tasks: Congressional Bills](./estimation_cb)
+    - [Prediction Tasks: Congressional Bills](./prediction_cb)
     - [Estimation Tasks: Financial News Headlines](./headlines)
+    - [Estimation Tasks: Congressional Bills](./estimation_cb)
     - [Figures](./figures)
     - [Tables](./tables)
 
