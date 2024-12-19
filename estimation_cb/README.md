@@ -35,10 +35,10 @@ You can replicate the results using one of the following methods:
 
     3. Run simulations and summarize results. 
         ```sh
-        Rscript ./estimation_cb/Code/3.1_run_lhs_simulations.r
-        Rscript ./estimation_cb/Code/3.2_run_rhs_simulations.r
-        Rscript ./estimation_cb/Code/3.3_summarize_lhs_simulations.r
-        Rscript ./estimation_cb/Code/3.4_summarize_rhs_simulations.r
+        Rscript ./estimation_cb/code/3.1_run_lhs_simulations.r
+        Rscript ./estimation_cb/code/3.2_run_rhs_simulations.r
+        Rscript ./estimation_cb/code/3.3_summarize_lhs_simulations.r
+        Rscript ./estimation_cb/code/3.4_summarize_rhs_simulations.r
         ```
 
 ## Notes
