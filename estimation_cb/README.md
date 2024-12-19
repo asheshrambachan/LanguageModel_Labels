@@ -1,4 +1,4 @@
-# Estimation Task: Congressional Bills
+# Estimation Tasks: Congressional Bills
 
 This subdirectory contains scripts, data, and outputs for **estimation tasks** using **Congressional bills** data. The steps involves data cleaning, querying LLMs, running simulations, and summarizing the results for use in figures and tables.
 
