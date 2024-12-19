@@ -36,16 +36,24 @@ conda env create -f conda_llm_env.yaml
 conda activate llm_env
 ```
 
-### Step 3: Run Specific Tasks
-Each subdirectory contains detailed README.md files with instructions for replicating the results. Follow the links below for task-specific guidance:
-- [Prediction Tasks: Congressional bills](./prediction_cb)
-- [Prediction Tasks: financial headlines](./prediction_headlines)
-- [Estimation Tasks: Congressional bills](./estimation_cb)
-- [Estimation Tasks: financial headlines](./headlines)
-- [Figures](./figures)
-- [Tables](./tables)
-    
-    
+## Replication Options
+
+You can replicate the results presented in the paper using one of the following methods:
+
+1. **Full Replication:** Run the `run_all.sh` shell script to execute all steps in sequence:
+    ```
+    chmod +x ./run_all.sh
+    ./run_all.sh
+    ```
+
+2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed README.md file with instructions for task-specific replication.
+    - [Prediction Tasks: Congressional Bills](./prediction_cb)
+    - [Prediction Tasks: Financial News Headlines](./prediction_headlines)
+    - [Estimation Tasks: Congressional Bills](./estimation_cb)
+    - [Estimation Tasks: Financial News Headlines](./headlines)
+    - [Figures](./figures)
+    - [Tables](./tables)
+
 ### Notes 
 - All outputs (e.g., `.csv` files) are saved in the respective `data/` directories of the subdirectories.
 - Steps involving LLM querying and running simulations can take time depending on the model used. Pre-generated results are provided for replication of subsequent steps.
