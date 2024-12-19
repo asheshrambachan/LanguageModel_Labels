@@ -4,7 +4,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 REPO_DIR = '.'
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/Embeddings")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/embeddings")
 
 # Place API_KEY in the .env file
 load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)

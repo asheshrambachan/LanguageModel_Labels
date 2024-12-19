@@ -7,7 +7,7 @@ from datetime import datetime
 
 REPO_DIR = "."
 DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/LLM")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/llm")
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch

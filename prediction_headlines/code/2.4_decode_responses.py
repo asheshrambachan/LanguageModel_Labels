@@ -1,22 +1,9 @@
 import os
-import glob
 import pandas as pd
 import json
 
 REPO_DIR = "."
 DATA_DIR = os.path.join(REPO_DIR, "prediction_headlines/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/LLM")
-os.makedirs(TEMP_DIR, exist_ok=True)
-
-def merge_batched_responses(responses_batched_paths):
-    responses = []
-    for responses_batched_path in sorted(responses_batched_paths):
-        responses_batched_file = pd.read_json(responses_batched_path, lines=True)
-        print(f"Loaded {os.path.basename(responses_batched_path)}, n = {len(responses_batched_file)}")
-        responses_batched_file["id"] = responses_batched_file["custom_id"].apply(lambda x: int(x))
-        responses.append(responses_batched_file)
-    responses = pd.concat(responses)
-    return(responses)
 
 def decode_responses(responses):
     responses_decoded = []
@@ -92,14 +79,35 @@ def add_trimmed(df):
 
     return(df)
 
+def read_and_merge_jsonl_files(input):
+    # Extract directory and prefix
+    directory = os.path.dirname(input)
+    prefix = os.path.basename(input)
+
+    all_data = []
+
+    # Traverse through the directory
+    for file in sorted(os.listdir(directory)):
+        if file.startswith(prefix) and file.endswith('.jsonl'):
+            file_path = os.path.join(directory, file)
+            print(f"Reading: {file_path}")
+            df = pd.read_json(file_path, lines=True)
+            all_data.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(all_data, ignore_index=True)
+    print(f"Combined DataFrame has {len(combined_df)} rows.")
+
+    return combined_df
+
 def main():
     headlines = pd.read_csv(os.path.join(DATA_DIR, f"headlines.csv"))
-    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
+    prompts = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/prompts"))
     prompts.drop(columns=["messages"], inplace=True)
 
-    # # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
-    responses = merge_batched_responses(responses_batched_paths)
+    # Load and merge batched responses
+    responses = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/responses_batched/responses_batched"))
+    responses["id"] = responses["custom_id"].apply(lambda x: int(x))
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["id",  "prompt_template_id", "headline_id", "add_date"]], on="id")
     responses.set_index("id", inplace=True, drop=False)

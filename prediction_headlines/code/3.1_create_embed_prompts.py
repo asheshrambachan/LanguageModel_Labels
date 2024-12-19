@@ -6,7 +6,7 @@ import tiktoken
 
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, "prediction_headlines/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/Embeddings")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/embeddings")
 
 os.chdir(REPO_DIR)
 PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
@@ -78,7 +78,7 @@ def estimate_cost(text, model="text-embedding-3-small", batched=True):
     return total_cost
 
 def main():
-    requests_dir = os.path.join(TEMP_DIR, "Requests")
+    requests_dir = os.path.join(TEMP_DIR, "requests")
     os.makedirs(requests_dir, exist_ok=True)
 
     headlines_completion = pd.read_csv(os.path.join(DATA_DIR, "headlines_completion.csv"))

@@ -4,7 +4,6 @@ import numpy as np
 
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/Embeddings")
 
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -15,6 +14,7 @@ def euclidean_distance(a, b):
     return np.linalg.norm(a - b)
 
 def decode_embed_responses(responses):
+    responses = responses.reset_index(drop=True)
     responses_decoded = []
     for _, response in responses.iterrows(): 
         response_out =  response.response['body']['data'][0]
@@ -42,13 +42,33 @@ def create_random_benchmark(data, N=10_000, seed=123):
         }) 
     return(benchmark)
 
+def read_and_merge_jsonl_files(input):
+    # Extract directory and prefix
+    directory = os.path.dirname(input)
+    prefix = os.path.basename(input)
+
+    all_data = []
+
+    # Traverse through the directory
+    for file in sorted(os.listdir(directory)):
+        if file.startswith(prefix) and file.endswith('.jsonl'):
+            file_path = os.path.join(directory, file)
+            print(f"Reading: {file_path}")
+            df = pd.read_json(file_path, lines=True)
+            all_data.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(all_data, ignore_index=True)
+    print(f"Combined DataFrame has {len(combined_df)} rows.")
+
+    return combined_df
 
 def main():
-    responses_description_path = os.path.join(TEMP_DIR, 'Responses/responses_DescriptionClean.jsonl')
-    responses_description_llm_path = os.path.join(TEMP_DIR, 'Responses/responses_DescriptionLLMClean.jsonl')
+    responses_description = read_and_merge_jsonl_files(os.path.join(DATA_DIR, 'embeddings/responses/responses_DescriptionClean'))
+    responses_description_llm = read_and_merge_jsonl_files(os.path.join(DATA_DIR, 'embeddings/responses/responses_DescriptionLLMClean'))
 
-    description_embeddings = decode_embed_responses(pd.read_json(responses_description_path, lines=True))
-    description_llm_embeddings = decode_embed_responses(pd.read_json(responses_description_llm_path, lines=True))
+    description_embeddings = decode_embed_responses(responses_description)
+    description_llm_embeddings = decode_embed_responses(responses_description_llm)
 
     description_embeddings.rename(columns={
         'custom_id': 'BillID',
@@ -68,23 +88,23 @@ def main():
     benchmark.to_csv(benchmark_path, index=False)
     print(f"Saved {os.path.basename(benchmark_path)}, n = {len(benchmark)}, at {os.path.dirname(benchmark_path)}")
 
-    # Add similarity columns to bills_llm_completion.csv
-    bills_llm_completion = pd.read_csv(os.path.join(DATA_DIR, f"bills_llm_completion.csv"))
-    bills_llm_completion = bills_llm_completion.merge(description_embeddings, on="BillID").merge(description_llm_embeddings, on="ID")
+    # Add similarity columns to bills_completion.csv
+    bills_completion_path = os.path.join(DATA_DIR, "bills_completion.csv")
+    bills_completion = pd.read_csv(bills_completion_path)
+    bills_completion = bills_completion.merge(description_embeddings, on="BillID").merge(description_llm_embeddings, on="ID")
 
-    bills_llm_completion["TextSimilarity"] = bills_llm_completion["DescriptionClean"] == bills_llm_completion["DescriptionLLMClean"]
-    bills_llm_completion["EuclideanDistance"] = bills_llm_completion.apply(lambda x: euclidean_distance(x["DescriptionCleanEmbed"], x["DescriptionLLMCleanEmbed"]), axis=1)
-    bills_llm_completion["CosineSimilarity"] = bills_llm_completion.apply(lambda x: cosine_similarity(x["DescriptionCleanEmbed"], x["DescriptionLLMCleanEmbed"]), axis=1)
+    bills_completion["TextSimilarity"] = bills_completion["DescriptionClean"] == bills_completion["DescriptionLLMClean"]
+    bills_completion["EuclideanDistance"] = bills_completion.apply(lambda x: euclidean_distance(x["DescriptionCleanEmbed"], x["DescriptionLLMCleanEmbed"]), axis=1)
+    bills_completion["CosineSimilarity"] = bills_completion.apply(lambda x: cosine_similarity(x["DescriptionCleanEmbed"], x["DescriptionLLMCleanEmbed"]), axis=1)
 
-    bills_llm_completion_similarity = bills_llm_completion[[
+    bills_completion = bills_completion[[
     'ID', 'BillID', 'PromptingStrategyID', 'PromptingStrategyName',
     'ResponseFormat', 'TrimText', 'AddIntrDate', 'Model', 'Temperature',
     'MaxTokens', 'Year', 'Major', 'MajorText', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal', 'IntrDate',
     'DescriptionTrim', 'Description', 'DescriptionLLM', 'DescriptionClean', 'DescriptionLLMClean',
     'CosineSimilarity', 'EuclideanDistance', 'TextSimilarity']]
-    bills_llm_completion_similarity_path = os.path.join(DATA_DIR, "bills_llm_completion.csv")
-    bills_llm_completion_similarity.to_csv(bills_llm_completion_similarity_path, index=False)
-    print(f"Saved {os.path.basename(bills_llm_completion_similarity_path)}, n = {len(bills_llm_completion_similarity)}, at {os.path.dirname(bills_llm_completion_similarity_path)}")
+    bills_completion.to_csv(bills_completion_path, index=False)
+    print(f"Saved {os.path.basename(bills_completion_path)}, n = {len(bills_completion)}, at {os.path.dirname(bills_completion_path)}")
 
 if __name__ == "__main__":
     main()

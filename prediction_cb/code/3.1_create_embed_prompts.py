@@ -6,7 +6,7 @@ import tiktoken
 
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/Embeddings")
+TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/embeddings")
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embedding_model="text-embedding-3-small"):
@@ -65,19 +65,19 @@ def estimate_cost(descriptions, model="text-embedding-3-small", batched=True):
     return total_cost
 
 def main():
-    requests_dir = os.path.join(TEMP_DIR, "Requests")
+    requests_dir = os.path.join(TEMP_DIR, "requests")
     os.makedirs(requests_dir, exist_ok=True)
 
-    bills_llm_completion = pd.read_csv(os.path.join(DATA_DIR, "bills_llm_completion.csv"))
+    bills_completion = pd.read_csv(os.path.join(DATA_DIR, "bills_completion.csv"))
 
     # Estimate cost using Batch API
-    cost_description = estimate_cost(bills_llm_completion["DescriptionClean"].unique(), batched=True)
+    cost_description = estimate_cost(bills_completion["DescriptionClean"].unique(), batched=True)
     print(f"Estimated cost to embed Description using Batch API is ${cost_description:.2f}")
-    cost_description_llm = estimate_cost(bills_llm_completion["DescriptionLLMClean"], batched=True)
+    cost_description_llm = estimate_cost(bills_completion["DescriptionLLMClean"], batched=True)
     print(f"Estimated cost to embed DescriptionLLM using Batch API is ${cost_description_llm:.2f}")
 
     # Create prompts
-    batches = create_embed_requests(bills_llm_completion, requests_dir, embedding_model="text-embedding-3-small")
+    batches = create_embed_requests(bills_completion, requests_dir, embedding_model="text-embedding-3-small")
     batches_path = os.path.join(TEMP_DIR, "batches.csv")
     batches.to_csv(batches_path, index=False)
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")

@@ -1,22 +1,9 @@
 import os
-import glob
 import pandas as pd
 import json
 
 REPO_DIR = "."
 DATA_DIR = os.path.join(REPO_DIR, "prediction_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "prediction_cb/temp/LLM")
-os.makedirs(TEMP_DIR, exist_ok=True)
-
-def merge_batched_responses(responses_batched_paths):
-    responses = []
-    for responses_batched_path in sorted(responses_batched_paths):
-        responses_batched_file = pd.read_json(responses_batched_path, lines=True)
-        print(f"Loaded {os.path.basename(responses_batched_path)}, n = {len(responses_batched_file)}")
-        responses_batched_file["ID"] = responses_batched_file["custom_id"].apply(lambda x: int(x))
-        responses.append(responses_batched_file)
-    responses = pd.concat(responses)
-    return(responses)
 
 def decode_responses_passage(responses):
     responses_decoded = []
@@ -104,11 +91,6 @@ def add_trimmed(df):
         
         description = part_to_trim + description
         description_llm = part_to_trim + description_llm
-    # else:
-    #     print(df["ID"])
-    #     print(part_to_trim[:100])
-    #     print(description[:100])
-    #     print(description_llm[:100])
 
     df["DescriptionTrim"] = part_to_trim
     df["Description"] = description
@@ -116,14 +98,35 @@ def add_trimmed(df):
 
     return(df)
 
+def read_and_merge_jsonl_files(input):
+    # Extract directory and prefix
+    directory = os.path.dirname(input)
+    prefix = os.path.basename(input)
+
+    all_data = []
+
+    # Traverse through the directory
+    for file in sorted(os.listdir(directory)):
+        if file.startswith(prefix) and file.endswith('.jsonl'):
+            file_path = os.path.join(directory, file)
+            print(f"Reading: {file_path}")
+            df = pd.read_json(file_path, lines=True)
+            all_data.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(all_data, ignore_index=True)
+    print(f"Combined DataFrame has {len(combined_df)} rows.")
+
+    return combined_df
+
 def main():
     bills = pd.read_csv(os.path.join(DATA_DIR, f"bills.csv"))
-    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
+    prompts = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/prompts"))
     prompts.drop(columns=["Messages"], inplace=True)
 
     # # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
-    responses = merge_batched_responses(responses_batched_paths)
+    responses = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/responses_batched/responses_batched"))
+    responses["ID"] = responses["custom_id"].apply(lambda x: int(x))
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["ID",  "PromptingStrategyID", "PromptingStrategyName", "BillID", "TrimText", "AddIntrDate"]], on="ID")
     responses.set_index("ID", inplace=True, drop=False)
@@ -136,18 +139,18 @@ def main():
     responses_passage = decode_responses_passage(responses_passage)
     
     # merge prompts and bills metadata with llm responses
-    bills_llm_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
-    bills_llm_passage.set_index("ID", inplace=True, drop=True)
-    bills_llm_passage.sort_index(inplace=True, ignore_index=True)
+    bills_passage = prompts.merge(responses_passage, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
+    bills_passage.set_index("ID", inplace=True, drop=True)
+    bills_passage.sort_index(inplace=True, ignore_index=True)
 
 
     # print mean input and output tokens
-    print(bills_llm_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
+    print(bills_passage[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     # save
-    bills_llm_passage_path = os.path.join(DATA_DIR, f"bills_llm_passage.csv")
-    bills_llm_passage.to_csv(bills_llm_passage_path, index=False)
-    print(f"Saved {os.path.basename(bills_llm_passage_path)}, n = {len(bills_llm_passage)}, at {os.path.dirname(bills_llm_passage_path)}")
+    bills_passage_path = os.path.join(DATA_DIR, f"bills_passage.csv")
+    bills_passage.to_csv(bills_passage_path, index=False)
+    print(f"Saved {os.path.basename(bills_passage_path)}, n = {len(bills_passage)}, at {os.path.dirname(bills_passage_path)}")
 
     # Completion
     responses_completion = responses.loc[responses["PromptingStrategyName"]=="Complete Bill Summary"]
@@ -156,26 +159,26 @@ def main():
     responses_completion = decode_responses_completion(responses_completion)
 
     # merge prompts and bills metadata with llm responses
-    bills_llm_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
+    bills_completion = prompts.merge(responses_completion, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
 
     # Add the provided beginning of bill summary to DescriptionLLM if not included
-    bills_llm_completion = bills_llm_completion.apply(lambda x: add_trimmed(x), axis=1)
+    bills_completion = bills_completion.apply(lambda x: add_trimmed(x), axis=1)
 
     # Remove non-alphanumeric characters, keeping stop-words
-    bills_llm_completion["DescriptionClean"] = bills_llm_completion["Description"].apply(lambda x: clean_text(x, remove_stop_words=False))
-    bills_llm_completion["DescriptionLLMClean"] = bills_llm_completion["DescriptionLLM"].apply(lambda x: clean_text(x, remove_stop_words=False))
+    bills_completion["DescriptionClean"] = bills_completion["Description"].apply(lambda x: clean_text(x, remove_stop_words=False))
+    bills_completion["DescriptionLLMClean"] = bills_completion["DescriptionLLM"].apply(lambda x: clean_text(x, remove_stop_words=False))
 
-    bills_llm_completion.set_index("ID", inplace=True, drop=True)
-    bills_llm_completion.sort_index(inplace=True, ignore_index=True)
-    bills_llm_completion["ID"] = bills_llm_completion.index
+    bills_completion.set_index("ID", inplace=True, drop=True)
+    bills_completion.sort_index(inplace=True, ignore_index=True)
+    bills_completion["ID"] = bills_completion.index
     
     # print mean input and output tokens
-    print(bills_llm_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
+    print(bills_completion[["AddIntrDate", "InputTokens", "OutputTokens"]].groupby("AddIntrDate").agg(['mean']))
 
     # save
-    bills_llm_completion_path = os.path.join(DATA_DIR, f"bills_llm_completion.csv")
-    bills_llm_completion.to_csv(bills_llm_completion_path, index=False)
-    print(f"Saved {os.path.basename(bills_llm_completion_path)}, n = {len(bills_llm_completion)}, at {os.path.dirname(bills_llm_completion_path)}")
+    bills_completion_path = os.path.join(DATA_DIR, f"bills_completion.csv")
+    bills_completion.to_csv(bills_completion_path, index=False)
+    print(f"Saved {os.path.basename(bills_completion_path)}, n = {len(bills_completion)}, at {os.path.dirname(bills_completion_path)}")
 
 if __name__ == "__main__":
     main()

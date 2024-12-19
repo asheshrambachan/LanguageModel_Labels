@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
+import time
 
 REPO_DIR = '.'
 TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
@@ -13,11 +14,16 @@ OPENAI_API_KEY = os.environ.get('API_KEY')
 # Check status of all batches
 def check_batches_status(batches):
     client = OpenAI(api_key=OPENAI_API_KEY)
+    status = True
     for _, batch in batches.iterrows():
         file = batch['file']
         id = batch['id']
         batch_status = client.batches.retrieve(id)
         print(f"{os.path.basename(file):>52s}: {batch_status.status}")
+        if (batch_status.status != "completed"):
+            status = False
+    print()
+    return(status)
 
 def download_batched_responses(batches, out_dir):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -44,7 +50,12 @@ def main():
     os.makedirs(batched_responses_dir, exist_ok=True)
 
     batches = pd.read_csv(os.path.join(TEMP_DIR, "batches.csv"))
-    check_batches_status(batches)
+    
+    status = check_batches_status(batches)
+    while (status==False):
+        time.sleep(15*60) # 15 min
+        status = check_batches_status(batches)
+
     download_batched_responses(batches, batched_responses_dir)
 
 if __name__ == "__main__":
