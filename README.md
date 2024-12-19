@@ -4,11 +4,11 @@ This repository contains the code, data, and outputs associated with the paper "
 
 ## Repository Structure
 
-This repository is organized to facilitate the replication of results presented in the paper. The subdirectories are structured based on task type (**prediction** or **estimation**) and data source (**Congressional bills** or **financial news headlines**):
-- `prediction_cb/`: Code and data for prediction tasks involving Congressional bills data.
+This repository is organized to facilitate the replication of results presented in the paper. The subdirectories are structured based on task type (**prediction** or **estimation**) and data source (**financial news headlines** of **Congressional bills**):
 - `prediction_headlines/`: Code and data for prediction tasks involving financial news headlines.
-- `estimation_cb/`: Code and data for estimation tasks involving Congressional bills data.
+- `prediction_cb/`: Code and data for prediction tasks involving Congressional bills data.
 - `estimation_headlines/`: Code and data for estimation tasks involving financial news headlines.
+- `estimation_cb/`: Code and data for estimation tasks involving Congressional bills data.
 - `figures/`: Code and outputs for generating figures presented in the paper.
 - `tables/`: Code and outputs for generating tables presented in the paper.
 

@@ -5,10 +5,10 @@ This subdirectory contains scripts for generating the tables presented in the pa
 ## Directory Structure
 
 - `code/`: Contains the R scripts for generating tables.
-    - `prediction_cb/`: Tables scripts for prediction tasks using Congressional bills.
     - `prediction_headlines/`: Tables scripts for prediction tasks using financial news headlines.
-    - `estimation_cb/`: Tables scripts for estimation tasks using Congressional bills.
+    - `prediction_cb/`: Tables scripts for prediction tasks using Congressional bills.
     - `estimation_headlines/`: Tables scripts for estimation tasks using financial news headlines.
+    - `estimation_cb/`: Tables scripts for estimation tasks using Congressional bills.
 - `output/`: Contains the generated `.tex` table files for each task and dataset.
     - Subdirectories mirror the `code/` structure.
 

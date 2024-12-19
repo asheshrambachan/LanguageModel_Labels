@@ -5,10 +5,10 @@ This subdirectory contains scripts for generating the figures presented in the p
 ## Directory Structure
 
 - `code/`: Contains the R scripts for generating figures.
-    - `prediction_cb/`: Figures scripts for prediction tasks using Congressional bills.
     - `prediction_headlines/`: Figures scripts for prediction tasks using financial news headlines.
-    - `estimation_cb/`: Figures scripts for estimation tasks using Congressional bills.
+    - `prediction_cb/`: Figures scripts for prediction tasks using Congressional bills.
     - `estimation_headlines/`: Figures scripts for estimation tasks using financial news headlines.
+    - `estimation_cb/`: Figures scripts for estimation tasks using Congressional bills.
 - `output/`: Contains the generated figures files (`.jpeg` and `.tex`) for each task and dataset.
     - Subdirectories mirror the `code/` structure.
 
