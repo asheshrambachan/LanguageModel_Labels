@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 import time
 
 REPO_DIR = '.'
-TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
+TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/llm")
+DATA_DIR = os.path.join(REPO_DIR, "estimation_cb/data/llm")
 
 # Place API_KEY in the .env file
 load_dotenv(os.path.join(REPO_DIR, ".env"), override=True)
@@ -45,6 +46,42 @@ def download_batched_responses(batches, out_dir):
         responses_batched.write_to_file(responses_batched_path)
         print(f"Saved {os.path.basename(responses_batched_path)} at {os.path.dirname(responses_batched_path)}")
 
+
+def split_jsonl_file(input_file, output_dir, max_size=100 * 1_000_000):  # 1 MB = 1,000,000 bytes
+    """Splits a JSONL file into smaller parts."""
+    os.makedirs(output_dir, exist_ok=True)
+    base_name = os.path.splitext(os.path.basename(input_file))[0]  # Remove .jsonl
+    file_count = 1
+    current_size = 0
+    output_file = os.path.join(output_dir, f"{base_name}_{file_count}.jsonl")
+    output = open(output_file, 'w', encoding='utf-8')
+    
+    with open(input_file, 'r', encoding='utf-8') as infile:
+        for line in infile:
+            line_size = len(line.encode('utf-8'))
+            if current_size + line_size > max_size:
+                output.close()
+                file_count += 1
+                output_file = os.path.join(output_dir, f"{base_name}_{file_count}.jsonl")
+                output = open(output_file, 'w', encoding='utf-8')
+                current_size = 0
+            
+            output.write(line)
+            current_size += line_size
+    
+    output.close()
+    print(f"Split completed for {input_file}. Files are saved in {output_dir}")
+
+def split_jsonl_in_directory(input_dir, output_base_dir, max_size=100 * 1_000_000):
+    """Splits all JSONL files in a directory recursively."""
+    for root, _, files in os.walk(input_dir):
+        for file in files:
+            if file.endswith('.jsonl'):  # Process only JSONL files
+                input_file = os.path.join(root, file)
+                relative_path = os.path.relpath(root, input_dir)
+                output_dir = os.path.join(output_base_dir, relative_path)
+                split_jsonl_file(input_file, output_dir, max_size)
+
 def main():
     batched_responses_dir = os.path.join(TEMP_DIR, "responses_batched")
     os.makedirs(batched_responses_dir, exist_ok=True)
@@ -57,6 +94,8 @@ def main():
         status = check_batches_status(batches)
 
     download_batched_responses(batches, batched_responses_dir)
+
+    split_jsonl_in_directory(TEMP_DIR, DATA_DIR)
 
 if __name__ == "__main__":
     main()

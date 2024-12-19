@@ -9,6 +9,9 @@
 # Note: This code is based on  https://github.com/asheshrambachan/LanguageModel_Labels/blob/main/egami_et_al/code/LLM_errors.R
 # -------------------------------------------------------------------
 
+# Removing all objects
+rm(list = ls())
+
 # --- User Configurable Parameters ----------------------------------
 n_cores <- 50
 N <- 1000 # Number of simulations per a single combination

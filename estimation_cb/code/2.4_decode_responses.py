@@ -6,19 +6,8 @@ import re
 
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, "estimation_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
 
 MAJOR_CODE = pd.read_csv(os.path.join(DATA_DIR, "major_topics.csv")).set_index('Major')['MajorText'].to_dict()
-
-def merge_batched_responses(responses_batched_paths):
-    responses = []
-    for responses_batched_path in sorted(responses_batched_paths):
-        responses_batched_file = pd.read_json(responses_batched_path, lines=True)
-        # print(f"Loaded {responses_batched_path}, n = {len(responses_batched_file)}")
-        responses_batched_file["ID"] = responses_batched_file["custom_id"].apply(lambda x: int(x[3:]))
-        responses.append(responses_batched_file)
-    responses = pd.concat(responses)
-    return(responses)
 
 def decode_responses(responses):
     responses_decoded = []
@@ -46,16 +35,37 @@ def decode_responses(responses):
             "InputTokens": int(response.response["body"]["usage"]["prompt_tokens"]),
             "OutputTokens": int(response.response["body"]["usage"]["completion_tokens"])
         })
-    return(responses_decoded)
+    return(pd.json_normalize(responses_decoded))
+
+def read_and_merge_jsonl_files(input):
+    # Extract directory and prefix
+    directory = os.path.dirname(input)
+    prefix = os.path.basename(input)
+
+    all_data = []
+
+    # Traverse through the directory
+    for file in sorted(os.listdir(directory)):
+        if file.startswith(prefix) and file.endswith('.jsonl'):
+            file_path = os.path.join(directory, file)
+            print(f"Reading: {file_path}")
+            df = pd.read_json(file_path, lines=True)
+            all_data.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(all_data, ignore_index=True)
+    print(f"Combined DataFrame has {len(combined_df)} rows.")
+
+    return combined_df
 
 def main():
     bills = pd.read_csv(os.path.join(DATA_DIR, f"bills.csv"))
-    prompts = pd.read_json(os.path.join(TEMP_DIR, f"prompts.jsonl"), lines=True) 
+    prompts = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/prompts")) 
     prompts.drop(columns=["Messages"], inplace=True)
 
     # Load and merge batched responses
-    responses_batched_paths = glob.glob(os.path.join(TEMP_DIR, f'responses_batched/*.jsonl'))
-    responses = merge_batched_responses(responses_batched_paths)
+    responses = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/responses_batched/responses_batched"))
+    responses["ID"] = responses["custom_id"].apply(lambda x: int(x[3:]))
     print(f"Appended all responses, n = {len(responses)}")
     responses = responses.merge(prompts[["ID", "BillID", "ResponseFormat", "AddExplanation"]], on="ID")
     responses.set_index("ID", inplace=True, drop=False)
@@ -63,14 +73,8 @@ def main():
 
     # Decoded responses and save aas jsonl file
     responses = decode_responses(responses)
-    responses_path = os.path.join(TEMP_DIR, f"responses.jsonl")
-    with open(responses_path, "w") as f:
-        for response in responses:
-            f.write(json.dumps(response) + "\n")
-    print(f"Saved {responses_path}")
-
+    
     # Merge prompts and bills metadata with llm responses
-    responses = pd.read_json(os.path.join(TEMP_DIR, f"responses.jsonl"), lines=True)
     bills_llm = prompts.merge(responses, on="ID", validate="1:1").merge(bills, on="BillID", validate="m:1")
     bills_llm_path = os.path.join(DATA_DIR, f"bills_llm.csv")
     bills_llm.to_csv(bills_llm_path, index=False)

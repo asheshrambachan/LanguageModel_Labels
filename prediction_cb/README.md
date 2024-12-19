@@ -44,8 +44,8 @@ You can replicate the results using one of the following methods:
         ```
 
 ## Notes
-
+- Step `2.1` generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory. 
+- In steps `2.1` and `3.1`, the OpenAI API token limit varies by user. If needed, you can split the prompts into smaller batches by modifying the `PER_BATCH_LIMIT` constant in the beginning of the script.
+- Steps that involve querying LLMs (i.e., `2.2`, `2.3`, `3.2`, and `3.3`) can take significant time due to OpenAI response generation. To save time, you can skip these steps and use the pre-generated results provided in the `data/` directory.
+- Data generated is initially saved in the `temp/` directory. It is then split into smaller files and added to the `data/` directory to facilitate GitHub uploads and enable replication of subsequent steps.
 - Final outputs are saved in the `data/` directory as `.csv` files, ready for use in figures and tables.
-- Generated prompts and responses from OpenAI are initially saved in the `temp/` directory. They are later split into smaller files and added to the `data/` directory to be able to upload them to GitHub.
-- Step `2.1` generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
-- Steps that involve querying LLMs can take significant time due to OpenAI response generation (i.e., `2.1`, `2.2`, `2.3`, `3.1`, `3.2`, and `3.3`). To save time, you can skip them and use the pre-generated results provided in the `data/` directory.

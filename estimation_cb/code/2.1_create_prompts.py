@@ -6,8 +6,10 @@ import tiktoken
 
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, "estimation_cb/data")
-TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/LLM")
+TEMP_DIR = os.path.join(REPO_DIR, "estimation_cb/temp/llm")
 os.makedirs(TEMP_DIR, exist_ok=True)
+
+PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
 def create_prompts(prompting_strategies, bills, min_confidence=0.9, max_confidence=1):
     id = 0
@@ -124,7 +126,7 @@ def create_batched_prompts(prompts, batched_prompts_dir):
                 }
             prompts_batched.append(prompt_batched)
 
-            if ((i==(12e3-1)) | (len(prompts_batched)==50e3) | (i==(len(prompts_model)-1))):
+            if ((len(prompts_batched)==PER_BATCH_LIMIT) | (i==(len(prompts_model)-1))):
                 part = part + 1
                 prompts_batched_path = os.path.join(batched_prompts_dir, f"prompts_batched_{model}_part{part}.jsonl")
 

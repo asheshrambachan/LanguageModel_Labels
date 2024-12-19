@@ -124,7 +124,7 @@ def main():
     prompts = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/prompts"))
     prompts.drop(columns=["Messages"], inplace=True)
 
-    # # Load and merge batched responses
+    # Load and merge batched responses
     responses = read_and_merge_jsonl_files(os.path.join(DATA_DIR, f"llm/responses_batched/responses_batched"))
     responses["ID"] = responses["custom_id"].apply(lambda x: int(x))
     print(f"Appended all responses, n = {len(responses)}")
