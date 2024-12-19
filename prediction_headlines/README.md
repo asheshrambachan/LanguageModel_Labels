@@ -21,33 +21,33 @@ You can replicate the results using one of the following methods:
 2. **Partial Replication:** Run individual scripts for specific steps. 
 
     1. Data cleaning
-    ```
-    python ./prediction_headlines/code/1_clean_data.py
-    ```
+        ```
+        python ./prediction_headlines/code/1_clean_data.py
+        ```
 
     2. Prompt creation, LLM querying, and response decoding. 
     
-    - This step generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
-    - Steps that involve querying LLMs (i.e., `2.2_query_llm.py` and `2.3_download_responses.py`) can take significant time due to OpenAI response generation. To save time, you can skip them and use the pre-generated results provided in the `data/` directory.
+        - This step generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
+        - Steps that involve querying LLMs (i.e., `2.2_query_llm.py` and `2.3_download_responses.py`) can take significant time due to OpenAI response generation. To save time, you can skip them and use the pre-generated results provided in the `data/` directory.
 
-    ```sh
-    python ./prediction_headlines/code/2.1_create_prompts.py
-    python ./prediction_headlines/code/2.2_query_llm.py
-    python ./prediction_headlines/code/2.3_download_responses.py
-    python ./prediction_headlines/code/2.4_decode_responses.py
-    ```
+        ```sh
+        python ./prediction_headlines/code/2.1_create_prompts.py
+        python ./prediction_headlines/code/2.2_query_llm.py
+        python ./prediction_headlines/code/2.3_download_responses.py
+        python ./prediction_headlines/code/2.4_decode_responses.py
+        ```
 
     3. Embedding generation and similarity analysis. 
 
-    Note: Steps that involve querying LLMs (i.e., `3.2_query_embed_prompts.py` and `3.3_download_embed_responses.py`) can take significant time due to OpenAI response generation. To save time, you can skip them and use the pre-generated results provided in the `data/` directory.
+        Note: Steps that involve querying LLMs (i.e., `3.2_query_embed_prompts.py` and `3.3_download_embed_responses.py`) can take significant time due to OpenAI response generation. To save time, you can skip them and use the pre-generated results provided in the `data/` directory.
 
-    ```sh
-    python ./prediction_headlines/code/3.1_create_embed_prompts.py
-    python ./prediction_headlines/code/3.2_query_embed_prompts.py
-    python ./prediction_headlines/code/3.3_download_embed_responses.py
-    python ./prediction_headlines/code/3.4_decode_embed_responses.py
-    Rscript ./prediction_headlines/code/3.5_summarize_completion.R
-    ```
+        ```sh
+        python ./prediction_headlines/code/3.1_create_embed_prompts.py
+        python ./prediction_headlines/code/3.2_query_embed_prompts.py
+        python ./prediction_headlines/code/3.3_download_embed_responses.py
+        python ./prediction_headlines/code/3.4_decode_embed_responses.py
+        Rscript ./prediction_headlines/code/3.5_summarize_completion.R
+        ```
 
 ## Notes
 
