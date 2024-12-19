@@ -8,7 +8,7 @@ This subdirectory contains scripts, data, and outputs for **estimation tasks** u
     - Python and R scripts for data cleaning, prompt creation, querying LLMs, LHS and RHS simulations, and result summarization.
     - `simUtils/`: A utility library for bootstrapping, robust estimations, and topic recoding.
 - `data/`: Contains input and output data files.
-- `temp`/: Temporary directory for intermediate files during execution.
+- `temp/`: Temporary directory for intermediate files during execution.
 
 ## Replication Options
 

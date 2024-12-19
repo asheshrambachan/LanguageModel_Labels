@@ -6,7 +6,7 @@ This subdirectory contains scripts, data, and outputs for **prediction tasks** u
 
 - `code/`: Python and R scripts for data cleaning, prompt creation, querying LLMs, embedding generation, and result summarization.
 - `data/`: Contains input and output data files.
-- `temp`/: Temporary directory for intermediate files during execution.
+- `temp/`: Temporary directory for intermediate files during execution.
 
 ## Replication Options
 
