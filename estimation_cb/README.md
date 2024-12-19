@@ -20,7 +20,7 @@ You can replicate the results using one of the following methods:
     ```
 2. **Partial Replication:** Run individual scripts for specific steps. 
 
-    1. Data cleaning
+    1. Data cleaning.
         ```sh
         python ./estimation_cb/code/1_clean_bills.py
         ```

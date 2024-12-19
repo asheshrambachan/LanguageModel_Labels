@@ -46,17 +46,13 @@ You can replicate the results presented in the paper using one of the following 
     ./run_all.sh
     ```
 
-2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed README.md file with instructions for task-specific replication.
+2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed `README.md` file with instructions for task-specific replication.
     - [Prediction Tasks: Congressional Bills](./prediction_cb)
     - [Prediction Tasks: Financial News Headlines](./prediction_headlines)
     - [Estimation Tasks: Congressional Bills](./estimation_cb)
     - [Estimation Tasks: Financial News Headlines](./headlines)
     - [Figures](./figures)
     - [Tables](./tables)
-
-### Notes 
-- All outputs (e.g., `.csv` files) are saved in the respective `data/` directories of the subdirectories.
-- Steps involving LLM querying and running simulations can take time depending on the model used. Pre-generated results are provided for replication of subsequent steps.
 
 ## Citation
 
