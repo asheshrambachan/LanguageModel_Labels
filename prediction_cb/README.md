@@ -28,7 +28,7 @@ You can replicate the results using one of the following methods:
     2. Prompt creation, LLM querying, and response decoding. 
 
         Notes:
-        - This step generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
+        - Step `2.1` generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
         - Steps that involve querying LLMs can take significant time due to OpenAI response generation. To save time, you can skip steps `2.1`, `2.2`, and `2.3` and use the pre-generated results provided in the `data/` directory.
 
         ```sh
