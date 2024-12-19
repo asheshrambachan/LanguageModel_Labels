@@ -26,11 +26,6 @@ You can replicate the results using one of the following methods:
         ```
 
     2. Prompt creation, LLM querying, and response decoding. 
-
-        Notes:
-        - Step `2.1` generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
-        - Steps that involve querying LLMs can take significant time due to OpenAI response generation. To save time, you can skip steps `2.1`, `2.2`, and `2.3` and use the pre-generated results provided in the `data/` directory.
-
         ```sh
         python ./prediction_cb/code/2.1_create_prompts.py
         python ./prediction_cb/code/2.2_query_llm.py
@@ -40,9 +35,6 @@ You can replicate the results using one of the following methods:
         ```
 
     3. Embedding generation and similarity analysis:
-        
-        Note: Steps that involve querying LLMs can take significant time due to OpenAI response generation. To save time, you can skip steps `3.1`, `3.2`, and `3.3` and use the pre-generated results provided in the `data/` directory.
-
         ```sh
         python ./prediction_cb/code/3.1_create_embed_prompts.py
         python ./prediction_cb/code/3.2_query_embed_prompts.py
@@ -55,3 +47,5 @@ You can replicate the results using one of the following methods:
 
 - Final outputs are saved in the `data/` directory as `.csv` files, ready for use in figures and tables.
 - Generated prompts and responses from OpenAI are initially saved in the `temp/` directory. They are later split into smaller files and added to the `data/` directory to be able to upload them to GitHub.
+- Step `2.1` generates prompts for the cleaned data using model and prompt specifications from [prompt_templates.csv](./data/prompt_templates.csv). You can customize these templates in the [prompt_templates/](./data/prompt_templates/) directory.
+- Steps that involve querying LLMs can take significant time due to OpenAI response generation (i.e., `2.1`, `2.2`, `2.3`, `3.1`, `3.2`, and `3.3`). To save time, you can skip them and use the pre-generated results provided in the `data/` directory.
