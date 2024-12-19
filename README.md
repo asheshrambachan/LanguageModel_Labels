@@ -77,6 +77,6 @@ If you use this repository, please cite the paper:
 
 - Jones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Codebook_. [https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf) (accessed July 5, 2024).
 
-- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Congressional Bills_. [https://www.comparativeagendas.net/#congressional_hearings](https://www.comparativeagendas.net/#congressional_hearings) (accessed July 5, 2024).
+- Wilkerson, John, E. Scott Adler, Bryan D. Jones, Frank R. Baumgartner, Guy Freedman, Sean M. Theriault, Alison Craig, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Congressional Bills_. [https://minio.la.utexas.edu/compagendas/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv](https://minio.la.utexas.edu/compagendas/datasetfiles/US-Legislative-congressional_bills_19.3_3_3.csv) (accessed July 5, 2024).
 
 - WRDS Research Team. 2023. _Beta Suite by WRDS_. [https://wrds-www.wharton.upenn.edu/pages/grid-items/beta-suite-wrds](https://wrds-www.wharton.upenn.edu/pages/grid-items/beta-suite-wrds) (accessed August 1, 2024).
