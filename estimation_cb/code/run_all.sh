@@ -17,7 +17,7 @@ python ./estimation_cb/code/2.3_download_responses.py
 echo "Decoding LLM responses..."
 python ./estimation_cb/code/2.4_decode_responses.py
 
-Step 3: Simulation Runs and Model Evaluation
+# Step 3: Simulation Runs & Model Evaluation
 echo "Running LHS simulations..."
 Rscript ./estimation_cb/code/3.1_run_lhs_simulations.r
 
