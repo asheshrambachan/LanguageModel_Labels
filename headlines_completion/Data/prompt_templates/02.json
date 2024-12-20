@@ -1,6 +1,0 @@
-[
-    {
-        "role": "user",
-        "content": "Here is the beginning of a news headline about {} on {}:\n\"{}\"\n\nTo the best of your ability, please complete this headline using information available up until {}. Do not reference or use any data beyond this date.\n\nDo not modify or paraphrase the provided portion. Only complete the headline starting from where it ends, and return the remaining part in the following JSON format:\n{{\n    \"headline_llm\": \"[Remaining headline text]\"\n}}\n"
-    }
-]

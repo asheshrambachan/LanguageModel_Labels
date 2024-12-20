@@ -1,0 +1,5 @@
+"Model","Prompt","Share","Count"
+"GPT-3.5","Base prompt",0.0104,104
+"GPT-3.5","Prompt with date restriction",0.0151999999999999,152
+"GPT-4o","Base prompt",0.0344,344
+"GPT-4o","Prompt with date restriction",0.033,330

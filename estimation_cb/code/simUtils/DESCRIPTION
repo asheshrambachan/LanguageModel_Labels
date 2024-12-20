@@ -1,0 +1,11 @@
+Package: simUtils
+Type: Package
+Title: Robust and Bootstrap Simulation Summaries
+Version: 1.0.0
+Author: CB
+Maintainer: CB <haya1@mit.edu>
+Description: A package that provides robust and bootstrap methods for summarizing simulation results for the congressional bills experiment.
+License: GPL-3
+Imports: lmtest, sandwich, dplyr, stats
+RoxygenNote: 7.3.2
+Encoding: UTF-8

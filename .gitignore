@@ -3,35 +3,21 @@
 
 code/__pycache__/
 /__pycache__/
-data/raw/*.csv.DS_Store
 settings.json
 .env
 .Rapp.history
-
 .rds
 *.rds
-
 *.Rhistory
 *.RData
+.python-version
+.envrc
 
-congressional_bills/Temp/*
-congressional_bills/Log/*
-congressional_bills/Papers and bib/*
-congressional_bills/Code/*.log
-congressional_bills/Data/US-*.csv
-congressional_bills/Data/bills80*.txt
-congressional_bills/Data/bills93*.csv
-congressional_bills/Rplots.pdf
+Papers and bib/*
+estimation_cb/data/Codebooks
+estimation_cb/temp/*
+prediction_cb/temp/*
+prediction_headlines/temp/*
+# headlines/code/.DS_Store
+# headlines/data/step1_batch_prompts/.DS_Store
 
-congressional_bills_v1
-zeims_et_al_clean/.DS_Store
-congressional_bills/Code/Prediction/clean.log
-congressional_bills/Code/Prediction/results.log
-congressional_bills/Code/Prediction/results.tex
-
-headlines/code/.DS_Store
-headlines/data/step1_batch_prompts/.DS_Store
-
-
-headlines_completion/Temp
-headlines_completion/Data/returns_data_realized
