@@ -85,14 +85,15 @@ There are three possible levels of replication that this code base allows for:
 2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
 3. Generating the regression tables and figures. 
 
-For running any of the code, navigate to `./headlines`. There are 3 shell scripts here that replicate our work. 
+For running any of the code, navigate to `./headlines/code`. There are 4 shell scripts here that replicate our work. 
+Run `chmod +x ./{SCRIPT}.sh` before executing any of the following scripts. 
 1. `run_prompting.sh`
 	* Navigate to the `./data/returns_data` directory. Unzip all the `.zip` files. 
 	* Now, run `./run_prompting.sh`. This will run a bash script that populates first the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
-	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists and you try to overwrite them by running this script, you will have to type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
-		* 	Note that you will have to set an API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
+	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists, to overwrite them by running this script, type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
+		* 	Note: set the API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
 2. `run_analysis.sh`
-3. `run_regs_figs.sh`
+3. `run_regressions.sh` and `run_figures.sh`
 	* The figures directory should be populated after this script executes. 
 
-You can run any of the individual scripts called by the bash scripts from the `./code` directory, and also modify the call to `main()` within a python script if you only want to run the script on a subset of the data. 
+Any of the individual scripts called by the bash scripts can be run from the `./code` directory. Modify the call to `main()` within a python script to run the script on a subset of the data instead of running for all models, months, etc. 

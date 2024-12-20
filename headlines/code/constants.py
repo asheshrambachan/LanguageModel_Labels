@@ -1,4 +1,4 @@
-API_KEY = "insert API key here"
+API_KEY = "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"
 
 personas = [
     "You are a knowledgeable economic agent. ",
@@ -25,10 +25,11 @@ models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"]
 prompt_types = ["base_blanks", "base_json", "persona1", "persona2", 
                 "persona3", "persona4", "cot1", "cot2", "cot3"]
 
-prompts_path = "./data/prompts_templates"
+prompts_path = "./data/prompt_templates"
 step0_path = "./data/step0_returns_data"
 step1_path = "./data/step1_batch_prompts"
-step2_path = "./data/step2_batch_responses"
+step2_path = "./data/step2_batch_ids"
+step3_path = "./data/step3_batch_responses"
 step4_path = "./data/step4_processed_responses"
 step5_path = "./data/step5_merged_returns"
 step6_path = "./data/step6_common_sample"

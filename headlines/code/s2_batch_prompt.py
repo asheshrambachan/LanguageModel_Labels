@@ -1,12 +1,12 @@
-from openai import OpenAI
 import os
-from constants import API_KEY, step1_path
+import pandas as pd
+from openai import OpenAI
+from constants import API_KEY, step1_path, step2_path
 from constants import economic_questions, models, month_batches, years
 
 def initialize_client(api_key):
     """Initializes and returns the OpenAI client using the provided API key."""
     return OpenAI(api_key=api_key)
-
 
 def create_batch_input_file(client, file_path):
     """Uploads a batch input file to OpenAI's servers and returns the file ID."""
@@ -16,7 +16,6 @@ def create_batch_input_file(client, file_path):
             purpose="batch"
         )
     return batch_input_file.id
-
 
 def create_batch(client, batch_input_file_id, description):
     """Creates a batch on OpenAI's servers using the input file ID and description."""
@@ -28,13 +27,18 @@ def create_batch(client, batch_input_file_id, description):
     )
 
 def main(question, model, month, year):
-    """Main function to create a batch on OpenAI's servers."""
+    """
+    Main function to create a batch on OpenAI's servers. 
+    Returns a list of tuples: (question, model, month, year, batch_id)
+    """
     description = f"{model} {question} {month} {year}"
+    print(f"Creating batch for {description}")
     model_path = os.path.join(step1_path, model, f'q{question}')
-    
-    # Initialize the client
+
     client = initialize_client(API_KEY)
-    
+
+    results = []
+
     if month == "oct":
         # File paths for both halves of October data
         file_path1 = os.path.join(model_path, f'q{question}_{month}first{year}_prompts.jsonl')
@@ -42,35 +46,37 @@ def main(question, model, month, year):
 
         # Create batches for both files
         batch_input_file_id1 = create_batch_input_file(client, file_path1)
-        batch1 = create_batch(client, batch_input_file_id1, description=f"{description} first")
+        batch1 = create_batch(client, batch_input_file_id1, description=f"{description} first").id
 
         batch_input_file_id2 = create_batch_input_file(client, file_path2)
-        batch2 = create_batch(client, batch_input_file_id2, description=f"{description} second")
+        batch2 = create_batch(client, batch_input_file_id2, description=f"{description} second").id
 
-        print("oct first half batch id:", batch1)
-        print("oct second half batch id:", batch2)
+        # Store results
+        results.append((question, model, month, year, batch1))
+        results.append((question, model, month, year, batch2))
 
     else:
         # Normal case for non-October months
         file_path = os.path.join(model_path, f'q{question}_{month}{year}_prompts.jsonl')
-
-        # Create batch
         batch_input_file_id = create_batch_input_file(client, file_path)
-        batch = create_batch(client, batch_input_file_id, description=description)
+        batch = create_batch(client, batch_input_file_id, description=description).id
+        results.append((question, model, month, year, batch))
 
-        print(f"{month} batch id:", batch)
+    return results
 
 if __name__ == "__main__":
-
-    QUESTIONS = economic_questions
-    MODELS = models
-    MONTHS = month_batches
-    YEARS = years
-
-    for question in QUESTIONS:
-        for model in MODELS:
-            for month in MONTHS:
-                for year in YEARS:
-                    main(question, model, month, year)
+    all_results = []
+    for question in economic_questions[0:1]:
+        for model in models[0:1]:
+            for month in month_batches[0:1]:
+                for year in years:
+                    # main returns a list of tuples
+                    batch_results = main(question, model, month, year)
+                    all_results.extend(batch_results)
                     print(f"Submitted batch for {question}, {model}, {month}, {year}")
 
+    # Convert all_results to a DataFrame
+    batch_data = pd.DataFrame(all_results, columns=["question", "model", "month", "year", "batch_id"])
+    if not os.path.exists(step2_path):
+        os.makedirs(step2_path)
+    batch_data.to_csv(f"{step2_path}/batch_data.csv", index=False)

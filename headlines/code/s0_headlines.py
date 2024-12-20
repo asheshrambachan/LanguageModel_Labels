@@ -1,7 +1,6 @@
 import pandas as pd
 import datetime as dt
 import os
-import numpy as np
 import pandas_market_calendars as pmc
 from helpers import try_float
 from constants import month_batches, step0_path

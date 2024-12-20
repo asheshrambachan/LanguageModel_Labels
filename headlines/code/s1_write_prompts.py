@@ -76,6 +76,8 @@ def generate_prompts(question, model, month, year):
     csv_file = os.path.join(step0_path, "realized", f"{month}{year}_realized.csv")
     base_prompt_file = os.path.join(prompts_path, f'q{question}base')
 
+    print(os.getcwd())
+    print(base_prompt_file)
     # Check if the model needs modification
     model = "gpt-4o" if model == "gpt-4o-08-26" else model
 

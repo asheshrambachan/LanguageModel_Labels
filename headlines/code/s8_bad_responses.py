@@ -3,7 +3,7 @@ import pandas as pd
 import random
 import json
 import os
-from constants import step2_path, step4_path, step7_path, step8_path
+from constants import step3_path, step4_path, step7_path, step8_path
 
 def sample_index_from_step4(step4_file):
     try:
@@ -17,17 +17,16 @@ def sample_index_from_step4(step4_file):
         print(f"Error reading {step4_file}: {e}")
         return None
 
-# Function to read and print the corresponding line from step2 based on the sampled index
-def read_line_from_step2(step2_file, line_number):
+# Function to read and print the corresponding line from step3 based on the sampled index
+def read_line_from_step3(step3_file, line_number):
     try:
-        with open(step2_file, 'r') as f:
+        with open(step3_file, 'r') as f:
             for i, line in enumerate(f):
                 if i == line_number:
-                    # print(f"Line from {step2_file} at index {line_number}:")  
                     return json.loads(line)['response']['body']['choices'][0]['message']['content']
                     break
     except Exception as e:
-        print(f"Error reading {line_number} from {step2_file}: {e}")
+        print(f"Error reading {line_number} from {step3_file}: {e}")
         return None
  
 
@@ -53,11 +52,11 @@ def main():
             sampled_index = sample_index_from_step4(step4_file)
             if sampled_index is not None:
                 if month == "oct":
-                    # Get the corresponding file from step2
-                    step2_file1 = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}first19_responses.jsonl")
-                    step2_file2 = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}second19_responses.jsonl")
-                    bad_response1 = read_line_from_step2(step2_file1, sampled_index)
-                    bad_response2 = read_line_from_step2(step2_file2, sampled_index)
+                    # Get the corresponding file from step3
+                    step3_file1 = os.path.join(step3_path, model, "q" + question, f"q{question}_{month}first19_responses.jsonl")
+                    step3_file2 = os.path.join(step3_path, model, "q" + question, f"q{question}_{month}second19_responses.jsonl")
+                    bad_response1 = read_line_from_step3(step3_file1, sampled_index)
+                    bad_response2 = read_line_from_step3(step3_file2, sampled_index)
                     bad_responses.append({
                         "custom id": sampled_index,
                         "model": model,
@@ -75,10 +74,10 @@ def main():
                         "bad_response": bad_response2
                     })
                 else:    
-                    # Get the corresponding file from step2
-                    step2_file = os.path.join(step2_path, model, "q" + question, f"q{question}_{month}19_responses.jsonl")
-                    # Read and collect the line from step2 using the sampled index
-                    bad_response = read_line_from_step2(step2_file, sampled_index)
+                    # Get the corresponding file from step3
+                    step3_file = os.path.join(step3_path, model, "q" + question, f"q{question}_{month}19_responses.jsonl")
+                    # Read and collect the line from step3 using the sampled index
+                    bad_response = read_line_from_step3(step3_file, sampled_index)
                     bad_responses.append({
                         "custom id": sampled_index,
                         "model": model,

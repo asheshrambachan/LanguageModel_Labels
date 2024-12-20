@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import os
 import re
-from constants import personas, thought_modifiers, step1_path, step2_path, step4_path
+from constants import personas, thought_modifiers, step1_path, step3_path, step4_path
 from constants import economic_questions, models, month_batches, years
 
 def read_jsonl(file_path, num_lines):
@@ -56,7 +56,7 @@ def extract_prompt_info(json_str):
 def construct_file_paths(question, model, month, year):
     """Constructs the input and output file paths based on the given parameters."""
     input_file_path = f'{step1_path}/{model}/q{question}/q{question}_{month}{year}_prompts.jsonl'
-    output_file_path = f'{step2_path}/{model}/q{question}/q{question}_{month}{year}_responses.jsonl'
+    output_file_path = f'{step3_path}/{model}/q{question}/q{question}_{month}{year}_responses.jsonl'
     return input_file_path, output_file_path
 
 def read_and_process_input_data(input_file_path):
