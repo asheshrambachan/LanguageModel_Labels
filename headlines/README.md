@@ -1,4 +1,4 @@
-# Code and Data for Returns and Firm Headlines LLM exercise
+# Code and Data for Headlines Estimation Exercise
 ## Process Description
 
 Our data generation and processing pipeline for this exercise is this the following:
