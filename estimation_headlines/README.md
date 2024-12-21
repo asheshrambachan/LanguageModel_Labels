@@ -1,4 +1,24 @@
 # Code and Data for Headlines Estimation Exercise
+
+## Quickstart and Using this Code Base
+There are three possible levels of replication that this code base allows for: 
+1. Creating the dataset of headlines and rerunning the prompting exercise followed by steps 2 and 3 below.
+2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
+3. Generating the regression tables and figures. 
+
+For running any of the code, navigate to `./headlines/code`. There are 4 shell scripts here that replicate our work. 
+Run `chmod +x ./{SCRIPT}.sh` before executing any of the following scripts. 
+1. `run_prompting.sh`
+	* Navigate to the `./data/returns_data` directory. Unzip all the `.zip` files. 
+	* Now, run `./run_prompting.sh`. This will run a bash script that populates first the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
+	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists, to overwrite them by running this script, type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
+		* 	Note: set the API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
+2. `run_analysis.sh`
+3. `run_regressions.sh` and `run_figures.sh`
+	* The figures directory should be populated after this script executes. 
+
+Any of the individual scripts called by the bash scripts can be run from the `./code` directory. Modify the call to `main()` within a python script to run the script on a subset of the data instead of running for all models, months, etc. 
+
 ## Process Description
 
 Our data generation and processing pipeline for this exercise is this the following:
@@ -28,8 +48,6 @@ Our data generation and processing pipeline for this exercise is this the follow
 	 The script to generate the prompts is `./code/s1_constants.py` and the generated prompts are located in the `./data/step1_batch_prompts` directory. The prompts are organized by model, economic question, and monthly batch. Each model/question/batch file contains all 9 versions of the prompt for a given headline.
 
 	 *Note that the month of October is split into 2 parts here since the number of headlines exceeds the maximum OpenAI batch size.
-
-  
 
 3. Prompt each LLM. The script for prompting is `./code/s2_batch_prompt.py`. This script submits calls to the OpenAI batch API, where the input batches are the prompt files located in `./data/step1_batch_prompts`. The responses from the API are stored in the `./data/step2_batch_responses` directory which has a similar structure to the prompt directory. For ease of checking progress and billing, we download the response files found in this directory from our OpenAI account instead of making calls to the API. However, we include a script `./code/s3_batch_status.py` that allows for getting the response file through the API.
 
@@ -78,22 +96,3 @@ The repository structure is the following:
 ### Figures
 * All figures and tables are contained in the `figures` directory. 
 * Figures and tables are produced by the code in `/code/produce_figures`. Note that this code will only work after generating the outputs of step 9 above. 
-
-## Using this Code Base
-There are three possible levels of replication that this code base allows for: 
-1. Creating the dataset of headlines and rerunning the prompting exercise followed by steps 2 and 3 below.
-2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
-3. Generating the regression tables and figures. 
-
-For running any of the code, navigate to `./headlines/code`. There are 4 shell scripts here that replicate our work. 
-Run `chmod +x ./{SCRIPT}.sh` before executing any of the following scripts. 
-1. `run_prompting.sh`
-	* Navigate to the `./data/returns_data` directory. Unzip all the `.zip` files. 
-	* Now, run `./run_prompting.sh`. This will run a bash script that populates first the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
-	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists, to overwrite them by running this script, type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
-		* 	Note: set the API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
-2. `run_analysis.sh`
-3. `run_regressions.sh` and `run_figures.sh`
-	* The figures directory should be populated after this script executes. 
-
-Any of the individual scripts called by the bash scripts can be run from the `./code` directory. Modify the call to `main()` within a python script to run the script on a subset of the data instead of running for all models, months, etc. 
