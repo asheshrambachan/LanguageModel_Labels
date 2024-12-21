@@ -1,0 +1,10 @@
+Here is a piece of news about %s: 
+
+%s
+
+Will this piece of news increase/decrease/uncertain %s’s stock price?
+
+Write your answer as: 
+____ (fill in with one of increase/decrease/uncertain), 
+____ (fill in with numerical value for confidence (0-1), 3 characters maximum), 
+____ (fill in with numerical value for magnitude of increase/decrease (0-1), 3 characters maximum)

@@ -1,0 +1,11 @@
+Here is a piece of news about %s: 
+
+%s
+
+Is this news positive, negative, or neutral about %s?
+
+Write your answer. 
+Output a JSON object structured like:
+{"headline type": "positive" or "negative" or "neutral",
+ "confidence": 0-1 value of your confidence in the headline type,
+ "magnitude": 0-1 magnitude of positive or negative for the headline type}

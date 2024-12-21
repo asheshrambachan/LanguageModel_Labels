@@ -1,0 +1,10 @@
+Here is a piece of news about %s: 
+
+%s
+
+Is this news positive, negative, or neutral about %s?
+
+Write your answer as: 
+____ (fill in with one of positive/negative/neutral), 
+____ (fill in with numerical value for confidence (0-1), 3 characters maximum), 
+____ (fill in with numerical value for magnitude of positive/negative (0-1), 3 characters maximum)
