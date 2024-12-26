@@ -38,6 +38,9 @@ tab <- data %>%
   add_header_above(c(" ", "Return Horizon" = 3), italic=T) %>%
   row_spec(4, hline_after = TRUE, extra_latex_after = "%")
 
+tab <- gsub("95th", "$95^\\\\text{th}$", tab)
+tab <- gsub("5th", "$5^\\\\text{th}$", tab)
+
 # Save tables
 save_kable(tab, file = tab_path)
 cat(sprintf("Saved %s\n", tab_path))

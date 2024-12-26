@@ -30,7 +30,7 @@ V_levels <- c(
   "Public Lands & Water Management"
 )
 model_labels_levels <- c(
-  "gpt-3.5-turbo-0125"="GPT-3.5", 
+  "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
   "gpt-4o-2024-05-13"="GPT-4o"
 )
 

@@ -17,7 +17,6 @@ require(dplyr, warn.conflicts = FALSE)
 require(kableExtra, warn.conflicts = FALSE)
 
 data <- read.csv(data_path)  %>%
-  rename("Distance"=Metric) %>%
   filter(
     Model=="GPT-4o",
     Prompt=="Prompt with date restriction"

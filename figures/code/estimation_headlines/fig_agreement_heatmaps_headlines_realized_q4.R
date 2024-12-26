@@ -12,7 +12,7 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
 data_paths <- list(
-  "GPT-3.5" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q4"),
+  "GPT-3.5-Turbo" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q4"),
   "GPT-4o" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o/q4"),
   "GPT-4o-mini" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q4")
 )

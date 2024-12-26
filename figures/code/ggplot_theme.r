@@ -20,7 +20,7 @@ my_palette <- c(
 )
 
 my_colors <- c(
-  "GPT-3.5" =  my_palette[["green"]],
+  "GPT-3.5-Turbo" =  my_palette[["green"]],
   "GPT-4o" = my_palette[["blue"]],
   "GPT-4o-mini" =  my_palette[["red"]],
   "Plug-In" = my_palette[["green"]], 
@@ -29,7 +29,7 @@ my_colors <- c(
 )
 
 my_shapes <- c(
-  "GPT-3.5" = 16, 
+  "GPT-3.5-Turbo" = 16, 
   "GPT-4o" = 17,
   "GPT-4o-mini" = 15,
   "Validation" = NA

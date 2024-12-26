@@ -25,7 +25,7 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 
 # Factor labels and levels
 model_labels_levels <- c(
-  "gpt-3.5-turbo"="GPT-3.5", 
+  "gpt-3.5-turbo"="GPT-3.5-Turbo", 
   "gpt-4o"="GPT-4o",
   "gpt-4o-mini"="GPT-4o-mini"
 )
