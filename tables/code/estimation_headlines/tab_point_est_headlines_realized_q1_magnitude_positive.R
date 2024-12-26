@@ -9,7 +9,7 @@ tab_dir <- file.path(repo_dir, "tables/output/estimation_headlines")
 dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
-data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/summary_stat_data.csv")
+data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/summary_stat_data.csv")
 tab_path <- file.path(tab_dir, "tab_point_est_headlines_realized_q1_magnitude_positive.tex")
 
 # Load required packages quietly

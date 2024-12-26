@@ -14,9 +14,9 @@ settings.json
 .envrc
 
 Papers and bib/*
-estimation_cb/data/Codebooks
-estimation_cb/temp/*
-prediction_cb/temp/*
+estimation_legislation/data/Codebooks
+estimation_legislation/temp/*
+prediction_legislation/temp/*
 prediction_headlines/temp/*
 # headlines/code/.DS_Store
 # headlines/data/step1_batch_prompts/.DS_Store

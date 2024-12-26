@@ -4,11 +4,11 @@ This repository contains the code, data, and outputs associated with the paper "
 
 ## Repository Structure
 
-This repository is organized to facilitate the replication of results presented in the paper. The subdirectories are structured based on task type (**prediction** or **estimation**) and data source (**financial news headlines** of **Congressional bills**):
+This repository is organized to facilitate the replication of results presented in the paper. The subdirectories are structured based on task type (**prediction** or **estimation**) and application (**financial news headlines** or **Congressional legislation**):
 - `prediction_headlines/`: Code and data for prediction tasks involving financial news headlines.
-- `prediction_cb/`: Code and data for prediction tasks involving Congressional bills data.
+- `prediction_legislation/`: Code and data for prediction tasks involving Congressional legislation.
 - `estimation_headlines/`: Code and data for estimation tasks involving financial news headlines.
-- `estimation_cb/`: Code and data for estimation tasks involving Congressional bills data.
+- `estimation_legislation/`: Code and data for estimation tasks involving Congressional legislation.
 - `figures/`: Code and outputs for generating figures presented in the paper.
 - `tables/`: Code and outputs for generating tables presented in the paper.
 
@@ -48,9 +48,9 @@ You can replicate the results presented in the paper using one of the following 
 
 2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed `README.md` file with instructions for task-specific replication.
     - [Prediction Tasks: Financial News Headlines](./prediction_headlines)
-    - [Prediction Tasks: Congressional Bills](./prediction_cb)
-    - [Estimation Tasks: Financial News Headlines](./headlines)
-    - [Estimation Tasks: Congressional Bills](./estimation_cb)
+    - [Prediction Tasks: Congressional Legislation](./prediction_legislation)
+    - [Estimation Tasks: Financial News Headlines](./estimation_headlines)
+    - [Estimation Tasks: Congressional Legislation](./estimation_legislation)
     - [Figures](./figures)
     - [Tables](./tables)
 

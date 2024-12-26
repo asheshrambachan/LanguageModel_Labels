@@ -10,13 +10,13 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
 data_path <- list(
-  file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_FF3_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_fe.csv")
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/realized_returns_clustered.csv"),
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/abnormal_FF3_returns_clustered.csv"),
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/realized_returns_fe.csv")
 )
-merged_data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/merged_data.csv")
-summary_stat_path <- file.path(repo_dir, "headlines/data/step9_reg_results/summary_stat_data.csv")
+merged_data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/merged_data.csv")
+summary_stat_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/summary_stat_data.csv")
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)

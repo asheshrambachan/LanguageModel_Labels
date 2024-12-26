@@ -8,7 +8,7 @@ import re
 REPO_DIR = '.'
 DATA_DIR = os.path.join(REPO_DIR, 'prediction_headlines/data')
 TEMP_DIR = os.path.join(REPO_DIR, 'prediction_headlines/temp')
-RETURNS_DATA_DIR = os.path.join(REPO_DIR, 'headlines/data/step0_returns_data/realized')
+RETURNS_DATA_DIR = os.path.join(REPO_DIR, 'estimation_headlines/data/step0_returns_data/realized')
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 
