@@ -2,13 +2,13 @@
 
 This subdirectory contains scripts, data, and outputs for **estimation tasks** on **financial news headlines**. 
 
-## Directory Structure
+## Directory Structure Overview
 
-- `code/`: 
-    - Contains Python and R scripts for data processing, prompting, and analysis.
+Below is an overview of the main directory structure. For a detailed explanation, see the [Detailed Directory Structure](#directory-structure-detailed) section below.
+
+- `code/`: Contains Python and R scripts for data processing, prompting, and analysis.
 - `data/`: Contains raw and processed data outputs.
 - `figures/`: generates all figures for all results, including those not used in the paper.
-
 
 ## Replication Options
 
@@ -69,7 +69,7 @@ Our data generation and processing pipeline for this exercise is this the follow
 
 7. Regress each type of return on the LLM-generated labels for the headlines.
 
-## Directory Structure (Detailed)
+## Detailed Directory Structure
 
 For this particular exercise, navigate to the `headlines` folder. This is the root directory. All the scripts should be run from this directory.
 
