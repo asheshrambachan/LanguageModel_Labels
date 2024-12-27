@@ -19,8 +19,7 @@ You can replicate the figures using the following methods:
 
 1. **Full Replication:** To generate all figures for all tasks and datasets, run `run_all.sh` script as follows:
     ```
-    chmod +x ./figures/code/run_all.sh
-    ./figures/code/run_all.sh
+    bash figures/code/run_all.sh
     ```
 
 2. **Partial Replication:** To generate a specific figure, run its relevant R script. For example:

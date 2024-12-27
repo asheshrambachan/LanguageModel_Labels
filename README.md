@@ -42,8 +42,7 @@ You can replicate the results presented in the paper using one of the following 
 
 1. **Full Replication:** Run the `run_all.sh` shell script to execute all steps in sequence:
     ```
-    chmod +x ./run_all.sh
-    ./run_all.sh
+    bash run_all.sh
     ```
 
 2. **Partial Replication:** Run individual scripts for specific steps. Each subdirectory contains a detailed `README.md` file with instructions for task-specific replication.

@@ -4,6 +4,7 @@ library(stargazer)
 library(lmtest)
 library(sandwich)
 library(glue)
+library(purrr)
 
 # Reset environment 
 rm(list = ls())

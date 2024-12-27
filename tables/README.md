@@ -19,8 +19,7 @@ You can replicate the tables using the following methods:
 
 1. **Full Replication:** To generate all tables for all tasks and datasets, run `run_all.sh` script as follows:
     ```
-    chmod +x ./tables/code/run_all.sh
-    ./tables/code/run_all.sh
+    bash tables/code/run_all.sh
     ```
 
 2. **Partial Replication:** to generate a specific table, run its relevant R script. For example:

@@ -38,5 +38,6 @@ dependencies:
   - r-modelsummary
   - r-glue
   - r-viridis
+  - r-purrr
   # - r-extrafont
 

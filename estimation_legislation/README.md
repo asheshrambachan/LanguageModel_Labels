@@ -15,8 +15,7 @@ This subdirectory contains scripts, data, and outputs for **estimation tasks** o
 You can replicate the results using one of the following methods:
 1. **Full Replication:** Run the shell script run_all.sh to execute all steps in sequence:
     ```
-    chmod +x ./estimation_legislation/code/run_all.sh
-    ./estimation_legislation/code/run_all.sh
+    bash estimation_legislation/code/run_all.sh
     ```
 2. **Partial Replication:** Run individual scripts for specific steps. 
 

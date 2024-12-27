@@ -1,18 +1,28 @@
-# Code and Data for Headlines Estimation Exercise
+# Estimation Tasks: Financial News Headlines
 
-## Quickstart and Using this Code Base
+This subdirectory contains scripts, data, and outputs for **estimation tasks** on **financial news headlines**. 
+
+## Directory Structure
+
+- `code/`: 
+    - Contains Python and R scripts for data processing, prompting, and analysis.
+- `data/`: Contains raw and processed data outputs.
+- `figures/`: generates all figures for all results, including those not used in the paper.
+
+
+## Replication Options
+
 There are three possible levels of replication that this code base allows for: 
 1. Creating the dataset of headlines and rerunning the prompting exercise followed by steps 2 and 3 below.
 2. Analyzing each LLMs responses to the prompting exercise followed by step 3 below. 
 3. Generating the regression tables and figures. 
 
-For running any of the code, navigate to `./headlines/code`. There are 4 shell scripts here that replicate our work. 
+For running any of the code, navigate to `./estimation_headlines/code`. There are 4 shell scripts here that replicate our work. 
 Run `chmod +x ./{SCRIPT}.sh` before executing any of the following scripts. 
 1. `run_prompting.sh`
-	* Navigate to the `./data/returns_data` directory. Unzip all the `.zip` files. 
+	* Navigate to the `./data/raw/returns_data` directory. Unzip all the `.zip` files. 
 	* Now, run `./run_prompting.sh`. This will run a bash script that populates first the data inside each return type subdirectory inside `./returns_data`. There will be a different `.csv` produced for each month and return type. 
 	* The bash script will then write LLM prompts based on the headlines data that was just generated. If a set of prompts already exists, to overwrite them by running this script, type "yes" to confirm the overwrite. Finally, the script will submit each of the prompts in batches via the Open AI API. 
-		* 	Note: set the API key in `constants.py` and make sure there are funds in the corresponding OpenAI account for this script to finish execution. 
 2. `run_analysis.sh`
 3. `run_regressions.sh` and `run_figures.sh`
 	* The figures directory should be populated after this script executes. 
@@ -59,7 +69,7 @@ Our data generation and processing pipeline for this exercise is this the follow
 
 7. Regress each type of return on the LLM-generated labels for the headlines.
 
-## Repository Structure
+## Directory Structure (Detailed)
 
 For this particular exercise, navigate to the `headlines` folder. This is the root directory. All the scripts should be run from this directory.
 
