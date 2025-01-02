@@ -1,5 +1,3 @@
-.DS_Store
-.Rhistory
 
 code/__pycache__/
 /__pycache__/
@@ -10,6 +8,7 @@ settings.json
 *.rds
 *.Rhistory
 *.RData
+*.DS_Store
 .python-version
 .envrc
 
@@ -18,6 +17,8 @@ estimation_legislation/data/Codebooks
 estimation_legislation/temp/*
 prediction_legislation/temp/*
 prediction_headlines/temp/*
-# headlines/code/.DS_Store
-# headlines/data/step1_batch_prompts/.DS_Store
 
+estimation_headlines/data/raw/CAPM_returns.csv
+estimation_headlines/data/raw/F-F_Research_Data_Factors_daily.CSV
+estimation_headlines/data/raw/headlines2019.csv
+estimation_headlines/data/raw/FF3_returns.csv
