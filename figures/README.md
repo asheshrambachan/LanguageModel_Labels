@@ -6,9 +6,9 @@ This subdirectory contains scripts for generating the figures presented in the p
 
 - `code/`: Contains the R scripts for generating figures.
     - `prediction_headlines/`: Figures scripts for prediction tasks using financial news headlines.
-    - `prediction_cb/`: Figures scripts for prediction tasks using Congressional bills.
+    - `prediction_legislation/`: Figures scripts for prediction tasks using Congressional legislation.
     - `estimation_headlines/`: Figures scripts for estimation tasks using financial news headlines.
-    - `estimation_cb/`: Figures scripts for estimation tasks using Congressional bills.
+    - `estimation_legislation/`: Figures scripts for estimation tasks using Congressional legislation.
 - `output/`: Contains the generated figures files (`.jpeg` and `.tex`) for each task and dataset.
     - Subdirectories mirror the `code/` structure.
 
@@ -19,13 +19,12 @@ You can replicate the figures using the following methods:
 
 1. **Full Replication:** To generate all figures for all tasks and datasets, run `run_all.sh` script as follows:
     ```
-    chmod +x ./figures/code/run_all.sh
-    ./figures/code/run_all.sh
+    bash figures/code/run_all.sh
     ```
 
 2. **Partial Replication:** To generate a specific figure, run its relevant R script. For example:
     ```
-    Rscript ./figures/code/prediction_cb/fig_prediction_gpt4o_cb_base_prompt.R
+    Rscript ./figures/code/prediction_legislation/fig_prediction_gpt4o_cb_base_prompt.R
     ```
 
 ## Notes

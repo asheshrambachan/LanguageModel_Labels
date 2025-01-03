@@ -14,8 +14,8 @@ data_path <- list(
   file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
   file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_fe.csv")
 )
-merged_data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/merged_data.csv")
-summary_stat_path <- file.path(repo_dir, "headlines/data/step9_reg_results/summary_stat_data.csv")
+merged_data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/merged_data.csv")
+summary_stat_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/summary_stat_data.csv")
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
@@ -24,7 +24,7 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 
 # Factor labels and levels
 model_labels_levels <- c(
-  "gpt-3.5-turbo"="GPT-3.5", 
+  "gpt-3.5-turbo"="GPT-3.5-Turbo", 
   "gpt-4o"="GPT-4o",
   "gpt-4o-mini"="GPT-4o-mini"
 )

@@ -14,8 +14,7 @@ You can replicate the results using one of the following methods:
 
 1. **Full Replication:** Run the shell script run_all.sh to execute all steps in sequence:
     ```
-    chmod +x ./prediction_headlines/code/run_all.sh
-    ./prediction_headlines/code/run_all.sh
+    bash prediction_headlines/code/run_all.sh
     ```
 
 2. **Partial Replication:** Run individual scripts for specific steps. 

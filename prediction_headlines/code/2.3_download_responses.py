@@ -23,6 +23,8 @@ def check_batches_status(batches):
         print(f"{os.path.basename(file):>52s}: {batch_status.status}")
         if (batch_status.status != "completed"):
             status = False
+        elif (batch_status.status in ["failed", "cancelled", "expired"]):
+            continue
     print()
     return(status)
 

@@ -9,7 +9,7 @@ tab_dir <- file.path(repo_dir, "tables/output/estimation_headlines")
 dir.create(tab_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and table paths
-data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/summary_stat_data.csv")
+data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/summary_stat_data.csv")
 tab_path <- file.path(tab_dir, "tab_point_est_headlines_realized_q1_confidence_positive.tex")
 
 # Load required packages quietly
@@ -37,6 +37,9 @@ tab <- data %>%
   kable(digits=3, linesep = "", escape=F, booktabs=T, format = "latex", col.names = data_colnames) %>%
   add_header_above(c(" ", "Return Horizon" = 3), italic=T) %>%
   row_spec(4, hline_after = TRUE, extra_latex_after = "%")
+
+tab <- gsub("95th", "$95^\\\\text{th}$", tab)
+tab <- gsub("5th", "$5^\\\\text{th}$", tab)
 
 # Save tables
 save_kable(tab, file = tab_path)

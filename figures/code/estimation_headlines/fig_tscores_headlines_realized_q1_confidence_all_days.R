@@ -10,7 +10,7 @@ fig_dir <- file.path(repo_dir, "figures/output/estimation_headlines")
 dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
-data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/merged_data.csv")
+data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/merged_data.csv")
 fig_path <- file.path(fig_dir, "fig_tscores_headlines_realized_q1_confidence_all_days.jpeg")
 fig_width <- 7
 fig_height <- 5.75

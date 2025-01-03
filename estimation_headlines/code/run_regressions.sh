@@ -9,7 +9,7 @@ cd "$parent_dir" || {
 }
 
 # List of R scripts to run
-r_scripts=("s9.1_realized_returns_clustered.R" "s9.2_abnormal_returns_clustered.R" "s9.3_realized_returns_robust.R" "s9.4_realized_returns_fe.R")
+r_scripts=("s9.1_realized_returns_clustered.R" "s9.2_abnormal_returns_clustered.R" "s9.3_realized_returns_robust.R" "s9.4_realized_returns_fe.R" "s9.5_merge_data_and_gen_summary_stat.R")
 
 # Run specific R scripts
 echo "Running R scripts..."

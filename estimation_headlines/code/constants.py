@@ -1,4 +1,8 @@
-API_KEY = "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"
+import os
+from dotenv import load_dotenv
+ENV_FILE_PATH = "../.env"
+load_dotenv(ENV_FILE_PATH, override=True)
+API_KEY = os.environ.get('API_KEY')
 
 personas = [
     "You are a knowledgeable economic agent. ",

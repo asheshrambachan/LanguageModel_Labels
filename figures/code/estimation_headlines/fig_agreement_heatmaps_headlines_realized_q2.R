@@ -1,6 +1,6 @@
 # Figure: Variation in pairwise agreement between large language model labels across prompting strategies on financial news headlines, q2
 # Dec 10, 2024
-# Code based on headlines/code/produce_figures/heatmaps.R
+# Code based on estimation_headlines/code/produce_figures/heatmaps.R
 
 # Removing all objects
 rm(list = ls())
@@ -12,9 +12,9 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
 data_paths <- list(
-  "GPT-3.5" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q2"),
-  "GPT-4o" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o/q2"),
-  "GPT-4o-mini" = file.path(repo_dir, "headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q2")
+  "GPT-3.5-Turbo" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q2"),
+  "GPT-4o" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o/q2"),
+  "GPT-4o-mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q2")
 )
 fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q2.jpeg")
 fig_width <- 9

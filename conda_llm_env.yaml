@@ -17,6 +17,7 @@ dependencies:
   - openai
   - pandas_market_calendars
   - tqdm
+  - kagglehub
 
   # R packages
   - r-base 
@@ -38,5 +39,6 @@ dependencies:
   - r-modelsummary
   - r-glue
   - r-viridis
+  - r-purrr
   # - r-extrafont
 
