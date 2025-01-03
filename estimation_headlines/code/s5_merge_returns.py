@@ -59,7 +59,7 @@ if __name__ == "__main__":
     MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
     MONTHS = ["oct"]
     YEARS = ["19"]
-    RETURN_TYPES = ["realized", "abnormal_CAPM", "abnormal_FF3"]
+    RETURN_TYPES = ["realized", "abnormal_CAPM"]
 
     for question in QUESTIONS:
         for model in MODELS:

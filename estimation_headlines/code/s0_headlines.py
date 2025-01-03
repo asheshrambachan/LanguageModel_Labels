@@ -8,26 +8,23 @@ from constants import month_batches, step0_path
 headlines_file_path = "./data/raw/headlines2019.csv"
 factors_file_path = "./data/raw/F-F_Research_Data_Factors_daily.csv"
 WRDS_CAPM_path = "./data/raw/CAPM_returns.csv"
-WRDS_FF3_path = "./data/raw/FF3_returns.csv"
 
 def month_to_num(month):
     return dt.datetime.strptime(month, "%b").month
 
-def load_data(headlines_file_path, factors_file_path, WRDS_CAPM_path, WRDS_FF3_path):
+def load_data(headlines_file_path, factors_file_path, WRDS_CAPM_path):
     data = pd.read_csv(headlines_file_path)
     factors = pd.read_csv(factors_file_path)
     WRDS_CAPM = pd.read_csv(WRDS_CAPM_path)
-    WRDS_FF3 = pd.read_csv(WRDS_FF3_path)
 
     # Convert date columns to datetime
     data['date'] = pd.to_datetime(data['date'])
     factors['date'] = pd.to_datetime(factors['Unnamed: 0'], format='%Y%m%d')
     WRDS_CAPM['DATE'] = pd.to_datetime(WRDS_CAPM['DATE'])
-    WRDS_FF3['DATE'] = pd.to_datetime(WRDS_FF3['DATE'])
 
     # Drop unnecessary columns
     factors.drop('Unnamed: 0', axis=1, inplace=True)
-    return data, factors, WRDS_CAPM, WRDS_FF3
+    return data, factors, WRDS_CAPM
 
 def process_returns(WRDS, factors):
     WRDS = WRDS.rename(columns=str.lower)[['permno', 'ret', 'exret', 'date', 'b_mkt']]
@@ -44,7 +41,7 @@ def get_trading_days(date, num_days=10):
 
 # Main function to execute the data processing
 def main(months):
-    data, factors, WRDS_CAPM, WRDS_FF3 = load_data(headlines_file_path, factors_file_path, WRDS_CAPM_path, WRDS_FF3_path)
+    data, factors, WRDS_CAPM = load_data(headlines_file_path, factors_file_path, WRDS_CAPM_path)
     print("Loaded data")
 
     for month in months:
@@ -68,9 +65,9 @@ def main(months):
             monthly_data[f'date_{i}'] = monthly_data['date'].map(lambda d: trading_days[d][i] if d in trading_days else pd.NaT)
 
         # Process WRDS returns for CAPM and FF3
-        returns_data = {'CAPM': process_returns(WRDS_CAPM, factors), 'FF3': process_returns(WRDS_FF3, factors)}
+        returns_data = {'CAPM': process_returns(WRDS_CAPM, factors)}
         
-        # Merge returns data dynamically for both CAPM and FF3
+        # Merge returns data 
         for key, returns in returns_data.items():
             merged = monthly_data.merge(returns, on=["date", "permno"], how='inner').drop(columns="ret_x").rename(columns={"ret_y": "ret"})
             for i in range(1, 11):

@@ -41,7 +41,7 @@ run_regression <- function(df, outcome_var, variables) {
 # Main processing loop
 file_names <- c("base_blanks", "base_json", "cot1", "cot2", "cot3", "persona1", "persona2", "persona3", "persona4")
 questions <- c("q1", "q2", "q3", "q4", "q5")
-return_types <- c("abnormal_CAPM", "abnormal_FF3")
+return_types <- c("abnormal_CAPM")
 models <- c("gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o")
 model_labels <- c("GPT-3.5", "GPT-4o-mini", "GPT-4o")
 model_map <- setNames(model_labels, models)

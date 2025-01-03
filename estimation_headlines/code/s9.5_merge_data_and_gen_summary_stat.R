@@ -12,7 +12,6 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 data_path <- list(
   file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_clustered.csv"),
   file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_FF3_returns_clustered.csv"),
   file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_fe.csv")
 )
 merged_data_path <- file.path(repo_dir, "headlines/data/step9_reg_results/merged_data.csv")
@@ -32,8 +31,7 @@ model_labels_levels <- c(
 return_labels_levels <- c(
   "realized" = "Realized Returns",
   "realized_fe" = "Realized Returns (Company and Date Fixed Effects)",
-  "abnormal_CAPM" = "Abnormal Returns (CAPM)",
-  "abnormal_FF3" = "Abnormal Returns (FF3)"
+  "abnormal_CAPM" = "Abnormal Returns (CAPM)"
 )
 W_labels_levels <- c(
   `1` = "1 day",
