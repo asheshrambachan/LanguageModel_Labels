@@ -18,13 +18,13 @@ To replicate the results, you need to manually download an additional dataset fr
 1. Go to the WRDS website and log in with your credentials.
 2. https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/
 3. Configure the parameters as follows:
-<img src="./data/raw/wrds_screenshots/wrds_step1.png" width="200">
-	![Step 2: Company Codes](./data/raw/wrds_screenshots/wrds_step2.png)
-	![Step 3: Frequency Selection](./data/raw/wrds_screenshots/wrds_step3.png)
-	![Step 4: Risk Model](./data/raw/wrds_screenshots/wrds_step4.png)
-	![Step 5: Return Type](./data/raw/wrds_screenshots/wrds_step5.png)
-	![Step 6: Variables](./data/raw/wrds_screenshots/wrds_step6.png)
-	![Step 7: Output](./data/raw/wrds_screenshots/wrds_step7.png)
+	<img src="./data/raw/wrds_screenshots/wrds_step1.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step2.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step3.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step4.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step5.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step6.png" width="800">
+	<img src="./data/raw/wrds_screenshots/wrds_step7.png" width="800">
 4. Click the `Submit Form` button.
 5. Once the query status shows `Success`, click `Download .csv Output`.
 6. Rename the downloaded file as `CAPM_returns.csv`.
