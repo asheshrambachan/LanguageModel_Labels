@@ -18,6 +18,8 @@ dependencies:
   - pandas_market_calendars
   - tqdm
   - kagglehub
+  - pyarrow
+  - fastparquet
 
   # R packages
   - r-base 
