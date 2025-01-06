@@ -18,7 +18,7 @@ To replicate the results, you need to manually download an additional dataset fr
 1. Go to the WRDS website and log in with your credentials.
 2. https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/
 3. Configure the parameters as follows:
-	![Step 1: Date Range](./data/raw/wrds_screenshots/wrds_step1.png)
+	![Step 1: Date Range](./data/raw/wrds_screenshots/wrds_step1.png =x250)
 	![Step 2: Company Codes](./data/raw/wrds_screenshots/wrds_step2.png)
 	![Step 3: Frequency Selection](./data/raw/wrds_screenshots/wrds_step3.png)
 	![Step 4: Risk Model](./data/raw/wrds_screenshots/wrds_step4.png)
