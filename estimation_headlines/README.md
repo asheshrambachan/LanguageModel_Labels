@@ -15,9 +15,8 @@ Below is an overview of the main directory structure. For a detailed explanation
 To replicate the results, you need to manually download an additional dataset from an external source. 
 <!-- Follow the instructions below for each dataset: -->
 
-1. Go to the WRDS website and log in with your credentials.
-2. https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/
-3. Configure the parameters as follows:
+1. Go to [Beta Suite by WRDS](https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/) and log in with your credentials.
+2. Configure the parameters as follows:
 
 	<img src="./data/raw/wrds_screenshots/wrds_step1.png" width="700">
 
@@ -32,11 +31,11 @@ To replicate the results, you need to manually download an additional dataset fr
 	<img src="./data/raw/wrds_screenshots/wrds_step6.png" width="700">
 
 	<img src="./data/raw/wrds_screenshots/wrds_step7.png" width="700">
-	
-4. Click the `Submit Form` button.
-5. Once the query status shows `Success`, click `Download .csv Output`.
-6. Rename the downloaded file as `CAPM_returns.csv`.
-7. Place it in the directory: `./estimation_legislation/data/raw`
+
+3. Click the `Submit Form` button.
+4. Once the query status shows `Success`, click `Download .csv Output`.
+5. Rename the downloaded file as `CAPM_returns.csv`.
+6. Place it in the directory: `./estimation_legislation/data/raw`
 
 <!-- ### `F-F_Research_Data_Factors_daily.csv`
 This dataset is publicly available and was downloaded from [this link](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip). Since the file is updated regularly, the version we used may differ slightly from the latest available. An archived version similar to the one we used can be accessed from [this archived link](https://web.archive.org/web/20240329224745/https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip). -->
