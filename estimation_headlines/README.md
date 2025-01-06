@@ -67,17 +67,17 @@ Our data generation and processing pipeline for this exercise is this the follow
 
 1. Merge [news headlines data](https://www.kaggle.com/datasets/miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests) about companies with their stock returns. We create versions of this data set based on the type of stock returns considered:
 
-* A dataset with **cumulative realized returns** at different fixed time horizons after the date the headline was published
-
-* A dataset with **abnormal returns (under the CAPM model)** at different fixed time horizons after the date the headline was published
+	* A dataset with **cumulative realized returns** at different fixed time horizons after the date the headline was published
+	* A dataset with **abnormal returns (under the CAPM model)** at different fixed time horizons after the date the headline was published
 
   All versions of this merged data can be found in the `./data/step0_returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
 
 
 2. For each headline in the data, generate 5 sets of prompts for 3 OpenAI LLMs (further model details found [here](https://platform.openai.com/docs/models/gpt-4o)):
- * GPT-3.5-turbo (default points to GPT-3.5-turbo-0125 trained up to Sep 2021)
- * GPT-4o-mini (default points to gpt-4o-mini-2024-07-18 trained up to Oct 2023)
- * GPT-4o (default pointed to gpt-4o-2024-05-13 in the version of the data here, but the data generating code has been updated to point to the newer gpt-4o-2024-08-06 trained up to Oct 2023). 
+
+	* GPT-3.5-turbo (default points to GPT-3.5-turbo-0125 trained up to Sep 2021)
+	* GPT-4o-mini (default points to gpt-4o-mini-2024-07-18 trained up to Oct 2023)
+	* GPT-4o (default pointed to gpt-4o-2024-05-13 in the version of the data here, but the data generating code has been updated to point to the newer gpt-4o-2024-08-06 trained up to Oct 2023). 
  
  	Each set of prompts asks a different economic question that tells the LLM to infer something about the company or its returns based on the headline.
 	
