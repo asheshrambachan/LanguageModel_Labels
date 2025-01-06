@@ -60,7 +60,7 @@ The tasks based on **financial news headlines** includes restricted data provide
 3. Click the `Submit Form` button.
 4. Once the query status shows `Success`, click `Download .csv Output`.
 5. Rename the downloaded file as `CAPM_returns.csv`.
-6. Place it in the directory: `./estimation_legislation/data/raw`
+6. Place it in the directory: `./estimation_headlines/data/raw`
 
 
 ## Replication Options
