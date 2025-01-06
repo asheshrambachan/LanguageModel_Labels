@@ -10,6 +10,31 @@ Below is an overview of the main directory structure. For a detailed explanation
 - `data/`: Contains raw and processed data outputs.
 - `figures/`: generates all figures for all results, including those not used in the paper.
 
+## `CAPM_returns.csv` Data Download Instructions
+
+To replicate the results, you need to manually download an additional dataset from an external source. 
+<!-- Follow the instructions below for each dataset: -->
+
+1. Go to the WRDS website and log in with your credentials.
+2. https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/
+3. Configure the parameters as follows:
+	![Step 1: Date Range](./data/raw/wrds_screenshots/wrds_step1.png)
+	![Step 2: Company Codes](./data/raw/wrds_screenshots/wrds_step2.png)
+	![Step 3: Frequency Selection](./data/raw/wrds_screenshots/wrds_step3.png)
+	![Step 4: Risk Model](./data/raw/wrds_screenshots/wrds_step4.png)
+	![Step 5: Return Type](./data/raw/wrds_screenshots/wrds_step5.png)
+	![Step 6: Variables](./data/raw/wrds_screenshots/wrds_step6.png)
+	![Step 7: Output](./data/raw/wrds_screenshots/wrds_step7.png)
+4. Click the `Submit Form` button.
+5. Once the query status shows `Success`, click `Download .csv Output`.
+6. Rename the downloaded file as `CAPM_returns.csv`.
+7. Place it in the directory: `./estimation_legislation/data/raw`
+
+<!-- ### `F-F_Research_Data_Factors_daily.csv`
+This dataset is publicly available and was downloaded from [this link](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip). Since the file is updated regularly, the version we used may differ slightly from the latest available. An archived version similar to the one we used can be accessed from [this archived link](https://web.archive.org/web/20240329224745/https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip). -->
+
+
+
 ## Replication Options
 
 There are three possible levels of replication that this code base allows for: 
@@ -33,15 +58,13 @@ Any of the individual scripts called by the bash scripts can be run from the `./
 
 Our data generation and processing pipeline for this exercise is this the following:
 
-1. Merge [news headlines data](https://www.kaggle.com/datasets/miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests) about companies with their stock returns. We create 3 versions of this data set based on the type of stock returns considered:
+1. Merge [news headlines data](https://www.kaggle.com/datasets/miguelaenlle/massive-stock-news-analysis-db-for-nlpbacktests) about companies with their stock returns. We create versions of this data set based on the type of stock returns considered:
 
 * A dataset with **cumulative realized returns** at different fixed time horizons after the date the headline was published
 
 * A dataset with **abnormal returns (under the CAPM model)** at different fixed time horizons after the date the headline was published
 
-* A dataset with **abnormal returns (under the Fama-French 3 Factor model)** at different fixed time horizons after the date the headline was published
-
-  All 3 versions of this merged data can be found in the `./data/returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
+  All versions of this merged data can be found in the `./data/returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
 
 
 2. For each headline in the data, generate 5 sets of prompts for 3 OpenAI LLMs (further model details found [here](https://platform.openai.com/docs/models/gpt-4o)):
@@ -92,7 +115,7 @@ The repository structure is the following:
 ### Data 
 
 * The `data` directory contains numbered directories with the raw data files that are the outputs from each of the python scripts in the code directory.
-	* `returns data` contains the outputs of the merge from `s0_headlines.py` in subdirectories corresponding to each return type. It also contains the raw data including the headlines data, market beta, and all data used to calculate returns. 
+	* `step0_returns data` contains the outputs of the merge from `s0_headlines.py` in subdirectories corresponding to each return type. It also contains the raw data including the headlines data, market beta, and all data used to calculate returns. 
 	* `step1_batch_prompts` contains for each model, for each question, for each month, a set of prompts in  `.jsonl`  format. (Note: 2 files are included for October due to batch size limits). 
 	* `step2_batch_prompts`contains for each model, for each question, for each month, a set of LLM responses in `.jsonl` format. (Note: 2 files are included for October due to batch size limits). 
 	* `step4_batch_prompts`contains for each model, for each question, for each month, a set of processed LLM responses in `.csv` format. 
