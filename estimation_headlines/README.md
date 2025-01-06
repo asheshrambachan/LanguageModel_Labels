@@ -71,7 +71,7 @@ Our data generation and processing pipeline for this exercise is this the follow
 
 * A dataset with **abnormal returns (under the CAPM model)** at different fixed time horizons after the date the headline was published
 
-  All versions of this merged data can be found in the `./data/returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
+  All versions of this merged data can be found in the `./data/step0_returns_data/` folder. Within the subdirectory for each return type, the data is organized into monthly "batches."
 
 
 2. For each headline in the data, generate 5 sets of prompts for 3 OpenAI LLMs (further model details found [here](https://platform.openai.com/docs/models/gpt-4o)):
@@ -83,7 +83,7 @@ Our data generation and processing pipeline for this exercise is this the follow
 	
 	The question text can be found in `./data/prompt_templates.` In this directory, there are 2 `.txt` files for each question. One file has a version of the question that asks the LLM to respond by filling in a blank. The other version of the question asks the LLM to respond with a structured JSON object.
 	
-	For each headline and each economic question, we write 9 types of prompts. The first prompt type is simply the text in the fill in the blank `.txt` and the second prompt type is simply the JSON `.txt`. We then add 7 additional modifications to the JSON variation of the prompt. These modifications either 1. ask the LLM to take on a given persona, or 2. use chain-of-thought prompting. The modification text can be found in `./code/s0_constants.py`.
+	For each headline and each economic question, we write 9 types of prompts. The first prompt type is simply the text in the fill in the blank `.txt` and the second prompt type is simply the JSON `.txt`. We then add 7 additional modifications to the JSON variation of the prompt. These modifications either 1. ask the LLM to take on a given persona, or 2. use chain-of-thought prompting. The modification text can be found in `./code/constants.py`.
 
 	 The script to generate the prompts is `./code/s1_constants.py` and the generated prompts are located in the `./data/step1_batch_prompts` directory. The prompts are organized by model, economic question, and monthly batch. Each model/question/batch file contains all 9 versions of the prompt for a given headline.
 
