@@ -36,6 +36,33 @@ conda env create -f conda_llm_env.yaml
 conda activate llm_env
 ```
 
+### Step 3: Download Restricted Data
+
+The tasks based on **financial news headlines** includes restricted data provided by Wharton Research Data Services (WRDS). To access this data:
+
+1. Go to [Beta Suite by WRDS](https://wrds-www.wharton.upenn.edu/pages/get-data/beta-suite-wrds/beta-suite-by-wrds/) and log in with your credentials.
+2. Configure the parameters as follows:
+
+    <img src="./readme_figures/wrds_step1.png" width="700">
+
+    <img src="./readme_figures/wrds_step2.png" width="700">
+
+    <img src="./readme_figures/wrds_step3.png" width="700">
+
+    <img src="./readme_figures/wrds_step4.png" width="700">
+
+    <img src="./readme_figures/wrds_step5.png" width="700">
+
+    <img src="./readme_figures/wrds_step6.png" width="700">
+
+    <img src="./readme_figures/wrds_step7.png" width="700">
+
+3. Click the `Submit Form` button.
+4. Once the query status shows `Success`, click `Download .csv Output`.
+5. Rename the downloaded file as `CAPM_returns.csv`.
+6. Place it in the directory: `./estimation_legislation/data/raw`
+
+
 ## Replication Options
 
 You can replicate the results presented in the paper using one of the following methods:
@@ -79,6 +106,8 @@ Wharton Research Data Services (WRDS) was used in preparing this paper. This ser
 - Beta Suite by WRDS. 2024. Provided by Wharton Research Data Services. [https://wrds-www.wharton.upenn.edu/pages/grid-items/beta-suite-wrds](https://wrds-www.wharton.upenn.edu/pages/grid-items/beta-suite-wrds) (accessed August 1, 2024).
 
 - Egami, Naoki, Musashi Hinck, Brandon M. Stewart, and Hanying Wei. 2023. _"Using imperfect surrogates for downstream inference: design-based supervised learning for social science applications of large language models"_. Advances in Neural Information Processing Systems, Vol. 36. Replication code available at: [https://osf.io/gjt87/](https://osf.io/gjt87/).
+
+- French, Kenneth R. 2024. Fama-French Research Data Factors (Daily). [https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_Factors_daily_CSV.zip) (accessed September 23, 2024).
 
 - Jones, Bryan D., Frank R. Baumgartner, Sean M. Theriault, Derek A. Epp, Cheyenne Lee, and Miranda E. Sullivan. 2023. _Policy Agendas Project: Codebook_. [https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf](https://minio.la.utexas.edu/compagendas/codebookfiles/Codebook_PAP_2019.pdf) (accessed July 5, 2024).
 
