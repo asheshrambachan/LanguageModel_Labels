@@ -21,3 +21,8 @@ prediction_headlines/temp/*
 estimation_headlines/data/raw/headlines2019.csv
 estimation_headlines/data/raw/news_daily_returns_deduplicated.pqt
 estimation_headlines/code/s00.ipynb
+estimation_headlines/data/raw/CAPM_returns.csv
+estimation_headlines/data/raw/ituelaynn5w93myx.csv
+estimation_headlines/data/raw/realized_returns.csv
+estimation_headlines/data/raw/xzpc6lvh9dzs1lgq.csv
+estimation_headlines/data/raw/kaggle_data.csv
