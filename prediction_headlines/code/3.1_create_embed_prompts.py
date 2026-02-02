@@ -49,10 +49,9 @@ def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embed
     return(pd.json_normalize(batches))
 
 def create_embed_requests(df, out_dir, embedding_model="text-embedding-3-small"):
-    batches = []
-    batches.append(create_embed_requests_generic(df, "headline_clean", "headline_id", out_dir, embedding_model))
-    batches.append(create_embed_requests_generic(df, "headline_llm_clean", "id", out_dir, embedding_model))
-    batches = pd.concat(batches, ignore_index=True)
+    batches_true = create_embed_requests_generic(df, "headline_clean", "headline_id", out_dir, embedding_model)
+    batches_llm = create_embed_requests_generic(df, "headline_llm_clean", "id", out_dir, embedding_model)
+    batches = pd.concat([batches_true, batches_llm], ignore_index=True)
     return(batches)
 
 def count_tokens(text, model="text-embedding-3-small"):

@@ -54,7 +54,7 @@ def create_prompts(prompt_templates, headlines):
             }
             prompts.append(prompt)
 
-    return(prompts)
+    return(pd.json_normalize(prompts))
 
 def count_tokens(messages, model):
     encoding = tiktoken.encoding_for_model(model)
@@ -113,18 +113,34 @@ def create_batched_prompts(prompts, batched_prompts_dir):
         prompts_batched = []
         part = 0
         for i, prompt in prompts_model.iterrows():
-            prompts_batched.append({
-                "custom_id": str(prompt["id"]),
-                "method": "POST",
-                "url": "/v1/chat/completions",
-                "body": {
-                    "model": prompt["model"],
-                    "temperature": prompt["temperature"],
-                    "response_format": {"type": "json_object"} if (prompt["response_format"]=="JSON") else None,
-                    "messages": prompt["messages"],
-                    "max_tokens": prompt["max_tokens"]
+            if "gpt-5" in model:
+                prompt_obj = {
+                    "custom_id": str(prompt["id"]),
+                    "method": "POST",
+                    "url": "/v1/chat/completions",
+                    "body": {
+                        "model": prompt["model"],
+                        "temperature": prompt["temperature"],
+                        "response_format": {"type": "json_object"} if (prompt["response_format"]=="JSON") else None,
+                        "messages": prompt["messages"]
+                        # "max_completion_tokens": prompt["max_tokens"]
+                    }
                 }
-            })
+            else:
+                prompt_obj = {
+                    "custom_id": str(prompt["id"]),
+                    "method": "POST",
+                    "url": "/v1/chat/completions",
+                    "body": {
+                        "model": prompt["model"],
+                        "temperature": prompt["temperature"],
+                        "response_format": {"type": "json_object"} if (prompt["response_format"]=="JSON") else None,
+                        "messages": prompt["messages"],
+                        "max_tokens": prompt["max_tokens"]
+                    }
+                }
+
+            prompts_batched.append(prompt_obj)
 
             if ((len(prompts_batched)==PER_BATCH_LIMIT) | (i==(len(prompts_model)-1))):
                 part = part + 1
@@ -150,17 +166,10 @@ def main():
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
     headlines = pd.read_csv(os.path.join(DATA_DIR, "headlines.csv")) 
-    prompt_templates = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates.csv"))
+    prompt_templates = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates_p2.csv"))
     prompt_templates["template_path"] = prompt_templates["template_path"].apply(lambda x: os.path.join(DATA_DIR, x))
     
-    # Create `prompts.jsonl`
-    prompts_json = create_prompts(prompt_templates, headlines)
-    prompts_json_path = os.path.join(TEMP_DIR, "prompts.jsonl")
-    with open(prompts_json_path, "w") as f:
-        for prompt in prompts_json:
-            f.write(json.dumps(prompt) + "\n")
-    print(f"Saved {os.path.basename(prompts_json_path)}, n = {len(prompts_json)}, at {os.path.dirname(prompts_json_path)}")
-    prompts = pd.json_normalize(prompts_json)
+    prompts = create_prompts(prompt_templates, headlines)
     
     # Create `prompts_batched_*.jsonl`
     batches = create_batched_prompts(prompts, batched_prompts_dir)
@@ -168,9 +177,9 @@ def main():
     batches.to_csv(batches_path, index=False)
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")
 
-    # Estimate cost using Batch API
-    cost = estimate_cost(prompts, batched=True)
-    print(f"Estimated cost using Batch API is ${cost:.2f}")
+    # # Estimate cost using Batch API
+    # cost = estimate_cost(prompts, batched=True)
+    # print(f"Estimated cost using Batch API is ${cost:.2f}")
 
 if __name__ == "__main__":
     main()

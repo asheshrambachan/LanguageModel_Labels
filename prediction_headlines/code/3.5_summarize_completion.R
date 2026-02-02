@@ -27,7 +27,9 @@ prompt_labels_levels <- c(
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5", 
   "gpt-4o-2024-05-13"="GPT-4o",
-  "gpt-4o-mini-2024-07-18"="GPT-4o-mini"
+  "gpt-4o-mini-2024-07-18"="GPT-4o-mini",
+  "gpt-5-mini"="GPT-5-mini",
+  "gpt-5-nano"="GPT-5-nano"
 )
 
 # Load and format data
@@ -45,7 +47,7 @@ completion_exact_examples <- data %>%
   select(c(Model, Prompt, headline_clean, headline_llm_clean))
 
 # Place samples used in paper and slides at the top
-index_first <- c(156, 7, 69, 121, 85)
+index_first <- c(237, 9, 109, 189, 136, 176, 243, 15, 30, 55, 59)
 index_last <- (1:nrow(completion_exact_examples))[-index_first]
 index <- c(index_first, index_last)
 completion_exact_examples <- completion_exact_examples[index, ] 

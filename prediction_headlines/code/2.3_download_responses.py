@@ -14,19 +14,23 @@ OPENAI_API_KEY = os.environ.get('API_KEY')
 
 # Check status of all batches
 def check_batches_status(batches):
-    client = OpenAI(api_key=OPENAI_API_KEY)
-    status = True
-    for _, batch in batches.iterrows():
-        file = batch['file']
-        id = batch['id']
-        batch_status = client.batches.retrieve(id)
-        print(f"{os.path.basename(file):>52s}: {batch_status.status}")
-        if (batch_status.status != "completed"):
-            status = False
-        elif (batch_status.status in ["failed", "cancelled", "expired"]):
-            continue
-    print()
-    return(status)
+	client = OpenAI(api_key=OPENAI_API_KEY)
+	status = True
+	for _, batch in batches.iterrows():
+		file = batch['file']
+		id = batch['id']
+		batch_status = client.batches.retrieve(id)
+		if batch_status.request_counts.total!=0:
+			progress = batch_status.request_counts.completed / batch_status.request_counts.total
+		else:
+			progress = 0
+		print(f"{os.path.basename(file):>52s}: {batch_status.status} ({progress:.2%})")
+		if (batch_status.status != "completed"):
+			status = False
+		elif (batch_status.status in ["failed", "cancelled", "expired"]):
+			continue
+	print()
+	return(status)
 
 def download_batched_responses(batches, out_dir):
     client = OpenAI(api_key=OPENAI_API_KEY)
@@ -41,8 +45,11 @@ def download_batched_responses(batches, out_dir):
         if batch_status.status != "completed":
             print(f"Skipping incomplete file = {os.path.basename(responses_batched_path)}, Batch ID = {batch_id}")
             continue
-        
         output_file_id = batch_status.output_file_id
+
+        # if output_file_id is None:
+        #     output_file_id = batch_status.error_file_id
+
         responses_batched = client.files.content(output_file_id)
 
         responses_batched.write_to_file(responses_batched_path)

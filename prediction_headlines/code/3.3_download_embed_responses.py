@@ -3,6 +3,7 @@ import pandas as pd
 from openai import OpenAI
 from dotenv import load_dotenv
 import time
+from pathlib import Path
 
 REPO_DIR = "."
 TEMP_DIR = os.path.join(REPO_DIR, "prediction_headlines/temp/embeddings")
@@ -32,19 +33,22 @@ def download_batched_responses(batches, out_dir):
     client = OpenAI(api_key=OPENAI_API_KEY)
     for _, batch in batches.iterrows():
         batch_id = batch['id']
-        part = batch['part']
-        col_name = batch['col_name']
-        responses_batched_path = os.path.join(out_dir, f"responses_{col_name}_part{part}.jsonl")
+        file = Path(batch['file'])
+        file.name.replace("requests", "responses")
+        responses_batched_path = Path(out_dir) / file.name.replace("requests", "responses")
 
         batch_status = client.batches.retrieve(batch_id)
         if batch_status.status != "completed":
             print(f"Skipping incomplete file = {os.path.basename(responses_batched_path)}, Batch ID = {batch_id}")
             continue
         
-        output_file_id = batch_status.output_file_id
-        responses_batched = client.files.content(output_file_id)
-        responses_batched.write_to_file(responses_batched_path)
-        print(f"Saved {os.path.basename(responses_batched_path)} at {os.path.dirname(responses_batched_path)}")
+        if responses_batched_path.exists():
+            print(f"{responses_batched_path} exists at {responses_batched_path.parent}.")
+        else:
+            output_file_id = batch_status.output_file_id
+            responses_batched = client.files.content(output_file_id)
+            responses_batched.write_to_file(responses_batched_path)
+            print(f"Saved {responses_batched_path.name} at {responses_batched_path.parent}")
 
 def split_jsonl_file(input_file, output_dir, max_size=100 * 1_000_000):  # 1 MB = 1,000,000 bytes
     """Splits a JSONL file into smaller parts."""
