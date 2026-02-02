@@ -41,3 +41,6 @@ estimation_headlines/data/raw/realized_returns.csv
 estimation_headlines/data/raw/kaggle_data.csv
 estimation_headlines/data/raw/ituelaynn5w93myx.csv
 estimation_headlines/data/raw/CAPM_returns.csv
+
+
+estimation_legislation/data/bills_llm.csv
