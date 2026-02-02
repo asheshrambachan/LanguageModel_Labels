@@ -13,7 +13,7 @@ def calculate_CAR(df):
 
 # Function to read, combine, mutate, and filter data for all files
 def read_combine_filter(model, months, question, file_name, return_type):
-    combined_df = pd.concat([pd.read_csv(f"{step5_path}/{return_type}/{model}/q{question}/q{question}_{month}19/{file_name}") 
+    combined_df = pd.concat([pd.read_csv(f"{step5_path}/{return_type}/{model}/q{question}/q{question}_{month}19/{file_name}", low_memory=False) 
                              for month in months], ignore_index=True)
 
     # Replace empty strings and other placeholders with NaN
@@ -59,6 +59,7 @@ def save_common_sample_within(question, model, return_type):
 
     # Save the cleaned datasets
     for file_name, final_df in final_data.items():
+        os.makedirs(f"{step6_path}/within_model/{return_type}/{model}/q{question}", exist_ok=True)
         save_path = f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv"
         final_df.to_csv(save_path, index=False)
 
@@ -70,7 +71,7 @@ def save_common_sample_across(question, return_type):
     # Step 1: Read, combine, and filter data for all models
     filtered_data_across_models = {
         model: {
-            file_name: pd.read_csv(f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv")
+            file_name: pd.read_csv(f"{step6_path}/within_model/{return_type}/{model}/q{question}/{file_name}.csv", low_memory=False)
             for file_name in prompt_types
         }
         for model in models
@@ -99,21 +100,18 @@ def save_common_sample_across(question, return_type):
     # Step 4: Save the cleaned datasets for each model
     for model, model_data in final_data_across_models.items():
         for file_name, file_df in model_data.items():
+            os.makedirs(f"{step6_path}/across_models/{return_type}/{model}/q{question}", exist_ok=True)
             save_path = f"{step6_path}/across_models/{return_type}/{model}/q{question}/{file_name}.csv"
             file_df.to_csv(save_path, index=False)    
 
-    print(f"Saved common sample across model for {question}, {model}, and {return_type}")
-
-def main(question, model, return_type):
-    save_common_sample_within(question, model, return_type)
-
+        print(f"Saved common sample across model for {question}, {model}, and {return_type}")
+  
+    
 if __name__ == "__main__":
-    RETURN_TYPES = return_types
-    QUESTIONS = economic_questions
-    MODELS = models
-
-    for return_type in RETURN_TYPES:
-        for question in QUESTIONS:
-            for model in MODELS:
-                main(question, model, return_type)
+    for return_type in return_types:
+        for question in economic_questions:
+            for model in models:
+                save_common_sample_within(question, model, return_type)
+            
+            save_common_sample_across(question, return_type)
 

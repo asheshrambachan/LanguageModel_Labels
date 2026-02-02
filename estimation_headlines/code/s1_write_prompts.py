@@ -3,7 +3,7 @@ import pandas as pd
 from tqdm import tqdm
 import json
 from constants import personas, thought_modifiers, explanation, explanation_json, step0_path, step1_path, prompts_path 
-from constants import month_batches, economic_questions, years, models
+from constants import month_batches, economic_questions, years, models, temperature
 from helpers import confirm_overwrite
 
 def format_content(content, JSON=False, chain_of_thought=False):
@@ -55,10 +55,10 @@ def write_prompt(companies, content, JSON, file, id_num, model):
                         "role": "user",
                         "content": prompt
                     }],
-                    "temperature": 0
+                    "temperature": 1 if model in ["gpt-5-mini", "gpt-5-nano"] else temperature
                 }
             }
-            if token_indicator:
+            if ("gpt-5" not in model) and token_indicator:
                 current_template["body"]["max_tokens"] = 35
             
             id_num += 1
@@ -70,8 +70,8 @@ def write_prompt(companies, content, JSON, file, id_num, model):
 def generate_prompts(question, model, month, year):
     """Main function to generate prompts and write them to a file."""  
     print(f"Writing prompts for {question}, {model},{month}, and {year}") 
-    if not confirm_overwrite():
-        return
+    # if not confirm_overwrite():
+    #     return
 
     csv_file = os.path.join(step0_path, "realized", f"{month}{year}_realized.csv")
     base_prompt_file = os.path.join(prompts_path, f'q{question}base')
@@ -108,7 +108,7 @@ def generate_prompts(question, model, month, year):
         # Write second half to second JSONL
         with open(output_file_path_2, 'w') as file2:
             new_id = write_prompt(companies=second_half, content=content, JSON=False, file=file2, id_num=0, model=model)
-            new_id = write_prompt(companies=second_half, content_json=content_json, JSON=True, file=file2, id_num=new_id, model=model)
+            new_id = write_prompt(companies=second_half, content=content_json, JSON=True, file=file2, id_num=new_id, model=model)
     else:
         # If not October, proceed as normal
         output_file_path = os.path.join(model_month_directory, f'q{question}_{month}{year}_prompts.jsonl')

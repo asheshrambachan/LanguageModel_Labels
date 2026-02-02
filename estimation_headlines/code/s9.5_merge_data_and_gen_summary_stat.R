@@ -10,9 +10,9 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 
 # Data and figure paths
 data_path <- list(
-  file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
-  file.path(repo_dir, "headlines/data/step9_reg_results/realized_returns_fe.csv")
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/realized_returns_clustered.csv"),
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/abnormal_CAPM_returns_clustered.csv"),
+  file.path(repo_dir, "estimation_headlines/data/step9_reg_results/realized_returns_fe.csv")
 )
 merged_data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/merged_data.csv")
 summary_stat_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/summary_stat_data.csv")
@@ -26,7 +26,9 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 model_labels_levels <- c(
   "gpt-3.5-turbo"="GPT-3.5-Turbo", 
   "gpt-4o"="GPT-4o",
-  "gpt-4o-mini"="GPT-4o-mini"
+  "gpt-4o-mini"="GPT-4o-Mini",
+  "gpt-5-mini"="GPT-5-Mini",
+  "gpt-5-nano"="GPT-5-Nano"
 )
 return_labels_levels <- c(
   "realized" = "Realized Returns",
@@ -49,9 +51,9 @@ V_labels_levels_other_q <- c(
 q_labels_levels <- c(
   "q1" = "Q1 Positive, Negative, or Neutral?", 
   "q2" = "Q2 Increase, Decrease, or Uncertain Change to Returns?",
-  "q3" = "Q3 Increase, Decrease, or Uncertain Change to Returns at Time?",
-  "q4" = "Q4 Increase, Decrease, or Uncertain Sentiment", 
-  "q5" = "Q5 Increase, Decrease, or Uncertain Sentiment at Time"
+  # "q3" = "Q3 Increase, Decrease, or Uncertain Change to Returns at Time?",
+  "q4" = "Q4 Increase, Decrease, or Uncertain Sentiment"
+  # "q5" = "Q5 Increase, Decrease, or Uncertain Sentiment at Time"
 )
 
 # CI

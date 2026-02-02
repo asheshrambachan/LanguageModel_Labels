@@ -54,17 +54,10 @@ def main(question, model, month, year, return_type):
     save_data(merged_data, directory)
 
 if __name__ == "__main__":
-
-    QUESTIONS = ["1", "2", "3", "4", "5"]
-    MODELS = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]
-    MONTHS = ["oct"]
-    YEARS = ["19"]
-    RETURN_TYPES = ["realized", "abnormal_CAPM"]
-
-    for question in QUESTIONS:
-        for model in MODELS:
-            for month in MONTHS:
-                for year in YEARS:
-                    for return_type in RETURN_TYPES:
+    for question in economic_questions:
+        for model in models:
+            for month in month_batches:
+                for year in years:
+                    for return_type in return_types:
                         main(question=question, model=model, month=month, year=year, return_type=return_type)
                         print(f"Merged returns data for {question}, {model}, {month}, {year}, {return_type}")

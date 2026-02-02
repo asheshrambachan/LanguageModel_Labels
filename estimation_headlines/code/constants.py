@@ -20,12 +20,14 @@ thought_modifiers = [
 explanation = '\n____ fill in with explanation (less than 25 words)'
 explanation_json = ',\n"explanation": one sentence explanation for your headline type answer}'
 
-economic_questions = ["1", "2", "3", "4", "5"]
+# economic_questions = ["1", "2", "3", "4", "5"]
+economic_questions = ["1", "2", "4"]
 return_types = ["realized", "abnormal_CAPM"]
 years = ["19"]
-month_batches = ["jan", "feb", "mar", "apr", "may", "jun", 
-                 "jul", "aug", "sep", "oct", "nov", "dec"]
-models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"]
+month_batches = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o", "gpt-5-mini", "gpt-5-nano"]
+temperature = 0 # Note for "gpt-5-mini", "gpt-5-nano" the code will automatically switch to temperature = 1
+
 prompt_types = ["base_blanks", "base_json", "persona1", "persona2", 
                 "persona3", "persona4", "cot1", "cot2", "cot3"]
 

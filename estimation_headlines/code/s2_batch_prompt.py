@@ -52,8 +52,8 @@ def main(question, model, month, year):
         batch2 = create_batch(client, batch_input_file_id2, description=f"{description} second").id
 
         # Store results
-        results.append((question, model, month, year, batch1))
-        results.append((question, model, month, year, batch2))
+        results.append((question, model, f'{month}first', year, batch1))
+        results.append((question, model, f'{month}second', year, batch2))
 
     else:
         # Normal case for non-October months
@@ -66,9 +66,9 @@ def main(question, model, month, year):
 
 if __name__ == "__main__":
     all_results = []
-    for question in economic_questions[0:1]:
-        for model in models[0:1]:
-            for month in month_batches[0:1]:
+    for question in economic_questions:
+        for model in models:
+            for month in month_batches:
                 for year in years:
                     # main returns a list of tuples
                     batch_results = main(question, model, month, year)

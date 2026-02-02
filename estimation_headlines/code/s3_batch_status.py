@@ -43,6 +43,7 @@ def download_completed_batches(client, batch_metadata):
             continue
 
         output_file_id = batch.output_file_id
+        os.makedirs(os.path.join(step3_path, model, f'q{question}'), exist_ok=True)
         output_file_path = os.path.join(step3_path, model, f'q{question}', f'q{question}_{month}{year}_responses.jsonl')
     
         download_batch_output(client, output_file_id, output_file_path)
@@ -55,7 +56,9 @@ def check_batches_status(client, batches):
         batch_status = client.batches.retrieve(id)
         if (batch_status.status in ["failed", "cancelled", "expired", "completed"]):
             complete = True
-        print(f"{id}: {batch_status.status}")
+        # print(f"{id}: {batch_status.status}")
+        file = f"Q{batch['question']}, {batch['model']}, {batch['month']}"
+        print(f"{file:>52s}: {batch_status.status}")
     return(complete)
 
 def main():
