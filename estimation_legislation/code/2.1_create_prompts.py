@@ -46,7 +46,7 @@ def create_prompts(prompting_strategies, bills, min_confidence=0.9, max_confiden
             }
             prompts.append(prompt)
 
-    return(prompts)
+    return(pd.json_normalize(prompts))
 
 def count_tokens(messages, model):
     encoding = tiktoken.encoding_for_model(model)
@@ -154,21 +154,16 @@ def main():
     bills = pd.read_csv(os.path.join(DATA_DIR, "bills.csv"))
 
     # Create `prompts.jsonl`
-    prompts_json = create_prompts(prompting_strategies, bills)
-    with open(os.path.join(TEMP_DIR, "prompts.jsonl"), "w") as f:
-        for prompt in prompts_json:
-            f.write(json.dumps(prompt) + "\n")
-    print(f"Saved prompts.jsonl, n = {len(prompts_json)}, at {TEMP_DIR}")
-    prompts = pd.json_normalize(prompts_json)
+    prompts = create_prompts(prompting_strategies, bills)
 
     # Create `prompts_batched_*.jsonl`
     batches = create_batched_prompts(prompts, batched_prompts_dir)
     batches.to_csv(os.path.join(TEMP_DIR, "batches.csv"), index=False)
     print(f"Created batched prompts with batch details stored at batches.csv, n = {len(batches)}, at {TEMP_DIR}")
 
-    # Estimate cost using Batch API
-    cost = estimate_cost(prompts, batched=True)
-    print(f"Estimated cost using Batch API is ${cost:.2f}")
+    # # Estimate cost using Batch API
+    # cost = estimate_cost(prompts, batched=True)
+    # print(f"Estimated cost using Batch API is ${cost:.2f}")
 
 if __name__ == "__main__":
     main()

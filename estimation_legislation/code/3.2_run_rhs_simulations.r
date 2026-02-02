@@ -98,7 +98,14 @@ rhs_debias <- function(train, test) {
     term2 <- term2 + omega[r] * V_hat_r %*% W[r]
   }
   
-  alpha_star <- as.numeric(solve(term1 - term3) %*% (term2 - term4))
+  inv_term <- tryCatch(
+    solve(term1 - term3),
+    error = function(e) {
+      warning("Singular solve(term1 - term3)")
+      matrix(NA, nrow=nrow(term1 - term3), ncol=ncol(term1 - term3))
+    }
+  )
+  alpha_star <- as.numeric(inv_term %*% (term2 - term4))
   names(alpha_star) <- colnames(V_hat)
   
   return(list(
