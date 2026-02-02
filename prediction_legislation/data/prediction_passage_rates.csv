@@ -5,7 +5,15 @@
 "House","GPT-3.5","Prompt with date restriction",0.8852
 "House","GPT-4o","Base prompt",0.0432
 "House","GPT-4o","Prompt with date restriction",0.3837
+"House","GPT-5-mini","Base prompt",0.7722
+"House","GPT-5-mini","Prompt with date restriction",0.7939
+"House","GPT-5-nano","Base prompt",0.7027
+"House","GPT-5-nano","Prompt with date restriction",0.7156
 "Senate","GPT-3.5","Base prompt",0.8009
 "Senate","GPT-3.5","Prompt with date restriction",0.7827
 "Senate","GPT-4o","Base prompt",0.0423
 "Senate","GPT-4o","Prompt with date restriction",0.3298
+"Senate","GPT-5-mini","Base prompt",0.6481
+"Senate","GPT-5-mini","Prompt with date restriction",0.6892
+"Senate","GPT-5-nano","Base prompt",0.5638
+"Senate","GPT-5-nano","Prompt with date restriction",0.6064

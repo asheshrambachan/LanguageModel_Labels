@@ -1,9 +1,17 @@
 "Metric","Model","Prompt","Average","Benchmark"
-"Cosine similarity","GPT-3.5","Base prompt",0.809688139693891,0.379477194720314
-"Cosine similarity","GPT-3.5","Prompt with date restriction",0.81358547583584,0.379477194720314
-"Cosine similarity","GPT-4o","Base prompt",0.830146915177605,0.379477194720314
-"Cosine similarity","GPT-4o","Prompt with date restriction",0.829163367016776,0.379477194720314
-"Euclidean distance","GPT-3.5","Base prompt",0.579930009289872,1.11045736622441
-"Euclidean distance","GPT-3.5","Prompt with date restriction",0.572797722863605,1.11045736622441
-"Euclidean distance","GPT-4o","Base prompt",0.535969137122471,1.11045736622441
-"Euclidean distance","GPT-4o","Prompt with date restriction",0.53843036181799,1.11045736622441
+"Cosine similarity","GPT-3.5","Base prompt",0.809682816948457,0.379472762235301
+"Cosine similarity","GPT-3.5","Prompt with date restriction",0.81358358588844,0.379472762235301
+"Cosine similarity","GPT-4o","Base prompt",0.830141965269018,0.379472762235301
+"Cosine similarity","GPT-4o","Prompt with date restriction",0.829161356613511,0.379472762235301
+"Cosine similarity","GPT-5-mini","Base prompt",0.74935509098929,0.379472762235301
+"Cosine similarity","GPT-5-mini","Prompt with date restriction",0.751742934406594,0.379472762235301
+"Cosine similarity","GPT-5-nano","Base prompt",0.770295228530991,0.379472762235301
+"Cosine similarity","GPT-5-nano","Prompt with date restriction",0.770051497878908,0.379472762235301
+"Euclidean distance","GPT-3.5","Base prompt",0.579956161647578,1.11046103847413
+"Euclidean distance","GPT-3.5","Prompt with date restriction",0.57281931126832,1.11046103847413
+"Euclidean distance","GPT-4o","Base prompt",0.536016855464934,1.11046103847413
+"Euclidean distance","GPT-4o","Prompt with date restriction",0.538456801912969,1.11046103847413
+"Euclidean distance","GPT-5-mini","Base prompt",0.692171403816944,1.11046103847413
+"Euclidean distance","GPT-5-mini","Prompt with date restriction",0.688420487608211,1.11046103847413
+"Euclidean distance","GPT-5-nano","Base prompt",0.659116965483039,1.11046103847413
+"Euclidean distance","GPT-5-nano","Prompt with date restriction",0.659493263662061,1.11046103847413

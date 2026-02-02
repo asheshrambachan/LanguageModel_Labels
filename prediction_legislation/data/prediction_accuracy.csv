@@ -7,3 +7,11 @@
 "GPT-4o","Base prompt","House",0.9123,0.198100407055631,0.0308755262873799
 "GPT-4o","Prompt with date restriction","Senate",0.6954,0.711409395973154,0.305614632071459
 "GPT-4o","Prompt with date restriction","House",0.6444,0.690637720488467,0.359278851344057
+"GPT-5-mini","Base prompt","Senate",0.4023,0.922818791946309,0.630689068481497
+"GPT-5-mini","Base prompt","House",0.2933,0.944369063772049,0.758501565367592
+"GPT-5-mini","Prompt with date restriction","Senate",0.363,0.937919463087248,0.673436835389196
+"GPT-5-mini","Prompt with date restriction","House",0.2718,0.94572591587517,0.781820144661557
+"GPT-5-nano","Base prompt","Senate",0.473,0.808724832214765,0.548277328796257
+"GPT-5-nano","Base prompt","House",0.354,0.884667571234735,0.688221958328835
+"GPT-5-nano","Prompt with date restriction","Senate",0.438,0.87248322147651,0.58953636750319
+"GPT-5-nano","Prompt with date restriction","House",0.3411,0.884667571234735,0.702148332073842

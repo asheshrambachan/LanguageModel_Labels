@@ -1,0 +1,9 @@
+PromptingStrategyID,PromptingStrategyName,AddIntrDate,TrimText,TrimProp,MaxTokens,ResponseFormat,Model,Temperature,TemplatePath
+1,Predict Bill Passage,FALSE,FALSE,,,JSON,gpt-5-mini,1,prompt_templates/01.json
+2,Predict Bill Passage,TRUE,FALSE,,,JSON,gpt-5-mini,1,prompt_templates/02.json
+3,Complete Bill Summary,FALSE,TRUE,0.5,,JSON,gpt-5-mini,1,prompt_templates/03.json
+4,Complete Bill Summary,TRUE,TRUE,0.5,,JSON,gpt-5-mini,1,prompt_templates/04.json
+1,Predict Bill Passage,FALSE,FALSE,,,JSON,gpt-5-nano,1,prompt_templates/01.json
+2,Predict Bill Passage,TRUE,FALSE,,,JSON,gpt-5-nano,1,prompt_templates/02.json
+3,Complete Bill Summary,FALSE,TRUE,0.5,,JSON,gpt-5-nano,1,prompt_templates/03.json
+4,Complete Bill Summary,TRUE,TRUE,0.5,,JSON,gpt-5-nano,1,prompt_templates/04.json
