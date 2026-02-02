@@ -9,11 +9,17 @@ DATA_DIR = os.path.join(REPO_DIR, "prediction_legislation/data")
 TEMP_DIR = os.path.join(REPO_DIR, "prediction_legislation/temp/embeddings")
 os.makedirs(TEMP_DIR, exist_ok=True)
 
-def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embedding_model="text-embedding-3-small"):
-    df = df[[id_col_name, text_col_name]].drop_duplicates()
+PER_BATCH_LIMIT = 50e3 # up to 50,000 requests per batch
 
+def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embedding_model="text-embedding-3-small"):
+    df = (
+        df[[id_col_name, text_col_name]]
+        .drop_duplicates(ignore_index=True)
+    )
+    batches = []
     requests = []
-    for _, row in df.iterrows():
+    part = 0
+    for i, row in df.iterrows():
         request = {
             "custom_id": str(row[id_col_name]),
             "method": "POST",
@@ -25,22 +31,26 @@ def create_embed_requests_generic(df, text_col_name, id_col_name, out_dir, embed
         }
         requests.append(request)
 
-    col_path = os.path.join(out_dir, f"requests_{text_col_name}.jsonl")
-    with open(col_path, "w") as f:
-        for request in requests:
-            f.write(json.dumps(request) + "\n")
-        print(f"Saved {os.path.basename(col_path)}, n = {len(requests)}, at {os.path.dirname(col_path)}")
+        if (len(requests)==PER_BATCH_LIMIT) | (i == len(df)-1):
+            part = part + 1
+            col_path = os.path.join(out_dir, f"requests_{text_col_name}_part{part}.jsonl")
+            with open(col_path, "w") as f:
+                for request in requests:
+                    f.write(json.dumps(request) + "\n")
+                print(f"Saved {os.path.basename(col_path)}, n = {len(requests)}, at {os.path.dirname(col_path)}")
 
-    return({
-        'file': col_path,
-        'col_name': text_col_name
-    })
+            requests = []
+            batches.append({
+                'file': col_path,
+                'col_name': text_col_name
+            })
+
+    return(pd.json_normalize(batches))
 
 def create_embed_requests(df, out_dir, embedding_model="text-embedding-3-small"):
-    batches = []
-    batches.append(create_embed_requests_generic(df, "DescriptionClean", "BillID", out_dir, embedding_model))
-    batches.append(create_embed_requests_generic(df, "DescriptionLLMClean", "ID", out_dir, embedding_model))
-    return(pd.json_normalize(batches))
+    batches_true = create_embed_requests_generic(df, "DescriptionClean", "BillID", out_dir, embedding_model)
+    batches_llm = create_embed_requests_generic(df, "DescriptionLLMClean", "ID", out_dir, embedding_model)
+    return(pd.concat([batches_true, batches_llm]))
 
 def count_tokens(text, model="text-embedding-3-small"):
     encoding = tiktoken.encoding_for_model(model)
@@ -67,7 +77,7 @@ def estimate_cost(descriptions, model="text-embedding-3-small", batched=True):
 def main():
     requests_dir = os.path.join(TEMP_DIR, "requests")
     os.makedirs(requests_dir, exist_ok=True)
-
+    
     bills_completion = pd.read_csv(os.path.join(DATA_DIR, "bills_completion.csv"))
 
     # Estimate cost using Batch API

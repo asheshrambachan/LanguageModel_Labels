@@ -1,5 +1,3 @@
-# Dec 17, 2024
-
 # Removing all objects
 rm(list = ls())
 
@@ -27,7 +25,9 @@ prompt_labels_levels <- c(
 )
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5", 
-  "gpt-4o-2024-05-13"="GPT-4o"
+  "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-mini",
+  "gpt-5-nano"="GPT-5-nano"
 )
 
 # Load and format data
@@ -97,3 +97,4 @@ prediction_accuracy <- read.csv(data_path) %>%
 
 write.csv(prediction_accuracy, prediction_accuracy_path, row.names=FALSE)
 cat(sprintf("Saved %s\n", prediction_accuracy_path))
+

@@ -60,7 +60,7 @@ def create_prompts(prompting_strategies, bills):
 
             # print(bill_messages[-1]["content"])
 
-    return(prompts)
+    return(pd.json_normalize(prompts))
 
 def count_tokens(messages, model):
     encoding = tiktoken.encoding_for_model(model)
@@ -171,17 +171,10 @@ def main():
     os.makedirs(batched_prompts_dir, exist_ok=True)
 
     bills = pd.read_csv(os.path.join(DATA_DIR, "bills.csv")) 
-    prompting_strategies = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates.csv"))
+    prompting_strategies = pd.read_csv(os.path.join(DATA_DIR, "prompt_templates_p2.csv"))
     prompting_strategies["TemplatePath"] = prompting_strategies["TemplatePath"].apply(lambda x: os.path.join(DATA_DIR, x))
     
-    # Create `prompts.jsonl`
-    prompts_json = create_prompts(prompting_strategies, bills)
-    prompts_json_path = os.path.join(TEMP_DIR, "prompts.jsonl")
-    with open(prompts_json_path, "w") as f:
-        for prompt in prompts_json:
-            f.write(json.dumps(prompt) + "\n")
-    print(f"Saved {os.path.basename(prompts_json_path)}, n = {len(prompts_json)}, at {os.path.dirname(prompts_json_path)}")
-    prompts = pd.json_normalize(prompts_json)
+    prompts = create_prompts(prompting_strategies, bills)
     
     # Create `prompts_batched_*.jsonl`
     batches = create_batched_prompts(prompts, batched_prompts_dir)
@@ -190,8 +183,8 @@ def main():
     print(f"Created batched prompts with batch details stored at {os.path.basename(batches_path)}, n = {len(batches)}, at {os.path.dirname(batches_path)}")
 
     # Estimate cost using Batch API
-    cost = estimate_cost(prompts, batched=True)
-    print(f"Estimated cost using Batch API is ${cost:.2f}")
+    # cost = estimate_cost(prompts, batched=True)
+    # print(f"Estimated cost using Batch API is ${cost:.2f}")
 
 if __name__ == "__main__":
     main()
