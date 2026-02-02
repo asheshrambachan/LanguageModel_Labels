@@ -101,7 +101,7 @@ def main():
     'ID', 'BillID', 'PromptingStrategyID', 'PromptingStrategyName',
     'ResponseFormat', 'TrimText', 'AddIntrDate', 'Model', 'Temperature',
     'MaxTokens', 'Year', 'Major', 'MajorText', 'Party', 'Chamber', 'DW1', 'PassH', 'PassS', 'Postal', 'IntrDate',
-    'DescriptionTrim', 'Description', 'DescriptionLLM', 'DescriptionClean', 'DescriptionLLMClean',
+    'DescriptionClean', 'DescriptionLLMClean',
     'CosineSimilarity', 'EuclideanDistance', 'TextSimilarity']]
     bills_completion.to_csv(bills_completion_path, index=False)
     print(f"Saved {os.path.basename(bills_completion_path)}, n = {len(bills_completion)}, at {os.path.dirname(bills_completion_path)}")
