@@ -26,7 +26,6 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 
 # setwd("~/Documents/LanguageModel_Labels/estimation_legislation/")
 repo_dir <- "."
-data_path <- file.path(repo_dir, "estimation_legislation/data/bills_llm.csv")
 rhs_rds_dir <- file.path(repo_dir, "estimation_legislation/temp/RHS")
 
 # Install our simUtils package
@@ -253,8 +252,16 @@ log_info("N = {N}, B = {B}")
 log_info("type_boot = {type_boot}")
 
 # Load and reformat data. 
-data <- read.csv(data_path) %>% 
-  rename(Prompt=PromptingStrategyID) %>%
+# Find all files starting with "bills_llm_p"
+files <- list.files(
+  path = data_dir,
+  pattern = "^bills_llm_p.*\\.csv$",
+  full.names = TRUE
+)
+data <- files %>%
+  lapply(read.csv) %>%
+  bind_rows() %>%
+  rename(Prompt = PromptingStrategyID) %>%
   mutate(
     Senate = as.integer(Chamber == "Senate"), 
     Democrat = as.integer(Party == "Democrat"),

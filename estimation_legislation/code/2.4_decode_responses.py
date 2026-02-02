@@ -418,9 +418,24 @@ def main():
 
 	# Merge prompts and bills metadata with llm responses
 	bills_llm = responses.merge(bills, on="BillID", validate="m:1")
-	bills_llm_path = os.path.join(DATA_DIR, f"bills_llm.csv")
-	bills_llm.to_csv(bills_llm_path, index=False)
-	print(f"Saved {os.path.basename(bills_llm_path)}, n = {len(bills_llm)}, at {os.path.dirname(bills_llm_path)}")
+	# bills_llm_path = os.path.join(DATA_DIR, f"bills_llm.csv")
+	# bills_llm.to_csv(bills_llm_path, index=False)
+	
+	bills_llm_path = os.path.join(DATA_DIR, f"bills_llm_p1.csv")
+	(
+		bills_llm
+		.query('~Model.isin(["gpt-5-nano", "gpt-5-mini"])')
+		.to_csv(bills_llm_path, index=False)
+	)
+	print(f"Saved {bills_llm_path}")
+
+	bills_llm_path = os.path.join(DATA_DIR, f"bills_llm_p2.csv")
+	(
+		bills_llm
+		.query('Model.isin(["gpt-5-nano", "gpt-5-mini"])')
+		.to_csv(bills_llm_path, index=False)
+	)
+	print(f"Saved {bills_llm_path}")
 
 if __name__ == "__main__":
 	main()
