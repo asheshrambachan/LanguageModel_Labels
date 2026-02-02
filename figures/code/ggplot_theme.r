@@ -1,13 +1,13 @@
-font_family <- "Helvetica"
-if ("extrafont" %in% rownames(installed.packages())){
-  # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
-  # 2. install ttf files via GUI on mac
-  extrafont::font_import(paths="~/Library/Fonts/", pattern="cmuns*.ttf", prompt=FALSE)
-  extrafont::loadfonts(quiet=T)
-  if ("CMU Sans Serif" %in% names(pdfFonts()))
-    font_family <- "CMU Sans Serif"
-}
-# font_family <- "CMU Sans Serif"
+font_family <- "Times"
+# if ("extrafont" %in% rownames(installed.packages())){
+#   # 1. download ttf file from https://www.fontsquirrel.com/fonts/computer-modern
+#   # 2. install ttf files via GUI on mac
+#   extrafont::font_import(paths="~/Library/Fonts/", pattern="cmuns*.ttf", prompt=FALSE)
+#   extrafont::loadfonts(quiet=T)
+#   if ("CMU Sans Serif" %in% names(pdfFonts()))
+#     font_family <- "CMU Sans Serif"
+# }
+# # font_family <- "CMU Sans Serif"
 
 my_palette <- c(
   "red"="#F85427", 
@@ -22,7 +22,9 @@ my_palette <- c(
 my_colors <- c(
   "GPT-3.5-Turbo" =  my_palette[["green"]],
   "GPT-4o" = my_palette[["blue"]],
-  "GPT-4o-mini" =  my_palette[["red"]],
+  "GPT-4o-Mini" =  my_palette[["red"]],
+  "GPT-5-Mini" =  my_palette[["gray"]],
+  "GPT-5-Nano" = my_palette[["yellow"]],
   "Plug-In" = my_palette[["green"]], 
   "Validation" = my_palette[["red"]],
   "Debiased" = my_palette[["gray"]]
@@ -31,7 +33,9 @@ my_colors <- c(
 my_shapes <- c(
   "GPT-3.5-Turbo" = 16, 
   "GPT-4o" = 17,
-  "GPT-4o-mini" = 15,
+  "GPT-4o-Mini" = 15,
+  "GPT-5-Mini" = 4,
+  "GPT-5-Nano" = 18,
   "Validation" = NA
 )
 

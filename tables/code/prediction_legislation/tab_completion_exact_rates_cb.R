@@ -24,7 +24,11 @@ data <- read.csv(data_path) %>%
       "GPT-3.5 Base prompt",
       "GPT-3.5 Prompt with date restriction",
       "GPT-4o Base prompt",
-      "GPT-4o Prompt with date restriction"
+      "GPT-4o Prompt with date restriction",
+      "GPT-5-mini Base prompt",
+      "GPT-5-mini Prompt with date restriction",
+      "GPT-5-nano Base prompt",
+      "GPT-5-nano Prompt with date restriction"
     )
   ), .before=1) %>%
   arrange(Model) %>%
@@ -33,7 +37,9 @@ data <- read.csv(data_path) %>%
 # Generate latex tables
 tab <- data %>% 
   kable(digits=3, linesep = "", escape=F, booktabs=T, format = "latex") %>%
-  row_spec(2, hline_after = TRUE, extra_latex_after = "%") 
+  row_spec(2, hline_after = TRUE, extra_latex_after = "%") %>%
+  row_spec(4, hline_after = TRUE, extra_latex_after = "%") %>%
+  row_spec(6, hline_after = TRUE, extra_latex_after = "%") 
 
 # Save tables
 save_kable(tab, file = tab_path)

@@ -12,8 +12,9 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 # Data and figure paths
 data_path <- file.path(repo_dir, "estimation_legislation/data/lhs_5k_plugin_validation_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_mse_cb_lhs_prop05.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_mse_cb_lhs_prop05.pdf")
 fig_width <- 9
-fig_height <- 4
+fig_height <- 7
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
@@ -25,7 +26,9 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 regression_levels <- c("Plug-In", "Validation", "Debiased")
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
-  "gpt-4o-2024-05-13"="GPT-4o"
+  "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-Mini",
+  "gpt-5-nano"="GPT-5-Nano"
 )
 proportion_labels_levels <- c(
   `0.025`="2.5% Validation Prop.", 
@@ -51,7 +54,7 @@ data <- read.csv(data_path) %>%
 fig <- data %>%
   ggplot(aes(x=mse_mean, color=regression, linetype=regression)) +
   stat_ecdf(linewidth=0.5) +
-  facet_grid(. ~ model)
+  facet_wrap(. ~ model, ncol=2)
   
 # Add theme and aesthetics
 fig <- fig + 
@@ -69,5 +72,7 @@ fig <- fig +
   theme(panel.spacing = unit(0.5, "cm", data = NULL))
 
 # save figure
-ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
+ggsave(fig_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
+cat(sprintf("Saved %s\n", fig_pdf_path))

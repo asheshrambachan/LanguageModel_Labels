@@ -33,6 +33,8 @@ V_levels <- c(
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
   "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-mini",
+  "gpt-5-nano"="GPT-5-nano",
   "Validation"="Validation"
 )
 
@@ -61,7 +63,7 @@ validation_data <- read.csv(validation_data_path) %>%
 fig <- plugin_data %>%
   ggplot(aes(x=prompt.sorted, color=model, shape=model)) +
   geom_errorbar(aes(ymin=lci, ymax=uci), width=0.5, linewidth=0.3) +
-  geom_point(aes(y=coef), size=1.25) +
+  geom_point(aes(y=coef), size=0.5) +
   facet_grid(W ~ V, labeller=label_wrap_gen(width=20)) +
   geom_hline(
     data=validation_data,

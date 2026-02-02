@@ -1,5 +1,3 @@
-# Dec 13, 2024
-
 # Removing all objects
 rm(list = ls())
 
@@ -28,19 +26,18 @@ data <- read.csv(data_path) %>%
 
 # Plot figure
 fig <- data %>%
-  ggplot(aes(x=as.factor(Chamber), y=Accuracy, fill=Model)) +
-  geom_col(width=0.5) +
+  ggplot(aes(x=as.factor(Chamber), y=Accuracy)) +
+  geom_col(width=0.5, fill=my_palette["blue"]) +
   facet_grid(. ~ Prompt)
 
 # Add theme and aesthetics
 fig <- fig + 
-  # geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2, alpha=0.7) +
   labs(
     x = "Predicted Outcome",
-    y = "Prediction Accuracy"
+    y = "Prediction Accuracy",
+    fill = NULL
   ) +
   scale_y_continuous(minor_breaks=seq(0, 1, by=0.05), limits=c(0,1)) +
-  scale_fill_manual(name="", values=my_colors) +
   theme.bar +
   guides(fill="none", color="none") +
   theme(panel.spacing = unit(0.5, "cm", data = NULL))

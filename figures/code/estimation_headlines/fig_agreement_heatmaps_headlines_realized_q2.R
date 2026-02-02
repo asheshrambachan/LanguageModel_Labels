@@ -14,11 +14,13 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 data_paths <- list(
   "GPT-3.5-Turbo" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q2"),
   "GPT-4o" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o/q2"),
-  "GPT-4o-mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q2")
+  "GPT-4o-mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q2"),
+  "GPT-5-mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-5-mini/q2"),
+  "GPT-5-nano" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-5-nano/q2")
 )
 fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q2.jpeg")
 fig_width <- 9
-fig_height <- 4.75
+fig_height <- 7
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
@@ -93,10 +95,21 @@ for (model in names(data_paths)) {
 agreement_matrices <- bind_rows(agreement_matrices)
 
 # Plot figure
+# print(unique(agreement_matrices$model))
+agreement_matrices$model_new <- factor(
+  agreement_matrices$model, levels=c(
+  "GPT-3.5-Turbo", 
+  "GPT-4o", 
+  "  ", 
+  "GPT-4o-mini", 
+  "GPT-5-mini", 
+  "GPT-5-nano"
+  ))
+
 fig <- agreement_matrices %>%
   ggplot(aes(x=prompt_x, y=prompt_y, fill=agreement)) +
   geom_tile() +
-  facet_grid(~ model) 
+  facet_wrap(~ model_new, nrow=2, drop=FALSE) 
 
 # Add theme and aesthetics
 fig <- fig +
@@ -118,6 +131,7 @@ fig <- fig +
   scale_color_identity() +
   theme.heatmap +
   guides(fill = guide_colourbar(title.vjust = .8)) 
+
 # Save figure
 ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
 cat(sprintf("Saved %s\n", fig_path))

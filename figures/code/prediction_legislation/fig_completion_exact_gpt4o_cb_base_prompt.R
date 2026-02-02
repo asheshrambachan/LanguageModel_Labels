@@ -1,4 +1,4 @@
-# Figure: Two examples of GPT-4o completions that exactly match original descriptions of congressional legislation.
+# Figure: Two examples of completions that exactly match original descriptions of congressional legislation.
 # Dec 10, 2024
 
 # Removing all objects
@@ -28,7 +28,7 @@ data <- read.csv(data_path) %>%
     "GPT-4o" = DescriptionLLMClean
   )
 
-data_sample <- data[1:2, ] 
+data_sample <- data %>% slice(1:2)
 
 # Function to create the figure for one row
 create_latex_row <- function(original, gpt) {

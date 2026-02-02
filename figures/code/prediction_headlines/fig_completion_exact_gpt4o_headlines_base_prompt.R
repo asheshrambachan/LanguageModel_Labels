@@ -29,7 +29,7 @@ data <- read.csv(data_path) %>%
     "GPT-4o" = headline_llm_clean
   )
 
-data_sample <- data[1:2, ] 
+data_sample <- data %>% slice(1:2)
 
 # Function to create the figure for one row
 create_latex_row <- function(original, gpt) {

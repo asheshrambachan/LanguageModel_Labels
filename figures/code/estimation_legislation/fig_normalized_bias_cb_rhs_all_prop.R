@@ -12,8 +12,9 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 # Data and figure paths
 data_path <- file.path(repo_dir, "estimation_legislation/data/rhs_5k_plugin_validation_debiased_averaged.csv")
 fig_path <- file.path(fig_dir, "fig_normalized_bias_cb_rhs_all_prop.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_normalized_bias_cb_rhs_all_prop.pdf")
 fig_width <- 9
-fig_height <- 4
+fig_height <- 7
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
@@ -25,7 +26,9 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 regression_levels <- c("Plug-In", "Validation", "Debiased")
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
-  "gpt-4o-2024-05-13"="GPT-4o"
+  "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-Mini",
+  "gpt-5-nano"="GPT-5-Nano"
 )
 proportion_labels_levels <- c(
   `0.025`="2.5% Validation Prop.", 
@@ -72,5 +75,7 @@ fig <- fig +
   theme.bar
 
 # save figure
-ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
+ggsave(fig_path, plot = fig, height = fig_height, width = fig_width, dpi = 300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, plot = fig, height = fig_height, width = fig_width, dpi = 300)
+cat(sprintf("Saved %s\n", fig_pdf_path))

@@ -13,8 +13,9 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 # Data and figure paths
 data_path <- file.path(repo_dir, "estimation_legislation/data/bills_llm.csv")
 fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_cb.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_agreement_heatmaps_cb.pdf")
 fig_width <- 8.5
-fig_height <- 5.25
+fig_height <- 8.5
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
@@ -24,7 +25,9 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 # Factor labels and levels
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
-  "gpt-4o-2024-05-13"="GPT-4o"
+  "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-Mini",
+  "gpt-5-nano"="GPT-5-Nano"
 )
 prompt_labels_values <- c(
   `1`="Base: Fill in Blank", 
@@ -81,13 +84,14 @@ agreement_matrices <- bind_rows(agreement_matrices)
 # Store global min and max
 # heatmap_global_min <- min(agreement_matrices$agreement, na.rm = TRUE)
 # heatmap_global_max <- max(agreement_matrices$agreement, na.rm = TRUE)
-
+# print(heatmap_global_min)
+# print(heatmap_global_max)
 
 # Plot figure
 fig <- agreement_matrices %>%
   ggplot(aes(x=prompt_x, y=prompt_y, fill=agreement)) +
   geom_tile() +
-  facet_grid(~ model) 
+  facet_wrap(~ model, ncol = 2) 
 
 # Add theme and aesthetics
 fig <- fig +
@@ -104,7 +108,8 @@ fig <- fig +
   # Add agreement percentage with appropriate font color for clarity.
   geom_text(aes(
     label = sprintf("%.1f", agreement), 
-    color = ifelse(agreement >= 80, "white", "black")
+    color = ifelse(agreement >= 80, "white", "black"),
+    # family = font_family
   ), size = 2.7, show.legend = FALSE) + 
   scale_color_identity() +
   theme.heatmap +
@@ -113,5 +118,7 @@ fig <- fig +
 
 
 # Save figure
-ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
+ggsave(fig_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
+cat(sprintf("Saved %s\n", fig_pdf_path))

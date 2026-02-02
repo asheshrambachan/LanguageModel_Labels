@@ -14,15 +14,20 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 data_paths <- list(
   "GPT-3.5-Turbo" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-3.5-turbo/q1"),
   "GPT-4o" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o/q1"),
-  "GPT-4o-mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q1")
+  "GPT-4o-Mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-4o-mini/q1"),
+  "GPT-5-Mini" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-5-mini/q1"),
+  "GPT-5-Nano" = file.path(repo_dir, "estimation_headlines/data/step6_common_sample/within_model/realized/gpt-5-nano/q1")
 )
 fig_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q1.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_agreement_heatmaps_headlines_realized_q1.pdf")
 fig_width <- 9
-fig_height <- 4.75
+fig_height <- 7
 
 # Load packages and ggplot themes
 require(dplyr, warn.conflicts = FALSE)
 require(ggplot2, warn.conflicts = FALSE)
+require(gtable)
+require(ggplotify)
 source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 
 # Factor labels and levels
@@ -78,7 +83,6 @@ create_agreement_matrix <- function(datasets) {
   return(agreement_matrix)
 }
 
-
 # Iterate over combinations and store data
 agreement_matrices <- list()
 for (model in names(data_paths)) {
@@ -92,11 +96,23 @@ for (model in names(data_paths)) {
 }
 agreement_matrices <- bind_rows(agreement_matrices)
 
+# 
+# agreement_matrices$model <- factor(
+#   agreement_matrices$model, levels=c(
+#     "GPT-3.5-Turbo", 
+#     "GPT-4o", 
+#     "  ", 
+#     "GPT-4o-Mini", 
+#     "GPT-5-Mini", 
+#     "GPT-5-Nano"
+#   ))
+
+
 # Plot figure
 fig <- agreement_matrices %>%
   ggplot(aes(x=prompt_x, y=prompt_y, fill=agreement)) +
   geom_tile() +
-  facet_grid(~ model) 
+  facet_wrap(~ model, nrow = 2, drop=F) 
 
 # Add theme and aesthetics
 fig <- fig +
@@ -113,12 +129,26 @@ fig <- fig +
   # Add agreement percentage with appropriate font color for clarity.
   geom_text(aes(
     label = sprintf("%.1f", agreement), 
-    color = ifelse(agreement >= 80, "white", "black")
+    color = ifelse(agreement >= 80, "white", "black"),
+    # family = font_family
   ), size = 2.7, show.legend = FALSE) + 
   scale_color_identity() +
   theme.heatmap +
   guides(fill = guide_colourbar(title.vjust = .8)) 
 
+gtable_filter_remove <- function (x, name, trim = TRUE){
+  matches <- !(x$layout$name %in% name)
+  x$layout <- x$layout[matches, , drop = FALSE]
+  x$grobs <- x$grobs[matches]
+  if (trim) 
+    x <- gtable_trim(x)
+  x
+}
+
+fig <- as.ggplot(gtable_filter_remove(ggplotGrob(fig), name = "axis-b-3-1", trim = FALSE))
+
 # Save figure
-ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
+ggsave(fig_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
+cat(sprintf("Saved %s\n", fig_pdf_path))

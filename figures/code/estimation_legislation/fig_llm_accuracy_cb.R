@@ -12,6 +12,7 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 # Data and figure paths
 data_path <- file.path(repo_dir, "estimation_legislation/data/bills_llm.csv")
 fig_path <- file.path(fig_dir, "fig_llm_accuracy_cb.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_llm_accuracy_cb.pdf")
 fig_width <- 9
 fig_height <- 4.5
 
@@ -23,8 +24,11 @@ source(file.path(repo_dir, "figures/code/ggplot_theme.r"))
 # Factor labels and levels
 model_labels_levels <- c(
   "gpt-3.5-turbo-0125"="GPT-3.5-Turbo", 
-  "gpt-4o-2024-05-13"="GPT-4o"
+  "gpt-4o-2024-05-13"="GPT-4o",
+  "gpt-5-mini"="GPT-5-Mini",
+  "gpt-5-nano"="GPT-5-Nano"
 )
+
 prompt_labels_values <- c(
   `1`="Base: Fill in Blank", 
   `2`="Base: JSON",
@@ -72,5 +76,7 @@ fig <- fig +
   # theme(axis.text=element_text(size=8.5))
 
 # Save figure
-ggsave(fig_path, height = fig_height, width = fig_width)
+ggsave(fig_path, height = fig_height, width = fig_width, dpi=300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, height = fig_height, width = fig_width, dpi=300)
+cat(sprintf("Saved %s\n", fig_pdf_path))

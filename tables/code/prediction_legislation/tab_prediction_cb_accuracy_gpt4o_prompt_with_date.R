@@ -1,5 +1,5 @@
-# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR) of GPT-4o’s predictions on Congressional legislation, with date.
-# Dec 10, 2024
+# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR) 
+# predictions on Congressional legislation, with date.
 
 # Removing all objects
 rm(list = ls())

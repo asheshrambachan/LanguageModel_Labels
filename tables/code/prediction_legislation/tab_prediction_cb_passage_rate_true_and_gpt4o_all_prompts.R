@@ -20,7 +20,7 @@ require(kableExtra, warn.conflicts = FALSE)
 data <- read.csv(data_path) %>%
   rename("Passage Rate"=Passage.Rate) %>%
   filter(
-    Model != "GPT-3.5"
+    Model %in% c("True", "GPT-4o")
   ) %>%
   mutate(Model = factor(
     if_else(Prompt!="", sprintf("%s %s", Model, Prompt), Model),

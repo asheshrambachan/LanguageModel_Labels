@@ -1,5 +1,5 @@
-# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR) of GPT-4o’s predictions on Congressional legislation, without date.
-# Dec 10, 2024
+# Table: Accuracy, true positive rate (TPR), and false positive rate (FPR)
+# predictions on Congressional legislation, without date.
 
 # Removing all objects
 rm(list = ls())
@@ -20,7 +20,7 @@ require(kableExtra, warn.conflicts = FALSE)
 # Load and format data
 data <- read.csv(data_path) %>%
   filter(
-    Model != "GPT-3.5"
+    Model == "GPT-4o"
   ) %>%
   mutate(Model = factor(
     if_else(Prompt!="", sprintf("%s %s", Model, Prompt), Model),

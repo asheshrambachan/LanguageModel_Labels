@@ -43,7 +43,7 @@ fig <- fig +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2, alpha=0.7) + # x-axis
   labs(
     x = "Prompt-Model Index (Sorted)",
-    y = "t-scores",
+    y = "t-statistics",
     color = NULL,
     shape = NULL
   ) +

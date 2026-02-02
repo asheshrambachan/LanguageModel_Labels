@@ -12,6 +12,7 @@ dir.create(fig_dir, showWarnings=FALSE, recursive = TRUE)
 # Data and figure paths
 data_path <- file.path(repo_dir, "estimation_headlines/data/step9_reg_results/merged_data.csv")
 fig_path <- file.path(fig_dir, "fig_tscores_headlines_realized_q1_magnitude_all_days.jpeg")
+fig_pdf_path <- file.path(fig_dir, "fig_tscores_headlines_realized_q1_magnitude_all_days.pdf")
 fig_width <- 7
 fig_height <- 5.75
 
@@ -43,7 +44,7 @@ fig <- fig +
   geom_hline(yintercept=0, color=my_palette[["black"]], linewidth=0.2, alpha=0.7) + # x-axis
   labs(
     x = "Prompt-Model Index (Sorted)",
-    y = "t-scores",
+    y = "t-statistics",
     color = NULL,
     shape = NULL
   ) +
@@ -53,5 +54,7 @@ fig <- fig +
   guides(color = guide_legend(override.aes = list(size=2)))
 
 # Save figure
-ggsave(fig_path, plot = fig, height = fig_height, width = fig_width)
+ggsave(fig_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
 cat(sprintf("Saved %s\n", fig_path))
+ggsave(fig_pdf_path, plot = fig, height = fig_height, width = fig_width, dpi=300)
+cat(sprintf("Saved %s\n", fig_pdf_path))
