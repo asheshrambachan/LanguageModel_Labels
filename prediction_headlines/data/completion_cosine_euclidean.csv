@@ -1,13 +1,21 @@
 "Metric","Model","Prompt","Average","Benchmark"
-"Cosine similarity","GPT-3.5","Base prompt",0.858806260561015,0.308661563505687
-"Cosine similarity","GPT-3.5","Prompt with date restriction",0.86040132663438,0.308661563505687
-"Cosine similarity","GPT-4o","Base prompt",0.879524702846241,0.308661563505687
-"Cosine similarity","GPT-4o","Prompt with date restriction",0.880002831129644,0.308661563505687
-"Cosine similarity","GPT-4o-mini","Base prompt",0.845712764999361,0.308661563505687
-"Cosine similarity","GPT-4o-mini","Prompt with date restriction",0.844904870042052,0.308661563505687
-"Euclidean distance","GPT-3.5","Base prompt",0.495255352443974,1.17172209500032
-"Euclidean distance","GPT-3.5","Prompt with date restriction",0.491693708261309,1.17172209500032
-"Euclidean distance","GPT-4o","Base prompt",0.455283454404745,1.17172209500032
-"Euclidean distance","GPT-4o","Prompt with date restriction",0.454526029179415,1.17172209500032
-"Euclidean distance","GPT-4o-mini","Base prompt",0.53187634590276,1.17172209500032
-"Euclidean distance","GPT-4o-mini","Prompt with date restriction",0.533428551482841,1.17172209500032
+"Cosine similarity","GPT-3.5","Base prompt",0.858799604050026,0.308653629524913
+"Cosine similarity","GPT-3.5","Prompt with date restriction",0.860394978459457,0.308653629524913
+"Cosine similarity","GPT-4o","Base prompt",0.879522425231184,0.308653629524913
+"Cosine similarity","GPT-4o","Prompt with date restriction",0.879993942104056,0.308653629524913
+"Cosine similarity","GPT-4o-mini","Base prompt",0.845705288831924,0.308653629524913
+"Cosine similarity","GPT-4o-mini","Prompt with date restriction",0.84489682020959,0.308653629524913
+"Cosine similarity","GPT-5-mini","Base prompt",0.851686374699879,0.308653629524913
+"Cosine similarity","GPT-5-mini","Prompt with date restriction",0.849184824574135,0.308653629524913
+"Cosine similarity","GPT-5-nano","Base prompt",0.849921184879026,0.308653629524913
+"Cosine similarity","GPT-5-nano","Prompt with date restriction",0.849375309723468,0.308653629524913
+"Euclidean distance","GPT-3.5","Base prompt",0.495286744644159,1.17172951981368
+"Euclidean distance","GPT-3.5","Prompt with date restriction",0.491724469039901,1.17172951981368
+"Euclidean distance","GPT-4o","Base prompt",0.455313264270876,1.17172951981368
+"Euclidean distance","GPT-4o","Prompt with date restriction",0.45456806759561,1.17172951981368
+"Euclidean distance","GPT-4o-mini","Base prompt",0.531898292389942,1.17172951981368
+"Euclidean distance","GPT-4o-mini","Prompt with date restriction",0.533446256353832,1.17172951981368
+"Euclidean distance","GPT-5-mini","Base prompt",0.522057829180749,1.17172951981368
+"Euclidean distance","GPT-5-mini","Prompt with date restriction",0.526785341975461,1.17172951981368
+"Euclidean distance","GPT-5-nano","Base prompt",0.524684564761498,1.17172951981368
+"Euclidean distance","GPT-5-nano","Prompt with date restriction",0.525450173203193,1.17172951981368

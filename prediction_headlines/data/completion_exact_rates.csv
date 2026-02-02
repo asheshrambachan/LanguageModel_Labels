@@ -5,3 +5,7 @@
 "GPT-4o","Prompt with date restriction",0.00730000000000004,73
 "GPT-4o-mini","Base prompt",0.000599999999999987,6
 "GPT-4o-mini","Prompt with date restriction",0.000700000000000011,7
+"GPT-5-mini","Base prompt",0.00109999999999994,11
+"GPT-5-mini","Prompt with date restriction",0.000800000000000028,8
+"GPT-5-nano","Base prompt",0.0030012004801921,30
+"GPT-5-nano","Prompt with date restriction",0.00319999999999994,32

@@ -1,0 +1,5 @@
+model,prompt_template_id,add_date,trim_prop,max_tokens,response_format,temperature,template_path
+gpt-5-mini,1,FALSE,0.5,,JSON,1,prompt_templates/01.json
+gpt-5-mini,2,TRUE,0.5,,JSON,1,prompt_templates/02.json
+gpt-5-nano,1,FALSE,0.5,,JSON,1,prompt_templates/01.json
+gpt-5-nano,2,TRUE,0.5,,JSON,1,prompt_templates/02.json
