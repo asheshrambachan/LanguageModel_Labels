@@ -1,0 +1,25 @@
+PromptingStrategyID,PromptingStrategyName,TextBefore,TextAfter,AddExamples,ExampleSetNum,ResponseFormat,AddExplanation,Model,Temperature,TemplatePath
+1,Base Prompt,,,FALSE,,Fill-in-the-Blanks,FALSE,gpt-5-mini,1,prompt_templates/01.json
+2,Base Prompt,,,FALSE,,JSON,FALSE,gpt-5-mini,1,prompt_templates/02.json
+3,Persona,You are a knowledgeable political analyst. ,,FALSE,,JSON,FALSE,gpt-5-mini,1,prompt_templates/03.json
+4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,,FALSE,,JSON,FALSE,gpt-5-mini,1,prompt_templates/04.json
+5,Persona,Answer this question as if you are an expert in United States politics. ,,FALSE,,JSON,FALSE,gpt-5-mini,1,prompt_templates/05.json
+6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,,FALSE,,JSON,FALSE,gpt-5-mini,1,prompt_templates/06.json
+7,Chain-of-Thoughts,,Think carefully. ,FALSE,,JSON,TRUE,gpt-5-mini,1,prompt_templates/07.json
+8,Chain-of-Thoughts,,Let's think step by step. Lay out each step. ,FALSE,,JSON,TRUE,gpt-5-mini,1,prompt_templates/08.json
+9,Chain-of-Thoughts,,Please provide an explanation for your answer. ,FALSE,,JSON,TRUE,gpt-5-mini,1,prompt_templates/09.json
+10,Few-Shot,,,TRUE,1,JSON,FALSE,gpt-5-mini,1,prompt_templates/10.json
+11,Few-Shot,,,TRUE,2,JSON,FALSE,gpt-5-mini,1,prompt_templates/11.json
+12,Few-Shot,,,TRUE,3,JSON,FALSE,gpt-5-mini,1,prompt_templates/12.json
+1,Base Prompt,,,FALSE,,Fill-in-the-Blanks,FALSE,gpt-5-nano,1,prompt_templates/01.json
+2,Base Prompt,,,FALSE,,JSON,FALSE,gpt-5-nano,1,prompt_templates/02.json
+3,Persona,You are a knowledgeable political analyst. ,,FALSE,,JSON,FALSE,gpt-5-nano,1,prompt_templates/03.json
+4,Persona,Answer this question as if you are a political scientist that studies legislation in the United States Congress. ,,FALSE,,JSON,FALSE,gpt-5-nano,1,prompt_templates/04.json
+5,Persona,Answer this question as if you are an expert in United States politics. ,,FALSE,,JSON,FALSE,gpt-5-nano,1,prompt_templates/05.json
+6,Persona,Answer this question as if you were a helpful research assistant for a political scientist. ,,FALSE,,JSON,FALSE,gpt-5-nano,1,prompt_templates/06.json
+7,Chain-of-Thoughts,,Think carefully. ,FALSE,,JSON,TRUE,gpt-5-nano,1,prompt_templates/07.json
+8,Chain-of-Thoughts,,Let's think step by step. Lay out each step. ,FALSE,,JSON,TRUE,gpt-5-nano,1,prompt_templates/08.json
+9,Chain-of-Thoughts,,Please provide an explanation for your answer. ,FALSE,,JSON,TRUE,gpt-5-nano,1,prompt_templates/09.json
+10,Few-Shot,,,TRUE,1,JSON,FALSE,gpt-5-nano,1,prompt_templates/10.json
+11,Few-Shot,,,TRUE,2,JSON,FALSE,gpt-5-nano,1,prompt_templates/11.json
+12,Few-Shot,,,TRUE,3,JSON,FALSE,gpt-5-nano,1,prompt_templates/12.json
