@@ -25,6 +25,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 
 # Set directories
 repo_dir <- "."
+data_dir <- file.path(repo_dir, "estimation_legislation/data")
 lhs_rds_dir <- file.path(repo_dir, "estimation_legislation/temp/LHS")
 
 # Install our simUtils package

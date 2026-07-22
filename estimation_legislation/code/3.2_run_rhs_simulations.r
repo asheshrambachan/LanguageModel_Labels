@@ -26,6 +26,7 @@ variable <- c("Senate", "Democrat", "DW1") # Independent variables of interest
 
 # setwd("~/Documents/LanguageModel_Labels/estimation_legislation/")
 repo_dir <- "."
+data_dir <- file.path(repo_dir, "estimation_legislation/data")
 rhs_rds_dir <- file.path(repo_dir, "estimation_legislation/temp/RHS")
 
 # Install our simUtils package
