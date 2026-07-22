@@ -1,5 +1,6 @@
 library(dplyr)
 repo_dir <- "."
+data_dir <- file.path(repo_dir, "estimation_legislation/data")
 rhs_rds_dir <- file.path(repo_dir, "estimation_legislation/temp/RHS")
 
 n_cores <- 19
